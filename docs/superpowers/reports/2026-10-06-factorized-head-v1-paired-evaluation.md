@@ -37,6 +37,8 @@ The mean paired changes in percentage points are CIFAR-100 `(+0.11, -0.07, -0.25
 - ISOLET source: `formal-isolet-local-4090-1-20260924-v4`; authoritative paired output: `factorized-posthoc-isolet-20261006-v3`.
 - UPMC clean image source: `formal-upmc-image-clean-4090-1-20260925-v1`; authoritative paired output: `factorized-posthoc-upmc-clean-20261006-v2`.
 
+A subsequent read-only provenance check under GitHub code commit `4d3a384a56b71d4d51fc357f4cf17cb0985e55d1` (native commits CIFAR-100 `3461dd16dc46170760a90005a5b1d6b7034aff8b`, ISOLET/UPMC `75c61e1bc8af9194f760c2e6e28565f82eea57ce`) verified the on-disk frozen marker, complete publication chain, and report checkpoint/result hashes for all nine source runs. It did not reread test examples or alter the metric records.
+
 Each output root contains exactly three per-seed `comparison.json` records with published source checkpoint/result hashes, test-source hash, evaluator commit, per-task counts, and both readout metrics. Earlier V1/V2 paired output roots are preserved and excluded from this summary. CIFAR V3, ISOLET V3, and UPMC V2 were regenerated under the strengthened evaluator; all nine metric triples exactly match the earlier successful paired calculations. ISOLET V1 stopped at a numeric task-order BWT check before writing a comparison record.
 
 ## Decision
