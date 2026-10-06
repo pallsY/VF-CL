@@ -35,3 +35,13 @@
 - [ ] On the isolated Linux worktree, run the focused and adaptive audit tests; run the entrypoint on CIFAR-100, ISOLET, and UPMC frozen training-validation checkpoints.
 - [ ] Freeze a commit before accessing any new final test outputs. Record the historical checkpoint identities and evaluation protocol separately from old formal runs.
 - [ ] Evaluate AA-final, BWT, and final Task-IL under the frozen three-dataset protocol only when complete compatible per-task evaluation evidence is available. Report any missing evidence rather than substitute validation values.
+
+### Task 3: Paired posthoc test evaluation
+
+**Files:** `factorized_paired_evaluation.py`, `test_factorized_paired_evaluation.py`.
+
+- [ ] Test that a factorized final row reuses the published Adaptive diagonal, while a Mixed row differing from the published per-task result is rejected.
+- [ ] Run the failing test, implement the smallest evaluator, and rerun focused tests.
+- [ ] Require published source checkpoint/result hashes and a separate output directory. Load the frozen checkpoint, iterate each exact test task once, and compute Mixed and Factorized predictions in the same batches. Write source/evaluator/data hashes and results without changing the source run.
+- [ ] Freeze the evaluator commit before test access. Evaluate only complete published Adaptive runs; reject any dataset or seed whose Mixed recomputation disagrees with its published per-task or summary metrics.
+- [ ] Label this as paired posthoc test evidence rather than a new training run. An independent held-out claim still needs an untouched dataset.
