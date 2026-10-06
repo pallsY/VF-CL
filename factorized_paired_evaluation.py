@@ -32,7 +32,11 @@ def _canonical_sha256(value):
 def summarize_paired(measured, history, baseline):
     """Reuse the frozen diagonal only after Mixed reproduces published metrics."""
     final = history[-1]
-    tasks = list(final['deferred_diagonal'])
+    tasks = sorted(final['deferred_diagonal'],
+                   key=lambda task: int(task.rsplit('_', 1)[1]))
+    final_task = final['deferred_final_task']
+    if final_task != tasks[-1]:
+        raise ValueError('paired final task identity mismatch')
     if (set(measured) != set(tasks)
             or set(final['per_task_accs']) != set(tasks)
             or set(final['per_task_accs_taskil']) != set(tasks)):
@@ -58,7 +62,8 @@ def summarize_paired(measured, history, baseline):
         return {
             'AA_final': round(statistics.fmean(class_final), 4),
             'BWT': round(statistics.fmean(
-                class_final[i] - diagonal[i] for i in range(len(tasks) - 1)
+                class_final[i] - diagonal[i]
+                for i, task in enumerate(tasks) if task != final_task
             ), 4),
             'AA_final_taskil': round(statistics.fmean(taskil_final), 4),
         }
