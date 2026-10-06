@@ -13,7 +13,8 @@ from types import SimpleNamespace
 import torch
 
 from adaptive_consolidation_audit import (
-    _fresh_trainer, _load_sealed_complete_artifact, _strict_json,
+    _formal_file_record, _formal_marker, _fresh_trainer,
+    _load_sealed_complete_artifact, _strict_json,
     _strict_load_trainer_state, _validate_formal_published,
 )
 from data_utils import VECTOR_DATASETS, VFLDataset, split_features
@@ -129,6 +130,14 @@ def summarize_paired(measured, history, baseline):
 def _verify_published_transaction(run_dir):
     try:
         complete, seal = _load_sealed_complete_artifact(run_dir)
+        freeze_path = run_dir / 'FORMAL_STATE_FROZEN.json'
+        freeze = _formal_marker(freeze_path, 'frozen', {
+            'schema_version', 'status', 'identity',
+        })
+        if (freeze['identity'] != complete['identity']
+                or _formal_file_record(freeze_path, run_dir)
+                != complete['freeze']):
+            raise ValueError('on-disk frozen marker differs from transaction')
         _validate_formal_published(run_dir, complete['identity'], complete, seal)
     except (FileNotFoundError, KeyError, TypeError, ValueError, RuntimeError) as error:
         raise ValueError('source complete/seal publication is invalid') from error

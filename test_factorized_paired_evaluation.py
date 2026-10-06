@@ -1,6 +1,7 @@
 import hashlib
 import json
 import unittest
+from unittest import mock
 import tempfile
 import subprocess
 from types import SimpleNamespace
@@ -11,6 +12,7 @@ from models import TopModel
 
 from factorized_paired_evaluation import (
     _canonical_sha256, _sha256, _validated_output_classes,
+    _verify_published_transaction,
     _test_source_path, _verified_evaluator_commit,
     evaluate_run, summarize_paired,
 )
@@ -90,6 +92,15 @@ class PairedEvaluationTests(unittest.TestCase):
         args.vector_npz = None
         self.assertEqual(_test_source_path(args),
                          Path('/dataset/cifar-100-python/test'))
+
+    def test_requires_on_disk_frozen_marker_even_with_sealed_copy(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with mock.patch(
+                    'factorized_paired_evaluation._load_sealed_complete_artifact',
+                    return_value=({'identity': {}, 'freeze': {}}, {})), \
+                 mock.patch('factorized_paired_evaluation._validate_formal_published'):
+                with self.assertRaises(ValueError):
+                    _verify_published_transaction(Path(directory))
 
     def test_published_digest_uses_canonical_result_not_file_bytes(self):
         result = {'b': 2, 'a': 1}
