@@ -1,9 +1,20 @@
+import hashlib
+import json
 import unittest
 
-from factorized_paired_evaluation import summarize_paired
+from factorized_paired_evaluation import _canonical_sha256, summarize_paired
 
 
 class PairedEvaluationTests(unittest.TestCase):
+    def test_published_digest_uses_canonical_result_not_file_bytes(self):
+        result = {'b': 2, 'a': 1}
+        file_bytes = json.dumps(result).encode()
+        published_digest = hashlib.sha256(
+            b'{\n  "a": 1,\n  "b": 2\n}\n'
+        ).hexdigest()
+        self.assertNotEqual(hashlib.sha256(file_bytes).hexdigest(), published_digest)
+        self.assertEqual(_canonical_sha256(result), published_digest)
+
     def test_reuses_unchanged_diagonal_and_rejects_mixed_mismatch(self):
         history = [
             {'per_task_accs': {'task_0': 0.9}},

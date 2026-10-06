@@ -10,7 +10,7 @@ from types import SimpleNamespace
 
 import torch
 
-from adaptive_consolidation_audit import _fresh_trainer, _strict_load_trainer_state
+from adaptive_consolidation_audit import _fresh_trainer, _strict_json, _strict_load_trainer_state
 from data_utils import VFLDataset, split_features
 
 
@@ -23,6 +23,10 @@ def _sha256(path):
         for chunk in iter(lambda: source.read(1024 * 1024), b''):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def _canonical_sha256(value):
+    return hashlib.sha256(_strict_json(value).encode('utf-8')).hexdigest()
 
 
 def summarize_paired(measured, history, baseline):
@@ -88,7 +92,7 @@ def evaluate_run(run_dir, output_dir):
     if (published.get('status') != 'published'
             or published.get('checkpoint', {}).get('sha256') != checkpoint_hash
             or published.get('results', {}).get('sha256') != results_hash
-            or published.get('results_sha256') != results_hash):
+            or published.get('results_sha256') != _canonical_sha256(results)):
         raise ValueError('published source artifact identity mismatch')
     checkpoint = torch.load(checkpoint_path, map_location='cpu', weights_only=False)
     if (checkpoint.get('protocol', {}).get('head_consolidation_mode')
