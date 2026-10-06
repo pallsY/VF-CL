@@ -148,6 +148,27 @@ class PartyDriftTelemetryTests(unittest.TestCase):
                                         {0: [1.0]}, lambda batch: [batch])
         self.assertEqual(changed['classes']['0']['party_cosine_drift'], [1.0])
 
+    def test_tiny_nonzero_vectors_are_not_treated_as_zero(self):
+        old = torch.nn.Linear(1, 1, bias=False).double().eval()
+        current = copy.deepcopy(old).eval()
+        replay = {0: torch.ones(1, 1, dtype=torch.float64)}
+        with torch.no_grad():
+            old.weight.zero_()
+            current.weight.fill_(1e-9)
+        one_sided = summarize_party_drift(
+            [old], [current], replay, {0: [1.0]}, lambda batch: [batch],
+        )
+        self.assertAlmostEqual(one_sided['classes']['0']['party_cosine_drift'][0],
+                               1.0, places=6)
+        with torch.no_grad():
+            old.weight.fill_(1e-9)
+            current.weight.fill_(-1e-9)
+        opposite = summarize_party_drift(
+            [old], [current], replay, {0: [1.0]}, lambda batch: [batch],
+        )
+        self.assertAlmostEqual(opposite['classes']['0']['party_cosine_drift'][0],
+                               2.0, places=6)
+
     def test_large_finite_double_features_remain_finite(self):
         old = torch.nn.Linear(1, 1, bias=False).double().eval()
         current = copy.deepcopy(old).eval()
