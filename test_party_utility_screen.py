@@ -103,6 +103,8 @@ class ReplayUtilityTests(unittest.TestCase):
         self.assertAlmostEqual(summary['centered_spearman']['uniform'], -1.0)
         self.assertEqual(summary['positive_boundaries'], 2)
         self.assertEqual(summary['eligible_boundaries'], 2)
+        self.assertAlmostEqual(summary['mean_abs_utility_frozen_score_gap'], 4 / 3)
+        self.assertAlmostEqual(summary['mean_abs_utility_shuffled_score_gap'], 4 / 3)
 
     @unittest.skipIf(os.name == 'nt', 'existing manifest fsync requires POSIX')
     def test_screen_reads_adjacent_checkpoints_without_final_transition(self):
@@ -153,6 +155,12 @@ class ReplayUtilityTests(unittest.TestCase):
             self.assertEqual(len(result['rows']), 2)
             self.assertEqual(result['summary']['boundaries'], 1)
             self.assertTrue((output / 'screen.json').is_file())
+            manifest_path = run / 'validation' / 'validation_manifest.json'
+            manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+            manifest['ordered_indices'] = list(reversed(manifest['ordered_indices']))
+            manifest_path.write_text(json.dumps(manifest), encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'source validation manifest'):
+                screen_run(run, root / 'tampered_screen')
 
 
 if __name__ == '__main__':

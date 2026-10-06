@@ -13,7 +13,7 @@ import torch
 import torch.nn.functional as F
 from scipy.stats import spearmanr
 
-from adaptive_consolidation_audit import _safe_torch_load
+from adaptive_consolidation_audit import _safe_json, _safe_torch_load
 from data_utils import VFLDataset, split_features
 from models import build_models
 from vfl_trainer import VFLTrainer
@@ -210,9 +210,12 @@ def summarize_rows(rows):
         'positive_boundaries': positive_boundaries,
         'eligible_boundaries': eligible_boundaries,
         'utility_fallback_fraction': sum(bool(row['utility_fallback']) for row in rows) / len(rows),
-        'mean_abs_utility_uniform_score_gap': float(np.mean([
-            abs(row['utility'] - row['uniform']) for row in rows
-        ])),
+        **{
+            f'mean_abs_utility_{control}_score_gap': float(np.mean([
+                abs(row['utility'] - row[control]) for row in rows
+            ]))
+            for control in ('uniform', 'frozen', 'shuffled')
+        },
         'passed': passed,
     }
 
@@ -277,6 +280,9 @@ def screen_run(run_dir, output_dir):
         args.num_workers = 0
         dataset = VFLDataset(args)
         manifest_sha = dataset.validation_manifest['sha256']
+        source_manifest_path = run_dir / 'validation' / 'validation_manifest.json'
+        if _safe_json(source_manifest_path) != dataset.validation_manifest:
+            raise ValueError('source validation manifest differs from rebuilt selection')
         for boundary in range(len(tasks) - 2):
             seen = sum(tasks[:boundary + 1], [])
             next_seen = seen + tasks[boundary + 1]
@@ -310,6 +316,7 @@ def screen_run(run_dir, output_dir):
         'source_run': str(run_dir),
         'source_config_sha256': _file_sha256(config_path),
         'source_dataset_sha256': _file_sha256(config['vector_npz']),
+        'source_validation_manifest_sha256': _file_sha256(source_manifest_path),
         'source_checkpoints_sha256': checkpoint_hashes,
         'validation_manifest_sha256': manifest_sha,
         'excluded_final_transition': len(tasks) - 2,
