@@ -305,6 +305,9 @@ class ProtoEvolveCL:
             0,
             int(getattr(args, 'num_tasks', 1)),
         )
+        self.party_drift_telemetry_enabled = bool(
+            getattr(args, 'party_drift_telemetry', 0)
+        )
         self.head_raw_replay = {}
         self.head_task_classes = {}
         self.head_validation_sha256 = ''
@@ -366,6 +369,47 @@ class ProtoEvolveCL:
         if int(replay_capacity) > 0:
             return protos, replay
         return protos
+
+    @torch.no_grad()
+    def _build_party_drift_record(self, task_id):
+        if int(task_id) <= 0 or self._old_bottoms is None:
+            raise ValueError('party drift requires a previous-task teacher')
+        old_classes = sorted(set(self.head_raw_replay) - set(self.current_task_classes))
+        if not old_classes or any(c not in self.class_party_weights for c in old_classes):
+            raise ValueError('old-class replay or contribution weights are incomplete')
+        from party_drift_telemetry import summarize_party_drift
+        measurement = summarize_party_drift(
+            self._old_bottoms, self.trainer.bottoms,
+            {c: self.head_raw_replay[c] for c in old_classes},
+            {c: self.class_party_weights[c] for c in old_classes},
+            lambda raw: split_features(raw.to(self.args.device), self.args),
+        )
+        return {
+            'schema_version': 1,
+            'task_id': int(task_id),
+            'seed': int(self.args.seed),
+            'old_class_ids': old_classes,
+            'current_task_classes': list(self.current_task_classes),
+            'measurement': measurement,
+            'validation_used': False,
+            'test_used': False,
+        }
+
+    def _write_party_drift_record(self, task_id):
+        if not self.party_drift_telemetry_enabled or int(task_id) == 0:
+            return None
+        from adaptive_consolidation_audit import (
+            _ensure_child_dir, _safe_json, atomic_write_new_json,
+        )
+        record = self._build_party_drift_record(task_id)
+        directory = _ensure_child_dir(self.args.output_dir, 'party_drift')
+        path = directory / f'event_{int(task_id)}_CIL.json'
+        if path.exists():
+            if _safe_json(path) != record:
+                raise ValueError('existing party drift record changed on resume')
+        else:
+            atomic_write_new_json(path, record)
+        return path
 
     @torch.no_grad()
     def _embed_head_raw_replay(self, allowed_classes=None):
@@ -1090,6 +1134,7 @@ class ProtoEvolveCL:
                 self.global_protos[c] = p
             for c, values in post_replay.items():
                 self.head_raw_replay[c] = values
+        self._write_party_drift_record(task_id)
         # 4. Re-encode bounded replay, then apply the configured final head step.
         self.head_task_classes[int(task_id)] = list(self.current_task_classes)
         self._consolidate_head(task_id)

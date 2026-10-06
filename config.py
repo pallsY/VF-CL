@@ -266,6 +266,9 @@ def get_config():
                    help='First task index that enables current-task supervised contrastive loss')
     p.add_argument('--dep_tracking_enabled', default=0, type=int,
                    help='If 1, track per-class per-party dependency statistics online during training')
+    p.add_argument('--party_drift_telemetry', default=0, type=int,
+                   choices=[0, 1],
+                   help='Record training-replay-only per-class per-party encoder drift')
     p.add_argument('--dep_tracking_momentum', default=0.9, type=float,
                    help='EMA momentum for online dependency tracking')
     p.add_argument('--party_kd_enabled', default=0, type=int,
@@ -494,6 +497,13 @@ def get_config():
                     'formal ER-ACE requires --er_ace_buffer_size >= 0')
             if args.er_ace_batch <= 0:
                 raise ValueError('formal ER-ACE requires --er_ace_batch > 0')
+        if (args.party_drift_telemetry and
+                (args.cl_method != 'proto_evolve'
+                 or not args.head_consolidation_enabled
+                 or not args.dep_tracking_enabled)):
+            raise ValueError(
+                'party drift telemetry requires ProtoEvolve, head replay, and '
+                'dependency tracking')
         validate_party_kd_variant(vars(args), args.expected_party_kd_variant)
         validate_adaptive_head_consolidation(args)
     except ValueError as exc:
