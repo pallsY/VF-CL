@@ -477,6 +477,17 @@ class TopModel(nn.Module):
             log_p_full, log_p_bias, float(self._adaptive_gate)
         )
 
+    def factorized_log_probabilities(self, x):
+        """Read out Mixed task mass with original within-task class ranking."""
+        if (not bool(self._adaptive_enabled)
+                or self._adaptive_full_weight.numel() == 0
+                or not bool(self._logit_calibration_enabled)):
+            raise RuntimeError('factorized readout requires a dual-branch head')
+        from factorized_head import factorize_task_probabilities
+        classes = self._adaptive_class_order
+        pre_logits = self._bias_logits(x).index_select(1, classes)
+        task_map = self._logit_calibration_task.index_select(0, classes)
+        return factorize_task_probabilities(self(x), pre_logits, task_map)
     def _load_from_state_dict(self, state_dict, prefix, local_metadata, strict,
                               missing_keys, unexpected_keys, error_msgs):
         adaptive_names = (
