@@ -3,6 +3,8 @@
 import argparse
 import hashlib
 import json
+import os
+import re
 import statistics
 import subprocess
 from pathlib import Path
@@ -10,8 +12,11 @@ from types import SimpleNamespace
 
 import torch
 
-from adaptive_consolidation_audit import _fresh_trainer, _strict_json, _strict_load_trainer_state
-from data_utils import VFLDataset, split_features
+from adaptive_consolidation_audit import (
+    _fresh_trainer, _load_sealed_complete_artifact, _strict_json,
+    _strict_load_trainer_state, _validate_formal_published,
+)
+from data_utils import VECTOR_DATASETS, VFLDataset, split_features
 
 
 _METRICS = ('AA_final', 'BWT', 'AA_final_taskil')
@@ -25,8 +30,53 @@ def _sha256(path):
     return digest.hexdigest()
 
 
+def _verified_evaluator_commit(root):
+    root = Path(root).resolve(strict=True)
+    try:
+        status = subprocess.check_output(
+            ['git', '-C', str(root), 'status', '--porcelain',
+             '--untracked-files=all'], text=True,
+        )
+        commit = subprocess.check_output(
+            ['git', '-C', str(root), 'rev-parse', 'HEAD'], text=True,
+        ).strip()
+    except (OSError, subprocess.CalledProcessError) as error:
+        raise ValueError('evaluator Git identity is unavailable') from error
+    if status or re.fullmatch(r'[0-9a-f]{40}', commit) is None:
+        raise ValueError('dirty or invalid evaluator source')
+    return commit
+
+
 def _canonical_sha256(value):
     return hashlib.sha256(_strict_json(value).encode('utf-8')).hexdigest()
+
+
+def _test_source_path(args):
+    if args.data == 'cifar100':
+        return Path(args.data_path) / 'cifar-100-python' / 'test'
+    if args.data not in VECTOR_DATASETS:
+        raise ValueError('unsupported paired test dataset')
+    if getattr(args, 'vector_npz', None):
+        return Path(args.vector_npz)
+    if args.data == 'mfeat':
+        return Path(getattr(args, 'mfeat_path', None) or
+                    Path(args.data_path) / 'mfeat' / 'mfeat_6view.npz')
+    return Path(args.data_path) / args.data / f'{args.data}.npz'
+
+
+def _validated_output_classes(top, task_classes):
+    output_classes = [int(value) for value in top._adaptive_class_order.tolist()]
+    mapped = [int(class_id) for classes in task_classes.values()
+              for class_id in classes]
+    if (len(mapped) != len(output_classes)
+            or len(set(mapped)) != len(mapped)
+            or set(mapped) != set(output_classes)):
+        raise ValueError('source task and output class set mismatch')
+    for task_id, classes in task_classes.items():
+        if any(int(top._logit_calibration_task[int(class_id)]) != int(task_id)
+               for class_id in classes):
+            raise ValueError('source task map differs from installed head')
+    return output_classes
 
 
 def summarize_paired(measured, history, baseline):
@@ -59,12 +109,11 @@ def summarize_paired(measured, history, baseline):
         class_final = [rows[task][class_key] for task in tasks]
         taskil_final = [rows[task][taskil_key] for task in tasks]
         diagonal = [final['deferred_diagonal'][task] for task in tasks]
+        comparisons = [class_final[i] - diagonal[i]
+                       for i, task in enumerate(tasks) if task != final_task]
         return {
             'AA_final': round(statistics.fmean(class_final), 4),
-            'BWT': round(statistics.fmean(
-                class_final[i] - diagonal[i]
-                for i, task in enumerate(tasks) if task != final_task
-            ), 4),
+            'BWT': round(statistics.fmean(comparisons), 4) if comparisons else 0.0,
             'AA_final_taskil': round(statistics.fmean(taskil_final), 4),
         }
     mixed = metrics('mixed_correct', 'mixed_taskil_correct')
@@ -77,14 +126,24 @@ def summarize_paired(measured, history, baseline):
     }
 
 
+def _verify_published_transaction(run_dir):
+    try:
+        complete, seal = _load_sealed_complete_artifact(run_dir)
+        _validate_formal_published(run_dir, complete['identity'], complete, seal)
+    except (FileNotFoundError, KeyError, TypeError, ValueError, RuntimeError) as error:
+        raise ValueError('source complete/seal publication is invalid') from error
+
+
 @torch.no_grad()
 def evaluate_run(run_dir, output_dir):
-    run_dir, output_dir = Path(run_dir), Path(output_dir)
-    if output_dir.exists():
+    run_dir = Path(run_dir).resolve(strict=True)
+    output_dir = Path(output_dir).resolve(strict=False)
+    source_root = run_dir.parent.parent
+    if output_dir == source_root or source_root in output_dir.parents:
+        raise ValueError('output/source overlap is forbidden')
+    if os.path.lexists(output_dir):
         raise FileExistsError(output_dir)
-    for name in ('FORMAL_STATE_FROZEN.json', 'FORMAL_EVALUATION_PUBLISHED.json'):
-        if not (run_dir / name).is_file():
-            raise ValueError('source run is not formally frozen and published')
+    _verify_published_transaction(run_dir)
     checkpoint_path = run_dir / 'checkpoints' / 'formal_final.pt'
     config_path = run_dir / 'config.json'
     results_path = run_dir / 'results.json'
@@ -99,6 +158,7 @@ def evaluate_run(run_dir, output_dir):
             or published.get('results', {}).get('sha256') != results_hash
             or published.get('results_sha256') != _canonical_sha256(results)):
         raise ValueError('published source artifact identity mismatch')
+    evaluator_commit = _verified_evaluator_commit(Path(__file__).resolve().parent)
     checkpoint = torch.load(checkpoint_path, map_location='cpu', weights_only=False)
     if (checkpoint.get('protocol', {}).get('head_consolidation_mode')
             != 'adaptive_dual_branch'):
@@ -119,12 +179,8 @@ def evaluate_run(run_dir, output_dir):
     top = trainer.top_model.eval()
     if not bool(top._adaptive_enabled):
         raise ValueError('source checkpoint lacks installed Adaptive head')
-    output_classes = [int(value) for value in top._adaptive_class_order.tolist()]
     task_classes = checkpoint['seen_task_classes']
-    expected_classes = [int(c) for task in sorted(task_classes)
-                        for c in task_classes[task]]
-    if output_classes != expected_classes:
-        raise ValueError('source task and output class order mismatch')
+    output_classes = _validated_output_classes(top, task_classes)
     class_to_column = {class_id: i for i, class_id in enumerate(output_classes)}
     output_class_tensor = torch.tensor(output_classes, dtype=torch.long)
     measured = {}
@@ -149,15 +205,11 @@ def evaluate_run(run_dir, output_dir):
         measured[f'task_{task_id}'] = counts
     comparison = summarize_paired(measured, results['task_acc_history'],
                                   results['cl_metrics'])
-    test_source = (Path(args.vector_npz) if getattr(args, 'vector_npz', None)
-                   else Path(args.data_path) / 'cifar-100-python' / 'test')
+    test_source = _test_source_path(args)
     report = {
         'method': 'factorized_pre_within_v1',
         'access_protocol': 'paired_posthoc_test_readout_v1',
-        'evaluator_commit': subprocess.check_output(
-            ['git', '-C', str(Path(__file__).resolve().parent), 'rev-parse', 'HEAD'],
-            text=True,
-        ).strip(),
+        'evaluator_commit': evaluator_commit,
         'published_marker_sha256': _sha256(published_path),
         'source_run': str(run_dir),
         'checkpoint_sha256': checkpoint_hash,

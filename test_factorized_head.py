@@ -62,6 +62,32 @@ class FactorizedHeadTests(unittest.TestCase):
                 model._bias_logits(x)[:, columns].argmax(1),
             ))
 
+    def test_cosine_head_reloads_factorized_readout(self):
+        model = TopModel(2, 4, cosine=True, scale=5.0)
+        with torch.no_grad():
+            model.classifier.weight.copy_(torch.tensor([
+                [1.0, 0.0], [0.0, 1.0], [-1.0, 0.0], [0.0, -1.0],
+            ]))
+        model.set_logit_calibration([0, 1, 2, 3], [1.0] * 4,
+                                    [0.0] * 4, [0, 0, 1, 1], 1.0)
+        model.set_adaptive_mixture(model.classifier.weight.clone(),
+                                   torch.zeros(4), 0.5, [0, 1, 2, 3])
+        x = torch.tensor([[1.0, 0.2], [-0.1, -1.0]])
+        expected = model.factorized_log_probabilities(x)
+        restored = TopModel(2, 4, cosine=True, scale=5.0)
+        restored.load_state_dict(model.state_dict(), strict=True)
+        torch.testing.assert_close(restored.factorized_log_probabilities(x),
+                                   expected, rtol=0, atol=0)
+        for columns in (torch.tensor([0, 1]), torch.tensor([2, 3])):
+            torch.testing.assert_close(
+                expected[:, columns].exp().sum(1),
+                model(x)[:, columns].exp().sum(1), rtol=0, atol=1e-12,
+            )
+            self.assertTrue(torch.equal(
+                expected[:, columns].argmax(1),
+                model._bias_logits(x)[:, columns].argmax(1),
+            ))
+
     def test_rejects_incomplete_task_map(self):
         with self.assertRaises(ValueError):
             factorize_task_probabilities(
