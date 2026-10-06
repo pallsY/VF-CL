@@ -53,6 +53,9 @@ class ReplayUtilityTests(unittest.TestCase):
                                   replay, [0, 1], frozen, args)
         self.assertTrue(all(row[key] == 0.0 for row in identical
                             for key in ('utility', 'uniform', 'frozen', 'shuffled')))
+        with self.assertRaises(ValueError):
+            replay_scores(trainer(old_top), trainer(new_top),
+                          {0: replay[0]}, [0, 1], frozen, args)
 
     def test_validation_ce_uses_only_pretransition_classes(self):
         args = types.SimpleNamespace(
