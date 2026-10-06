@@ -10,7 +10,7 @@ Before changing PartyKD, test whether old-class encoder drift differs by vertica
 
 At the end of each task after task 0, use the frozen previous-task bottom models already held by ProtoEvolve and the current bottom models. For every retained old class, pass the same bounded training replay samples through each corresponding old/current party model. Record the mean `1 - cosine(old_embedding, current_embedding)` per party, replay count, and the already frozen class-party contribution weights. Read no validation or test examples in this step. Save no individual embeddings or raw samples beyond the replay already required by the frozen method.
 
-The measurement is enabled only by an explicit recorded option, defaults off, and cannot change parameters, gradients, losses, the final head, replay selection, or the formal baseline. One JSON record per task boundary is written atomically and must be identical on deterministic replay/resume. An unexpected/missing teacher, class, party, replay tensor, or non-finite value is a hard diagnostic failure when enabled.
+The measurement is restricted to CL-only streams with no unlearning boundary, enabled only by an explicit recorded option, defaults off, and cannot change parameters, gradients, losses, the final head, replay selection, or the formal baseline. One JSON record per task boundary is written atomically and must be identical on deterministic replay/resume. An unexpected/missing teacher, retained class, party, replay tensor, or non-finite value is a hard diagnostic failure when enabled. Identical zero feature vectors have zero drift; a one-sided zero vector has unit cosine drift.
 
 ## Analysis boundary
 

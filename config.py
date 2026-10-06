@@ -504,6 +504,10 @@ def get_config():
             raise ValueError(
                 'party drift telemetry requires ProtoEvolve, head replay, and '
                 'dependency tracking')
+        if (args.party_drift_telemetry
+                and any(int(value) < args.num_tasks
+                        for value in args.unlearn_after_tasks.split(','))):
+            raise ValueError('party drift telemetry requires a CL-only stream')
         validate_party_kd_variant(vars(args), args.expected_party_kd_variant)
         validate_adaptive_head_consolidation(args)
     except ValueError as exc:

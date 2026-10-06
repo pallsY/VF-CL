@@ -64,6 +64,7 @@ class PartyDriftTelemetryTests(unittest.TestCase):
             1: torch.tensor([[0.0, 1.0, 0.0, 1.0]]),
         }
         method.class_party_weights = {0: [0.5, 0.5]}
+        method.global_protos = {0: {}, 1: {}}
 
         record = method._build_party_drift_record(1)
 
@@ -113,14 +114,71 @@ class PartyDriftTelemetryTests(unittest.TestCase):
             with mock.patch('sys.argv', [
                     'vfcl', '--results_dir', directory, '--exp_name', 'on',
                     '--cl_method', 'proto_evolve', '--head_consolidation_enabled', '1',
-                    '--dep_tracking_enabled', '1', '--party_drift_telemetry', '1']):
+                    '--dep_tracking_enabled', '1', '--party_drift_telemetry', '1',
+                    '--unlearn_after_tasks', '99,99']):
                 self.assertEqual(get_config().party_drift_telemetry, 1)
+            with mock.patch('sys.argv', [
+                    'vfcl', '--results_dir', directory, '--exp_name', 'ul_blocked',
+                    '--cl_method', 'proto_evolve', '--head_consolidation_enabled', '1',
+                    '--dep_tracking_enabled', '1', '--party_drift_telemetry', '1',
+                    '--num_tasks', '2', '--unlearn_after_tasks', '1,99']):
+                with mock.patch('sys.stderr', io.StringIO()):
+                    with self.assertRaises(SystemExit):
+                        get_config()
             with mock.patch('sys.argv', [
                     'vfcl', '--results_dir', directory, '--exp_name', 'invalid',
                     '--cl_method', 'proto_evolve', '--party_drift_telemetry', '1']):
                 with mock.patch('sys.stderr', io.StringIO()):
                     with self.assertRaises(SystemExit):
                         get_config()
+
+    def test_identical_zero_features_have_zero_drift(self):
+        old = torch.nn.Linear(2, 2, bias=False).eval()
+        current = copy.deepcopy(old).eval()
+        with torch.no_grad():
+            old.weight.zero_()
+            current.weight.zero_()
+        replay = {0: torch.tensor([[1.0, 0.0]])}
+        result = summarize_party_drift([old], [current], replay,
+                                       {0: [1.0]}, lambda batch: [batch])
+        self.assertEqual(result['classes']['0']['party_cosine_drift'], [0.0])
+        with torch.no_grad():
+            current.weight.copy_(torch.eye(2))
+        changed = summarize_party_drift([old], [current], replay,
+                                        {0: [1.0]}, lambda batch: [batch])
+        self.assertEqual(changed['classes']['0']['party_cosine_drift'], [1.0])
+
+    def test_large_finite_double_features_remain_finite(self):
+        old = torch.nn.Linear(1, 1, bias=False).double().eval()
+        current = copy.deepcopy(old).eval()
+        with torch.no_grad():
+            old.weight.fill_(1e40)
+            current.weight.fill_(1e40)
+        result = summarize_party_drift(
+            [old], [current], {0: torch.ones(2, 1, dtype=torch.float64)},
+            {0: [1.0]}, lambda batch: [batch],
+        )
+        self.assertEqual(result['classes']['0']['party_cosine_drift'], [0.0])
+
+    def test_rejects_forgotten_or_missing_old_replay_before_forward(self):
+        model = torch.nn.Identity().eval()
+        method = ProtoEvolveCL.__new__(ProtoEvolveCL)
+        method.args = SimpleNamespace(num_parties=1, data='tabvfl',
+                                      party_col_ranges=[(0, 2)], device='cpu', seed=42)
+        method.trainer = SimpleNamespace(bottoms=[model])
+        method._old_bottoms = [model]
+        method.current_task_classes = [1]
+        method.global_protos = {0: {}}
+        method.head_raw_replay = {0: torch.ones(1, 2),
+                                  1: torch.ones(1, 2),
+                                  2: torch.ones(1, 2)}
+        method.class_party_weights = {0: [1.0], 2: [1.0]}
+        with self.assertRaisesRegex(ValueError, 'retained old-class replay'):
+            method._build_party_drift_record(1)
+        method.global_protos = {0: {}, 2: {}}
+        method.head_raw_replay.pop(2)
+        with self.assertRaisesRegex(ValueError, 'retained old-class replay'):
+            method._build_party_drift_record(1)
 
     def test_rejects_missing_or_nonfinite_replay(self):
         model = torch.nn.Linear(2, 2, bias=False).eval()

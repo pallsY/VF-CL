@@ -11,7 +11,7 @@
 ## Global Constraints
 
 - Default off. No change to frozen formal method or legacy checkpoint schema.
-- Training replay only; no validation/test access during measurement.
+- CL-only training replay; reject scheduled unlearning, forgotten raw replay, and missing retained old classes before any measurement. No validation/test access during measurement.
 - No extra persistent raw samples, embeddings, or full model snapshots.
 
 ---

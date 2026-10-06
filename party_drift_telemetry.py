@@ -53,9 +53,15 @@ def summarize_party_drift(old_bottoms, current_bottoms, replay_by_class,
                     or not torch.isfinite(old).all()
                     or not torch.isfinite(current).all()):
                 raise ValueError('party features are malformed or non-finite')
-            distance = (1.0 - F.cosine_similarity(
-                old.float(), current.float(), dim=1, eps=1e-8
-            )).clamp_min(0.0).mean()
+            old_float, current_float = old.double(), current.double()
+            both_zero = ((old_float.norm(dim=1) <= 1e-8)
+                         & (current_float.norm(dim=1) <= 1e-8))
+            per_sample = (1.0 - F.cosine_similarity(
+                old_float, current_float, dim=1, eps=1e-8
+            )).clamp_min(0.0)
+            distance = torch.where(both_zero, 0.0, per_sample).mean()
+            if not torch.isfinite(distance):
+                raise ValueError('party cosine drift is non-finite')
             drift.append(float(distance))
         classes[str(class_id)] = {
             'sample_count': int(raw.size(0)),

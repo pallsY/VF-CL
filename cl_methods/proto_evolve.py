@@ -374,7 +374,12 @@ class ProtoEvolveCL:
     def _build_party_drift_record(self, task_id):
         if int(task_id) <= 0 or self._old_bottoms is None:
             raise ValueError('party drift requires a previous-task teacher')
-        old_classes = sorted(set(self.head_raw_replay) - set(self.current_task_classes))
+        current_classes = set(self.current_task_classes)
+        retained_old = set(self.global_protos) - current_classes
+        replayed_old = set(self.head_raw_replay) - current_classes
+        if retained_old != replayed_old:
+            raise ValueError('retained old-class replay does not match prototypes')
+        old_classes = sorted(retained_old)
         if not old_classes or any(c not in self.class_party_weights for c in old_classes):
             raise ValueError('old-class replay or contribution weights are incomplete')
         from party_drift_telemetry import summarize_party_drift
