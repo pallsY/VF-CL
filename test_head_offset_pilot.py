@@ -48,6 +48,13 @@ class HeadOffsetPilotConfigTests(unittest.TestCase):
             'head_consolidation_mode', 'results_dir', 'output_dir', 'exp_name',
         })
         self.assertEqual(config['output_dir'], str(root / 'seed_45_baseline'))
+        with tempfile.TemporaryDirectory() as temp:
+            budget_root = Path(temp) / 'budget-root'
+            budget, budget_changed = derive_config(source, budget_root, seed=46)
+        self.assertEqual(budget['seed'], 46)
+        self.assertEqual(budget['lambda_validation_split_seed'], 20261008)
+        self.assertEqual(budget['output_dir'], str(budget_root / 'seed_46_baseline'))
+        self.assertEqual(set(budget_changed), set(changed))
 
     def test_train_only_calibration_indices_are_fixed_and_disjoint(self):
         labels = [0, 0, 0, 0, 1, 1, 1, 1]
