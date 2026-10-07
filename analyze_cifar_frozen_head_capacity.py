@@ -14,6 +14,7 @@ import torch
 from torch.utils.data import DataLoader, Subset
 
 import adaptive_consolidation_audit
+import analyze_head_offset_pilot
 import data_utils
 import head_consolidation
 import models
@@ -29,6 +30,7 @@ from vfl_trainer import VFLTrainer
 
 
 SOURCE_COMMIT = '7bfe6b1d724fb1206bc0053a9008126bad86332d'
+HELPER_SHA256 = '346b3b95a5abe2f5d7c749bf2b4780b1fbbebd5a5ce7843ff43cab684b9682f9'
 
 
 def tensor_tree_sha256(states):
@@ -85,10 +87,13 @@ def run(run_dir, output_dir, device):
                    != digest
                    for key, digest in protocol['source_data_sha256'].items())):
         raise ValueError('training configuration/data differ from pilot protocol')
-    record = json.loads(Path(
+    record_path = Path(
         '/home/c3080/YangXiaoXiang/VF-CL/results/formal-method-adaptive-20261005-v1/'
         'records/cifar100%3Aadaptive%3A42.json'
-    ).read_text())
+    )
+    if file_sha256(record_path) != protocol['source_record_sha256']:
+        raise ValueError('formal source record differs from pilot launch')
+    record = json.loads(record_path.read_text())
     source_modules = {
         name: file_sha256(Path(module.__file__))
         for name, module in (
@@ -102,6 +107,9 @@ def run(run_dir, output_dir, device):
     if any(digest != record['artifact_sha256']['source:' + name]
            for name, digest in source_modules.items()):
         raise ValueError('imported model or fitter code differs from producer')
+    helper_sha = file_sha256(Path(analyze_head_offset_pilot.__file__))
+    if helper_sha != HELPER_SHA256:
+        raise ValueError('imported pilot analysis helper differs from frozen source')
     checkpoint = _safe_torch_load(checkpoint_path)
     tasks = [list(map(int, checkpoint['seen_task_classes'][task]))
              for task in range(10)]
@@ -184,6 +192,8 @@ def run(run_dir, output_dir, device):
         'source_config_sha256': file_sha256(config_path),
         'data_flow_audit_sha256': file_sha256(audit_path),
         'source_modules_sha256': source_modules,
+        'formal_source_record_sha256': file_sha256(record_path),
+        'analysis_helper_sha256': helper_sha,
         'validation_manifest_sha256': file_sha256(validation_manifest),
         'bic_manifest_sha256': file_sha256(bic_manifest),
         'calibration_index_sha256': hashlib.sha256(
