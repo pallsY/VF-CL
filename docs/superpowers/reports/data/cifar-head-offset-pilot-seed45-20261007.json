@@ -1,0 +1,83 @@
+{
+  "analyzer_sha256": "346b3b95a5abe2f5d7c749bf2b4780b1fbbebd5a5ce7843ff43cab684b9682f9",
+  "baseline": {
+    "accuracy": 0.1576,
+    "correct": 394,
+    "examples": 2500,
+    "new_accuracy": 0.788,
+    "new_correct": 197,
+    "new_examples": 250,
+    "new_to_old_rate": 0.06,
+    "nll": 3.335237956543444,
+    "old_accuracy": 0.08755555555555555,
+    "old_correct": 197,
+    "old_examples": 2250,
+    "old_to_new_rate": 0.7457777777777778,
+    "per_task_accuracy": [
+      0.1,
+      0.028,
+      0.08,
+      0.036,
+      0.068,
+      0.032,
+      0.108,
+      0.104,
+      0.232,
+      0.788
+    ],
+    "taskil_accuracy": 0.742,
+    "taskil_correct": 1855
+  },
+  "bic_manifest_sha256": "d6802b2cff810db76910ef12fb80c5bd9ccbac9cbbd4539aee8ac303bfde26e9",
+  "calibration_count": 2000,
+  "calibration_indices_sha256": "aa142091c03fc2775288ccda5958cfbb3f87727343805f57403a08a9547e5048",
+  "calibration_nll_after_fit": 2.42635661031699,
+  "corrected": {
+    "accuracy": 0.2644,
+    "correct": 661,
+    "examples": 2500,
+    "new_accuracy": 0.376,
+    "new_correct": 94,
+    "new_examples": 250,
+    "new_to_old_rate": 0.608,
+    "nll": 2.8248442747250504,
+    "old_accuracy": 0.252,
+    "old_correct": 567,
+    "old_examples": 2250,
+    "old_to_new_rate": 0.09733333333333333,
+    "per_task_accuracy": [
+      0.188,
+      0.072,
+      0.156,
+      0.148,
+      0.172,
+      0.224,
+      0.304,
+      0.396,
+      0.608,
+      0.376
+    ],
+    "taskil_accuracy": 0.742,
+    "taskil_correct": 1855
+  },
+  "delta": -2.8631606572729953,
+  "existing_bic_context": {
+    "accuracy": 0.3328000009059906,
+    "new_accuracy": 0.3400000035762787,
+    "old_accuracy": 0.3320000006092919
+  },
+  "model_state_sha256": "c1f839e36764f273571a4e6b7db81f66352be091df48a5d7c2e2565bb4f5a0ce",
+  "passed": false,
+  "schema_version": 1,
+  "source_commit": "7bfe6b1d724fb1206bc0053a9008126bad86332d",
+  "source_data_sha256": {
+    "data:cifar-100-python/meta": "a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9",
+    "data:cifar-100-python/test": "4b67687d9933c4db8f0831104447f15b93774f4f464bd0516f0f0f2ac83b7864",
+    "data:cifar-100-python/train": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b"
+  },
+  "source_run": "/home/c3080/YangXiaoXiang/VF-CL/results/cifar-head-offset-pilot-seed45-20261007-v1/seed_45_baseline",
+  "training_checkpoint_sha256": "be73d584b067487ef58adca3ac15ce6e4de0bf17905c35a36998f189df958462",
+  "training_config_sha256": "c85882da57cf1059a604cba4b5142c79b8acf2eab1198b8b716dc13230873581",
+  "validation_count": 2500,
+  "validation_manifest_sha256": "ee4d934a64ccb154b11cc80753e55ce38ceb1c0567e320de5acbbfcdf76f8b8c"
+}
