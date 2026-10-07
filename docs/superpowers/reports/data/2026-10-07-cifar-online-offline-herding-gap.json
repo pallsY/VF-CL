@@ -1,0 +1,6213 @@
+{
+  "helper_sha256": "346b3b95a5abe2f5d7c749bf2b4780b1fbbebd5a5ce7843ff43cab684b9682f9",
+  "overall": {
+    "class_rows": 300,
+    "fraction_online_worse": 1.0,
+    "offline_mean": 0.0306848878475527,
+    "online_mean": 0.056058284354706604
+  },
+  "schema_version": 1,
+  "script_sha256": "c980e3347becc75984f91009aeccfe50fac8ffa87a022d43502690e194a6f5c3",
+  "seeds": [
+    {
+      "bic_manifest_sha256": "d6802b2cff810db76910ef12fb80c5bd9ccbac9cbbd4539aee8ac303bfde26e9",
+      "bottom_state_sha256": "5aa507f17a1eb8ba9284f52bfc459b6d0c4c983449d13d5bcd2531a188a616b2",
+      "checkpoint_sha256": "22fe7b6856156cce62c54cd1e63d745597b08f25a7528a0666793ab793ac30fd",
+      "classes": [
+        {
+          "candidate_count": 450,
+          "class_id": 0,
+          "offline_aggregate_error": 0.027148345485329628,
+          "offline_count": 20,
+          "online_aggregate_error": 0.048658695071935654,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0704260990023613,
+            0.048263851553201675,
+            0.051168765872716904,
+            0.055555664002895355
+          ],
+          "party_online_errors": [
+            0.10400769859552383,
+            0.07049690186977386,
+            0.07338627427816391,
+            0.09822891652584076
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 1,
+          "offline_aggregate_error": 0.02804756723344326,
+          "offline_count": 20,
+          "online_aggregate_error": 0.043101631104946136,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05309413745999336,
+            0.05035598203539848,
+            0.05952620506286621,
+            0.05450063571333885
+          ],
+          "party_online_errors": [
+            0.07862653583288193,
+            0.08315888047218323,
+            0.0843522772192955,
+            0.06568777561187744
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 2,
+          "offline_aggregate_error": 0.028824638575315475,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05279238522052765,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05861477181315422,
+            0.0707160159945488,
+            0.06151200085878372,
+            0.05199865251779556
+          ],
+          "party_online_errors": [
+            0.09599003940820694,
+            0.09296028316020966,
+            0.08707792311906815,
+            0.11383221298456192
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 3,
+          "offline_aggregate_error": 0.031649935990571976,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05673897638916969,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0545167438685894,
+            0.06392756849527359,
+            0.06844690442085266,
+            0.06058298796415329
+          ],
+          "party_online_errors": [
+            0.10767804086208344,
+            0.09086809307336807,
+            0.10077499598264694,
+            0.10145054012537003
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 4,
+          "offline_aggregate_error": 0.029218314215540886,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05932784825563431,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05851350352168083,
+            0.06848382949829102,
+            0.07352694869041443,
+            0.05525822192430496
+          ],
+          "party_online_errors": [
+            0.12381611764431,
+            0.10061225295066833,
+            0.0834982767701149,
+            0.1018666997551918
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 5,
+          "offline_aggregate_error": 0.029603829607367516,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05351190268993378,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.07170432806015015,
+            0.06415311992168427,
+            0.06731972098350525,
+            0.05712074786424637
+          ],
+          "party_online_errors": [
+            0.11731576919555664,
+            0.07905032485723495,
+            0.0891403779387474,
+            0.10354242473840714
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 6,
+          "offline_aggregate_error": 0.030783196911215782,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05340828001499176,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.061425793915987015,
+            0.05907132104039192,
+            0.06507982313632965,
+            0.05813675746321678
+          ],
+          "party_online_errors": [
+            0.09493862837553024,
+            0.0815967470407486,
+            0.09811941534280777,
+            0.09677905589342117
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 7,
+          "offline_aggregate_error": 0.03301924467086792,
+          "offline_count": 20,
+          "online_aggregate_error": 0.056932345032691956,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.08536525070667267,
+            0.058558378368616104,
+            0.06484529376029968,
+            0.059086110442876816
+          ],
+          "party_online_errors": [
+            0.09431547671556473,
+            0.10155917704105377,
+            0.09392644464969635,
+            0.09837372601032257
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 8,
+          "offline_aggregate_error": 0.02848496474325657,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05306869000196457,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05320262908935547,
+            0.06456800550222397,
+            0.05728839710354805,
+            0.054205719381570816
+          ],
+          "party_online_errors": [
+            0.10564947873353958,
+            0.08922182023525238,
+            0.08610907942056656,
+            0.08535449951887131
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 9,
+          "offline_aggregate_error": 0.031053336337208748,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06796366721391678,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.07003562152385712,
+            0.06038608029484749,
+            0.07125827670097351,
+            0.06181544065475464
+          ],
+          "party_online_errors": [
+            0.09741830825805664,
+            0.11061183363199234,
+            0.09164030104875565,
+            0.1163080632686615
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 10,
+          "offline_aggregate_error": 0.03147748485207558,
+          "offline_count": 20,
+          "online_aggregate_error": 0.056332796812057495,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05401298776268959,
+            0.0629015564918518,
+            0.06379690021276474,
+            0.05913449078798294
+          ],
+          "party_online_errors": [
+            0.11045052856206894,
+            0.09438621997833252,
+            0.08759399503469467,
+            0.10688313841819763
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 11,
+          "offline_aggregate_error": 0.03222924470901489,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05419569090008736,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.07124651223421097,
+            0.061326876282691956,
+            0.06707184761762619,
+            0.05717375874519348
+          ],
+          "party_online_errors": [
+            0.1042887419462204,
+            0.08219146728515625,
+            0.09070068597793579,
+            0.09244152903556824
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 12,
+          "offline_aggregate_error": 0.02893177419900894,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06161763146519661,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.057535603642463684,
+            0.0641273558139801,
+            0.062477532774209976,
+            0.05169570446014404
+          ],
+          "party_online_errors": [
+            0.10822800546884537,
+            0.09997841715812683,
+            0.10074345022439957,
+            0.13276028633117676
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 13,
+          "offline_aggregate_error": 0.02942311391234398,
+          "offline_count": 20,
+          "online_aggregate_error": 0.052863959223032,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.053451571613550186,
+            0.07524363696575165,
+            0.0704716369509697,
+            0.053884752094745636
+          ],
+          "party_online_errors": [
+            0.10446558892726898,
+            0.09837392717599869,
+            0.09279458969831467,
+            0.09808175265789032
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 14,
+          "offline_aggregate_error": 0.031304627656936646,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05540064722299576,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05666539445519447,
+            0.06602811068296432,
+            0.06033547967672348,
+            0.05854340270161629
+          ],
+          "party_online_errors": [
+            0.1156068965792656,
+            0.09075156599283218,
+            0.0834965780377388,
+            0.1082950010895729
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 15,
+          "offline_aggregate_error": 0.030265118926763535,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05398117005825043,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06569916754961014,
+            0.06716835498809814,
+            0.06874413043260574,
+            0.058749761432409286
+          ],
+          "party_online_errors": [
+            0.09527791291475296,
+            0.10328920185565948,
+            0.08408574014902115,
+            0.10559040307998657
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 16,
+          "offline_aggregate_error": 0.03251652419567108,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06325513124465942,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0735827311873436,
+            0.06728311628103256,
+            0.06194189190864563,
+            0.060366615653038025
+          ],
+          "party_online_errors": [
+            0.11424455046653748,
+            0.10397027432918549,
+            0.11234617978334427,
+            0.10314734280109406
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 17,
+          "offline_aggregate_error": 0.02578173205256462,
+          "offline_count": 20,
+          "online_aggregate_error": 0.055962979793548584,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05513130500912666,
+            0.057232815772295,
+            0.06002197042107582,
+            0.04724846035242081
+          ],
+          "party_online_errors": [
+            0.10904407501220703,
+            0.0932513028383255,
+            0.10748882591724396,
+            0.11234647780656815
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 18,
+          "offline_aggregate_error": 0.03134191036224365,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05750519037246704,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04812270775437355,
+            0.06558013707399368,
+            0.07163424044847488,
+            0.06559314578771591
+          ],
+          "party_online_errors": [
+            0.11178100854158401,
+            0.10662949830293655,
+            0.09408602863550186,
+            0.09940268844366074
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 19,
+          "offline_aggregate_error": 0.030875898897647858,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05694303289055824,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06519542634487152,
+            0.06323413550853729,
+            0.06362762302160263,
+            0.05652255564928055
+          ],
+          "party_online_errors": [
+            0.11459367722272873,
+            0.09693378955125809,
+            0.09267640858888626,
+            0.09153751283884048
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 20,
+          "offline_aggregate_error": 0.02888736128807068,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05661803111433983,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05101972445845604,
+            0.060854222625494,
+            0.06466080993413925,
+            0.054511573165655136
+          ],
+          "party_online_errors": [
+            0.09321065992116928,
+            0.0873737782239914,
+            0.08391078561544418,
+            0.10647866129875183
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 21,
+          "offline_aggregate_error": 0.030027559027075768,
+          "offline_count": 20,
+          "online_aggregate_error": 0.057724788784980774,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05021483823657036,
+            0.06106306239962578,
+            0.0678580105304718,
+            0.05650555342435837
+          ],
+          "party_online_errors": [
+            0.09623117744922638,
+            0.11257465183734894,
+            0.1008208766579628,
+            0.09016149491071701
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 22,
+          "offline_aggregate_error": 0.03307938203215599,
+          "offline_count": 20,
+          "online_aggregate_error": 0.0641390010714531,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05532287806272507,
+            0.0664830356836319,
+            0.07290545105934143,
+            0.0503363162279129
+          ],
+          "party_online_errors": [
+            0.1293715387582779,
+            0.1009281799197197,
+            0.1012912392616272,
+            0.10338571667671204
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 23,
+          "offline_aggregate_error": 0.027984874323010445,
+          "offline_count": 20,
+          "online_aggregate_error": 0.048085641115903854,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.051567934453487396,
+            0.05170157924294472,
+            0.051537346094846725,
+            0.0479123592376709
+          ],
+          "party_online_errors": [
+            0.09005624055862427,
+            0.0831727683544159,
+            0.07720103114843369,
+            0.0943104475736618
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 24,
+          "offline_aggregate_error": 0.028167787939310074,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06066683679819107,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04313971474766731,
+            0.07636848837137222,
+            0.05442151799798012,
+            0.0648370310664177
+          ],
+          "party_online_errors": [
+            0.0921691283583641,
+            0.10903830081224442,
+            0.09644219279289246,
+            0.11997408419847488
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 25,
+          "offline_aggregate_error": 0.03201250731945038,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05225783959031105,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.056553106755018234,
+            0.0673450231552124,
+            0.06621038168668747,
+            0.058999232947826385
+          ],
+          "party_online_errors": [
+            0.10392742604017258,
+            0.08502055704593658,
+            0.09054768085479736,
+            0.1009160503745079
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 26,
+          "offline_aggregate_error": 0.03210039064288139,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05095911771059036,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06126134470105171,
+            0.07322685420513153,
+            0.06233701854944229,
+            0.052015457302331924
+          ],
+          "party_online_errors": [
+            0.09093520045280457,
+            0.09461212903261185,
+            0.08896126598119736,
+            0.08889929950237274
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 27,
+          "offline_aggregate_error": 0.030797582119703293,
+          "offline_count": 20,
+          "online_aggregate_error": 0.052173253148794174,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05640311911702156,
+            0.06553806364536285,
+            0.06542527675628662,
+            0.048909999430179596
+          ],
+          "party_online_errors": [
+            0.09543872624635696,
+            0.09095317870378494,
+            0.09522853791713715,
+            0.09285657852888107
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 28,
+          "offline_aggregate_error": 0.03367256373167038,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05829000845551491,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05401773005723953,
+            0.06591662019491196,
+            0.07526684552431107,
+            0.0673915296792984
+          ],
+          "party_online_errors": [
+            0.10252784192562103,
+            0.09472690522670746,
+            0.09082689881324768,
+            0.10397946834564209
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 29,
+          "offline_aggregate_error": 0.030058635398745537,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06229066103696823,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06917621940374374,
+            0.06281362473964691,
+            0.060755655169487,
+            0.06072177365422249
+          ],
+          "party_online_errors": [
+            0.08918669819831848,
+            0.10170043259859085,
+            0.09577823430299759,
+            0.09278247505426407
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 30,
+          "offline_aggregate_error": 0.025454610586166382,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05391936004161835,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04539461061358452,
+            0.049600258469581604,
+            0.05559298396110535,
+            0.043667104095220566
+          ],
+          "party_online_errors": [
+            0.0970287173986435,
+            0.08754651993513107,
+            0.08068269491195679,
+            0.10355985909700394
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 31,
+          "offline_aggregate_error": 0.030656207352876663,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05936533957719803,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05962160974740982,
+            0.05814638361334801,
+            0.06627114862203598,
+            0.0576782301068306
+          ],
+          "party_online_errors": [
+            0.12135676294565201,
+            0.11812172830104828,
+            0.0964079350233078,
+            0.10507442057132721
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 32,
+          "offline_aggregate_error": 0.03122320957481861,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05446675419807434,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05532008782029152,
+            0.07138238102197647,
+            0.0681411400437355,
+            0.06249428540468216
+          ],
+          "party_online_errors": [
+            0.11025632172822952,
+            0.09129757434129715,
+            0.08727889508008957,
+            0.08671952784061432
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 33,
+          "offline_aggregate_error": 0.032152120023965836,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05374182015657425,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05538579821586609,
+            0.06536182761192322,
+            0.0708608403801918,
+            0.05859394371509552
+          ],
+          "party_online_errors": [
+            0.10317431390285492,
+            0.08815741539001465,
+            0.08795975148677826,
+            0.09765403717756271
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 34,
+          "offline_aggregate_error": 0.029968813061714172,
+          "offline_count": 20,
+          "online_aggregate_error": 0.04923596978187561,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05440043285489082,
+            0.0630512535572052,
+            0.05643758177757263,
+            0.05921994149684906
+          ],
+          "party_online_errors": [
+            0.11286674439907074,
+            0.08180999010801315,
+            0.08223095536231995,
+            0.09170471131801605
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 35,
+          "offline_aggregate_error": 0.03170737624168396,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05701720342040062,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06615374982357025,
+            0.07144294679164886,
+            0.06594469398260117,
+            0.06337417662143707
+          ],
+          "party_online_errors": [
+            0.09417642652988434,
+            0.0915873646736145,
+            0.09128407388925552,
+            0.095203697681427
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 36,
+          "offline_aggregate_error": 0.03135388717055321,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05207236856222153,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.057653285562992096,
+            0.0672089233994484,
+            0.05776936560869217,
+            0.055309515446424484
+          ],
+          "party_online_errors": [
+            0.09154336154460907,
+            0.08453968167304993,
+            0.09287481009960175,
+            0.09954275190830231
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 37,
+          "offline_aggregate_error": 0.028026273474097252,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05498147010803223,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.056186504662036896,
+            0.06265317648649216,
+            0.06900158524513245,
+            0.05358640104532242
+          ],
+          "party_online_errors": [
+            0.10863328725099564,
+            0.09614211320877075,
+            0.08674322068691254,
+            0.0959152802824974
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 38,
+          "offline_aggregate_error": 0.031179100275039673,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05711567401885986,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.048866238445043564,
+            0.06500044465065002,
+            0.06523392349481583,
+            0.0547238327562809
+          ],
+          "party_online_errors": [
+            0.10746585577726364,
+            0.10886333137750626,
+            0.09641241282224655,
+            0.11049284040927887
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 39,
+          "offline_aggregate_error": 0.03438297286629677,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05665503814816475,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06558197736740112,
+            0.076597198843956,
+            0.058327991515398026,
+            0.05814361199736595
+          ],
+          "party_online_errors": [
+            0.1089257150888443,
+            0.08293841034173965,
+            0.09257200360298157,
+            0.08892673999071121
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 40,
+          "offline_aggregate_error": 0.03379490599036217,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05292166769504547,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.055371616035699844,
+            0.07183334231376648,
+            0.07286902517080307,
+            0.07776501774787903
+          ],
+          "party_online_errors": [
+            0.0905841663479805,
+            0.11348433792591095,
+            0.09425264596939087,
+            0.08178108185529709
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 41,
+          "offline_aggregate_error": 0.025384224951267242,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06461641192436218,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04289272800087929,
+            0.06277898699045181,
+            0.062385208904743195,
+            0.05278123542666435
+          ],
+          "party_online_errors": [
+            0.1030973270535469,
+            0.08992568403482437,
+            0.10131483525037766,
+            0.09587752819061279
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 42,
+          "offline_aggregate_error": 0.03053188882768154,
+          "offline_count": 20,
+          "online_aggregate_error": 0.057220589369535446,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04884037375450134,
+            0.06247697025537491,
+            0.0638536736369133,
+            0.058841973543167114
+          ],
+          "party_online_errors": [
+            0.09832348674535751,
+            0.1053965836763382,
+            0.10877495259046555,
+            0.11068087816238403
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 43,
+          "offline_aggregate_error": 0.030636675655841827,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05357331782579422,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.052265167236328125,
+            0.06343680620193481,
+            0.06656663119792938,
+            0.057745207101106644
+          ],
+          "party_online_errors": [
+            0.1075771227478981,
+            0.08652250468730927,
+            0.08308542519807816,
+            0.1084904596209526
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 44,
+          "offline_aggregate_error": 0.03070719912648201,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05531078949570656,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.054465148597955704,
+            0.07030611485242844,
+            0.0645017996430397,
+            0.062326546758413315
+          ],
+          "party_online_errors": [
+            0.1145622730255127,
+            0.09021438658237457,
+            0.09598828852176666,
+            0.103307344019413
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 45,
+          "offline_aggregate_error": 0.03144252672791481,
+          "offline_count": 20,
+          "online_aggregate_error": 0.049883097410202026,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.07870268821716309,
+            0.058854516595602036,
+            0.06935751438140869,
+            0.05900204926729202
+          ],
+          "party_online_errors": [
+            0.0901547372341156,
+            0.0995776578783989,
+            0.07962589710950851,
+            0.08662750571966171
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 46,
+          "offline_aggregate_error": 0.032194167375564575,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05195232108235359,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.07334008067846298,
+            0.06295783072710037,
+            0.07348151504993439,
+            0.07117673754692078
+          ],
+          "party_online_errors": [
+            0.09091104567050934,
+            0.0906015932559967,
+            0.08912813663482666,
+            0.11863613873720169
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 47,
+          "offline_aggregate_error": 0.029249100014567375,
+          "offline_count": 20,
+          "online_aggregate_error": 0.061021335422992706,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.044923748821020126,
+            0.05953587591648102,
+            0.06579244136810303,
+            0.05352339893579483
+          ],
+          "party_online_errors": [
+            0.10502438992261887,
+            0.10199899226427078,
+            0.08471717685461044,
+            0.11999191343784332
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 48,
+          "offline_aggregate_error": 0.028440944850444794,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06292251497507095,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05261271446943283,
+            0.06506925076246262,
+            0.057990752160549164,
+            0.05071888864040375
+          ],
+          "party_online_errors": [
+            0.13190321624279022,
+            0.08787567168474197,
+            0.09622439742088318,
+            0.12757642567157745
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 49,
+          "offline_aggregate_error": 0.023672806099057198,
+          "offline_count": 20,
+          "online_aggregate_error": 0.044153377413749695,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04380911961197853,
+            0.05855919048190117,
+            0.05561315640807152,
+            0.04619113355875015
+          ],
+          "party_online_errors": [
+            0.09016083925962448,
+            0.07032080739736557,
+            0.0763651579618454,
+            0.09917964786291122
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 50,
+          "offline_aggregate_error": 0.0330422967672348,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05266118794679642,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05837119743227959,
+            0.06506600975990295,
+            0.07822778075933456,
+            0.0634232759475708
+          ],
+          "party_online_errors": [
+            0.09990871697664261,
+            0.09458284825086594,
+            0.08486414700746536,
+            0.09444747120141983
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 51,
+          "offline_aggregate_error": 0.030332274734973907,
+          "offline_count": 20,
+          "online_aggregate_error": 0.051581479609012604,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04741556569933891,
+            0.0647284984588623,
+            0.06427321583032608,
+            0.05076682195067406
+          ],
+          "party_online_errors": [
+            0.1040269136428833,
+            0.09097599983215332,
+            0.08802822232246399,
+            0.10359586030244827
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 52,
+          "offline_aggregate_error": 0.02634606696665287,
+          "offline_count": 20,
+          "online_aggregate_error": 0.07206673175096512,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.046487957239151,
+            0.05568872392177582,
+            0.06190932169556618,
+            0.04946315288543701
+          ],
+          "party_online_errors": [
+            0.12100683152675629,
+            0.11491018533706665,
+            0.11701563000679016,
+            0.12436507642269135
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 53,
+          "offline_aggregate_error": 0.026434602215886116,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05123090744018555,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05615132674574852,
+            0.052940573543310165,
+            0.048343557864427567,
+            0.06058160215616226
+          ],
+          "party_online_errors": [
+            0.11110535264015198,
+            0.06974488496780396,
+            0.0667571946978569,
+            0.0926208570599556
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 54,
+          "offline_aggregate_error": 0.029025765135884285,
+          "offline_count": 20,
+          "online_aggregate_error": 0.04155388101935387,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.053385935723781586,
+            0.061071813106536865,
+            0.06423617154359818,
+            0.05936630442738533
+          ],
+          "party_online_errors": [
+            0.06412973254919052,
+            0.08265462517738342,
+            0.08532844483852386,
+            0.07297229021787643
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 55,
+          "offline_aggregate_error": 0.03275519981980324,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05543532967567444,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.051150329411029816,
+            0.07747447490692139,
+            0.06634189933538437,
+            0.05935287103056908
+          ],
+          "party_online_errors": [
+            0.11034190654754639,
+            0.10099966824054718,
+            0.08402422815561295,
+            0.1028224378824234
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 56,
+          "offline_aggregate_error": 0.03051721677184105,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05673767253756523,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05055220425128937,
+            0.06209070235490799,
+            0.06751348078250885,
+            0.05404656380414963
+          ],
+          "party_online_errors": [
+            0.09238545596599579,
+            0.09395907074213028,
+            0.08538033068180084,
+            0.10229817777872086
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 57,
+          "offline_aggregate_error": 0.03195978328585625,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05523655191063881,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06230450049042702,
+            0.06511655449867249,
+            0.06043332815170288,
+            0.05772077292203903
+          ],
+          "party_online_errors": [
+            0.10821997374296188,
+            0.08186902850866318,
+            0.08575760573148727,
+            0.10137901455163956
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 58,
+          "offline_aggregate_error": 0.029279109090566635,
+          "offline_count": 20,
+          "online_aggregate_error": 0.052645258605480194,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.063363216817379,
+            0.06097016856074333,
+            0.062271248549222946,
+            0.05614202469587326
+          ],
+          "party_online_errors": [
+            0.10728991031646729,
+            0.07842748612165451,
+            0.08837439119815826,
+            0.11069323867559433
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 59,
+          "offline_aggregate_error": 0.029282107949256897,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06048661470413208,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05455085635185242,
+            0.06289668381214142,
+            0.06398513913154602,
+            0.06250089406967163
+          ],
+          "party_online_errors": [
+            0.10012711584568024,
+            0.10698715597391129,
+            0.10050997883081436,
+            0.113706573843956
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 60,
+          "offline_aggregate_error": 0.023096174001693726,
+          "offline_count": 20,
+          "online_aggregate_error": 0.04725369065999985,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04092707112431526,
+            0.048091717064380646,
+            0.04666345193982124,
+            0.043195441365242004
+          ],
+          "party_online_errors": [
+            0.08756574988365173,
+            0.07281849533319473,
+            0.0841417983174324,
+            0.08997870981693268
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 61,
+          "offline_aggregate_error": 0.03181137144565582,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05182628706097603,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06341919302940369,
+            0.06706552952528,
+            0.06669560819864273,
+            0.05327807366847992
+          ],
+          "party_online_errors": [
+            0.09205237030982971,
+            0.09156190603971481,
+            0.08299870789051056,
+            0.095782071352005
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 62,
+          "offline_aggregate_error": 0.02805963158607483,
+          "offline_count": 20,
+          "online_aggregate_error": 0.03452106937766075,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05716075003147125,
+            0.05094865337014198,
+            0.0536738820374012,
+            0.07348570227622986
+          ],
+          "party_online_errors": [
+            0.09594046324491501,
+            0.06861091405153275,
+            0.06417576968669891,
+            0.0753462165594101
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 63,
+          "offline_aggregate_error": 0.028033031150698662,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05373191833496094,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05571397766470909,
+            0.059352774173021317,
+            0.0644603744149208,
+            0.052178747951984406
+          ],
+          "party_online_errors": [
+            0.09440308064222336,
+            0.09070488810539246,
+            0.09072550386190414,
+            0.09201144427061081
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 64,
+          "offline_aggregate_error": 0.029905615374445915,
+          "offline_count": 20,
+          "online_aggregate_error": 0.0528879277408123,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05782807618379593,
+            0.06376269459724426,
+            0.0647781565785408,
+            0.056884583085775375
+          ],
+          "party_online_errors": [
+            0.09841611236333847,
+            0.07693076878786087,
+            0.0994151160120964,
+            0.10237851738929749
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 65,
+          "offline_aggregate_error": 0.0321321114897728,
+          "offline_count": 20,
+          "online_aggregate_error": 0.04826413467526436,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.062364861369132996,
+            0.07368507981300354,
+            0.06661748886108398,
+            0.0693851113319397
+          ],
+          "party_online_errors": [
+            0.08812420815229416,
+            0.08182418346405029,
+            0.0840991660952568,
+            0.09125169366598129
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 66,
+          "offline_aggregate_error": 0.03118990920484066,
+          "offline_count": 20,
+          "online_aggregate_error": 0.0524967797100544,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06136234849691391,
+            0.0701686292886734,
+            0.06844940036535263,
+            0.06201774999499321
+          ],
+          "party_online_errors": [
+            0.09335193783044815,
+            0.09725691378116608,
+            0.08070730417966843,
+            0.09724591672420502
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 67,
+          "offline_aggregate_error": 0.030223127454519272,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05058937147259712,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04519489407539368,
+            0.0632123351097107,
+            0.05906390771269798,
+            0.05892399698495865
+          ],
+          "party_online_errors": [
+            0.09856020659208298,
+            0.09407100081443787,
+            0.09063412249088287,
+            0.09715196490287781
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 68,
+          "offline_aggregate_error": 0.0251648910343647,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05111156031489372,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04027414321899414,
+            0.05745933949947357,
+            0.06281474977731705,
+            0.04727465286850929
+          ],
+          "party_online_errors": [
+            0.10463465005159378,
+            0.09298668056726456,
+            0.09493082761764526,
+            0.09179409593343735
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 69,
+          "offline_aggregate_error": 0.02924717403948307,
+          "offline_count": 20,
+          "online_aggregate_error": 0.04789455235004425,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06245284900069237,
+            0.06386738270521164,
+            0.05316086485981941,
+            0.05672629177570343
+          ],
+          "party_online_errors": [
+            0.08369342237710953,
+            0.08821025490760803,
+            0.08191293478012085,
+            0.10907367616891861
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 70,
+          "offline_aggregate_error": 0.02797723188996315,
+          "offline_count": 20,
+          "online_aggregate_error": 0.038441646844148636,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06406952440738678,
+            0.057859450578689575,
+            0.057633575052022934,
+            0.06036137044429779
+          ],
+          "party_online_errors": [
+            0.10187819600105286,
+            0.06308542191982269,
+            0.06521924585103989,
+            0.08368278294801712
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 71,
+          "offline_aggregate_error": 0.025164524093270302,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05118381232023239,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04323471337556839,
+            0.050462450832128525,
+            0.05349471792578697,
+            0.047556474804878235
+          ],
+          "party_online_errors": [
+            0.09272085130214691,
+            0.07791747152805328,
+            0.07860274612903595,
+            0.11897684633731842
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 72,
+          "offline_aggregate_error": 0.03126652538776398,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05358928442001343,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05718717724084854,
+            0.07390572130680084,
+            0.06776823848485947,
+            0.055332984775304794
+          ],
+          "party_online_errors": [
+            0.10019988566637039,
+            0.08994011580944061,
+            0.08686788380146027,
+            0.09217673540115356
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 73,
+          "offline_aggregate_error": 0.02912207879126072,
+          "offline_count": 20,
+          "online_aggregate_error": 0.040854621678590775,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.055008236318826675,
+            0.060537565499544144,
+            0.06213369965553284,
+            0.05661135911941528
+          ],
+          "party_online_errors": [
+            0.07595684379339218,
+            0.06660810112953186,
+            0.07443828135728836,
+            0.07879767566919327
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 74,
+          "offline_aggregate_error": 0.030963461846113205,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05734343081712723,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04903891682624817,
+            0.06106061115860939,
+            0.07675781100988388,
+            0.06501418352127075
+          ],
+          "party_online_errors": [
+            0.12852180004119873,
+            0.09341231733560562,
+            0.10307452827692032,
+            0.10694334656000137
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 75,
+          "offline_aggregate_error": 0.02953052520751953,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05536862835288048,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0483231246471405,
+            0.06683600693941116,
+            0.06704563647508621,
+            0.05365530401468277
+          ],
+          "party_online_errors": [
+            0.12205655127763748,
+            0.09789259731769562,
+            0.08846340328454971,
+            0.0979485809803009
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 76,
+          "offline_aggregate_error": 0.030125131830573082,
+          "offline_count": 20,
+          "online_aggregate_error": 0.056045051664114,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05061590299010277,
+            0.06451155990362167,
+            0.06569782644510269,
+            0.05311570316553116
+          ],
+          "party_online_errors": [
+            0.10308749973773956,
+            0.09339632093906403,
+            0.09394074976444244,
+            0.10105031728744507
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 77,
+          "offline_aggregate_error": 0.029901273548603058,
+          "offline_count": 20,
+          "online_aggregate_error": 0.055408917367458344,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05605725198984146,
+            0.06727989763021469,
+            0.06304433196783066,
+            0.06175386160612106
+          ],
+          "party_online_errors": [
+            0.11628459393978119,
+            0.10043931007385254,
+            0.0927913710474968,
+            0.1124226301908493
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 78,
+          "offline_aggregate_error": 0.033041682094335556,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05232131481170654,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06053530052304268,
+            0.06630256772041321,
+            0.07629743218421936,
+            0.05885760486125946
+          ],
+          "party_online_errors": [
+            0.099753238260746,
+            0.08438242226839066,
+            0.08419009298086166,
+            0.10641121119260788
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 79,
+          "offline_aggregate_error": 0.03461518883705139,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05408966913819313,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06114128977060318,
+            0.07236111164093018,
+            0.07301187515258789,
+            0.056260496377944946
+          ],
+          "party_online_errors": [
+            0.0982656180858612,
+            0.08754629641771317,
+            0.09245454519987106,
+            0.09540095925331116
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 80,
+          "offline_aggregate_error": 0.031219948083162308,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05615421012043953,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05821208283305168,
+            0.07171884924173355,
+            0.06873339414596558,
+            0.05597131326794624
+          ],
+          "party_online_errors": [
+            0.0982951670885086,
+            0.09978564828634262,
+            0.0922165960073471,
+            0.11236071586608887
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 81,
+          "offline_aggregate_error": 0.028631528839468956,
+          "offline_count": 20,
+          "online_aggregate_error": 0.048118963837623596,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05441020801663399,
+            0.06547565758228302,
+            0.06186768412590027,
+            0.056435491889715195
+          ],
+          "party_online_errors": [
+            0.09213262796401978,
+            0.08133020251989365,
+            0.09045614302158356,
+            0.0970630869269371
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 82,
+          "offline_aggregate_error": 0.030790267512202263,
+          "offline_count": 20,
+          "online_aggregate_error": 0.04176612198352814,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.048068515956401825,
+            0.05378194898366928,
+            0.05717645585536957,
+            0.08552707731723785
+          ],
+          "party_online_errors": [
+            0.0778273493051529,
+            0.06781737506389618,
+            0.07080136984586716,
+            0.08416493237018585
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 83,
+          "offline_aggregate_error": 0.028701022267341614,
+          "offline_count": 20,
+          "online_aggregate_error": 0.042825423181056976,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06644169241189957,
+            0.05937609076499939,
+            0.07427912205457687,
+            0.07151603698730469
+          ],
+          "party_online_errors": [
+            0.07950185239315033,
+            0.06986818462610245,
+            0.06677854061126709,
+            0.07414250075817108
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 84,
+          "offline_aggregate_error": 0.03147895634174347,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05385338515043259,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04282889515161514,
+            0.06572224944829941,
+            0.06555116176605225,
+            0.05661670118570328
+          ],
+          "party_online_errors": [
+            0.1026226356625557,
+            0.08312011510133743,
+            0.08982732892036438,
+            0.1081346869468689
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 85,
+          "offline_aggregate_error": 0.02928784489631653,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05688484385609627,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05688556656241417,
+            0.074177585542202,
+            0.0709264874458313,
+            0.05536254495382309
+          ],
+          "party_online_errors": [
+            0.11043187975883484,
+            0.09104958921670914,
+            0.09071773290634155,
+            0.11798229813575745
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 86,
+          "offline_aggregate_error": 0.03022266924381256,
+          "offline_count": 20,
+          "online_aggregate_error": 0.07291857153177261,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05727309361100197,
+            0.07033229619264603,
+            0.07041119039058685,
+            0.052819982171058655
+          ],
+          "party_online_errors": [
+            0.1251533031463623,
+            0.09150784462690353,
+            0.10416483879089355,
+            0.10659443587064743
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 87,
+          "offline_aggregate_error": 0.032591965049505234,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06136230751872063,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.062440767884254456,
+            0.06868995726108551,
+            0.06575560569763184,
+            0.061385102570056915
+          ],
+          "party_online_errors": [
+            0.11154104024171829,
+            0.08869919180870056,
+            0.0781165137887001,
+            0.12231256812810898
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 88,
+          "offline_aggregate_error": 0.028917601332068443,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05595841631293297,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0445701889693737,
+            0.05544307455420494,
+            0.05788963660597801,
+            0.06063605844974518
+          ],
+          "party_online_errors": [
+            0.10466168075799942,
+            0.09587863832712173,
+            0.09464625269174576,
+            0.09067036211490631
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 89,
+          "offline_aggregate_error": 0.02889462187886238,
+          "offline_count": 20,
+          "online_aggregate_error": 0.04927048087120056,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05334314703941345,
+            0.06650703400373459,
+            0.06487905979156494,
+            0.0508083775639534
+          ],
+          "party_online_errors": [
+            0.0955558568239212,
+            0.09527970105409622,
+            0.08508443087339401,
+            0.10108412057161331
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 90,
+          "offline_aggregate_error": 0.028686799108982086,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05057074874639511,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.050287727266550064,
+            0.06820592284202576,
+            0.058314207941293716,
+            0.061402224004268646
+          ],
+          "party_online_errors": [
+            0.08710399270057678,
+            0.09905019402503967,
+            0.09591919183731079,
+            0.10423661023378372
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 91,
+          "offline_aggregate_error": 0.028539536520838737,
+          "offline_count": 20,
+          "online_aggregate_error": 0.04802295193076134,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05042443424463272,
+            0.061449307948350906,
+            0.06015089526772499,
+            0.05608928203582764
+          ],
+          "party_online_errors": [
+            0.08709961175918579,
+            0.08866193890571594,
+            0.08199770003557205,
+            0.09006665647029877
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 92,
+          "offline_aggregate_error": 0.028061015531420708,
+          "offline_count": 20,
+          "online_aggregate_error": 0.040379468351602554,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.060913484543561935,
+            0.052795518189668655,
+            0.060378581285476685,
+            0.056679461151361465
+          ],
+          "party_online_errors": [
+            0.07881493121385574,
+            0.07712586224079132,
+            0.06507228314876556,
+            0.08526858687400818
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 93,
+          "offline_aggregate_error": 0.031716953963041306,
+          "offline_count": 20,
+          "online_aggregate_error": 0.045473601669073105,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05969803407788277,
+            0.06273584812879562,
+            0.07159803062677383,
+            0.056690920144319534
+          ],
+          "party_online_errors": [
+            0.08383671939373016,
+            0.08508699387311935,
+            0.07290208339691162,
+            0.0930294468998909
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 94,
+          "offline_aggregate_error": 0.03475980460643768,
+          "offline_count": 20,
+          "online_aggregate_error": 0.069606713950634,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0742398276925087,
+            0.0648098811507225,
+            0.06960201263427734,
+            0.07660634815692902
+          ],
+          "party_online_errors": [
+            0.13742613792419434,
+            0.10195638984441757,
+            0.08295592665672302,
+            0.1332622766494751
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 95,
+          "offline_aggregate_error": 0.029264943674206734,
+          "offline_count": 20,
+          "online_aggregate_error": 0.054784100502729416,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0725695788860321,
+            0.05901367962360382,
+            0.06037933751940727,
+            0.05646635219454765
+          ],
+          "party_online_errors": [
+            0.10133396834135056,
+            0.07981866598129272,
+            0.08234688639640808,
+            0.1077614352107048
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 96,
+          "offline_aggregate_error": 0.030132174491882324,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05425368994474411,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05171823874115944,
+            0.05993996560573578,
+            0.06615498661994934,
+            0.04994750767946243
+          ],
+          "party_online_errors": [
+            0.09855730831623077,
+            0.0868711769580841,
+            0.08259262144565582,
+            0.10153939574956894
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 97,
+          "offline_aggregate_error": 0.030734537169337273,
+          "offline_count": 20,
+          "online_aggregate_error": 0.051379501819610596,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05370163917541504,
+            0.06048620119690895,
+            0.06862401217222214,
+            0.06194771081209183
+          ],
+          "party_online_errors": [
+            0.10233928263187408,
+            0.0981353297829628,
+            0.08655205368995667,
+            0.10231629014015198
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 98,
+          "offline_aggregate_error": 0.03405432403087616,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05098552629351616,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06769835948944092,
+            0.06155254319310188,
+            0.07388655096292496,
+            0.06574475020170212
+          ],
+          "party_online_errors": [
+            0.11512488126754761,
+            0.09512758255004883,
+            0.09731320291757584,
+            0.08107591420412064
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 99,
+          "offline_aggregate_error": 0.0339210107922554,
+          "offline_count": 20,
+          "online_aggregate_error": 0.0523742251098156,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06725209951400757,
+            0.0662749633193016,
+            0.07462919503450394,
+            0.06335224956274033
+          ],
+          "party_online_errors": [
+            0.08310218155384064,
+            0.09564393758773804,
+            0.09093290567398071,
+            0.1012868657708168
+          ]
+        }
+      ],
+      "config_sha256": "5ef9984e091b83d7f84ac373cd702811c0ed15595dc6f4075ca23cc515535955",
+      "data_sha256": {
+        "data:cifar-100-python/meta": "a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9",
+        "data:cifar-100-python/test": "4b67687d9933c4db8f0831104447f15b93774f4f464bd0516f0f0f2ac83b7864",
+        "data:cifar-100-python/train": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b"
+      },
+      "eligible_indices_sha256": "30f96089b22c9dc65c4a5db906d90224369a12ef47b3d408a74e4a635c3b3542",
+      "formal_record_sha256": "aad02da1ba8e87f29e79f5702e71fe8e99c8ef4cdf554976cc1b881af6dc0871",
+      "offline_selected_indices_sha256": "f2530ba206ecba29a7b0962ea40821e9a37b884b5ed3406673477c8d04951db2",
+      "seed": 42,
+      "summary": {
+        "classes": 100,
+        "fraction_online_worse": 1.0,
+        "mean_difference": 0.023796357214450836,
+        "offline_mean": 0.030110810659825803,
+        "offline_median": 0.030244123190641403,
+        "online_mean": 0.053907167874276636,
+        "online_median": 0.05379760265350342,
+        "party_fraction_online_worse": [
+          1.0,
+          1.0,
+          0.99,
+          0.99
+        ],
+        "party_mean_differences": [
+          0.04448362573981285,
+          0.027419987469911575,
+          0.024147364757955075,
+          0.042382595762610435
+        ],
+        "party_offline_means": [
+          0.056866268515586856,
+          0.06351438358426094,
+          0.06445452656596899,
+          0.05783417113125324
+        ],
+        "party_offline_medians": [
+          0.055885614827275276,
+          0.06381503865122795,
+          0.06486217677593231,
+          0.05700266547501087
+        ],
+        "party_online_means": [
+          0.1013498942553997,
+          0.09093437105417251,
+          0.08860189132392407,
+          0.10021676689386368
+        ],
+        "party_online_medians": [
+          0.10076692700386047,
+          0.09101279452443123,
+          0.08871233463287354,
+          0.10098318383097649
+        ]
+      },
+      "validation_manifest_sha256": "7934fcbc5385883cd4312d7416d70dbae8a73044802431f766ee6de2249e5418"
+    },
+    {
+      "bic_manifest_sha256": "d6802b2cff810db76910ef12fb80c5bd9ccbac9cbbd4539aee8ac303bfde26e9",
+      "bottom_state_sha256": "8199cced6c67c0907c70f70e2d456e4e819daf98be79070217ff1a8c8a96ed7c",
+      "checkpoint_sha256": "015471d294b207fee53f0324d63a0da1aba1b45f8e4eb029fbd8e0c3735b5f1f",
+      "classes": [
+        {
+          "candidate_count": 450,
+          "class_id": 0,
+          "offline_aggregate_error": 0.027260875329375267,
+          "offline_count": 20,
+          "online_aggregate_error": 0.054068177938461304,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.055221036076545715,
+            0.05843786150217056,
+            0.06138468161225319,
+            0.05364992469549179
+          ],
+          "party_online_errors": [
+            0.1370302140712738,
+            0.08359037339687347,
+            0.08713693916797638,
+            0.09396880120038986
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 1,
+          "offline_aggregate_error": 0.028656229376792908,
+          "offline_count": 20,
+          "online_aggregate_error": 0.043462395668029785,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.059352438896894455,
+            0.06226604804396629,
+            0.05556168779730797,
+            0.04871101304888725
+          ],
+          "party_online_errors": [
+            0.07039379328489304,
+            0.0749012753367424,
+            0.07685896009206772,
+            0.06818869709968567
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 2,
+          "offline_aggregate_error": 0.02953769639134407,
+          "offline_count": 20,
+          "online_aggregate_error": 0.0629088506102562,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06454034149646759,
+            0.057921797037124634,
+            0.06002440303564072,
+            0.05719781294465065
+          ],
+          "party_online_errors": [
+            0.12290678918361664,
+            0.10489223152399063,
+            0.11154564470052719,
+            0.07950731366872787
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 3,
+          "offline_aggregate_error": 0.03068963810801506,
+          "offline_count": 20,
+          "online_aggregate_error": 0.061477117240428925,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06719639152288437,
+            0.061169691383838654,
+            0.06620597094297409,
+            0.06734677404165268
+          ],
+          "party_online_errors": [
+            0.11900799721479416,
+            0.10380889475345612,
+            0.1039375588297844,
+            0.09991105645895004
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 4,
+          "offline_aggregate_error": 0.03191865608096123,
+          "offline_count": 20,
+          "online_aggregate_error": 0.059973739087581635,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06234447658061981,
+            0.062177956104278564,
+            0.07047101110219955,
+            0.061711009591817856
+          ],
+          "party_online_errors": [
+            0.09984919428825378,
+            0.09710609167814255,
+            0.10320757329463959,
+            0.10295737534761429
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 5,
+          "offline_aggregate_error": 0.029495231807231903,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05613839253783226,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.060179006308317184,
+            0.06255446374416351,
+            0.06560992449522018,
+            0.06239777058362961
+          ],
+          "party_online_errors": [
+            0.09555645287036896,
+            0.1003996878862381,
+            0.09089497476816177,
+            0.1019328311085701
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 6,
+          "offline_aggregate_error": 0.030350208282470703,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05085587501525879,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06124057248234749,
+            0.06080733984708786,
+            0.06397845596075058,
+            0.049775298684835434
+          ],
+          "party_online_errors": [
+            0.10212041437625885,
+            0.08180329203605652,
+            0.07742222398519516,
+            0.07534857839345932
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 7,
+          "offline_aggregate_error": 0.031672511249780655,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06660815328359604,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05223923549056053,
+            0.0710449144244194,
+            0.06468399614095688,
+            0.06217261403799057
+          ],
+          "party_online_errors": [
+            0.12917232513427734,
+            0.11311811953783035,
+            0.0942804366350174,
+            0.11308831721544266
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 8,
+          "offline_aggregate_error": 0.027971308678388596,
+          "offline_count": 20,
+          "online_aggregate_error": 0.059954091906547546,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05940500274300575,
+            0.06028978154063225,
+            0.06598278880119324,
+            0.04624548554420471
+          ],
+          "party_online_errors": [
+            0.119315966963768,
+            0.09041731059551239,
+            0.10060281306505203,
+            0.10696511715650558
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 9,
+          "offline_aggregate_error": 0.0344180203974247,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06874224543571472,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06668142229318619,
+            0.06327833980321884,
+            0.0755956843495369,
+            0.06346927583217621
+          ],
+          "party_online_errors": [
+            0.10093910992145538,
+            0.12757962942123413,
+            0.10064373165369034,
+            0.1257859170436859
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 10,
+          "offline_aggregate_error": 0.03132343664765358,
+          "offline_count": 20,
+          "online_aggregate_error": 0.0633457750082016,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.053309932351112366,
+            0.06220484897494316,
+            0.0662679374217987,
+            0.07063289731740952
+          ],
+          "party_online_errors": [
+            0.11598075181245804,
+            0.09726627916097641,
+            0.10319817066192627,
+            0.11301491409540176
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 11,
+          "offline_aggregate_error": 0.030763961374759674,
+          "offline_count": 20,
+          "online_aggregate_error": 0.056720148772001266,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05840171128511429,
+            0.06005183234810829,
+            0.06605130434036255,
+            0.0655524954199791
+          ],
+          "party_online_errors": [
+            0.10329429060220718,
+            0.09543710201978683,
+            0.08489185571670532,
+            0.0724942609667778
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 12,
+          "offline_aggregate_error": 0.02988947182893753,
+          "offline_count": 20,
+          "online_aggregate_error": 0.062276121228933334,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0623248890042305,
+            0.0597662553191185,
+            0.06282756477594376,
+            0.057359158992767334
+          ],
+          "party_online_errors": [
+            0.10809054970741272,
+            0.10501184314489365,
+            0.11284248530864716,
+            0.10657516866922379
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 13,
+          "offline_aggregate_error": 0.030359601601958275,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05813748762011528,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0482817180454731,
+            0.06557901948690414,
+            0.06969007104635239,
+            0.058989956974983215
+          ],
+          "party_online_errors": [
+            0.10526712983846664,
+            0.0895722359418869,
+            0.09326977282762527,
+            0.10188326239585876
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 14,
+          "offline_aggregate_error": 0.032998159527778625,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05950189754366875,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06299227476119995,
+            0.07457689195871353,
+            0.0681796595454216,
+            0.06852353364229202
+          ],
+          "party_online_errors": [
+            0.09897205233573914,
+            0.09205834567546844,
+            0.09565215557813644,
+            0.09535988420248032
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 15,
+          "offline_aggregate_error": 0.0306515172123909,
+          "offline_count": 20,
+          "online_aggregate_error": 0.061104051768779755,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06680797785520554,
+            0.0732143372297287,
+            0.06323898583650589,
+            0.06673453003168106
+          ],
+          "party_online_errors": [
+            0.12609855830669403,
+            0.09828776866197586,
+            0.09623418748378754,
+            0.08532463014125824
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 16,
+          "offline_aggregate_error": 0.0327005498111248,
+          "offline_count": 20,
+          "online_aggregate_error": 0.07169796526432037,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.07560164481401443,
+            0.06572325527667999,
+            0.06664540618658066,
+            0.05642402917146683
+          ],
+          "party_online_errors": [
+            0.13925695419311523,
+            0.10088258981704712,
+            0.09671173989772797,
+            0.10995820164680481
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 17,
+          "offline_aggregate_error": 0.02713758870959282,
+          "offline_count": 20,
+          "online_aggregate_error": 0.057126518338918686,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.053841330111026764,
+            0.06315794587135315,
+            0.05928000062704086,
+            0.04743383824825287
+          ],
+          "party_online_errors": [
+            0.10293719917535782,
+            0.10237807035446167,
+            0.10397703945636749,
+            0.10745685547590256
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 18,
+          "offline_aggregate_error": 0.03236880153417587,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05632247403264046,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05377626046538353,
+            0.06811899691820145,
+            0.06763016432523727,
+            0.05554908141493797
+          ],
+          "party_online_errors": [
+            0.12426434457302094,
+            0.08567165583372116,
+            0.08792600780725479,
+            0.11345641314983368
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 19,
+          "offline_aggregate_error": 0.03000808320939541,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05642222240567207,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.050346650183200836,
+            0.06410478800535202,
+            0.056338291615247726,
+            0.0699632465839386
+          ],
+          "party_online_errors": [
+            0.11429499089717865,
+            0.09249547123908997,
+            0.08922351151704788,
+            0.11218619346618652
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 20,
+          "offline_aggregate_error": 0.028518233448266983,
+          "offline_count": 20,
+          "online_aggregate_error": 0.07246359437704086,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05291164293885231,
+            0.06766137480735779,
+            0.06529122591018677,
+            0.05216755345463753
+          ],
+          "party_online_errors": [
+            0.15495289862155914,
+            0.0847858339548111,
+            0.10497767478227615,
+            0.10223332792520523
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 21,
+          "offline_aggregate_error": 0.030079908668994904,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06676661223173141,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0552399605512619,
+            0.06172485649585724,
+            0.06237366795539856,
+            0.06181545928120613
+          ],
+          "party_online_errors": [
+            0.14599573612213135,
+            0.09742512553930283,
+            0.11826854199171066,
+            0.11668273061513901
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 22,
+          "offline_aggregate_error": 0.035161130130290985,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06490827351808548,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0571775883436203,
+            0.08237548172473907,
+            0.07472798973321915,
+            0.06402957439422607
+          ],
+          "party_online_errors": [
+            0.13064338266849518,
+            0.0968509241938591,
+            0.10699359327554703,
+            0.10518206655979156
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 23,
+          "offline_aggregate_error": 0.030584972351789474,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05624070018529892,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0435098372399807,
+            0.06250028312206268,
+            0.06729350239038467,
+            0.04167898744344711
+          ],
+          "party_online_errors": [
+            0.11996908485889435,
+            0.08626936376094818,
+            0.09297412633895874,
+            0.10424180328845978
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 24,
+          "offline_aggregate_error": 0.027880756184458733,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06552132964134216,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.047390419989824295,
+            0.06035374477505684,
+            0.06718958914279938,
+            0.04727735370397568
+          ],
+          "party_online_errors": [
+            0.10591602325439453,
+            0.09474758803844452,
+            0.10710437595844269,
+            0.13068439066410065
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 25,
+          "offline_aggregate_error": 0.03188084065914154,
+          "offline_count": 20,
+          "online_aggregate_error": 0.059426721185445786,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05745279788970947,
+            0.06683212518692017,
+            0.06393232941627502,
+            0.05234715715050697
+          ],
+          "party_online_errors": [
+            0.13014888763427734,
+            0.1036774143576622,
+            0.10363947600126266,
+            0.09344958513975143
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 26,
+          "offline_aggregate_error": 0.03180324658751488,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06084875017404556,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06127956509590149,
+            0.06703740358352661,
+            0.06494660675525665,
+            0.05550605058670044
+          ],
+          "party_online_errors": [
+            0.12782709300518036,
+            0.08825454115867615,
+            0.08409443497657776,
+            0.10893294215202332
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 27,
+          "offline_aggregate_error": 0.031068915501236916,
+          "offline_count": 20,
+          "online_aggregate_error": 0.0567154735326767,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0524306520819664,
+            0.06437532603740692,
+            0.0636790469288826,
+            0.06872709095478058
+          ],
+          "party_online_errors": [
+            0.10615045577287674,
+            0.08538489043712616,
+            0.08951946347951889,
+            0.1042931005358696
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 28,
+          "offline_aggregate_error": 0.03421996906399727,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05853963643312454,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.057927027344703674,
+            0.07106473296880722,
+            0.06785233318805695,
+            0.047367118299007416
+          ],
+          "party_online_errors": [
+            0.09461405128240585,
+            0.10420191287994385,
+            0.10092785209417343,
+            0.10890094935894012
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 29,
+          "offline_aggregate_error": 0.03152325376868248,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05615251138806343,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05960455164313316,
+            0.06243826076388359,
+            0.07364949584007263,
+            0.0625179335474968
+          ],
+          "party_online_errors": [
+            0.09513869881629944,
+            0.08922845870256424,
+            0.08552968502044678,
+            0.09391707181930542
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 30,
+          "offline_aggregate_error": 0.03088240697979927,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05191333219408989,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0572633370757103,
+            0.07773568481206894,
+            0.06867367774248123,
+            0.04774416610598564
+          ],
+          "party_online_errors": [
+            0.11761690676212311,
+            0.07559201866388321,
+            0.08529283851385117,
+            0.0896337702870369
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 31,
+          "offline_aggregate_error": 0.02912992052733898,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06463482975959778,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05568648502230644,
+            0.06343009322881699,
+            0.06425168365240097,
+            0.05480022355914116
+          ],
+          "party_online_errors": [
+            0.1472330391407013,
+            0.08922341465950012,
+            0.11496581882238388,
+            0.0970127061009407
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 32,
+          "offline_aggregate_error": 0.03274673968553543,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05391330271959305,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05885135382413864,
+            0.06781218200922012,
+            0.06547173857688904,
+            0.0582861490547657
+          ],
+          "party_online_errors": [
+            0.10004345327615738,
+            0.08865635842084885,
+            0.09769537299871445,
+            0.09200277924537659
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 33,
+          "offline_aggregate_error": 0.03136586770415306,
+          "offline_count": 20,
+          "online_aggregate_error": 0.052281882613897324,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.052611712366342545,
+            0.06702205538749695,
+            0.0646066889166832,
+            0.05500120669603348
+          ],
+          "party_online_errors": [
+            0.10591551661491394,
+            0.0934937372803688,
+            0.07843516021966934,
+            0.10249444097280502
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 34,
+          "offline_aggregate_error": 0.0332968570291996,
+          "offline_count": 20,
+          "online_aggregate_error": 0.0509464405477047,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.053508736193180084,
+            0.07509608566761017,
+            0.07850813865661621,
+            0.06434071809053421
+          ],
+          "party_online_errors": [
+            0.09708646684885025,
+            0.08931879699230194,
+            0.09458382427692413,
+            0.08815714716911316
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 35,
+          "offline_aggregate_error": 0.03467101231217384,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05701861530542374,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.062026020139455795,
+            0.06901253759860992,
+            0.07050655037164688,
+            0.0778561383485794
+          ],
+          "party_online_errors": [
+            0.1112935021519661,
+            0.09160936623811722,
+            0.09619587659835815,
+            0.09978742152452469
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 36,
+          "offline_aggregate_error": 0.03018551506102085,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05318715050816536,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.062018781900405884,
+            0.06067861244082451,
+            0.06789141893386841,
+            0.05824209749698639
+          ],
+          "party_online_errors": [
+            0.11262249201536179,
+            0.08010078221559525,
+            0.08551990240812302,
+            0.09493094682693481
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 37,
+          "offline_aggregate_error": 0.028522798791527748,
+          "offline_count": 20,
+          "online_aggregate_error": 0.057974692434072495,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.057846516370773315,
+            0.06440716236829758,
+            0.06018269062042236,
+            0.05257360264658928
+          ],
+          "party_online_errors": [
+            0.12486212700605392,
+            0.09518022835254669,
+            0.09319490194320679,
+            0.09380248934030533
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 38,
+          "offline_aggregate_error": 0.03105110675096512,
+          "offline_count": 20,
+          "online_aggregate_error": 0.060927800834178925,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.059921812266111374,
+            0.07069452852010727,
+            0.06387989968061447,
+            0.05844721570611
+          ],
+          "party_online_errors": [
+            0.12133228778839111,
+            0.10543698072433472,
+            0.10515423864126205,
+            0.09014139324426651
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 39,
+          "offline_aggregate_error": 0.036159027367830276,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05372185632586479,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05978909507393837,
+            0.06818386167287827,
+            0.07543614506721497,
+            0.06002626195549965
+          ],
+          "party_online_errors": [
+            0.09720738977193832,
+            0.09163697808980942,
+            0.0851082131266594,
+            0.09452114254236221
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 40,
+          "offline_aggregate_error": 0.0332380086183548,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05740763992071152,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0651639923453331,
+            0.06890848278999329,
+            0.07527969032526016,
+            0.05909419804811478
+          ],
+          "party_online_errors": [
+            0.09076495468616486,
+            0.10684967786073685,
+            0.09651774913072586,
+            0.09779789298772812
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 41,
+          "offline_aggregate_error": 0.02744348905980587,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05759534612298012,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04648600146174431,
+            0.07154897600412369,
+            0.06605295091867447,
+            0.05248494818806648
+          ],
+          "party_online_errors": [
+            0.09176064282655716,
+            0.08903554081916809,
+            0.08805706351995468,
+            0.10110361129045486
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 42,
+          "offline_aggregate_error": 0.02945726551115513,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05242278054356575,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05109499767422676,
+            0.06313348561525345,
+            0.0595816969871521,
+            0.04988575354218483
+          ],
+          "party_online_errors": [
+            0.0927058681845665,
+            0.08098851889371872,
+            0.08848409354686737,
+            0.0844496414065361
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 43,
+          "offline_aggregate_error": 0.03115510754287243,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05262212082743645,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04983861371874809,
+            0.06874297559261322,
+            0.06417448073625565,
+            0.053663887083530426
+          ],
+          "party_online_errors": [
+            0.0900546982884407,
+            0.09319256246089935,
+            0.09149385243654251,
+            0.0788530483841896
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 44,
+          "offline_aggregate_error": 0.03322231397032738,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05988198146224022,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.060285333544015884,
+            0.06753654032945633,
+            0.06825710088014603,
+            0.06256921589374542
+          ],
+          "party_online_errors": [
+            0.1063147783279419,
+            0.09329664707183838,
+            0.10360982269048691,
+            0.089989572763443
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 45,
+          "offline_aggregate_error": 0.03428732231259346,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05230560898780823,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05972383916378021,
+            0.06259137392044067,
+            0.06963670253753662,
+            0.06503433734178543
+          ],
+          "party_online_errors": [
+            0.09128381311893463,
+            0.08174338191747665,
+            0.0836418867111206,
+            0.1049162819981575
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 46,
+          "offline_aggregate_error": 0.030372481793165207,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05518268048763275,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05801645666360855,
+            0.0676155686378479,
+            0.06360160559415817,
+            0.06400057673454285
+          ],
+          "party_online_errors": [
+            0.1043882817029953,
+            0.09127504378557205,
+            0.10366135090589523,
+            0.10540326684713364
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 47,
+          "offline_aggregate_error": 0.0315818265080452,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06207455322146416,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.057382263243198395,
+            0.06367945671081543,
+            0.074979767203331,
+            0.0550740547478199
+          ],
+          "party_online_errors": [
+            0.14464446902275085,
+            0.08967575430870056,
+            0.10825791209936142,
+            0.09071507304906845
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 48,
+          "offline_aggregate_error": 0.02882135845720768,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05763063207268715,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.055190764367580414,
+            0.06131045147776604,
+            0.05615224316716194,
+            0.06690807640552521
+          ],
+          "party_online_errors": [
+            0.136110320687294,
+            0.07797248661518097,
+            0.09198328852653503,
+            0.10393229126930237
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 49,
+          "offline_aggregate_error": 0.027151277288794518,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05084730312228203,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05108260735869408,
+            0.060057155787944794,
+            0.05863490700721741,
+            0.0463067926466465
+          ],
+          "party_online_errors": [
+            0.09993363171815872,
+            0.08801475167274475,
+            0.08522822707891464,
+            0.1039757952094078
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 50,
+          "offline_aggregate_error": 0.03241127356886864,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05743374302983284,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06668293476104736,
+            0.06144387274980545,
+            0.0716712549328804,
+            0.05515098571777344
+          ],
+          "party_online_errors": [
+            0.11149375885725021,
+            0.09498077630996704,
+            0.09579935669898987,
+            0.08541015535593033
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 51,
+          "offline_aggregate_error": 0.031223954632878304,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05116629973053932,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.054126765578985214,
+            0.06759757548570633,
+            0.0705183669924736,
+            0.06029826030135155
+          ],
+          "party_online_errors": [
+            0.091954305768013,
+            0.07688843458890915,
+            0.09114649891853333,
+            0.08136960119009018
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 52,
+          "offline_aggregate_error": 0.027319984510540962,
+          "offline_count": 20,
+          "online_aggregate_error": 0.0670248493552208,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05087888240814209,
+            0.06710626929998398,
+            0.06408638507127762,
+            0.04585414007306099
+          ],
+          "party_online_errors": [
+            0.1373298168182373,
+            0.10186218470335007,
+            0.11024957150220871,
+            0.10286097973585129
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 53,
+          "offline_aggregate_error": 0.028849709779024124,
+          "offline_count": 20,
+          "online_aggregate_error": 0.050469283014535904,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04860804229974747,
+            0.059887755662202835,
+            0.05255807563662529,
+            0.05811796709895134
+          ],
+          "party_online_errors": [
+            0.11680043488740921,
+            0.06652086973190308,
+            0.08281812816858292,
+            0.07608550041913986
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 54,
+          "offline_aggregate_error": 0.03133191540837288,
+          "offline_count": 20,
+          "online_aggregate_error": 0.043487031012773514,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05949562042951584,
+            0.06218307837843895,
+            0.06246113404631615,
+            0.06210164353251457
+          ],
+          "party_online_errors": [
+            0.08161574602127075,
+            0.06970792263746262,
+            0.09148828685283661,
+            0.07323870062828064
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 55,
+          "offline_aggregate_error": 0.03237165883183479,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05585367977619171,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06691647320985794,
+            0.06464798003435135,
+            0.060218121856451035,
+            0.059691280126571655
+          ],
+          "party_online_errors": [
+            0.12140554189682007,
+            0.085234634578228,
+            0.08333370834589005,
+            0.09329773485660553
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 56,
+          "offline_aggregate_error": 0.02949456311762333,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05702900514006615,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05172623693943024,
+            0.06490487605333328,
+            0.07099227607250214,
+            0.0551498681306839
+          ],
+          "party_online_errors": [
+            0.12448642402887344,
+            0.08180996030569077,
+            0.1003553569316864,
+            0.10400109738111496
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 57,
+          "offline_aggregate_error": 0.03217921406030655,
+          "offline_count": 20,
+          "online_aggregate_error": 0.051915399730205536,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.058912407606840134,
+            0.06971007585525513,
+            0.05869900807738304,
+            0.06514031440019608
+          ],
+          "party_online_errors": [
+            0.10865169763565063,
+            0.07721825689077377,
+            0.08931358903646469,
+            0.09622212499380112
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 58,
+          "offline_aggregate_error": 0.029204437509179115,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05237046629190445,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.051099032163619995,
+            0.07010108232498169,
+            0.058719977736473083,
+            0.06597672402858734
+          ],
+          "party_online_errors": [
+            0.11329863220453262,
+            0.08868773281574249,
+            0.0906960666179657,
+            0.08337028324604034
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 59,
+          "offline_aggregate_error": 0.03238671272993088,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05935410410165787,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.054428935050964355,
+            0.06642670929431915,
+            0.07392732053995132,
+            0.05535697564482689
+          ],
+          "party_online_errors": [
+            0.09745526313781738,
+            0.09763657301664352,
+            0.10323268920183182,
+            0.09766475111246109
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 60,
+          "offline_aggregate_error": 0.025228504091501236,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05354657024145126,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0448300801217556,
+            0.05730143561959267,
+            0.05567830055952072,
+            0.04464335739612579
+          ],
+          "party_online_errors": [
+            0.0999164953827858,
+            0.08761296421289444,
+            0.0821392759680748,
+            0.09752324968576431
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 61,
+          "offline_aggregate_error": 0.029141683131456375,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05684410408139229,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04922749102115631,
+            0.056911714375019073,
+            0.059401798993349075,
+            0.06680098921060562
+          ],
+          "party_online_errors": [
+            0.1214800775051117,
+            0.08989523351192474,
+            0.09755799919366837,
+            0.08637279272079468
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 62,
+          "offline_aggregate_error": 0.0301680751144886,
+          "offline_count": 20,
+          "online_aggregate_error": 0.037810295820236206,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0686345249414444,
+            0.05337579920887947,
+            0.06473898142576218,
+            0.057596608996391296
+          ],
+          "party_online_errors": [
+            0.08489122241735458,
+            0.06470729410648346,
+            0.06276323646306992,
+            0.06726570427417755
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 63,
+          "offline_aggregate_error": 0.029873808845877647,
+          "offline_count": 20,
+          "online_aggregate_error": 0.0568094328045845,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04719829186797142,
+            0.06111609563231468,
+            0.06702733039855957,
+            0.06751805543899536
+          ],
+          "party_online_errors": [
+            0.11461597681045532,
+            0.0902145653963089,
+            0.09746019542217255,
+            0.08935220539569855
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 64,
+          "offline_aggregate_error": 0.030421121045947075,
+          "offline_count": 20,
+          "online_aggregate_error": 0.054221440106630325,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05492774769663811,
+            0.06690188497304916,
+            0.06145045906305313,
+            0.053762465715408325
+          ],
+          "party_online_errors": [
+            0.10512160509824753,
+            0.10803000628948212,
+            0.0897577553987503,
+            0.09003274887800217
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 65,
+          "offline_aggregate_error": 0.03224135562777519,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05974740907549858,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05552106350660324,
+            0.06864406913518906,
+            0.06874949485063553,
+            0.05723441392183304
+          ],
+          "party_online_errors": [
+            0.12043780088424683,
+            0.09299932420253754,
+            0.1103973388671875,
+            0.09238440543413162
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 66,
+          "offline_aggregate_error": 0.03218400850892067,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05972277745604515,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.054914627224206924,
+            0.06534888595342636,
+            0.0669851005077362,
+            0.05594133958220482
+          ],
+          "party_online_errors": [
+            0.11213190853595734,
+            0.10433895140886307,
+            0.1051151230931282,
+            0.08783648908138275
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 67,
+          "offline_aggregate_error": 0.031174832955002785,
+          "offline_count": 20,
+          "online_aggregate_error": 0.052553657442331314,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.058176081627607346,
+            0.06345179677009583,
+            0.06767643988132477,
+            0.0653911605477333
+          ],
+          "party_online_errors": [
+            0.1032986119389534,
+            0.08317884057760239,
+            0.08759529888629913,
+            0.08573313802480698
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 68,
+          "offline_aggregate_error": 0.02622145600616932,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05351259186863899,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.043357718735933304,
+            0.06388692557811737,
+            0.05947405844926834,
+            0.04687202349305153
+          ],
+          "party_online_errors": [
+            0.10457002371549606,
+            0.09021865576505661,
+            0.08519857376813889,
+            0.08769732713699341
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 69,
+          "offline_aggregate_error": 0.03201211616396904,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05719880014657974,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05469382926821709,
+            0.07382732629776001,
+            0.0625823438167572,
+            0.06115271896123886
+          ],
+          "party_online_errors": [
+            0.12576867640018463,
+            0.09146098047494888,
+            0.09523629397153854,
+            0.10616683214902878
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 70,
+          "offline_aggregate_error": 0.032127268612384796,
+          "offline_count": 20,
+          "online_aggregate_error": 0.04375901073217392,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.060677412897348404,
+            0.058127518743276596,
+            0.06734301149845123,
+            0.08137181401252747
+          ],
+          "party_online_errors": [
+            0.09950858354568481,
+            0.0817108228802681,
+            0.07183168828487396,
+            0.08713600784540176
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 71,
+          "offline_aggregate_error": 0.02707833983004093,
+          "offline_count": 20,
+          "online_aggregate_error": 0.053554337471723557,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.054053712636232376,
+            0.05368780717253685,
+            0.049215544015169144,
+            0.047452911734580994
+          ],
+          "party_online_errors": [
+            0.11219608783721924,
+            0.09442814439535141,
+            0.0772676169872284,
+            0.10583801567554474
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 72,
+          "offline_aggregate_error": 0.03287101536989212,
+          "offline_count": 20,
+          "online_aggregate_error": 0.059894271194934845,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0532507449388504,
+            0.07426164299249649,
+            0.06993279606103897,
+            0.06044957786798477
+          ],
+          "party_online_errors": [
+            0.10421210527420044,
+            0.09649553149938583,
+            0.09907807409763336,
+            0.11630776524543762
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 73,
+          "offline_aggregate_error": 0.0299507025629282,
+          "offline_count": 20,
+          "online_aggregate_error": 0.04535313695669174,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04838206246495247,
+            0.0540313795208931,
+            0.059817057102918625,
+            0.05472227931022644
+          ],
+          "party_online_errors": [
+            0.10220340639352798,
+            0.07051805406808853,
+            0.08114058524370193,
+            0.0804743692278862
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 74,
+          "offline_aggregate_error": 0.031752943992614746,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05764961987733841,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05410873889923096,
+            0.07045377045869827,
+            0.07230452448129654,
+            0.0632699504494667
+          ],
+          "party_online_errors": [
+            0.09625256806612015,
+            0.10285142809152603,
+            0.10877607762813568,
+            0.09946303069591522
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 75,
+          "offline_aggregate_error": 0.03173094615340233,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06174452230334282,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05970265716314316,
+            0.06706862151622772,
+            0.06363578140735626,
+            0.05423668771982193
+          ],
+          "party_online_errors": [
+            0.1252523958683014,
+            0.09532338380813599,
+            0.10651320964097977,
+            0.09173300862312317
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 76,
+          "offline_aggregate_error": 0.0314161516726017,
+          "offline_count": 20,
+          "online_aggregate_error": 0.0564340278506279,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.058006469160318375,
+            0.068976029753685,
+            0.060832127928733826,
+            0.04815341532230377
+          ],
+          "party_online_errors": [
+            0.10924502462148666,
+            0.0985390692949295,
+            0.09392854571342468,
+            0.09776146709918976
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 77,
+          "offline_aggregate_error": 0.029994184151291847,
+          "offline_count": 20,
+          "online_aggregate_error": 0.058573849499225616,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05900710076093674,
+            0.06826697289943695,
+            0.07272317260503769,
+            0.05033857002854347
+          ],
+          "party_online_errors": [
+            0.09914534538984299,
+            0.10587751120328903,
+            0.10073386877775192,
+            0.10610396414995193
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 78,
+          "offline_aggregate_error": 0.0333738848567009,
+          "offline_count": 20,
+          "online_aggregate_error": 0.059414442628622055,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.059813667088747025,
+            0.0682176798582077,
+            0.06683488190174103,
+            0.04901272803544998
+          ],
+          "party_online_errors": [
+            0.13153131306171417,
+            0.07482795417308807,
+            0.08923579007387161,
+            0.11032284796237946
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 79,
+          "offline_aggregate_error": 0.031825803220272064,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05830812826752663,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0702061578631401,
+            0.06418416649103165,
+            0.05966513976454735,
+            0.05733395740389824
+          ],
+          "party_online_errors": [
+            0.10660247504711151,
+            0.08853863924741745,
+            0.0917227640748024,
+            0.09543603658676147
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 80,
+          "offline_aggregate_error": 0.03174615278840065,
+          "offline_count": 20,
+          "online_aggregate_error": 0.057834938168525696,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05610078200697899,
+            0.07166149467229843,
+            0.07435503602027893,
+            0.055704157799482346
+          ],
+          "party_online_errors": [
+            0.10431288927793503,
+            0.09852173179388046,
+            0.09881503134965897,
+            0.09610752016305923
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 81,
+          "offline_aggregate_error": 0.028998177498579025,
+          "offline_count": 20,
+          "online_aggregate_error": 0.053001489490270615,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05679398030042648,
+            0.061639510095119476,
+            0.058003127574920654,
+            0.04848125949501991
+          ],
+          "party_online_errors": [
+            0.12124400585889816,
+            0.0776263177394867,
+            0.09334959834814072,
+            0.10716009885072708
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 82,
+          "offline_aggregate_error": 0.02901138924062252,
+          "offline_count": 20,
+          "online_aggregate_error": 0.04780881851911545,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06254100799560547,
+            0.05602705478668213,
+            0.0551547110080719,
+            0.06584510952234268
+          ],
+          "party_online_errors": [
+            0.12864364683628082,
+            0.0826067104935646,
+            0.07263760268688202,
+            0.07558250427246094
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 83,
+          "offline_aggregate_error": 0.030902676284313202,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05476278439164162,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.07587507367134094,
+            0.06412060558795929,
+            0.05944674834609032,
+            0.05889568850398064
+          ],
+          "party_online_errors": [
+            0.11278462409973145,
+            0.0881318524479866,
+            0.08199823647737503,
+            0.09432069212198257
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 84,
+          "offline_aggregate_error": 0.031589485704898834,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05154829099774361,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06526517868041992,
+            0.06530629843473434,
+            0.0668676570057869,
+            0.05429447069764137
+          ],
+          "party_online_errors": [
+            0.10258150845766068,
+            0.0846467837691307,
+            0.09338825941085815,
+            0.09272971749305725
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 85,
+          "offline_aggregate_error": 0.030696213245391846,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05951135605573654,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0668698325753212,
+            0.059572990983724594,
+            0.059550292789936066,
+            0.05230733007192612
+          ],
+          "party_online_errors": [
+            0.12234162539243698,
+            0.0915856584906578,
+            0.0899583101272583,
+            0.10849181562662125
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 86,
+          "offline_aggregate_error": 0.030114753171801567,
+          "offline_count": 20,
+          "online_aggregate_error": 0.0697205662727356,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05028403550386429,
+            0.06709932535886765,
+            0.07510238885879517,
+            0.0572974719107151
+          ],
+          "party_online_errors": [
+            0.130038321018219,
+            0.10465845465660095,
+            0.12729007005691528,
+            0.11199435591697693
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 87,
+          "offline_aggregate_error": 0.032563064247369766,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06464558094739914,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05991149693727493,
+            0.07664033025503159,
+            0.06700275093317032,
+            0.060605570673942566
+          ],
+          "party_online_errors": [
+            0.12092486768960953,
+            0.09245629608631134,
+            0.10992082208395004,
+            0.10249059647321701
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 88,
+          "offline_aggregate_error": 0.029884660616517067,
+          "offline_count": 20,
+          "online_aggregate_error": 0.04739461839199066,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.052453797310590744,
+            0.06682195514440536,
+            0.06188822537660599,
+            0.06197420135140419
+          ],
+          "party_online_errors": [
+            0.10189889371395111,
+            0.08774694800376892,
+            0.07870644330978394,
+            0.10096840560436249
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 89,
+          "offline_aggregate_error": 0.03049791231751442,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05379324033856392,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04963502660393715,
+            0.059421245008707047,
+            0.06768500804901123,
+            0.059080734848976135
+          ],
+          "party_online_errors": [
+            0.12623712420463562,
+            0.0788109302520752,
+            0.09171578288078308,
+            0.10157860070466995
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 90,
+          "offline_aggregate_error": 0.02991960197687149,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05484602227807045,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05952009558677673,
+            0.06674981117248535,
+            0.06458601355552673,
+            0.051807112991809845
+          ],
+          "party_online_errors": [
+            0.09455052763223648,
+            0.09128859639167786,
+            0.1020529642701149,
+            0.09534213691949844
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 91,
+          "offline_aggregate_error": 0.031236160546541214,
+          "offline_count": 20,
+          "online_aggregate_error": 0.048319000750780106,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05891605466604233,
+            0.06722000986337662,
+            0.07232232391834259,
+            0.04593707621097565
+          ],
+          "party_online_errors": [
+            0.09892860800027847,
+            0.0861256793141365,
+            0.08225735276937485,
+            0.0874597430229187
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 92,
+          "offline_aggregate_error": 0.0345342643558979,
+          "offline_count": 20,
+          "online_aggregate_error": 0.04196656867861748,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05858375132083893,
+            0.06093321368098259,
+            0.06746218353509903,
+            0.07513082027435303
+          ],
+          "party_online_errors": [
+            0.08693599700927734,
+            0.0723625123500824,
+            0.08224278688430786,
+            0.07378914952278137
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 93,
+          "offline_aggregate_error": 0.03051469288766384,
+          "offline_count": 20,
+          "online_aggregate_error": 0.053122807294130325,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05681190639734268,
+            0.0666525661945343,
+            0.07312045246362686,
+            0.055740583688020706
+          ],
+          "party_online_errors": [
+            0.11446909606456757,
+            0.07477140426635742,
+            0.09143245965242386,
+            0.09675045311450958
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 94,
+          "offline_aggregate_error": 0.032065488398075104,
+          "offline_count": 20,
+          "online_aggregate_error": 0.07069600373506546,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06479372084140778,
+            0.06347870081663132,
+            0.0687623918056488,
+            0.05638652294874191
+          ],
+          "party_online_errors": [
+            0.1603342741727829,
+            0.09482108056545258,
+            0.09726019948720932,
+            0.12591931223869324
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 95,
+          "offline_aggregate_error": 0.02934129536151886,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05788404494524002,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.062493856996297836,
+            0.05574600771069527,
+            0.07200261950492859,
+            0.04967102035880089
+          ],
+          "party_online_errors": [
+            0.1452314257621765,
+            0.07872802019119263,
+            0.08780226856470108,
+            0.09778343141078949
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 96,
+          "offline_aggregate_error": 0.028212158009409904,
+          "offline_count": 20,
+          "online_aggregate_error": 0.054371967911720276,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.046026136726140976,
+            0.06072782352566719,
+            0.056527379900217056,
+            0.0487210713326931
+          ],
+          "party_online_errors": [
+            0.10020001232624054,
+            0.08584509044885635,
+            0.08081012964248657,
+            0.08716774731874466
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 97,
+          "offline_aggregate_error": 0.032854873687028885,
+          "offline_count": 20,
+          "online_aggregate_error": 0.050789523869752884,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0634419322013855,
+            0.06565625965595245,
+            0.06727821379899979,
+            0.07403934746980667
+          ],
+          "party_online_errors": [
+            0.09109246730804443,
+            0.08788046985864639,
+            0.09150753915309906,
+            0.07628446072340012
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 98,
+          "offline_aggregate_error": 0.03460977226495743,
+          "offline_count": 20,
+          "online_aggregate_error": 0.051439885050058365,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.061363909393548965,
+            0.06861504167318344,
+            0.0644194483757019,
+            0.06450751423835754
+          ],
+          "party_online_errors": [
+            0.11083166301250458,
+            0.08088752627372742,
+            0.08752461522817612,
+            0.0888737291097641
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 99,
+          "offline_aggregate_error": 0.03531406819820404,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05575282871723175,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06400081515312195,
+            0.06817544251680374,
+            0.07083049416542053,
+            0.05617552623152733
+          ],
+          "party_online_errors": [
+            0.08786115050315857,
+            0.08004877716302872,
+            0.09858481585979462,
+            0.086795374751091
+          ]
+        }
+      ],
+      "config_sha256": "2871ddd8d41d9d2ec31d95083532358399eb79cc13e456607aa3f03a61ab3faf",
+      "data_sha256": {
+        "data:cifar-100-python/meta": "a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9",
+        "data:cifar-100-python/test": "4b67687d9933c4db8f0831104447f15b93774f4f464bd0516f0f0f2ac83b7864",
+        "data:cifar-100-python/train": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b"
+      },
+      "eligible_indices_sha256": "30f96089b22c9dc65c4a5db906d90224369a12ef47b3d408a74e4a635c3b3542",
+      "formal_record_sha256": "e7f518330dad3442120d17e0ac078ad732f42978bd6c1028bafa7bbc647f9848",
+      "offline_selected_indices_sha256": "ae04e1243099dad4ab0f003f6b18285f16f029985a1e5b380df3b0958ec5bfda",
+      "seed": 43,
+      "summary": {
+        "classes": 100,
+        "fraction_online_worse": 1.0,
+        "mean_difference": 0.025710815135389566,
+        "offline_mean": 0.030898029636591672,
+        "offline_median": 0.03097689151763916,
+        "online_mean": 0.05660884477198124,
+        "online_median": 0.056764790788292885,
+        "party_fraction_online_worse": [
+          1.0,
+          0.99,
+          0.99,
+          0.99
+        ],
+        "party_mean_differences": [
+          0.054375511072576044,
+          0.025253391787409783,
+          0.028480749651789664,
+          0.03855245228856802
+        ],
+        "party_offline_means": [
+          0.05736044976860285,
+          0.06506323710083961,
+          0.06544631287455559,
+          0.057843094207346436
+        ],
+        "party_offline_medians": [
+          0.057886771857738495,
+          0.06477642804384232,
+          0.06579635664820671,
+          0.05731571465730667
+        ],
+        "party_online_means": [
+          0.1117359608411789,
+          0.0903166288882494,
+          0.09392706252634525,
+          0.09639554649591446
+        ],
+        "party_online_medians": [
+          0.10894836112856865,
+          0.09005489945411682,
+          0.09323233738541603,
+          0.09648628905415535
+        ]
+      },
+      "validation_manifest_sha256": "7934fcbc5385883cd4312d7416d70dbae8a73044802431f766ee6de2249e5418"
+    },
+    {
+      "bic_manifest_sha256": "d6802b2cff810db76910ef12fb80c5bd9ccbac9cbbd4539aee8ac303bfde26e9",
+      "bottom_state_sha256": "b9901c328a1f314b8d37891cc1dd7f264f66f1f098550a460e1ab860778fb88e",
+      "checkpoint_sha256": "df14c910e6969859a01b0a553374b0464680862c0c6095ee4ca69363b7b39c00",
+      "classes": [
+        {
+          "candidate_count": 450,
+          "class_id": 0,
+          "offline_aggregate_error": 0.02748953551054001,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05882146582007408,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0499415285885334,
+            0.05518774688243866,
+            0.05339490994811058,
+            0.07841946929693222
+          ],
+          "party_online_errors": [
+            0.07465419173240662,
+            0.07376161962747574,
+            0.08137315511703491,
+            0.09725642204284668
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 1,
+          "offline_aggregate_error": 0.028455451130867004,
+          "offline_count": 20,
+          "online_aggregate_error": 0.0476568266749382,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.047309037297964096,
+            0.06222549453377724,
+            0.05976628512144089,
+            0.05674554035067558
+          ],
+          "party_online_errors": [
+            0.08842436969280243,
+            0.09606178849935532,
+            0.07516808807849884,
+            0.09033076465129852
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 2,
+          "offline_aggregate_error": 0.030346469953656197,
+          "offline_count": 20,
+          "online_aggregate_error": 0.059894710779190063,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0624256357550621,
+            0.06410606950521469,
+            0.058892618864774704,
+            0.061557549983263016
+          ],
+          "party_online_errors": [
+            0.11014822870492935,
+            0.08676376193761826,
+            0.09130623936653137,
+            0.12544851005077362
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 3,
+          "offline_aggregate_error": 0.030170246958732605,
+          "offline_count": 20,
+          "online_aggregate_error": 0.0599062405526638,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.035524141043424606,
+            0.06788728386163712,
+            0.06135321035981178,
+            0.05629593878984451
+          ],
+          "party_online_errors": [
+            0.11081264913082123,
+            0.09771296381950378,
+            0.09716068208217621,
+            0.11566182971000671
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 4,
+          "offline_aggregate_error": 0.03128005191683769,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06574469804763794,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04769652336835861,
+            0.06647004187107086,
+            0.06434356421232224,
+            0.0599040612578392
+          ],
+          "party_online_errors": [
+            0.0883985236287117,
+            0.10955271869897842,
+            0.10897929966449738,
+            0.13191650807857513
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 5,
+          "offline_aggregate_error": 0.029546841979026794,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05573839694261551,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04803214594721794,
+            0.06363590806722641,
+            0.0656735748052597,
+            0.061234746128320694
+          ],
+          "party_online_errors": [
+            0.11603657156229019,
+            0.09078459441661835,
+            0.08390914648771286,
+            0.09852646291255951
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 6,
+          "offline_aggregate_error": 0.030292285606265068,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05477788299322128,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0769285336136818,
+            0.06592141836881638,
+            0.06320109218358994,
+            0.07059179991483688
+          ],
+          "party_online_errors": [
+            0.08209380507469177,
+            0.09726085513830185,
+            0.08045653253793716,
+            0.09735087305307388
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 7,
+          "offline_aggregate_error": 0.031447332352399826,
+          "offline_count": 20,
+          "online_aggregate_error": 0.057448334991931915,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05868013948202133,
+            0.06529941409826279,
+            0.06011984869837761,
+            0.06538216769695282
+          ],
+          "party_online_errors": [
+            0.0802946537733078,
+            0.09202336519956589,
+            0.09513445943593979,
+            0.10065694153308868
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 8,
+          "offline_aggregate_error": 0.029084337875247,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05925258249044418,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.037741050124168396,
+            0.06903426349163055,
+            0.06241258233785629,
+            0.059552326798439026
+          ],
+          "party_online_errors": [
+            0.11914359778165817,
+            0.10148477554321289,
+            0.0970786064863205,
+            0.08683374524116516
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 9,
+          "offline_aggregate_error": 0.032573916018009186,
+          "offline_count": 20,
+          "online_aggregate_error": 0.061988163739442825,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.044534917920827866,
+            0.06699299812316895,
+            0.06840543448925018,
+            0.07272238284349442
+          ],
+          "party_online_errors": [
+            0.09413968771696091,
+            0.08960311859846115,
+            0.10207963734865189,
+            0.10977112501859665
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 10,
+          "offline_aggregate_error": 0.032765816897153854,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06507144868373871,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.055280715227127075,
+            0.06521035730838776,
+            0.07403174042701721,
+            0.061403896659612656
+          ],
+          "party_online_errors": [
+            0.09497833997011185,
+            0.09227076172828674,
+            0.10129854828119278,
+            0.12331411987543106
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 11,
+          "offline_aggregate_error": 0.031415920704603195,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06601380556821823,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05935099348425865,
+            0.06373411417007446,
+            0.06082460284233093,
+            0.06683547049760818
+          ],
+          "party_online_errors": [
+            0.10795190930366516,
+            0.0929659977555275,
+            0.11792219430208206,
+            0.10831146687269211
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 12,
+          "offline_aggregate_error": 0.030490253120660782,
+          "offline_count": 20,
+          "online_aggregate_error": 0.059614021331071854,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.053137216717004776,
+            0.0638776496052742,
+            0.0657353550195694,
+            0.04916376620531082
+          ],
+          "party_online_errors": [
+            0.10303588956594467,
+            0.0994483232498169,
+            0.0917738750576973,
+            0.1113404706120491
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 13,
+          "offline_aggregate_error": 0.029797082766890526,
+          "offline_count": 20,
+          "online_aggregate_error": 0.055593375116586685,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.042943116277456284,
+            0.07052482664585114,
+            0.0665135309100151,
+            0.05767825245857239
+          ],
+          "party_online_errors": [
+            0.10446646064519882,
+            0.09786350280046463,
+            0.0918203815817833,
+            0.11112695932388306
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 14,
+          "offline_aggregate_error": 0.03188919648528099,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05769413337111473,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05072856321930885,
+            0.05909324437379837,
+            0.0679558515548706,
+            0.05130083113908768
+          ],
+          "party_online_errors": [
+            0.12662427127361298,
+            0.10822786390781403,
+            0.09006612002849579,
+            0.08242908865213394
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 15,
+          "offline_aggregate_error": 0.0326596237719059,
+          "offline_count": 20,
+          "online_aggregate_error": 0.055197589099407196,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.053996045142412186,
+            0.06643940508365631,
+            0.07195480912923813,
+            0.05718252435326576
+          ],
+          "party_online_errors": [
+            0.10560794919729233,
+            0.08640061318874359,
+            0.08287137001752853,
+            0.09631341695785522
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 16,
+          "offline_aggregate_error": 0.03314809501171112,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06659307330846786,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04479232430458069,
+            0.06439099460840225,
+            0.0725829154253006,
+            0.06483335793018341
+          ],
+          "party_online_errors": [
+            0.1019665077328682,
+            0.11857087910175323,
+            0.11575278639793396,
+            0.12023360282182693
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 17,
+          "offline_aggregate_error": 0.026745786890387535,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06142711639404297,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05019223690032959,
+            0.055081333965063095,
+            0.061386588960886,
+            0.045763928443193436
+          ],
+          "party_online_errors": [
+            0.09516406059265137,
+            0.09773597866296768,
+            0.10165050625801086,
+            0.09923356771469116
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 18,
+          "offline_aggregate_error": 0.03306065499782562,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05644882842898369,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06061464920639992,
+            0.0656537190079689,
+            0.06214404106140137,
+            0.07321379333734512
+          ],
+          "party_online_errors": [
+            0.11315575987100601,
+            0.09504195302724838,
+            0.08406540751457214,
+            0.11030818521976471
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 19,
+          "offline_aggregate_error": 0.03214172646403313,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06181033328175545,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.056431543081998825,
+            0.0691056102514267,
+            0.0650879293680191,
+            0.0684099942445755
+          ],
+          "party_online_errors": [
+            0.13431411981582642,
+            0.09754767268896103,
+            0.10226457566022873,
+            0.11285877227783203
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 20,
+          "offline_aggregate_error": 0.027330663055181503,
+          "offline_count": 20,
+          "online_aggregate_error": 0.07394667714834213,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.042984362691640854,
+            0.06301957368850708,
+            0.060081373900175095,
+            0.059520650655031204
+          ],
+          "party_online_errors": [
+            0.13141317665576935,
+            0.08347958326339722,
+            0.0991283506155014,
+            0.12420400232076645
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 21,
+          "offline_aggregate_error": 0.033403899520635605,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06428669393062592,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05163285508751869,
+            0.06221073120832443,
+            0.06973491609096527,
+            0.05886826291680336
+          ],
+          "party_online_errors": [
+            0.10135745257139206,
+            0.09928209334611893,
+            0.1037689819931984,
+            0.11277167499065399
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 22,
+          "offline_aggregate_error": 0.03261994197964668,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05664854496717453,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04935288429260254,
+            0.06499319523572922,
+            0.06988268345594406,
+            0.06918088346719742
+          ],
+          "party_online_errors": [
+            0.07515890896320343,
+            0.09460877627134323,
+            0.0954512357711792,
+            0.0940953716635704
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 23,
+          "offline_aggregate_error": 0.027092766016721725,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05277593061327934,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.045944225043058395,
+            0.05769050493836403,
+            0.04979625344276428,
+            0.04938790202140808
+          ],
+          "party_online_errors": [
+            0.09124235063791275,
+            0.07866333425045013,
+            0.08835969120264053,
+            0.11496424674987793
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 24,
+          "offline_aggregate_error": 0.02853243052959442,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05967424064874649,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0447208397090435,
+            0.05810752511024475,
+            0.05878820642828941,
+            0.053627677261829376
+          ],
+          "party_online_errors": [
+            0.0989423617720604,
+            0.08794783800840378,
+            0.09865188598632812,
+            0.11319471150636673
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 25,
+          "offline_aggregate_error": 0.034090861678123474,
+          "offline_count": 20,
+          "online_aggregate_error": 0.066266730427742,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.050615549087524414,
+            0.06740786135196686,
+            0.06452815234661102,
+            0.08173508197069168
+          ],
+          "party_online_errors": [
+            0.10052791982889175,
+            0.0962301716208458,
+            0.09158006310462952,
+            0.12239711731672287
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 26,
+          "offline_aggregate_error": 0.03220971301198006,
+          "offline_count": 20,
+          "online_aggregate_error": 0.056125346571207047,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.049644835293293,
+            0.06641951948404312,
+            0.06637989729642868,
+            0.06180325150489807
+          ],
+          "party_online_errors": [
+            0.0844828337430954,
+            0.09591435641050339,
+            0.08869852125644684,
+            0.105970598757267
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 27,
+          "offline_aggregate_error": 0.03180154040455818,
+          "offline_count": 20,
+          "online_aggregate_error": 0.056590061634778976,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04747883602976799,
+            0.06706464290618896,
+            0.07331255823373795,
+            0.05746972933411598
+          ],
+          "party_online_errors": [
+            0.10158318281173706,
+            0.08905588090419769,
+            0.10285337269306183,
+            0.10007330775260925
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 28,
+          "offline_aggregate_error": 0.03441377356648445,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06208407133817673,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05246921256184578,
+            0.06893469393253326,
+            0.071320079267025,
+            0.06565771996974945
+          ],
+          "party_online_errors": [
+            0.07778913527727127,
+            0.09345483779907227,
+            0.09265726804733276,
+            0.08614220470190048
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 29,
+          "offline_aggregate_error": 0.03384089469909668,
+          "offline_count": 20,
+          "online_aggregate_error": 0.0546899177134037,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04483209177851677,
+            0.06300171464681625,
+            0.07042580842971802,
+            0.06966184079647064
+          ],
+          "party_online_errors": [
+            0.08120282739400864,
+            0.09312877058982849,
+            0.09799021482467651,
+            0.09571531414985657
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 30,
+          "offline_aggregate_error": 0.027877043932676315,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05334511026740074,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.044022828340530396,
+            0.061582911759614944,
+            0.05943560600280762,
+            0.05920092388987541
+          ],
+          "party_online_errors": [
+            0.09114468097686768,
+            0.08013958483934402,
+            0.08408383280038834,
+            0.09968902170658112
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 31,
+          "offline_aggregate_error": 0.029363885521888733,
+          "offline_count": 20,
+          "online_aggregate_error": 0.060220103710889816,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.047868404537439346,
+            0.07290124148130417,
+            0.0597001314163208,
+            0.05282999202609062
+          ],
+          "party_online_errors": [
+            0.10083843022584915,
+            0.09976592659950256,
+            0.10237383842468262,
+            0.11410683393478394
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 32,
+          "offline_aggregate_error": 0.03166214004158974,
+          "offline_count": 20,
+          "online_aggregate_error": 0.062428273260593414,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05325692892074585,
+            0.0627182126045227,
+            0.06376028060913086,
+            0.062217846512794495
+          ],
+          "party_online_errors": [
+            0.07353207468986511,
+            0.09577196836471558,
+            0.10133408010005951,
+            0.13141630589962006
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 33,
+          "offline_aggregate_error": 0.033441342413425446,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06161462515592575,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.052564870566129684,
+            0.06896066665649414,
+            0.07435613870620728,
+            0.05536157637834549
+          ],
+          "party_online_errors": [
+            0.11594855785369873,
+            0.10602667182683945,
+            0.09809894859790802,
+            0.12168878316879272
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 34,
+          "offline_aggregate_error": 0.03239451348781586,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06309855729341507,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05214451253414154,
+            0.06785693019628525,
+            0.06208394467830658,
+            0.06620287150144577
+          ],
+          "party_online_errors": [
+            0.13452190160751343,
+            0.08633127808570862,
+            0.09386191517114639,
+            0.11164961755275726
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 35,
+          "offline_aggregate_error": 0.032402072101831436,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05418536439538002,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04833286255598068,
+            0.07258496433496475,
+            0.06800679117441177,
+            0.09220673143863678
+          ],
+          "party_online_errors": [
+            0.1019008457660675,
+            0.08436717092990875,
+            0.09113675355911255,
+            0.10440345853567123
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 36,
+          "offline_aggregate_error": 0.02964075468480587,
+          "offline_count": 20,
+          "online_aggregate_error": 0.0578281469643116,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04384129121899605,
+            0.06642912328243256,
+            0.06952392309904099,
+            0.062262993305921555
+          ],
+          "party_online_errors": [
+            0.09591905772686005,
+            0.09487440437078476,
+            0.1003219485282898,
+            0.09034040570259094
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 37,
+          "offline_aggregate_error": 0.029357219114899635,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05627844110131264,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.038388896733522415,
+            0.06994824856519699,
+            0.06311185657978058,
+            0.05827933922410011
+          ],
+          "party_online_errors": [
+            0.07285282760858536,
+            0.09411846846342087,
+            0.09245859086513519,
+            0.10352646559476852
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 38,
+          "offline_aggregate_error": 0.031744956970214844,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06376107037067413,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.045647356659173965,
+            0.06634143739938736,
+            0.07495878636837006,
+            0.06002202257514
+          ],
+          "party_online_errors": [
+            0.08697173744440079,
+            0.11734852939844131,
+            0.11200364679098129,
+            0.11690914630889893
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 39,
+          "offline_aggregate_error": 0.035775817930698395,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05348275601863861,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.045266587287187576,
+            0.06698691099882126,
+            0.07002720981836319,
+            0.06073500216007233
+          ],
+          "party_online_errors": [
+            0.08954066038131714,
+            0.09767936170101166,
+            0.0761241689324379,
+            0.10684020072221756
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 40,
+          "offline_aggregate_error": 0.032597366720438004,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05953032523393631,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04341625049710274,
+            0.06773430109024048,
+            0.07816706597805023,
+            0.06297404319047928
+          ],
+          "party_online_errors": [
+            0.08788743615150452,
+            0.09320257604122162,
+            0.09126358479261398,
+            0.09844636917114258
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 41,
+          "offline_aggregate_error": 0.027264805510640144,
+          "offline_count": 20,
+          "online_aggregate_error": 0.060374218970537186,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05027344822883606,
+            0.058965373784303665,
+            0.06068360432982445,
+            0.05858005955815315
+          ],
+          "party_online_errors": [
+            0.09213411808013916,
+            0.1043011024594307,
+            0.08386571705341339,
+            0.1078486442565918
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 42,
+          "offline_aggregate_error": 0.031917352229356766,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06164444983005524,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0474693700671196,
+            0.0743841826915741,
+            0.06583992391824722,
+            0.05290471762418747
+          ],
+          "party_online_errors": [
+            0.10767915099859238,
+            0.09543190151453018,
+            0.0970236286520958,
+            0.1111396849155426
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 43,
+          "offline_aggregate_error": 0.03023439086973667,
+          "offline_count": 20,
+          "online_aggregate_error": 0.0651170015335083,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05115538835525513,
+            0.06590137630701065,
+            0.06701391935348511,
+            0.061337877064943314
+          ],
+          "party_online_errors": [
+            0.12288110703229904,
+            0.09780974686145782,
+            0.09860584884881973,
+            0.11371346563100815
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 44,
+          "offline_aggregate_error": 0.03303908556699753,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05826915055513382,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04338306933641434,
+            0.06642616540193558,
+            0.06737419217824936,
+            0.04903905466198921
+          ],
+          "party_online_errors": [
+            0.09893715381622314,
+            0.0915551632642746,
+            0.09864234179258347,
+            0.10341440141201019
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 45,
+          "offline_aggregate_error": 0.0313870869576931,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05323144793510437,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06041102483868599,
+            0.0653977319598198,
+            0.06739102303981781,
+            0.05577582120895386
+          ],
+          "party_online_errors": [
+            0.08288506418466568,
+            0.0872127041220665,
+            0.08526576310396194,
+            0.09788636863231659
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 46,
+          "offline_aggregate_error": 0.03316151350736618,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05332614481449127,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.047138046473264694,
+            0.0759008377790451,
+            0.0739385336637497,
+            0.06211882829666138
+          ],
+          "party_online_errors": [
+            0.09306027740240097,
+            0.08886122703552246,
+            0.09792300313711166,
+            0.09849803149700165
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 47,
+          "offline_aggregate_error": 0.030425719916820526,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05951670557260513,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.042478181421756744,
+            0.06299501657485962,
+            0.06091782823204994,
+            0.05351824685931206
+          ],
+          "party_online_errors": [
+            0.10429329425096512,
+            0.10119303315877914,
+            0.09468016773462296,
+            0.12252583354711533
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 48,
+          "offline_aggregate_error": 0.028682595118880272,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06009408459067345,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04826778918504715,
+            0.06325043737888336,
+            0.06842619180679321,
+            0.06347442418336868
+          ],
+          "party_online_errors": [
+            0.09806116670370102,
+            0.09518340975046158,
+            0.09249181300401688,
+            0.10369525104761124
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 49,
+          "offline_aggregate_error": 0.027616409584879875,
+          "offline_count": 20,
+          "online_aggregate_error": 0.049341924488544464,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04250223934650421,
+            0.05402357131242752,
+            0.05947886034846306,
+            0.051168233156204224
+          ],
+          "party_online_errors": [
+            0.11696967482566833,
+            0.08173467963933945,
+            0.07732797414064407,
+            0.08386710286140442
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 50,
+          "offline_aggregate_error": 0.03307746350765228,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06046847626566887,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.054165810346603394,
+            0.05974140390753746,
+            0.07401494681835175,
+            0.06903108209371567
+          ],
+          "party_online_errors": [
+            0.09882291406393051,
+            0.0941806212067604,
+            0.09615515917539597,
+            0.11278588324785233
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 51,
+          "offline_aggregate_error": 0.033385589718818665,
+          "offline_count": 20,
+          "online_aggregate_error": 0.055598847568035126,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05048365145921707,
+            0.06542623043060303,
+            0.06807497143745422,
+            0.0644238144159317
+          ],
+          "party_online_errors": [
+            0.10760871320962906,
+            0.08902440220117569,
+            0.08843682706356049,
+            0.1290821135044098
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 52,
+          "offline_aggregate_error": 0.026168974116444588,
+          "offline_count": 20,
+          "online_aggregate_error": 0.07242205739021301,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.041540198028087616,
+            0.06084683910012245,
+            0.059408314526081085,
+            0.046112239360809326
+          ],
+          "party_online_errors": [
+            0.09887382388114929,
+            0.12113131582736969,
+            0.12209954112768173,
+            0.1428195834159851
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 53,
+          "offline_aggregate_error": 0.02834618091583252,
+          "offline_count": 20,
+          "online_aggregate_error": 0.053748615086078644,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.08077973127365112,
+            0.04986956715583801,
+            0.05728813633322716,
+            0.06234866380691528
+          ],
+          "party_online_errors": [
+            0.06833466142416,
+            0.08439592272043228,
+            0.09255759418010712,
+            0.12018153071403503
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 54,
+          "offline_aggregate_error": 0.03071874938905239,
+          "offline_count": 20,
+          "online_aggregate_error": 0.043363310396671295,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05506941303610802,
+            0.05882764607667923,
+            0.06336720287799835,
+            0.06003519520163536
+          ],
+          "party_online_errors": [
+            0.08105659484863281,
+            0.08278735727071762,
+            0.07178687304258347,
+            0.08926592022180557
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 55,
+          "offline_aggregate_error": 0.031458646059036255,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05823027715086937,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.046196650713682175,
+            0.06277415156364441,
+            0.06466527283191681,
+            0.05679585784673691
+          ],
+          "party_online_errors": [
+            0.10001837462186813,
+            0.09910187125205994,
+            0.09448585659265518,
+            0.12907470762729645
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 56,
+          "offline_aggregate_error": 0.030695779249072075,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05792584270238876,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04729877784848213,
+            0.06956222653388977,
+            0.07059035450220108,
+            0.0513232983648777
+          ],
+          "party_online_errors": [
+            0.10468021035194397,
+            0.10094595700502396,
+            0.09220066666603088,
+            0.0980403870344162
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 57,
+          "offline_aggregate_error": 0.031124699860811234,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05422505363821983,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.07031611353158951,
+            0.06744399666786194,
+            0.06535382568836212,
+            0.06886317580938339
+          ],
+          "party_online_errors": [
+            0.08718249201774597,
+            0.09812988340854645,
+            0.08435636758804321,
+            0.1081027016043663
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 58,
+          "offline_aggregate_error": 0.028803789988160133,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05437685176730156,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.044786661863327026,
+            0.06226400285959244,
+            0.05611761286854744,
+            0.05540654808282852
+          ],
+          "party_online_errors": [
+            0.1070718988776207,
+            0.0811239555478096,
+            0.09098748862743378,
+            0.10570355504751205
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 59,
+          "offline_aggregate_error": 0.031129224225878716,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06063440442085266,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.048928383737802505,
+            0.06385674327611923,
+            0.06844957917928696,
+            0.05543455854058266
+          ],
+          "party_online_errors": [
+            0.0995766893029213,
+            0.11705155670642853,
+            0.09471897780895233,
+            0.10435422509908676
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 60,
+          "offline_aggregate_error": 0.026964278891682625,
+          "offline_count": 20,
+          "online_aggregate_error": 0.052629634737968445,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04187358170747757,
+            0.05074446648359299,
+            0.058246348053216934,
+            0.047784458845853806
+          ],
+          "party_online_errors": [
+            0.09537096321582794,
+            0.08660505712032318,
+            0.07792720198631287,
+            0.09897468239068985
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 61,
+          "offline_aggregate_error": 0.032117486000061035,
+          "offline_count": 20,
+          "online_aggregate_error": 0.058892689645290375,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04349835216999054,
+            0.06926583498716354,
+            0.07137817144393921,
+            0.07434295117855072
+          ],
+          "party_online_errors": [
+            0.09504780918359756,
+            0.09283003211021423,
+            0.0894136056303978,
+            0.1118004322052002
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 62,
+          "offline_aggregate_error": 0.029515044763684273,
+          "offline_count": 20,
+          "online_aggregate_error": 0.040966250002384186,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06900016963481903,
+            0.06257657706737518,
+            0.062519870698452,
+            0.06671087443828583
+          ],
+          "party_online_errors": [
+            0.08055843412876129,
+            0.06732894480228424,
+            0.0643928200006485,
+            0.07744637131690979
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 63,
+          "offline_aggregate_error": 0.031544625759124756,
+          "offline_count": 20,
+          "online_aggregate_error": 0.060211390256881714,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04527909681200981,
+            0.07128262519836426,
+            0.06618519872426987,
+            0.04769713804125786
+          ],
+          "party_online_errors": [
+            0.10670207440853119,
+            0.09861616045236588,
+            0.10928743332624435,
+            0.11801856011152267
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 64,
+          "offline_aggregate_error": 0.03149394690990448,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05415588617324829,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04774114117026329,
+            0.06201867386698723,
+            0.07061615586280823,
+            0.06137743964791298
+          ],
+          "party_online_errors": [
+            0.11482757329940796,
+            0.10848279297351837,
+            0.0828680619597435,
+            0.09300577640533447
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 65,
+          "offline_aggregate_error": 0.03410522639751434,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06060704216361046,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06157879903912544,
+            0.07186318188905716,
+            0.07031397521495819,
+            0.06648004800081253
+          ],
+          "party_online_errors": [
+            0.0968271791934967,
+            0.08793479204177856,
+            0.09929223358631134,
+            0.10564243793487549
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 66,
+          "offline_aggregate_error": 0.0333760604262352,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05745558440685272,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05120573565363884,
+            0.07149869203567505,
+            0.07469106465578079,
+            0.06191626191139221
+          ],
+          "party_online_errors": [
+            0.10026408731937408,
+            0.10430942475795746,
+            0.0875961109995842,
+            0.0961279645562172
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 67,
+          "offline_aggregate_error": 0.03381040692329407,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05394178256392479,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04298592358827591,
+            0.06679029762744904,
+            0.06414519250392914,
+            0.06490606814622879
+          ],
+          "party_online_errors": [
+            0.0966547429561615,
+            0.09878947585821152,
+            0.0836033970117569,
+            0.10632762312889099
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 68,
+          "offline_aggregate_error": 0.02847454883158207,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06075926497578621,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04624348506331444,
+            0.06292186677455902,
+            0.0601159930229187,
+            0.04792315512895584
+          ],
+          "party_online_errors": [
+            0.09879681468009949,
+            0.09973756968975067,
+            0.0920601561665535,
+            0.1122780442237854
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 69,
+          "offline_aggregate_error": 0.03147144243121147,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05038797855377197,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.03932006284594536,
+            0.06516911089420319,
+            0.06674360483884811,
+            0.05894098058342934
+          ],
+          "party_online_errors": [
+            0.09104748070240021,
+            0.09456618130207062,
+            0.08541130274534225,
+            0.0814053937792778
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 70,
+          "offline_aggregate_error": 0.028903577476739883,
+          "offline_count": 20,
+          "online_aggregate_error": 0.03812326118350029,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06233580410480499,
+            0.05459534004330635,
+            0.05962766334414482,
+            0.07809285819530487
+          ],
+          "party_online_errors": [
+            0.08318791538476944,
+            0.06931859999895096,
+            0.07034316658973694,
+            0.10300175100564957
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 71,
+          "offline_aggregate_error": 0.02792932838201523,
+          "offline_count": 20,
+          "online_aggregate_error": 0.04816273972392082,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.035829801112413406,
+            0.056023262441158295,
+            0.06892947852611542,
+            0.059111952781677246
+          ],
+          "party_online_errors": [
+            0.12015929818153381,
+            0.07435157150030136,
+            0.0753735899925232,
+            0.09148634225130081
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 72,
+          "offline_aggregate_error": 0.032137054949998856,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05402541533112526,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04798741266131401,
+            0.06447688490152359,
+            0.07399240881204605,
+            0.06843321770429611
+          ],
+          "party_online_errors": [
+            0.12070918083190918,
+            0.08873841911554337,
+            0.09365089237689972,
+            0.10395549237728119
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 73,
+          "offline_aggregate_error": 0.02997145801782608,
+          "offline_count": 20,
+          "online_aggregate_error": 0.04257813096046448,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04180130362510681,
+            0.07042928040027618,
+            0.06357429176568985,
+            0.05287448316812515
+          ],
+          "party_online_errors": [
+            0.07369692623615265,
+            0.07558498531579971,
+            0.06890446692705154,
+            0.07126618176698685
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 74,
+          "offline_aggregate_error": 0.03257983550429344,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06041956692934036,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.06311000883579254,
+            0.0644778311252594,
+            0.0714978277683258,
+            0.06624100357294083
+          ],
+          "party_online_errors": [
+            0.10732188075780869,
+            0.10205478221178055,
+            0.10530383884906769,
+            0.10351555049419403
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 75,
+          "offline_aggregate_error": 0.030328871682286263,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05654961243271828,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04379793629050255,
+            0.06748054921627045,
+            0.06411799043416977,
+            0.054691653698682785
+          ],
+          "party_online_errors": [
+            0.10636593401432037,
+            0.1004907563328743,
+            0.08879302442073822,
+            0.10178369283676147
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 76,
+          "offline_aggregate_error": 0.02994038537144661,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05754949897527695,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0433635413646698,
+            0.06086954474449158,
+            0.06930758059024811,
+            0.050816699862480164
+          ],
+          "party_online_errors": [
+            0.09300806373357773,
+            0.09603705257177353,
+            0.09322328865528107,
+            0.09208685159683228
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 77,
+          "offline_aggregate_error": 0.03204939886927605,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05404515191912651,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04217710345983505,
+            0.06646760553121567,
+            0.07100097090005875,
+            0.06124506890773773
+          ],
+          "party_online_errors": [
+            0.10208287090063095,
+            0.09418413788080215,
+            0.07936081290245056,
+            0.12808406352996826
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 78,
+          "offline_aggregate_error": 0.032290540635585785,
+          "offline_count": 20,
+          "online_aggregate_error": 0.0649302676320076,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0533309280872345,
+            0.06368747353553772,
+            0.06359986215829849,
+            0.055846333503723145
+          ],
+          "party_online_errors": [
+            0.11294268071651459,
+            0.11096060276031494,
+            0.09184674918651581,
+            0.1099727526307106
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 79,
+          "offline_aggregate_error": 0.033139992505311966,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05818561092019081,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.051615700125694275,
+            0.07344789057970047,
+            0.060933664441108704,
+            0.06020236015319824
+          ],
+          "party_online_errors": [
+            0.09087067097425461,
+            0.11336476355791092,
+            0.09306326508522034,
+            0.10184384137392044
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 80,
+          "offline_aggregate_error": 0.03290531039237976,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06583477556705475,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05156421288847923,
+            0.07413265109062195,
+            0.07672127336263657,
+            0.0659872442483902
+          ],
+          "party_online_errors": [
+            0.11626084893941879,
+            0.10076145827770233,
+            0.10841264575719833,
+            0.11703737825155258
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 81,
+          "offline_aggregate_error": 0.029550589621067047,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05505930259823799,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05630690976977348,
+            0.06644770503044128,
+            0.06037493050098419,
+            0.06155737116932869
+          ],
+          "party_online_errors": [
+            0.1254785656929016,
+            0.09050191193819046,
+            0.08205131441354752,
+            0.12766315042972565
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 82,
+          "offline_aggregate_error": 0.02775704301893711,
+          "offline_count": 20,
+          "online_aggregate_error": 0.04446288198232651,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.057216476649045944,
+            0.06076856330037117,
+            0.05975140258669853,
+            0.06354185193777084
+          ],
+          "party_online_errors": [
+            0.07114353775978088,
+            0.09030373394489288,
+            0.07909227907657623,
+            0.10892890393733978
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 83,
+          "offline_aggregate_error": 0.03027600422501564,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05557576194405556,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04470015689730644,
+            0.05922665446996689,
+            0.05597652494907379,
+            0.10465738922357559
+          ],
+          "party_online_errors": [
+            0.05726487189531326,
+            0.08102719485759735,
+            0.07852339744567871,
+            0.08456997573375702
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 84,
+          "offline_aggregate_error": 0.03212546557188034,
+          "offline_count": 20,
+          "online_aggregate_error": 0.058608535677194595,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.057624220848083496,
+            0.06471475213766098,
+            0.0704084038734436,
+            0.07259447127580643
+          ],
+          "party_online_errors": [
+            0.09390481561422348,
+            0.08924301713705063,
+            0.10135296732187271,
+            0.09148534387350082
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 85,
+          "offline_aggregate_error": 0.029535459354519844,
+          "offline_count": 20,
+          "online_aggregate_error": 0.0598398819565773,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04030703380703926,
+            0.06559623777866364,
+            0.06351988017559052,
+            0.05170821398496628
+          ],
+          "party_online_errors": [
+            0.09609486907720566,
+            0.10386566817760468,
+            0.10003159940242767,
+            0.10758602619171143
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 86,
+          "offline_aggregate_error": 0.030828043818473816,
+          "offline_count": 20,
+          "online_aggregate_error": 0.07660938054323196,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04098240286111832,
+            0.06496329605579376,
+            0.06299897283315659,
+            0.05555949732661247
+          ],
+          "party_online_errors": [
+            0.09901730716228485,
+            0.11661797761917114,
+            0.1196034699678421,
+            0.126168355345726
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 87,
+          "offline_aggregate_error": 0.032330937683582306,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06347108632326126,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.060513705015182495,
+            0.06275618821382523,
+            0.07228758186101913,
+            0.08312924206256866
+          ],
+          "party_online_errors": [
+            0.11759892851114273,
+            0.0879548043012619,
+            0.09540034830570221,
+            0.10420343279838562
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 88,
+          "offline_aggregate_error": 0.0328732430934906,
+          "offline_count": 20,
+          "online_aggregate_error": 0.057611461728811264,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05853062868118286,
+            0.06643137335777283,
+            0.06807862967252731,
+            0.06762059777975082
+          ],
+          "party_online_errors": [
+            0.10598572343587875,
+            0.0939139798283577,
+            0.09473344683647156,
+            0.09143158793449402
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 89,
+          "offline_aggregate_error": 0.030710840597748756,
+          "offline_count": 20,
+          "online_aggregate_error": 0.059867989271879196,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04013508930802345,
+            0.07105091214179993,
+            0.06687242537736893,
+            0.06451621651649475
+          ],
+          "party_online_errors": [
+            0.12946102023124695,
+            0.10359250754117966,
+            0.09072565287351608,
+            0.10839959979057312
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 90,
+          "offline_aggregate_error": 0.029981158673763275,
+          "offline_count": 20,
+          "online_aggregate_error": 0.056992385536432266,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04943109676241875,
+            0.061399415135383606,
+            0.06478317081928253,
+            0.05811280384659767
+          ],
+          "party_online_errors": [
+            0.124719999730587,
+            0.09560741484165192,
+            0.08578518778085709,
+            0.10336800664663315
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 91,
+          "offline_aggregate_error": 0.029220152646303177,
+          "offline_count": 20,
+          "online_aggregate_error": 0.054435957223176956,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.04140153527259827,
+            0.06082616373896599,
+            0.06152372062206268,
+            0.060157790780067444
+          ],
+          "party_online_errors": [
+            0.09026124328374863,
+            0.0902886763215065,
+            0.08125089854001999,
+            0.1078951358795166
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 92,
+          "offline_aggregate_error": 0.029398174956440926,
+          "offline_count": 20,
+          "online_aggregate_error": 0.041968319565057755,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05436358228325844,
+            0.05495908483862877,
+            0.05922830104827881,
+            0.06787779182195663
+          ],
+          "party_online_errors": [
+            0.10166554898023605,
+            0.07393311709165573,
+            0.06682905554771423,
+            0.07964897900819778
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 93,
+          "offline_aggregate_error": 0.0333159975707531,
+          "offline_count": 20,
+          "online_aggregate_error": 0.047552719712257385,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.049671851098537445,
+            0.07110511511564255,
+            0.07332546263933182,
+            0.07461701333522797
+          ],
+          "party_online_errors": [
+            0.07945778220891953,
+            0.07451067119836807,
+            0.0812983438372612,
+            0.09639426320791245
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 94,
+          "offline_aggregate_error": 0.03245149925351143,
+          "offline_count": 20,
+          "online_aggregate_error": 0.07838146388530731,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.043825164437294006,
+            0.05809414014220238,
+            0.06969520449638367,
+            0.06587767601013184
+          ],
+          "party_online_errors": [
+            0.09979032725095749,
+            0.09952154010534286,
+            0.11361176520586014,
+            0.13106796145439148
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 95,
+          "offline_aggregate_error": 0.029427431523799896,
+          "offline_count": 20,
+          "online_aggregate_error": 0.0513884611427784,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.03782820329070091,
+            0.0599990114569664,
+            0.05694189667701721,
+            0.0525682307779789
+          ],
+          "party_online_errors": [
+            0.09760907292366028,
+            0.07484608888626099,
+            0.08023369312286377,
+            0.11043133586645126
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 96,
+          "offline_aggregate_error": 0.0328042097389698,
+          "offline_count": 20,
+          "online_aggregate_error": 0.06451457738876343,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.0455249585211277,
+            0.07169093191623688,
+            0.06450371444225311,
+            0.061537958681583405
+          ],
+          "party_online_errors": [
+            0.10377317667007446,
+            0.11252648383378983,
+            0.08559659868478775,
+            0.11397984623908997
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 97,
+          "offline_aggregate_error": 0.033537134528160095,
+          "offline_count": 20,
+          "online_aggregate_error": 0.058604028075933456,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05138273537158966,
+            0.06695622205734253,
+            0.0685391053557396,
+            0.05754930153489113
+          ],
+          "party_online_errors": [
+            0.10944390296936035,
+            0.0934227779507637,
+            0.10005128383636475,
+            0.09963539987802505
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 98,
+          "offline_aggregate_error": 0.03193344920873642,
+          "offline_count": 20,
+          "online_aggregate_error": 0.053015466779470444,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05578447878360748,
+            0.07011015713214874,
+            0.06871349364519119,
+            0.06632677465677261
+          ],
+          "party_online_errors": [
+            0.09096077084541321,
+            0.0952378585934639,
+            0.08794352412223816,
+            0.1043110191822052
+          ]
+        },
+        {
+          "candidate_count": 450,
+          "class_id": 99,
+          "offline_aggregate_error": 0.03644438832998276,
+          "offline_count": 20,
+          "online_aggregate_error": 0.05004996433854103,
+          "online_count": 20,
+          "party_offline_errors": [
+            0.05358555167913437,
+            0.07600389420986176,
+            0.0741480216383934,
+            0.06322051584720612
+          ],
+          "party_online_errors": [
+            0.06227006018161774,
+            0.09175821393728256,
+            0.08685433864593506,
+            0.07493226230144501
+          ]
+        }
+      ],
+      "config_sha256": "f504f1d636416bb1e53b6eb3a5f2aef6022528d3dccb13d886bc1d47c02cc5d1",
+      "data_sha256": {
+        "data:cifar-100-python/meta": "a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9",
+        "data:cifar-100-python/test": "4b67687d9933c4db8f0831104447f15b93774f4f464bd0516f0f0f2ac83b7864",
+        "data:cifar-100-python/train": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b"
+      },
+      "eligible_indices_sha256": "30f96089b22c9dc65c4a5db906d90224369a12ef47b3d408a74e4a635c3b3542",
+      "formal_record_sha256": "edccfa72339d7512f20397fb55ba1004905babe4787d2d52481d1fc7b3c12a29",
+      "offline_selected_indices_sha256": "0717b02cb93c8821a2425e3603f812e53d73a9d2532b9d0ce1e2238b09a99120",
+      "seed": 44,
+      "summary": {
+        "classes": 100,
+        "fraction_online_worse": 1.0,
+        "mean_difference": 0.026613017171621324,
+        "offline_mean": 0.031045823246240615,
+        "offline_median": 0.03143162652850151,
+        "online_mean": 0.057658840417861935,
+        "online_median": 0.05787699483335018,
+        "party_fraction_online_worse": [
+          0.99,
+          1.0,
+          1.0,
+          0.99
+        ],
+        "party_mean_differences": [
+          0.04906794872134924,
+          0.02933407936245203,
+          0.026275554709136485,
+          0.04397486355155707
+        ],
+        "party_offline_means": [
+          0.04968107368797064,
+          0.06483943764120341,
+          0.06571485873311758,
+          0.06179442796856165
+        ],
+        "party_offline_medians": [
+          0.048149967566132545,
+          0.06525488570332527,
+          0.06570446491241455,
+          0.06129147298634052
+        ],
+        "party_online_means": [
+          0.09874902240931988,
+          0.09417351700365544,
+          0.09199041344225406,
+          0.10576929152011871
+        ],
+        "party_online_medians": [
+          0.09893975779414177,
+          0.09458747878670692,
+          0.09213041141629219,
+          0.10567299649119377
+        ]
+      },
+      "validation_manifest_sha256": "7934fcbc5385883cd4312d7416d70dbae8a73044802431f766ee6de2249e5418"
+    }
+  ],
+  "source_commit": "7bfe6b1d724fb1206bc0053a9008126bad86332d",
+  "source_modules_sha256": {
+    "calibration_split.py": "b75eff934143defc7338b4b7cf56469d08792627a09d3b9be4e69f5cfeb98e24",
+    "cl_methods/proto_evolve.py": "8da778b07a3a3c7b8ddef698a8f7ba646653c02a9eae85bcf27c074a66f49234",
+    "data_utils.py": "bcc830f19978e14490fd0294470be30cc703e902e4dd89ca6aa9e50d30b4df17",
+    "determinism.py": "4b11b518ae33aeaf6584302328b17fab62509a05e874343a4f51cec653494742",
+    "models.py": "d240686b02b7dda16dd37068b2c1b60057b0b462f26c69631eeaec91b6395d89",
+    "vfl_trainer.py": "d7f9af5da617d6ed9cdbec1ba72d9d4d6f9d12631a019e988dc85550a6dddf19"
+  },
+  "source_root": "/home/c3080/YangXiaoXiang/VF-CL/results/formal-method-adaptive-20261005-v1",
+  "status": "training_only_online_offline_herding_gap"
+}
