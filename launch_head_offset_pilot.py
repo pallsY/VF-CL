@@ -13,6 +13,7 @@ from types import SimpleNamespace
 SOURCE_COMMIT = '7bfe6b1d724fb1206bc0053a9008126bad86332d'
 DESIGN_COMMIT = 'f8487fa00519b35f1a1b2fbf543188d4d7a34208'
 HEAD_BUDGET_DESIGN_COMMIT = '645bb89f97feac5386c09ffec61bde7c10814eb8'
+HERDING_DESIGN_COMMIT = '18d18fad6480f0854b42b9fbdc322c80544d2f4d'
 OVERRIDE_KEYS = frozenset({
     'seed', 'lambda_validation_split_seed', 'formal_deferred_evaluation',
     'head_consolidation_enabled', 'head_consolidation_mode',
@@ -48,20 +49,23 @@ def derive_config(source, root, seed=45):
         raise ValueError('source config is not the audited CIFAR Adaptive run')
     if any(int(task) < 10 for task in source['unlearn_after_tasks']):
         raise ValueError('pilot requires a CL-only timeline')
-    if seed not in (45, 46):
+    if seed not in (45, 46, 47):
         raise ValueError('pilot seed is not registered')
     root = Path(root).resolve()
     config = copy.deepcopy(source)
     config.update(
         seed=seed,
-        lambda_validation_split_seed=(20261007 if seed == 45 else 20261008),
+        lambda_validation_split_seed=20261007 + (seed - 45),
         formal_deferred_evaluation=False,
         head_consolidation_enabled=0,
         head_consolidation_mode='full_classifier',
         results_dir=str(root),
         output_dir=str(root / f'seed_{seed}_baseline'),
-        exp_name=('cifar_head_offset_seed45_baseline' if seed == 45
-                  else 'cifar_head_budget_seed46_baseline'),
+        exp_name={
+            45: 'cifar_head_offset_seed45_baseline',
+            46: 'cifar_head_budget_seed46_baseline',
+            47: 'cifar_herding_seed47_baseline',
+        }[seed],
     )
     changed = {
         key: {'source': source.get(key), 'pilot': config.get(key)}
@@ -78,7 +82,7 @@ def main():
     parser.add_argument('--source-config', required=True, type=Path)
     parser.add_argument('--source-record', required=True, type=Path)
     parser.add_argument('--root', required=True, type=Path)
-    parser.add_argument('--seed', type=int, choices=(45, 46), default=45)
+    parser.add_argument('--seed', type=int, choices=(45, 46, 47), default=45)
     parser.add_argument('--check', action='store_true')
     options = parser.parse_args()
     source_config = options.source_config.resolve(strict=True)
@@ -144,8 +148,11 @@ def main():
     protocol = {
         'schema_version': 1,
         'source_commit': SOURCE_COMMIT,
-        'design_commit': (DESIGN_COMMIT if options.seed == 45
-                          else HEAD_BUDGET_DESIGN_COMMIT),
+        'design_commit': {
+            45: DESIGN_COMMIT,
+            46: HEAD_BUDGET_DESIGN_COMMIT,
+            47: HERDING_DESIGN_COMMIT,
+        }[options.seed],
         'source_record_sha256': file_sha256(source_record),
         'source_config_sha256': file_sha256(source_config),
         'source_data_sha256': source_data,

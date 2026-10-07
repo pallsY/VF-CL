@@ -55,6 +55,15 @@ class HeadOffsetPilotConfigTests(unittest.TestCase):
         self.assertEqual(budget['lambda_validation_split_seed'], 20261008)
         self.assertEqual(budget['output_dir'], str(budget_root / 'seed_46_baseline'))
         self.assertEqual(set(budget_changed), set(changed))
+        with tempfile.TemporaryDirectory() as temp:
+            herding_root = Path(temp) / 'herding-root'
+            herding, herding_changed = derive_config(
+                source, herding_root, seed=47,
+            )
+        self.assertEqual(herding['seed'], 47)
+        self.assertEqual(herding['lambda_validation_split_seed'], 20261009)
+        self.assertEqual(herding['output_dir'], str(herding_root / 'seed_47_baseline'))
+        self.assertEqual(set(herding_changed), set(changed))
 
     def test_train_only_calibration_indices_are_fixed_and_disjoint(self):
         labels = [0, 0, 0, 0, 1, 1, 1, 1]
