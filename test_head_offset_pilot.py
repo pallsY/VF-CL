@@ -3,9 +3,12 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import numpy as np
+
 from launch_head_offset_pilot import derive_config
 from analyze_head_offset_pilot import (
     fit_scalar_offset, select_calibration_indices, pilot_passes,
+    summarize_logits,
 )
 
 
@@ -78,6 +81,23 @@ class HeadOffsetPilotConfigTests(unittest.TestCase):
         self.assertTrue(pilot_passes(baseline, improved))
         regressed = dict(improved, correct=65, old_correct=10, new_correct=55)
         self.assertFalse(pilot_passes(baseline, regressed))
+
+    def test_offset_corrects_new_to_old_without_changing_taskil(self):
+        tasks = [list(range(task * 10, (task + 1) * 10))
+                 for task in range(10)]
+        labels = np.arange(0, 100, 10)
+        logits = np.zeros((10, 100))
+        for row, label in enumerate(labels[:-1]):
+            logits[row, label] = 5.0
+        logits[-1, 0] = 2.0
+        logits[-1, 90] = 1.0
+        baseline = summarize_logits(logits, labels, tasks, tasks[-1])
+        shifted = logits.copy()
+        shifted[:, tasks[-1]] += 2.0
+        corrected = summarize_logits(shifted, labels, tasks, tasks[-1])
+        self.assertEqual(baseline['new_to_old_rate'], 1.0)
+        self.assertEqual(corrected['new_to_old_rate'], 0.0)
+        self.assertEqual(baseline['taskil_correct'], corrected['taskil_correct'])
 
 
 if __name__ == '__main__':
