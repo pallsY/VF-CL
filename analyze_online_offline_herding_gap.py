@@ -7,6 +7,7 @@ import os
 import statistics
 import subprocess
 import tempfile
+from collections import Counter
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -90,6 +91,17 @@ def summarize_rows(rows):
     if not all(0 <= value < float('inf') for value in online + offline):
         raise ValueError('non-finite centroid error')
     parties = len(rows[0]['party_online_errors'])
+    if (parties != 4 or any(len(row['party_online_errors']) != parties
+                            or len(row['party_offline_errors']) != parties
+                            for row in rows)):
+        raise ValueError('party error rows are malformed')
+    party_online = [[row['party_online_errors'][p] for row in rows]
+                    for p in range(parties)]
+    party_offline = [[row['party_offline_errors'][p] for row in rows]
+                     for p in range(parties)]
+    if not all(0 <= value < float('inf')
+               for values in party_online + party_offline for value in values):
+        raise ValueError('non-finite party centroid error')
     return {
         'classes': 100,
         'online_mean': statistics.fmean(online),
@@ -98,12 +110,14 @@ def summarize_rows(rows):
         'offline_median': statistics.median(offline),
         'mean_difference': statistics.fmean(a - b for a, b in zip(online, offline)),
         'fraction_online_worse': sum(a > b for a, b in zip(online, offline)) / 100,
-        'party_online_means': [statistics.fmean(row['party_online_errors'][p]
-                                                  for row in rows)
-                               for p in range(parties)],
-        'party_offline_means': [statistics.fmean(row['party_offline_errors'][p]
-                                                   for row in rows)
-                                for p in range(parties)],
+        'party_online_means': [statistics.fmean(values) for values in party_online],
+        'party_offline_means': [statistics.fmean(values) for values in party_offline],
+        'party_online_medians': [statistics.median(values) for values in party_online],
+        'party_offline_medians': [statistics.median(values) for values in party_offline],
+        'party_mean_differences': [statistics.fmean(a - b for a, b in zip(
+            party_online[p], party_offline[p])) for p in range(parties)],
+        'party_fraction_online_worse': [sum(a > b for a, b in zip(
+            party_online[p], party_offline[p])) / 100 for p in range(parties)],
     }
 
 
@@ -166,10 +180,15 @@ def screen_seed(root, seed, device):
                     encoding='utf-8'))):
             raise ValueError('rebuilt holdouts differ from formal source')
         heldout = dataset.validation_indices | dataset.calibration_indices
-        eligible = select_calibration_indices(
-            dataset.validationset.targets, heldout, 450,
-        )
-        if len(eligible) != 45000 or set(eligible) & heldout:
+        targets = dataset.validationset.targets
+        available = [index for index in range(len(targets)) if index not in heldout]
+        if (len(available) != 45000
+                or Counter(int(targets[index]) for index in available)
+                != {class_id: 450 for class_id in range(100)}):
+            raise ValueError('full train-minus-holdouts pool is not 450 per class')
+        eligible = select_calibration_indices(targets, heldout, 450)
+        if (len(eligible) != 45000 or len(set(eligible)) != 45000
+                or set(eligible) != set(available)):
             raise ValueError('eligible pool is not class-balanced train-only data')
         bottoms, top = build_models(args)
         trainer = VFLTrainer(bottoms, top, args)
