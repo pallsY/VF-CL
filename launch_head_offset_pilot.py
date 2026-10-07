@@ -40,6 +40,8 @@ def derive_config(source, root):
         'head_consolidation_mode': 'adaptive_dual_branch',
         'dep_tracking_enabled': 1, 'party_kd_enabled': 1,
         'party_kd_mode': 'uniform', 'save_task_checkpoints': 3,
+        'deterministic': 1, 'data_flow_audit': 1,
+        'num_workers': 2, 'bic_enabled': 1,
     }
     if any(source.get(key) != value for key, value in expected.items()):
         raise ValueError('source config is not the audited CIFAR Adaptive run')
