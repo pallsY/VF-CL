@@ -1,0 +1,69 @@
+{
+  "candidates": [
+    {
+      "cil": 0.9019230769230769,
+      "new_cil": 0.85,
+      "old_cil": 0.90625,
+      "parameters": [
+        0.05,
+        0.1,
+        0.02
+      ],
+      "rank": [
+        0.9019230769230769,
+        0.90625,
+        0.9932692307692308,
+        -1.8666666666666667
+      ],
+      "readout_sha256": "c3d85c2c1a4d5de5244f8b4675235d3e6b4d07f544588d944c803008fd199b42",
+      "run": "/home/c3080/YangXiaoXiang/VF-CL/results/isolet-hparam-sweep-20261008-v1/seed45_a005_d010_f002/run",
+      "til": 0.9932692307692308
+    },
+    {
+      "cil": 0.8971153846153846,
+      "new_cil": 0.9125,
+      "old_cil": 0.8958333333333334,
+      "parameters": [
+        0.05,
+        0.1,
+        0.05
+      ],
+      "rank": [
+        0.8971153846153846,
+        0.8958333333333334,
+        0.989423076923077,
+        -1.2666666666666666
+      ],
+      "readout_sha256": "5a9b65d85f0794d921f44d8c9c3b1e64d9f7883908e9b7c3cde916a9d3bb7264",
+      "run": "/home/c3080/YangXiaoXiang/VF-CL/results/isolet-hparam-sweep-20261008-v1/seed45_a005_d010_f005/run",
+      "til": 0.989423076923077
+    },
+    {
+      "cil": 0.9009615384615385,
+      "new_cil": 0.875,
+      "old_cil": 0.903125,
+      "parameters": [
+        0.05,
+        0.1,
+        0.1
+      ],
+      "rank": [
+        0.9009615384615385,
+        0.903125,
+        0.9903846153846154,
+        -2.2666666666666666
+      ],
+      "readout_sha256": "5982bb8907093cee3adee2a217a434974257a60725fbbbe30231e930ea979253",
+      "run": "/home/c3080/YangXiaoXiang/VF-CL/results/isolet-hparam-sweep-20261008-v1/seed45_a005_d010_f010/run",
+      "til": 0.9903846153846154
+    }
+  ],
+  "prior_ledger_sha256": "21a7073c5df93e99998d5d1d1d5b508226db56439eb1e2c57ffb939afd936696",
+  "selection_rule": "cil_old_cil_til_then_formal_distance",
+  "stage": 3,
+  "winner": [
+    0.05,
+    0.1,
+    0.02
+  ]
+}
