@@ -35,11 +35,11 @@
 
 **Files:** Create `launch_cifar_view_matched_pilot.py`; create `test_cifar_view_matched_launcher.py`.
 
-**Interfaces:** `derive_config(source: dict, root: Path) -> tuple[dict, dict]` accepts only the audited seed-42 config, sets seed 48 and new output paths, and flips only `formal_deferred_evaluation` besides naming/path changes. The main launcher verifies formal source hashes, clean producer commit, GPU/environment and no test-loader access; it writes protocol and completion manifests.
+**Interfaces:** `derive_config(source: dict, root: Path) -> tuple[dict, dict]` accepts only the audited seed-42 config, sets seed 48 and new output paths, and flips only `formal_deferred_evaluation` besides naming/path changes. The main launcher verifies formal source hashes, clean producer commit, GPU/environment and no test-loader access; it replaces only `runner.evaluate_deferred_cil_trajectory` with an intentional stop so the unmodified training path saves and freezes its final checkpoint without reading test data. It writes protocol and training-only completion manifests, with no `results.json` requirement.
 
 - [ ] Write a failing test asserting the exact override key set and preserved Adaptive mode, 20/class, holdout parameters and task stream.
 - [ ] Run the focused test red; implement the minimal launcher by reusing the guard/manifest pattern in `launch_head_offset_pilot.py`.
-- [ ] Run the focused test green and the launcher's `--check` path on the server.
+- [ ] Run the focused test green and the launcher's `--check` path on the server. Assert the intentional stop is observed only after `ADAPTIVE_STATE_FROZEN.json` and all ten event checkpoints exist.
 - [ ] Commit launcher and tests before launching; copy it outside the clean producer checkout and start a fresh seed-48 output root.
 
 ### Task 3: Read-only matched-view analyzer
