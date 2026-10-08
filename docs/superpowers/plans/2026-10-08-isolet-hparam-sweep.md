@@ -15,7 +15,7 @@
 - The 13-task, 26-class, 4-party, 20/class-memory protocol and validation manifest remain unchanged.
 - Candidate grid is fixed: `proto_lambda_a` 0.05/0.15/0.30, `distill_weight` 0.10/0.25/0.50, `feat_distill_weight` 0.02/0.05/0.10.
 - Only the method's own runs are launched; baseline method outputs and formal roots remain read-only.
-- No final test access. Validation scores use the same cohort as the Adaptive gate and are development evidence only.
+- No final test loader iteration or test-label use for scoring. The vector NPZ loader still materializes fixed test arrays at initialization. Validation scores use the same cohort as the Adaptive gate and are development evidence only.
 
 ---
 

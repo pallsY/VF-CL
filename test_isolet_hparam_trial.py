@@ -51,9 +51,12 @@ class ISOLETHparamTrialTests(unittest.TestCase):
         self.assertEqual(config['lambda_validation_split_seed'], 20260809)
 
     def test_rank_prefers_cil_then_old_then_til(self):
-        a = {'cil': .9, 'old_cil': .8, 'til': .98}
-        b = {'cil': .9, 'old_cil': .81, 'til': .97}
-        c = {'cil': .91, 'old_cil': .7, 'til': .8}
+        a = {'cil': {'accuracy': .9}, 'old_cil': {'accuracy': .8},
+             'til': {'accuracy': .98}}
+        b = {'cil': {'accuracy': .9}, 'old_cil': {'accuracy': .81},
+             'til': {'accuracy': .97}}
+        c = {'cil': {'accuracy': .91}, 'old_cil': {'accuracy': .7},
+             'til': {'accuracy': .8}}
         self.assertGreater(rank_candidate(b, (.15, .25, .05)),
                            rank_candidate(a, (.15, .25, .05)))
         self.assertGreater(rank_candidate(c, (.15, .25, .05)),

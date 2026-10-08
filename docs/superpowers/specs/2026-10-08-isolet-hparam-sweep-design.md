@@ -20,7 +20,7 @@ Development seed 45 begins at the exact formal values:
 
 Stage 1 changes only `proto_lambda_a`; hold its best value in stage 2. Hold stages 1–2 best values in stage 3. Reuse a completed run if its exact parameter tuple already exists. Seven distinct seed-45 runs are expected: one baseline plus two new alternatives per stage. Pick the highest final **class-incremental accuracy** on the same rebuilt 40/class lambda-validation cohort; tie-break by old-class CIL, then Task-IL, then smaller deviation from the formal values. Record all candidate CIL, Task-IL, old classes 0–23 and newest task 24–25, NLL, gate and configuration/checkpoint hashes. The lambda-validation cohort is also used by the Adaptive gate, so these scores are development-selection evidence, not an untouched test estimate.
 
-After selecting the final tuple, run **both the formal baseline tuple and the selected tuple on a new seed 46** under identical host/data/split settings. This paired confirmation checks whether the seed-45 choice improves CIL without a material old/new or Task-IL regression. It does not replace the formal three-seed table. No final ISOLET test labels are read during this sweep.
+After selecting the final tuple, run **both the formal baseline tuple and the selected tuple on a new seed 46** under identical host/data/split settings. This paired confirmation checks whether the seed-45 choice improves CIL without a material old/new or Task-IL regression. It does not replace the formal three-seed table. No final ISOLET test loader is iterated, and test labels are not used for scoring or tuning. The existing vector dataset loader still materializes the NPZ's fixed test arrays at initialization.
 
 ## Interpretation and limits
 

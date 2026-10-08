@@ -102,13 +102,17 @@ def derive_config(source, root, seed, proto_lambda_a, distill_weight,
 
 
 def rank_candidate(metrics, params):
-    if any(key not in metrics or not math.isfinite(float(metrics[key]))
-           for key in ('cil', 'old_cil', 'til')):
-        raise ValueError('candidate metric is missing or non-finite')
+    values = []
+    for key in ('cil', 'old_cil', 'til'):
+        entry = metrics.get(key)
+        if (not isinstance(entry, dict)
+                or not isinstance(entry.get('accuracy'), (int, float))
+                or not math.isfinite(float(entry['accuracy']))):
+            raise ValueError('candidate metric is missing or non-finite')
+        values.append(float(entry['accuracy']))
     distance = sum(abs(float(value) - baseline) / baseline
                    for value, baseline in zip(params, FORMAL))
-    return (float(metrics['cil']), float(metrics['old_cil']),
-            float(metrics['til']), -distance)
+    return (*values, -distance)
 
 
 def readout_metrics(log_probabilities, labels):
