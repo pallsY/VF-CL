@@ -23,12 +23,12 @@
 
 **Files:** Create `cifar_replay_id_match.py`; create `test_cifar_replay_id_match.py`.
 
-**Interfaces:** `recover_id(augmented: torch.Tensor, candidate_ids: list[int], cifar_data: np.ndarray) -> int` restores uint8 pixels from CIFAR normalization, matches the central patch under 9×9 crops and both flip states, then checks the full augmented image. It rejects zero or multiple exact source IDs.
+**Interfaces:** `CifarReplayMatcher(cifar_data: np.ndarray, candidate_ids: list[int]).recover_id(augmented: torch.Tensor) -> int` restores uint8 pixels from CIFAR normalization, matches the central patch under 9×9 crops and both flip states, then checks the full augmented image. Byte-identical duplicate originals map to the smallest eligible ID and increment `identical_duplicate_matches`; zero matches or multiple distinct originals fail.
 
-- [ ] Write failing tests for a known crop/flip, wrong-class candidates, and ambiguous duplicated source images. A synthetic uint8 source image passed through the actual torchvision transform should recover its index.
+- [ ] Write failing tests for a known crop/flip, wrong-class candidates, byte-identical duplicate originals, and distinct originals with one identical crop. A synthetic uint8 source image passed through the same pad/crop/flip/normalize arithmetic should recover its index.
 - [ ] Run `python -m unittest -q test_cifar_replay_id_match` and confirm the missing implementation failure.
 - [ ] Implement only the matcher and integer-pixel conversion using existing NumPy/PyTorch dependencies. Whole-image byte comparison is the final acceptance check.
-- [ ] Run the focused tests; then dry-run complete recovery on formal seed 42, requiring 2,000 unique, eligible matches. Record only the count and an ID-list SHA-256.
+- [ ] Run the focused tests; then dry-run complete recovery on formal seed 42, requiring 2,000 eligible canonical IDs and no distinct-original ambiguity. Record the count, exact-duplicate matches and an ID-list SHA-256.
 - [ ] Commit the matcher and tests.
 
 ### Task 2: Guarded seed-48 Adaptive launcher
