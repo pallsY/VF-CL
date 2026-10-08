@@ -1,0 +1,3510 @@
+{
+  "bottom_state_sha256": "705a71dbc8653a1290ada7b6df252646e938d57bc1a9a33ad9ce1b5e93a490a4",
+  "checkpoint_sha256": "cd23fa3b7b6e84d243bef0236a33ba31edfce878029bb748fd5d6e200cc62274",
+  "classes": [
+    {
+      "aggregate": {
+        "augmented": 0.05540311336517334,
+        "matched": 0.03447195515036583,
+        "offline": 0.029480278491973877
+      },
+      "candidate_count": 450,
+      "class_id": 0,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11066938936710358,
+          "matched": 0.0742136687040329,
+          "offline": 0.06950017064809799
+        },
+        {
+          "augmented": 0.08407770842313766,
+          "matched": 0.06354345381259918,
+          "offline": 0.05368402972817421
+        },
+        {
+          "augmented": 0.08257521688938141,
+          "matched": 0.059381842613220215,
+          "offline": 0.051496271044015884
+        },
+        {
+          "augmented": 0.1251392513513565,
+          "matched": 0.0751892477273941,
+          "offline": 0.07783430814743042
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.045586418360471725,
+        "matched": 0.04244036227464676,
+        "offline": 0.027777457609772682
+      },
+      "candidate_count": 450,
+      "class_id": 1,
+      "identical_duplicate_matches": 1,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.08529464155435562,
+          "matched": 0.06736209988594055,
+          "offline": 0.04957748204469681
+        },
+        {
+          "augmented": 0.08568249642848969,
+          "matched": 0.07262001931667328,
+          "offline": 0.05560905858874321
+        },
+        {
+          "augmented": 0.07450263202190399,
+          "matched": 0.0727933868765831,
+          "offline": 0.05342532694339752
+        },
+        {
+          "augmented": 0.08374837040901184,
+          "matched": 0.07331890612840652,
+          "offline": 0.05715513229370117
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.0570739321410656,
+        "matched": 0.04440287873148918,
+        "offline": 0.02867344580590725
+      },
+      "candidate_count": 450,
+      "class_id": 2,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10159875452518463,
+          "matched": 0.07674814015626907,
+          "offline": 0.05942646786570549
+        },
+        {
+          "augmented": 0.09895960986614227,
+          "matched": 0.0856344997882843,
+          "offline": 0.05704556033015251
+        },
+        {
+          "augmented": 0.09311158210039139,
+          "matched": 0.07954060286283493,
+          "offline": 0.06281176209449768
+        },
+        {
+          "augmented": 0.10693865269422531,
+          "matched": 0.07956887781620026,
+          "offline": 0.05334104225039482
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06899987161159515,
+        "matched": 0.047907061874866486,
+        "offline": 0.030545443296432495
+      },
+      "candidate_count": 450,
+      "class_id": 3,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.1398952752351761,
+          "matched": 0.07302497327327728,
+          "offline": 0.05950170382857323
+        },
+        {
+          "augmented": 0.11472981423139572,
+          "matched": 0.08521322160959244,
+          "offline": 0.06152709573507309
+        },
+        {
+          "augmented": 0.1013302281498909,
+          "matched": 0.09858009964227676,
+          "offline": 0.06923120468854904
+        },
+        {
+          "augmented": 0.10518403351306915,
+          "matched": 0.0637027770280838,
+          "offline": 0.04749445617198944
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05972253158688545,
+        "matched": 0.05176711082458496,
+        "offline": 0.02987643890082836
+      },
+      "candidate_count": 450,
+      "class_id": 4,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.0925142765045166,
+          "matched": 0.08036059141159058,
+          "offline": 0.053199708461761475
+        },
+        {
+          "augmented": 0.11144699901342392,
+          "matched": 0.08796103298664093,
+          "offline": 0.0714598074555397
+        },
+        {
+          "augmented": 0.08946193754673004,
+          "matched": 0.08334343135356903,
+          "offline": 0.06623704731464386
+        },
+        {
+          "augmented": 0.11411280930042267,
+          "matched": 0.08408443629741669,
+          "offline": 0.056375887244939804
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.055458977818489075,
+        "matched": 0.04346724599599838,
+        "offline": 0.02893078699707985
+      },
+      "candidate_count": 450,
+      "class_id": 5,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11699257791042328,
+          "matched": 0.07249462604522705,
+          "offline": 0.044768109917640686
+        },
+        {
+          "augmented": 0.09271343052387238,
+          "matched": 0.0741603896021843,
+          "offline": 0.05919301509857178
+        },
+        {
+          "augmented": 0.09550724923610687,
+          "matched": 0.07820047438144684,
+          "offline": 0.05628615617752075
+        },
+        {
+          "augmented": 0.1120932474732399,
+          "matched": 0.05289167910814285,
+          "offline": 0.05119679495692253
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05847907066345215,
+        "matched": 0.04566529765725136,
+        "offline": 0.031151555478572845
+      },
+      "candidate_count": 450,
+      "class_id": 6,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10768439620733261,
+          "matched": 0.06893737614154816,
+          "offline": 0.07641443610191345
+        },
+        {
+          "augmented": 0.0934857502579689,
+          "matched": 0.08853402733802795,
+          "offline": 0.06644440442323685
+        },
+        {
+          "augmented": 0.08435843884944916,
+          "matched": 0.07143573462963104,
+          "offline": 0.06332790851593018
+        },
+        {
+          "augmented": 0.08448071032762527,
+          "matched": 0.07034612447023392,
+          "offline": 0.08139652758836746
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.061381082981824875,
+        "matched": 0.042117200791835785,
+        "offline": 0.02966107614338398
+      },
+      "candidate_count": 450,
+      "class_id": 7,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10014831274747849,
+          "matched": 0.06824832409620285,
+          "offline": 0.058011073619127274
+        },
+        {
+          "augmented": 0.10197557508945465,
+          "matched": 0.07739344984292984,
+          "offline": 0.06537463515996933
+        },
+        {
+          "augmented": 0.10175760835409164,
+          "matched": 0.0747504010796547,
+          "offline": 0.05591220408678055
+        },
+        {
+          "augmented": 0.1137431263923645,
+          "matched": 0.06921432167291641,
+          "offline": 0.054279182106256485
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05935245379805565,
+        "matched": 0.047093793749809265,
+        "offline": 0.02871500328183174
+      },
+      "candidate_count": 450,
+      "class_id": 8,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.0945006012916565,
+          "matched": 0.07365888357162476,
+          "offline": 0.04747303947806358
+        },
+        {
+          "augmented": 0.09341276437044144,
+          "matched": 0.07798007130622864,
+          "offline": 0.05819633603096008
+        },
+        {
+          "augmented": 0.09531521052122116,
+          "matched": 0.0763528048992157,
+          "offline": 0.05835331603884697
+        },
+        {
+          "augmented": 0.11905037611722946,
+          "matched": 0.07237464189529419,
+          "offline": 0.049842603504657745
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06327506899833679,
+        "matched": 0.049126241356134415,
+        "offline": 0.03234964981675148
+      },
+      "candidate_count": 450,
+      "class_id": 9,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11565058678388596,
+          "matched": 0.05216551572084427,
+          "offline": 0.055091336369514465
+        },
+        {
+          "augmented": 0.11484300345182419,
+          "matched": 0.09161941707134247,
+          "offline": 0.06257936358451843
+        },
+        {
+          "augmented": 0.09744315594434738,
+          "matched": 0.09430903196334839,
+          "offline": 0.06312798708677292
+        },
+        {
+          "augmented": 0.10357864946126938,
+          "matched": 0.07027389854192734,
+          "offline": 0.05451595038175583
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.0591188408434391,
+        "matched": 0.04273177310824394,
+        "offline": 0.03307761251926422
+      },
+      "candidate_count": 450,
+      "class_id": 10,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.13607127964496613,
+          "matched": 0.05642674118280411,
+          "offline": 0.050335995852947235
+        },
+        {
+          "augmented": 0.09443450719118118,
+          "matched": 0.07645799964666367,
+          "offline": 0.06215333193540573
+        },
+        {
+          "augmented": 0.09515157341957092,
+          "matched": 0.08000265806913376,
+          "offline": 0.06820135563611984
+        },
+        {
+          "augmented": 0.10595975071191788,
+          "matched": 0.06287059187889099,
+          "offline": 0.05553404614329338
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05628921464085579,
+        "matched": 0.04674582928419113,
+        "offline": 0.031648069620132446
+      },
+      "candidate_count": 450,
+      "class_id": 11,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10170857608318329,
+          "matched": 0.06410055607557297,
+          "offline": 0.05639317259192467
+        },
+        {
+          "augmented": 0.09346404671669006,
+          "matched": 0.08190460503101349,
+          "offline": 0.06707863509654999
+        },
+        {
+          "augmented": 0.0892443135380745,
+          "matched": 0.07935690134763718,
+          "offline": 0.062047895044088364
+        },
+        {
+          "augmented": 0.07961606979370117,
+          "matched": 0.08328980207443237,
+          "offline": 0.07375222444534302
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.059413615614175797,
+        "matched": 0.041702404618263245,
+        "offline": 0.027987774461507797
+      },
+      "candidate_count": 450,
+      "class_id": 12,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11962322145700455,
+          "matched": 0.05680935084819794,
+          "offline": 0.04574812948703766
+        },
+        {
+          "augmented": 0.09923533350229263,
+          "matched": 0.08178538829088211,
+          "offline": 0.06189269572496414
+        },
+        {
+          "augmented": 0.09584811329841614,
+          "matched": 0.08515649288892746,
+          "offline": 0.0603766068816185
+        },
+        {
+          "augmented": 0.1040111556649208,
+          "matched": 0.05848908796906471,
+          "offline": 0.04716195538640022
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.0646548941731453,
+        "matched": 0.04504444822669029,
+        "offline": 0.030123336240649223
+      },
+      "candidate_count": 450,
+      "class_id": 13,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.12870211899280548,
+          "matched": 0.06019643694162369,
+          "offline": 0.05790713429450989
+        },
+        {
+          "augmented": 0.09632676839828491,
+          "matched": 0.08334481716156006,
+          "offline": 0.06329898536205292
+        },
+        {
+          "augmented": 0.10646983981132507,
+          "matched": 0.08061999827623367,
+          "offline": 0.06973323971033096
+        },
+        {
+          "augmented": 0.12024011462926865,
+          "matched": 0.07331052422523499,
+          "offline": 0.051094550639390945
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06139543652534485,
+        "matched": 0.049693092703819275,
+        "offline": 0.03024618700146675
+      },
+      "candidate_count": 450,
+      "class_id": 14,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.09931839257478714,
+          "matched": 0.0955643355846405,
+          "offline": 0.05929610878229141
+        },
+        {
+          "augmented": 0.0905892550945282,
+          "matched": 0.07922104001045227,
+          "offline": 0.06522392481565475
+        },
+        {
+          "augmented": 0.1142139583826065,
+          "matched": 0.08852899819612503,
+          "offline": 0.0655934289097786
+        },
+        {
+          "augmented": 0.11678795516490936,
+          "matched": 0.08552305400371552,
+          "offline": 0.05574243515729904
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.0648864284157753,
+        "matched": 0.042288102209568024,
+        "offline": 0.030069315806031227
+      },
+      "candidate_count": 450,
+      "class_id": 15,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11705149710178375,
+          "matched": 0.054825372993946075,
+          "offline": 0.052671439945697784
+        },
+        {
+          "augmented": 0.11933368444442749,
+          "matched": 0.08602403849363327,
+          "offline": 0.06579942256212234
+        },
+        {
+          "augmented": 0.10228534042835236,
+          "matched": 0.07072262465953827,
+          "offline": 0.06576801836490631
+        },
+        {
+          "augmented": 0.1155734434723854,
+          "matched": 0.0719919204711914,
+          "offline": 0.054292939603328705
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.0576431043446064,
+        "matched": 0.046096522361040115,
+        "offline": 0.03144828602671623
+      },
+      "candidate_count": 450,
+      "class_id": 16,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11535700410604477,
+          "matched": 0.08216743171215057,
+          "offline": 0.05276159942150116
+        },
+        {
+          "augmented": 0.08790964633226395,
+          "matched": 0.06740812212228775,
+          "offline": 0.061602212488651276
+        },
+        {
+          "augmented": 0.09411318600177765,
+          "matched": 0.08129572868347168,
+          "offline": 0.06384224444627762
+        },
+        {
+          "augmented": 0.11755884438753128,
+          "matched": 0.07180699706077576,
+          "offline": 0.05472361296415329
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.0635451152920723,
+        "matched": 0.036794163286685944,
+        "offline": 0.02792182005941868
+      },
+      "candidate_count": 450,
+      "class_id": 17,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10109107941389084,
+          "matched": 0.06150154396891594,
+          "offline": 0.051725562661886215
+        },
+        {
+          "augmented": 0.10567716509103775,
+          "matched": 0.06419318914413452,
+          "offline": 0.06057457998394966
+        },
+        {
+          "augmented": 0.10521817207336426,
+          "matched": 0.08182930946350098,
+          "offline": 0.05430020019412041
+        },
+        {
+          "augmented": 0.09275225549936295,
+          "matched": 0.05353605002164841,
+          "offline": 0.04940696805715561
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06242572143673897,
+        "matched": 0.045670777559280396,
+        "offline": 0.0318785160779953
+      },
+      "candidate_count": 450,
+      "class_id": 18,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.13583388924598694,
+          "matched": 0.06186264753341675,
+          "offline": 0.05048685893416405
+        },
+        {
+          "augmented": 0.10395954549312592,
+          "matched": 0.08264170587062836,
+          "offline": 0.06406603753566742
+        },
+        {
+          "augmented": 0.09756915271282196,
+          "matched": 0.0877147689461708,
+          "offline": 0.06178370118141174
+        },
+        {
+          "augmented": 0.10547497868537903,
+          "matched": 0.066999651491642,
+          "offline": 0.060731273144483566
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06398571282625198,
+        "matched": 0.046847593039274216,
+        "offline": 0.031624145805835724
+      },
+      "candidate_count": 450,
+      "class_id": 19,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.09744568169116974,
+          "matched": 0.06905879080295563,
+          "offline": 0.071320079267025
+        },
+        {
+          "augmented": 0.10444710403680801,
+          "matched": 0.083485908806324,
+          "offline": 0.06629855185747147
+        },
+        {
+          "augmented": 0.11508835107088089,
+          "matched": 0.09085359424352646,
+          "offline": 0.06290027499198914
+        },
+        {
+          "augmented": 0.107844777405262,
+          "matched": 0.07179762423038483,
+          "offline": 0.06322114914655685
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.07077465951442719,
+        "matched": 0.03865883871912956,
+        "offline": 0.029115257784724236
+      },
+      "candidate_count": 450,
+      "class_id": 20,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.1538015902042389,
+          "matched": 0.0662321224808693,
+          "offline": 0.06269452720880508
+        },
+        {
+          "augmented": 0.09551165997982025,
+          "matched": 0.0799618661403656,
+          "offline": 0.05938887596130371
+        },
+        {
+          "augmented": 0.10901149362325668,
+          "matched": 0.06409987807273865,
+          "offline": 0.05706747621297836
+        },
+        {
+          "augmented": 0.1262684166431427,
+          "matched": 0.06150094419717789,
+          "offline": 0.045630816370248795
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.0653388500213623,
+        "matched": 0.04440120607614517,
+        "offline": 0.03227018192410469
+      },
+      "candidate_count": 450,
+      "class_id": 21,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.12368670105934143,
+          "matched": 0.09777773171663284,
+          "offline": 0.05749329552054405
+        },
+        {
+          "augmented": 0.11564887315034866,
+          "matched": 0.07685323804616928,
+          "offline": 0.07497025281190872
+        },
+        {
+          "augmented": 0.09882786870002747,
+          "matched": 0.08055315166711807,
+          "offline": 0.07135079056024551
+        },
+        {
+          "augmented": 0.11874309927225113,
+          "matched": 0.05879008769989014,
+          "offline": 0.06360748410224915
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06531711667776108,
+        "matched": 0.04698794335126877,
+        "offline": 0.031751155853271484
+      },
+      "candidate_count": 450,
+      "class_id": 22,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.1324576586484909,
+          "matched": 0.06946136057376862,
+          "offline": 0.05225275084376335
+        },
+        {
+          "augmented": 0.09563738107681274,
+          "matched": 0.08670549839735031,
+          "offline": 0.06879964470863342
+        },
+        {
+          "augmented": 0.10153552144765854,
+          "matched": 0.08610247820615768,
+          "offline": 0.07542358338832855
+        },
+        {
+          "augmented": 0.10748517513275146,
+          "matched": 0.0678604319691658,
+          "offline": 0.06180376186966896
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.0525231659412384,
+        "matched": 0.0396924763917923,
+        "offline": 0.028627431020140648
+      },
+      "candidate_count": 450,
+      "class_id": 23,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10361482203006744,
+          "matched": 0.07024221122264862,
+          "offline": 0.03863578289747238
+        },
+        {
+          "augmented": 0.08315300941467285,
+          "matched": 0.06915400177240372,
+          "offline": 0.06017718091607094
+        },
+        {
+          "augmented": 0.08584599196910858,
+          "matched": 0.07033108919858932,
+          "offline": 0.06073365733027458
+        },
+        {
+          "augmented": 0.09953200817108154,
+          "matched": 0.06283939629793167,
+          "offline": 0.05328849330544472
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.07454469054937363,
+        "matched": 0.038589585572481155,
+        "offline": 0.028686922043561935
+      },
+      "candidate_count": 450,
+      "class_id": 24,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.1518651843070984,
+          "matched": 0.057306867092847824,
+          "offline": 0.04842991754412651
+        },
+        {
+          "augmented": 0.1001843586564064,
+          "matched": 0.08146166056394577,
+          "offline": 0.060165565460920334
+        },
+        {
+          "augmented": 0.10956460982561111,
+          "matched": 0.06450241804122925,
+          "offline": 0.05087847262620926
+        },
+        {
+          "augmented": 0.12134614586830139,
+          "matched": 0.048255711793899536,
+          "offline": 0.04954482614994049
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.059299495071172714,
+        "matched": 0.04484634846448898,
+        "offline": 0.030142992734909058
+      },
+      "candidate_count": 450,
+      "class_id": 25,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11725985258817673,
+          "matched": 0.06671014428138733,
+          "offline": 0.05163027346134186
+        },
+        {
+          "augmented": 0.08992933481931686,
+          "matched": 0.08466601371765137,
+          "offline": 0.06408057361841202
+        },
+        {
+          "augmented": 0.09639989584684372,
+          "matched": 0.06868185847997665,
+          "offline": 0.05789707601070404
+        },
+        {
+          "augmented": 0.10148372501134872,
+          "matched": 0.08536159992218018,
+          "offline": 0.05814787745475769
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05720406025648117,
+        "matched": 0.04443115368485451,
+        "offline": 0.03185728192329407
+      },
+      "candidate_count": 450,
+      "class_id": 26,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.09854409843683243,
+          "matched": 0.06618253141641617,
+          "offline": 0.0548824816942215
+        },
+        {
+          "augmented": 0.09158855676651001,
+          "matched": 0.07746284455060959,
+          "offline": 0.06289040297269821
+        },
+        {
+          "augmented": 0.09124384820461273,
+          "matched": 0.0857585072517395,
+          "offline": 0.06405805796384811
+        },
+        {
+          "augmented": 0.11436691880226135,
+          "matched": 0.07352688163518906,
+          "offline": 0.056605033576488495
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05903247371315956,
+        "matched": 0.04271451011300087,
+        "offline": 0.0302721057087183
+      },
+      "candidate_count": 450,
+      "class_id": 27,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.09473484754562378,
+          "matched": 0.05587507411837578,
+          "offline": 0.052159715443849564
+        },
+        {
+          "augmented": 0.11148497462272644,
+          "matched": 0.08220122009515762,
+          "offline": 0.06643905490636826
+        },
+        {
+          "augmented": 0.09823550283908844,
+          "matched": 0.07381308823823929,
+          "offline": 0.06530702859163284
+        },
+        {
+          "augmented": 0.11071395128965378,
+          "matched": 0.06226899474859238,
+          "offline": 0.05117374286055565
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.058036919683218,
+        "matched": 0.0507814884185791,
+        "offline": 0.033500559628009796
+      },
+      "candidate_count": 450,
+      "class_id": 28,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10378929227590561,
+          "matched": 0.08002223074436188,
+          "offline": 0.05175265669822693
+        },
+        {
+          "augmented": 0.10066212713718414,
+          "matched": 0.08429048210382462,
+          "offline": 0.061906374990940094
+        },
+        {
+          "augmented": 0.09805043041706085,
+          "matched": 0.08212339878082275,
+          "offline": 0.07178406417369843
+        },
+        {
+          "augmented": 0.08800406008958817,
+          "matched": 0.06480803340673447,
+          "offline": 0.05546686425805092
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06176760047674179,
+        "matched": 0.04435617849230766,
+        "offline": 0.03256707638502121
+      },
+      "candidate_count": 450,
+      "class_id": 29,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10575735569000244,
+          "matched": 0.07194839417934418,
+          "offline": 0.05605991929769516
+        },
+        {
+          "augmented": 0.09760093688964844,
+          "matched": 0.08207233250141144,
+          "offline": 0.06568173319101334
+        },
+        {
+          "augmented": 0.09754462540149689,
+          "matched": 0.09597417712211609,
+          "offline": 0.06840910017490387
+        },
+        {
+          "augmented": 0.11035556346178055,
+          "matched": 0.05904215946793556,
+          "offline": 0.06419862806797028
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05371525511145592,
+        "matched": 0.03801405057311058,
+        "offline": 0.028088189661502838
+      },
+      "candidate_count": 450,
+      "class_id": 30,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10528581589460373,
+          "matched": 0.06370927393436432,
+          "offline": 0.03575746715068817
+        },
+        {
+          "augmented": 0.08601180464029312,
+          "matched": 0.07078034430742264,
+          "offline": 0.057078439742326736
+        },
+        {
+          "augmented": 0.0995030626654625,
+          "matched": 0.07824820280075073,
+          "offline": 0.0634654238820076
+        },
+        {
+          "augmented": 0.09593529999256134,
+          "matched": 0.06050277501344681,
+          "offline": 0.03785465657711029
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06369922310113907,
+        "matched": 0.041496582329273224,
+        "offline": 0.028870964422822
+      },
+      "candidate_count": 450,
+      "class_id": 31,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11655333638191223,
+          "matched": 0.06170317903161049,
+          "offline": 0.050077300518751144
+        },
+        {
+          "augmented": 0.10020100325345993,
+          "matched": 0.07798740267753601,
+          "offline": 0.06367767602205276
+        },
+        {
+          "augmented": 0.1035650447010994,
+          "matched": 0.07211831212043762,
+          "offline": 0.05794030427932739
+        },
+        {
+          "augmented": 0.11832351982593536,
+          "matched": 0.07196573913097382,
+          "offline": 0.04825591668486595
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05692095309495926,
+        "matched": 0.04067899286746979,
+        "offline": 0.03129655122756958
+      },
+      "candidate_count": 450,
+      "class_id": 32,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11798600852489471,
+          "matched": 0.06719686090946198,
+          "offline": 0.04587198421359062
+        },
+        {
+          "augmented": 0.09051740169525146,
+          "matched": 0.07275784760713577,
+          "offline": 0.06327426433563232
+        },
+        {
+          "augmented": 0.09502153098583221,
+          "matched": 0.08070637285709381,
+          "offline": 0.07140988111495972
+        },
+        {
+          "augmented": 0.0837114080786705,
+          "matched": 0.07713886350393295,
+          "offline": 0.05459744483232498
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06229998543858528,
+        "matched": 0.04753214865922928,
+        "offline": 0.03268738463521004
+      },
+      "candidate_count": 450,
+      "class_id": 33,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.09953834861516953,
+          "matched": 0.060856893658638,
+          "offline": 0.04826280102133751
+        },
+        {
+          "augmented": 0.11559252440929413,
+          "matched": 0.0899527370929718,
+          "offline": 0.07159546762704849
+        },
+        {
+          "augmented": 0.1048286110162735,
+          "matched": 0.08805232495069504,
+          "offline": 0.06349245458841324
+        },
+        {
+          "augmented": 0.11524800956249237,
+          "matched": 0.06000130623579025,
+          "offline": 0.052929073572158813
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.056354179978370667,
+        "matched": 0.04428877308964729,
+        "offline": 0.0292360782623291
+      },
+      "candidate_count": 450,
+      "class_id": 34,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10817713290452957,
+          "matched": 0.07199301570653915,
+          "offline": 0.053732894361019135
+        },
+        {
+          "augmented": 0.08949282765388489,
+          "matched": 0.08750133961439133,
+          "offline": 0.060966044664382935
+        },
+        {
+          "augmented": 0.09770182520151138,
+          "matched": 0.07901419699192047,
+          "offline": 0.057404983788728714
+        },
+        {
+          "augmented": 0.12091104686260223,
+          "matched": 0.07324285805225372,
+          "offline": 0.06259385496377945
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.058839380741119385,
+        "matched": 0.047570277005434036,
+        "offline": 0.03144305199384689
+      },
+      "candidate_count": 450,
+      "class_id": 35,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.09553124755620956,
+          "matched": 0.062309544533491135,
+          "offline": 0.06192191690206528
+        },
+        {
+          "augmented": 0.09212253242731094,
+          "matched": 0.09755228459835052,
+          "offline": 0.07145585864782333
+        },
+        {
+          "augmented": 0.09433714300394058,
+          "matched": 0.0868687629699707,
+          "offline": 0.06834521889686584
+        },
+        {
+          "augmented": 0.11850379407405853,
+          "matched": 0.07909488677978516,
+          "offline": 0.0545218400657177
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06023814156651497,
+        "matched": 0.04418650642037392,
+        "offline": 0.028092535212635994
+      },
+      "candidate_count": 450,
+      "class_id": 36,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.09967043995857239,
+          "matched": 0.05289941653609276,
+          "offline": 0.048109836876392365
+        },
+        {
+          "augmented": 0.09378117322921753,
+          "matched": 0.08013893663883209,
+          "offline": 0.06406686455011368
+        },
+        {
+          "augmented": 0.10004489868879318,
+          "matched": 0.07823439687490463,
+          "offline": 0.057384781539440155
+        },
+        {
+          "augmented": 0.10490832477807999,
+          "matched": 0.06390530616044998,
+          "offline": 0.05016881227493286
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.0625888928771019,
+        "matched": 0.041528914123773575,
+        "offline": 0.02855181135237217
+      },
+      "candidate_count": 450,
+      "class_id": 37,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10098873823881149,
+          "matched": 0.07056721299886703,
+          "offline": 0.05753288418054581
+        },
+        {
+          "augmented": 0.11544308066368103,
+          "matched": 0.09173744916915894,
+          "offline": 0.0576695092022419
+        },
+        {
+          "augmented": 0.10994535684585571,
+          "matched": 0.0775531455874443,
+          "offline": 0.0625973492860794
+        },
+        {
+          "augmented": 0.12682189047336578,
+          "matched": 0.07068468630313873,
+          "offline": 0.055442653596401215
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06506577134132385,
+        "matched": 0.04531417414546013,
+        "offline": 0.031479183584451675
+      },
+      "candidate_count": 450,
+      "class_id": 38,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.09824205935001373,
+          "matched": 0.06028629094362259,
+          "offline": 0.05128033831715584
+        },
+        {
+          "augmented": 0.10723282396793365,
+          "matched": 0.07500472664833069,
+          "offline": 0.06943649798631668
+        },
+        {
+          "augmented": 0.10615381598472595,
+          "matched": 0.09056849777698517,
+          "offline": 0.06333116441965103
+        },
+        {
+          "augmented": 0.10978297144174576,
+          "matched": 0.06291557848453522,
+          "offline": 0.06759986281394958
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.058250732719898224,
+        "matched": 0.046958547085523605,
+        "offline": 0.03581169247627258
+      },
+      "candidate_count": 450,
+      "class_id": 39,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11611617356538773,
+          "matched": 0.0837937742471695,
+          "offline": 0.05465495586395264
+        },
+        {
+          "augmented": 0.08896908164024353,
+          "matched": 0.0848926454782486,
+          "offline": 0.08132316917181015
+        },
+        {
+          "augmented": 0.0985192134976387,
+          "matched": 0.08545052260160446,
+          "offline": 0.07520830631256104
+        },
+        {
+          "augmented": 0.11027604341506958,
+          "matched": 0.07094638794660568,
+          "offline": 0.05649549514055252
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05856432020664215,
+        "matched": 0.04436851665377617,
+        "offline": 0.034671537578105927
+      },
+      "candidate_count": 450,
+      "class_id": 40,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10762549191713333,
+          "matched": 0.08046586066484451,
+          "offline": 0.05526098608970642
+        },
+        {
+          "augmented": 0.0962323248386383,
+          "matched": 0.06964048743247986,
+          "offline": 0.06363940238952637
+        },
+        {
+          "augmented": 0.1041613221168518,
+          "matched": 0.0831901803612709,
+          "offline": 0.06333110481500626
+        },
+        {
+          "augmented": 0.0859801396727562,
+          "matched": 0.05673140659928322,
+          "offline": 0.06331459432840347
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06626962870359421,
+        "matched": 0.0413258820772171,
+        "offline": 0.026846805587410927
+      },
+      "candidate_count": 450,
+      "class_id": 41,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11411159485578537,
+          "matched": 0.06620898842811584,
+          "offline": 0.05118531733751297
+        },
+        {
+          "augmented": 0.09748660027980804,
+          "matched": 0.07112514972686768,
+          "offline": 0.05876075476408005
+        },
+        {
+          "augmented": 0.1056290715932846,
+          "matched": 0.0779733806848526,
+          "offline": 0.0594160258769989
+        },
+        {
+          "augmented": 0.13010895252227783,
+          "matched": 0.05705181881785393,
+          "offline": 0.0492122545838356
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06309646368026733,
+        "matched": 0.05365774780511856,
+        "offline": 0.030809009447693825
+      },
+      "candidate_count": 450,
+      "class_id": 42,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.09945806860923767,
+          "matched": 0.08364498615264893,
+          "offline": 0.05086415261030197
+        },
+        {
+          "augmented": 0.11251557618379593,
+          "matched": 0.11209733784198761,
+          "offline": 0.06648921221494675
+        },
+        {
+          "augmented": 0.09224743396043777,
+          "matched": 0.09110546112060547,
+          "offline": 0.06659181416034698
+        },
+        {
+          "augmented": 0.08302854746580124,
+          "matched": 0.07935404777526855,
+          "offline": 0.05382620543241501
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06719572097063065,
+        "matched": 0.044986166059970856,
+        "offline": 0.029587913304567337
+      },
+      "candidate_count": 450,
+      "class_id": 43,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.12899070978164673,
+          "matched": 0.059982072561979294,
+          "offline": 0.0454554446041584
+        },
+        {
+          "augmented": 0.10665985196828842,
+          "matched": 0.08336446434259415,
+          "offline": 0.060710612684488297
+        },
+        {
+          "augmented": 0.09768936783075333,
+          "matched": 0.07246660441160202,
+          "offline": 0.06086630001664162
+        },
+        {
+          "augmented": 0.12337857484817505,
+          "matched": 0.10168779641389847,
+          "offline": 0.05899393931031227
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05600902810692787,
+        "matched": 0.04584560915827751,
+        "offline": 0.033401861786842346
+      },
+      "candidate_count": 450,
+      "class_id": 44,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.08910822123289108,
+          "matched": 0.060152631253004074,
+          "offline": 0.049289438873529434
+        },
+        {
+          "augmented": 0.0951116755604744,
+          "matched": 0.08155900239944458,
+          "offline": 0.07164596766233444
+        },
+        {
+          "augmented": 0.09844685345888138,
+          "matched": 0.07690385729074478,
+          "offline": 0.06576955318450928
+        },
+        {
+          "augmented": 0.11350836604833603,
+          "matched": 0.07987738400697708,
+          "offline": 0.05904886871576309
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05621764808893204,
+        "matched": 0.04543290287256241,
+        "offline": 0.03122817724943161
+      },
+      "candidate_count": 450,
+      "class_id": 45,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.09040369838476181,
+          "matched": 0.0705244392156601,
+          "offline": 0.05886711925268173
+        },
+        {
+          "augmented": 0.09266690164804459,
+          "matched": 0.07160160690546036,
+          "offline": 0.06000152602791786
+        },
+        {
+          "augmented": 0.09363102167844772,
+          "matched": 0.07674407958984375,
+          "offline": 0.06433215737342834
+        },
+        {
+          "augmented": 0.09196562319993973,
+          "matched": 0.08107071369886398,
+          "offline": 0.07069434225559235
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05524948984384537,
+        "matched": 0.05333992466330528,
+        "offline": 0.031283341348171234
+      },
+      "candidate_count": 450,
+      "class_id": 46,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11005209386348724,
+          "matched": 0.08209896087646484,
+          "offline": 0.05960210785269737
+        },
+        {
+          "augmented": 0.09832035005092621,
+          "matched": 0.08590906113386154,
+          "offline": 0.06945749372243881
+        },
+        {
+          "augmented": 0.08898286521434784,
+          "matched": 0.08722899854183197,
+          "offline": 0.05977936461567879
+        },
+        {
+          "augmented": 0.104271300137043,
+          "matched": 0.07393525540828705,
+          "offline": 0.057165078818798065
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.058570802211761475,
+        "matched": 0.04653604328632355,
+        "offline": 0.03084632009267807
+      },
+      "candidate_count": 450,
+      "class_id": 47,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11462786048650742,
+          "matched": 0.06575153023004532,
+          "offline": 0.052770037204027176
+        },
+        {
+          "augmented": 0.09612228721380234,
+          "matched": 0.07613176852464676,
+          "offline": 0.06045820936560631
+        },
+        {
+          "augmented": 0.09406580775976181,
+          "matched": 0.09870278090238571,
+          "offline": 0.0646536722779274
+        },
+        {
+          "augmented": 0.09371477365493774,
+          "matched": 0.07614550739526749,
+          "offline": 0.05485419183969498
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06067391857504845,
+        "matched": 0.05075586214661598,
+        "offline": 0.02925194799900055
+      },
+      "candidate_count": 450,
+      "class_id": 48,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.12651441991329193,
+          "matched": 0.07741639763116837,
+          "offline": 0.05719359964132309
+        },
+        {
+          "augmented": 0.08395253866910934,
+          "matched": 0.08810975402593613,
+          "offline": 0.05810176581144333
+        },
+        {
+          "augmented": 0.10299059003591537,
+          "matched": 0.0924457386136055,
+          "offline": 0.05855755880475044
+        },
+        {
+          "augmented": 0.13746581971645355,
+          "matched": 0.07203507423400879,
+          "offline": 0.05594932660460472
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05769820511341095,
+        "matched": 0.032009270042181015,
+        "offline": 0.026406655088067055
+      },
+      "candidate_count": 450,
+      "class_id": 49,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.09773964434862137,
+          "matched": 0.0545017272233963,
+          "offline": 0.03702405095100403
+        },
+        {
+          "augmented": 0.09803971648216248,
+          "matched": 0.06399234384298325,
+          "offline": 0.060805946588516235
+        },
+        {
+          "augmented": 0.11059805005788803,
+          "matched": 0.06566502153873444,
+          "offline": 0.06346400827169418
+        },
+        {
+          "augmented": 0.07011941075325012,
+          "matched": 0.051938243210315704,
+          "offline": 0.05484284833073616
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06106191873550415,
+        "matched": 0.04778632894158363,
+        "offline": 0.03197411447763443
+      },
+      "candidate_count": 450,
+      "class_id": 50,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.13587987422943115,
+          "matched": 0.07140232622623444,
+          "offline": 0.05527450889348984
+        },
+        {
+          "augmented": 0.10444243997335434,
+          "matched": 0.08339815586805344,
+          "offline": 0.06358898431062698
+        },
+        {
+          "augmented": 0.08778116106987,
+          "matched": 0.08428619801998138,
+          "offline": 0.06181758642196655
+        },
+        {
+          "augmented": 0.10270968079566956,
+          "matched": 0.07436641305685043,
+          "offline": 0.053716644644737244
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.059062886983156204,
+        "matched": 0.04956335574388504,
+        "offline": 0.03150637075304985
+      },
+      "candidate_count": 450,
+      "class_id": 51,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.1178971379995346,
+          "matched": 0.07440832257270813,
+          "offline": 0.0511309877038002
+        },
+        {
+          "augmented": 0.09677179157733917,
+          "matched": 0.0983775183558464,
+          "offline": 0.07355845719575882
+        },
+        {
+          "augmented": 0.09742920100688934,
+          "matched": 0.08558957278728485,
+          "offline": 0.06976684927940369
+        },
+        {
+          "augmented": 0.11140037328004837,
+          "matched": 0.0712754875421524,
+          "offline": 0.05950773507356644
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.07133625447750092,
+        "matched": 0.03866170346736908,
+        "offline": 0.026022236794233322
+      },
+      "candidate_count": 450,
+      "class_id": 52,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.12999829649925232,
+          "matched": 0.07326266914606094,
+          "offline": 0.04303102567791939
+        },
+        {
+          "augmented": 0.1332908421754837,
+          "matched": 0.07713811844587326,
+          "offline": 0.051973357796669006
+        },
+        {
+          "augmented": 0.10866966098546982,
+          "matched": 0.07196295261383057,
+          "offline": 0.062181953340768814
+        },
+        {
+          "augmented": 0.11661984026432037,
+          "matched": 0.05355456471443176,
+          "offline": 0.04122866317629814
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05012210085988045,
+        "matched": 0.03513292595744133,
+        "offline": 0.026187043637037277
+      },
+      "candidate_count": 450,
+      "class_id": 53,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10785594582557678,
+          "matched": 0.0681493729352951,
+          "offline": 0.06816619634628296
+        },
+        {
+          "augmented": 0.07444552332162857,
+          "matched": 0.062157586216926575,
+          "offline": 0.051965098828077316
+        },
+        {
+          "augmented": 0.07737669348716736,
+          "matched": 0.06341153383255005,
+          "offline": 0.05672747641801834
+        },
+        {
+          "augmented": 0.09352409094572067,
+          "matched": 0.08616937696933746,
+          "offline": 0.05559077113866806
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.04593534767627716,
+        "matched": 0.04169867932796478,
+        "offline": 0.03186272084712982
+      },
+      "candidate_count": 450,
+      "class_id": 54,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10177794843912125,
+          "matched": 0.07230536639690399,
+          "offline": 0.07036975026130676
+        },
+        {
+          "augmented": 0.07618185132741928,
+          "matched": 0.06846848130226135,
+          "offline": 0.06667802482843399
+        },
+        {
+          "augmented": 0.07402049005031586,
+          "matched": 0.0829254537820816,
+          "offline": 0.061839759349823
+        },
+        {
+          "augmented": 0.09038597345352173,
+          "matched": 0.10297969728708267,
+          "offline": 0.05810645967721939
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05588143318891525,
+        "matched": 0.04652360826730728,
+        "offline": 0.03139502927660942
+      },
+      "candidate_count": 450,
+      "class_id": 55,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.09613048285245895,
+          "matched": 0.08818177133798599,
+          "offline": 0.04501304030418396
+        },
+        {
+          "augmented": 0.10238303989171982,
+          "matched": 0.08406700938940048,
+          "offline": 0.07034114003181458
+        },
+        {
+          "augmented": 0.0875806137919426,
+          "matched": 0.09514924883842468,
+          "offline": 0.06402206420898438
+        },
+        {
+          "augmented": 0.09366343170404434,
+          "matched": 0.07387031614780426,
+          "offline": 0.05711666867136955
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06338635832071304,
+        "matched": 0.045798007398843765,
+        "offline": 0.029002441093325615
+      },
+      "candidate_count": 450,
+      "class_id": 56,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11205372959375381,
+          "matched": 0.06204409897327423,
+          "offline": 0.04300960153341293
+        },
+        {
+          "augmented": 0.10319415479898453,
+          "matched": 0.06843047589063644,
+          "offline": 0.0644584521651268
+        },
+        {
+          "augmented": 0.11904017627239227,
+          "matched": 0.09532733261585236,
+          "offline": 0.06020522117614746
+        },
+        {
+          "augmented": 0.09474503993988037,
+          "matched": 0.08447311818599701,
+          "offline": 0.04646516591310501
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05661923065781593,
+        "matched": 0.04508782550692558,
+        "offline": 0.03324776515364647
+      },
+      "candidate_count": 450,
+      "class_id": 57,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.12177574634552002,
+          "matched": 0.07337258756160736,
+          "offline": 0.06011964753270149
+        },
+        {
+          "augmented": 0.09292726963758469,
+          "matched": 0.08050954341888428,
+          "offline": 0.06254264712333679
+        },
+        {
+          "augmented": 0.08552836626768112,
+          "matched": 0.0777316763997078,
+          "offline": 0.06466265022754669
+        },
+        {
+          "augmented": 0.09929800778627396,
+          "matched": 0.061528537422418594,
+          "offline": 0.06393267959356308
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05952814593911171,
+        "matched": 0.04072602093219757,
+        "offline": 0.02829439379274845
+      },
+      "candidate_count": 450,
+      "class_id": 58,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11770316958427429,
+          "matched": 0.06626879423856735,
+          "offline": 0.04615841060876846
+        },
+        {
+          "augmented": 0.09963221848011017,
+          "matched": 0.062231406569480896,
+          "offline": 0.0587165467441082
+        },
+        {
+          "augmented": 0.0936206504702568,
+          "matched": 0.09055737406015396,
+          "offline": 0.058106742799282074
+        },
+        {
+          "augmented": 0.10627801716327667,
+          "matched": 0.05918309465050697,
+          "offline": 0.05292244628071785
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.062161173671483994,
+        "matched": 0.04750493913888931,
+        "offline": 0.029880225658416748
+      },
+      "candidate_count": 450,
+      "class_id": 59,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10588302463293076,
+          "matched": 0.0530274473130703,
+          "offline": 0.053971026092767715
+        },
+        {
+          "augmented": 0.11092626303434372,
+          "matched": 0.08801957219839096,
+          "offline": 0.06277067214250565
+        },
+        {
+          "augmented": 0.09605617076158524,
+          "matched": 0.09051795303821564,
+          "offline": 0.06214157119393349
+        },
+        {
+          "augmented": 0.11596689373254776,
+          "matched": 0.05794195085763931,
+          "offline": 0.04907938092947006
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.055765602737665176,
+        "matched": 0.03379599750041962,
+        "offline": 0.028646310791373253
+      },
+      "candidate_count": 450,
+      "class_id": 60,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.091539166867733,
+          "matched": 0.04003129154443741,
+          "offline": 0.045337893068790436
+        },
+        {
+          "augmented": 0.08607057482004166,
+          "matched": 0.06784902513027191,
+          "offline": 0.054739002138376236
+        },
+        {
+          "augmented": 0.10474798828363419,
+          "matched": 0.06456401199102402,
+          "offline": 0.059086255729198456
+        },
+        {
+          "augmented": 0.09981028735637665,
+          "matched": 0.061513353139162064,
+          "offline": 0.05466994270682335
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.055991318076848984,
+        "matched": 0.04544387012720108,
+        "offline": 0.03194813430309296
+      },
+      "candidate_count": 450,
+      "class_id": 61,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11162105947732925,
+          "matched": 0.056714534759521484,
+          "offline": 0.052657801657915115
+        },
+        {
+          "augmented": 0.09592440724372864,
+          "matched": 0.0711151733994484,
+          "offline": 0.06057595834136009
+        },
+        {
+          "augmented": 0.09154591709375381,
+          "matched": 0.08603475987911224,
+          "offline": 0.060355864465236664
+        },
+        {
+          "augmented": 0.1009649783372879,
+          "matched": 0.07644519954919815,
+          "offline": 0.0622246190905571
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.042905837297439575,
+        "matched": 0.036280278116464615,
+        "offline": 0.02909882366657257
+      },
+      "candidate_count": 450,
+      "class_id": 62,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.08516387641429901,
+          "matched": 0.06796293705701828,
+          "offline": 0.06439676880836487
+        },
+        {
+          "augmented": 0.07410675287246704,
+          "matched": 0.06328009068965912,
+          "offline": 0.05219903588294983
+        },
+        {
+          "augmented": 0.06669464707374573,
+          "matched": 0.05570746958255768,
+          "offline": 0.05661178007721901
+        },
+        {
+          "augmented": 0.0876510888338089,
+          "matched": 0.09841836243867874,
+          "offline": 0.0742785856127739
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05892731994390488,
+        "matched": 0.04048778861761093,
+        "offline": 0.028910132125020027
+      },
+      "candidate_count": 450,
+      "class_id": 63,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11605767160654068,
+          "matched": 0.06377729773521423,
+          "offline": 0.057544950395822525
+        },
+        {
+          "augmented": 0.10042750090360641,
+          "matched": 0.07204341143369675,
+          "offline": 0.06170051917433739
+        },
+        {
+          "augmented": 0.09656865149736404,
+          "matched": 0.08462735265493393,
+          "offline": 0.05871846526861191
+        },
+        {
+          "augmented": 0.10113957524299622,
+          "matched": 0.056176770478487015,
+          "offline": 0.04656461253762245
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.055040907114744186,
+        "matched": 0.050707146525382996,
+        "offline": 0.031404294073581696
+      },
+      "candidate_count": 450,
+      "class_id": 64,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11031171679496765,
+          "matched": 0.08102978020906448,
+          "offline": 0.04923386499285698
+        },
+        {
+          "augmented": 0.09343910217285156,
+          "matched": 0.08166762441396713,
+          "offline": 0.062493741512298584
+        },
+        {
+          "augmented": 0.09137959778308868,
+          "matched": 0.10304095596075058,
+          "offline": 0.07595448195934296
+        },
+        {
+          "augmented": 0.09459074586629868,
+          "matched": 0.08127415925264359,
+          "offline": 0.063353531062603
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05594000965356827,
+        "matched": 0.04557536914944649,
+        "offline": 0.03339989110827446
+      },
+      "candidate_count": 450,
+      "class_id": 65,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.09905274212360382,
+          "matched": 0.07615876197814941,
+          "offline": 0.054099466651678085
+        },
+        {
+          "augmented": 0.09977639466524124,
+          "matched": 0.08791650086641312,
+          "offline": 0.05933814123272896
+        },
+        {
+          "augmented": 0.09280379861593246,
+          "matched": 0.07626187056303024,
+          "offline": 0.06571853905916214
+        },
+        {
+          "augmented": 0.11505573242902756,
+          "matched": 0.0653138980269432,
+          "offline": 0.06342875957489014
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06330900639295578,
+        "matched": 0.03928019106388092,
+        "offline": 0.031039010733366013
+      },
+      "candidate_count": 450,
+      "class_id": 66,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.09888302534818649,
+          "matched": 0.0721421018242836,
+          "offline": 0.05281045287847519
+        },
+        {
+          "augmented": 0.10083229094743729,
+          "matched": 0.07030724734067917,
+          "offline": 0.06581564247608185
+        },
+        {
+          "augmented": 0.09350785613059998,
+          "matched": 0.07194532454013824,
+          "offline": 0.06137485429644585
+        },
+        {
+          "augmented": 0.11316067725419998,
+          "matched": 0.06260530650615692,
+          "offline": 0.053967107087373734
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.04880305752158165,
+        "matched": 0.037792857736349106,
+        "offline": 0.03278664872050285
+      },
+      "candidate_count": 450,
+      "class_id": 67,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11638686060905457,
+          "matched": 0.06602046638727188,
+          "offline": 0.058222681283950806
+        },
+        {
+          "augmented": 0.0766039490699768,
+          "matched": 0.06978417932987213,
+          "offline": 0.06968323141336441
+        },
+        {
+          "augmented": 0.0845559686422348,
+          "matched": 0.07277622818946838,
+          "offline": 0.06404298543930054
+        },
+        {
+          "augmented": 0.09339148551225662,
+          "matched": 0.06437515467405319,
+          "offline": 0.04240643233060837
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.058244723826646805,
+        "matched": 0.03291313722729683,
+        "offline": 0.02548074722290039
+      },
+      "candidate_count": 450,
+      "class_id": 68,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10373453795909882,
+          "matched": 0.048231154680252075,
+          "offline": 0.04180119186639786
+        },
+        {
+          "augmented": 0.08966632187366486,
+          "matched": 0.06513480842113495,
+          "offline": 0.05888642370700836
+        },
+        {
+          "augmented": 0.11988091468811035,
+          "matched": 0.0678512454032898,
+          "offline": 0.04699960723519325
+        },
+        {
+          "augmented": 0.09749841690063477,
+          "matched": 0.05343861132860184,
+          "offline": 0.054105740040540695
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05988287180662155,
+        "matched": 0.04079077020287514,
+        "offline": 0.028856173157691956
+      },
+      "candidate_count": 450,
+      "class_id": 69,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.09777338802814484,
+          "matched": 0.06008201465010643,
+          "offline": 0.04742405191063881
+        },
+        {
+          "augmented": 0.10050409287214279,
+          "matched": 0.08558758348226547,
+          "offline": 0.059905730187892914
+        },
+        {
+          "augmented": 0.09658897668123245,
+          "matched": 0.08895471692085266,
+          "offline": 0.060092441737651825
+        },
+        {
+          "augmented": 0.106766477227211,
+          "matched": 0.05272351950407028,
+          "offline": 0.0554475374519825
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.047331057488918304,
+        "matched": 0.042095016688108444,
+        "offline": 0.028179718181490898
+      },
+      "candidate_count": 450,
+      "class_id": 70,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.12859684228897095,
+          "matched": 0.08211197704076767,
+          "offline": 0.07825920730829239
+        },
+        {
+          "augmented": 0.06639410555362701,
+          "matched": 0.05764452740550041,
+          "offline": 0.047487322241067886
+        },
+        {
+          "augmented": 0.07352142781019211,
+          "matched": 0.07961145788431168,
+          "offline": 0.05957365408539772
+        },
+        {
+          "augmented": 0.09856350719928741,
+          "matched": 0.0852789580821991,
+          "offline": 0.06348104774951935
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05627067759633064,
+        "matched": 0.036626871675252914,
+        "offline": 0.030112776905298233
+      },
+      "candidate_count": 450,
+      "class_id": 71,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.09680096060037613,
+          "matched": 0.07161523401737213,
+          "offline": 0.05384810268878937
+        },
+        {
+          "augmented": 0.09903363883495331,
+          "matched": 0.06389271467924118,
+          "offline": 0.0641307458281517
+        },
+        {
+          "augmented": 0.0972621962428093,
+          "matched": 0.05763939023017883,
+          "offline": 0.06044118478894234
+        },
+        {
+          "augmented": 0.10871132463216782,
+          "matched": 0.05337021127343178,
+          "offline": 0.052399493753910065
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06023221090435982,
+        "matched": 0.03760769963264465,
+        "offline": 0.03129686042666435
+      },
+      "candidate_count": 450,
+      "class_id": 72,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.09122831374406815,
+          "matched": 0.057862378656864166,
+          "offline": 0.05298662930727005
+        },
+        {
+          "augmented": 0.10708560794591904,
+          "matched": 0.07977426052093506,
+          "offline": 0.06623083353042603
+        },
+        {
+          "augmented": 0.10679103434085846,
+          "matched": 0.06934395432472229,
+          "offline": 0.06735685467720032
+        },
+        {
+          "augmented": 0.12837518751621246,
+          "matched": 0.071538046002388,
+          "offline": 0.05909097194671631
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.04135039076209068,
+        "matched": 0.038101643323898315,
+        "offline": 0.029656458646059036
+      },
+      "candidate_count": 450,
+      "class_id": 73,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10161080956459045,
+          "matched": 0.06792246550321579,
+          "offline": 0.04712093994021416
+        },
+        {
+          "augmented": 0.07352735102176666,
+          "matched": 0.06981536000967026,
+          "offline": 0.06140727922320366
+        },
+        {
+          "augmented": 0.0694005936384201,
+          "matched": 0.07538017630577087,
+          "offline": 0.05645627900958061
+        },
+        {
+          "augmented": 0.07594892382621765,
+          "matched": 0.06893537938594818,
+          "offline": 0.050422243773937225
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05968089401721954,
+        "matched": 0.04085417464375496,
+        "offline": 0.031448569148778915
+      },
+      "candidate_count": 450,
+      "class_id": 74,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10504164546728134,
+          "matched": 0.0827765166759491,
+          "offline": 0.05117517337203026
+        },
+        {
+          "augmented": 0.09805846959352493,
+          "matched": 0.07178313285112381,
+          "offline": 0.06665676832199097
+        },
+        {
+          "augmented": 0.09758229553699493,
+          "matched": 0.0784679427742958,
+          "offline": 0.06574790179729462
+        },
+        {
+          "augmented": 0.11424121260643005,
+          "matched": 0.06317240744829178,
+          "offline": 0.05293641239404678
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05896721035242081,
+        "matched": 0.04406319186091423,
+        "offline": 0.030044810846447945
+      },
+      "candidate_count": 450,
+      "class_id": 75,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11015404015779495,
+          "matched": 0.06644951552152634,
+          "offline": 0.05843218043446541
+        },
+        {
+          "augmented": 0.10258126258850098,
+          "matched": 0.08178514242172241,
+          "offline": 0.07207024097442627
+        },
+        {
+          "augmented": 0.09794172644615173,
+          "matched": 0.07967131584882736,
+          "offline": 0.06350366771221161
+        },
+        {
+          "augmented": 0.1061628982424736,
+          "matched": 0.0629597008228302,
+          "offline": 0.05404454842209816
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05905866250395775,
+        "matched": 0.049899887293577194,
+        "offline": 0.029381871223449707
+      },
+      "candidate_count": 450,
+      "class_id": 76,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.09114114940166473,
+          "matched": 0.07538143545389175,
+          "offline": 0.048386167734861374
+        },
+        {
+          "augmented": 0.10116533190011978,
+          "matched": 0.08724956959486008,
+          "offline": 0.0642721951007843
+        },
+        {
+          "augmented": 0.11030938476324081,
+          "matched": 0.09459751099348068,
+          "offline": 0.06208735704421997
+        },
+        {
+          "augmented": 0.09033003449440002,
+          "matched": 0.06357026845216751,
+          "offline": 0.046706993132829666
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05562736466526985,
+        "matched": 0.040212709456682205,
+        "offline": 0.0321383960545063
+      },
+      "candidate_count": 450,
+      "class_id": 77,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11396776139736176,
+          "matched": 0.0801236629486084,
+          "offline": 0.05147772654891014
+        },
+        {
+          "augmented": 0.08705227822065353,
+          "matched": 0.07863522320985794,
+          "offline": 0.07002320885658264
+        },
+        {
+          "augmented": 0.09124055504798889,
+          "matched": 0.081999272108078,
+          "offline": 0.06960608810186386
+        },
+        {
+          "augmented": 0.09782198071479797,
+          "matched": 0.060540806502103806,
+          "offline": 0.057410214096307755
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06031910330057144,
+        "matched": 0.03838205710053444,
+        "offline": 0.03225250914692879
+      },
+      "candidate_count": 450,
+      "class_id": 78,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11760537326335907,
+          "matched": 0.06331490725278854,
+          "offline": 0.053565990179777145
+        },
+        {
+          "augmented": 0.10936741530895233,
+          "matched": 0.07125384360551834,
+          "offline": 0.06469276547431946
+        },
+        {
+          "augmented": 0.09451081603765488,
+          "matched": 0.0763627365231514,
+          "offline": 0.06496384739875793
+        },
+        {
+          "augmented": 0.1138649582862854,
+          "matched": 0.0661039724946022,
+          "offline": 0.057057540863752365
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05947314202785492,
+        "matched": 0.04296298325061798,
+        "offline": 0.03281569853425026
+      },
+      "candidate_count": 450,
+      "class_id": 79,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.09334881603717804,
+          "matched": 0.07145208865404129,
+          "offline": 0.04720291495323181
+        },
+        {
+          "augmented": 0.10183075815439224,
+          "matched": 0.07560379803180695,
+          "offline": 0.06753204017877579
+        },
+        {
+          "augmented": 0.09280888736248016,
+          "matched": 0.08467976003885269,
+          "offline": 0.06927482038736343
+        },
+        {
+          "augmented": 0.1257440745830536,
+          "matched": 0.06477759778499603,
+          "offline": 0.05894440412521362
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.0605226531624794,
+        "matched": 0.04425172135233879,
+        "offline": 0.029772935435175896
+      },
+      "candidate_count": 450,
+      "class_id": 80,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.12293864041566849,
+          "matched": 0.060487255454063416,
+          "offline": 0.05075110122561455
+        },
+        {
+          "augmented": 0.10972636193037033,
+          "matched": 0.08294689655303955,
+          "offline": 0.06577257812023163
+        },
+        {
+          "augmented": 0.09489277750253677,
+          "matched": 0.07952740788459778,
+          "offline": 0.06318876892328262
+        },
+        {
+          "augmented": 0.11157270520925522,
+          "matched": 0.05604878440499306,
+          "offline": 0.049622081220149994
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05396968871355057,
+        "matched": 0.04144706577062607,
+        "offline": 0.030301757156848907
+      },
+      "candidate_count": 450,
+      "class_id": 81,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10835675895214081,
+          "matched": 0.05535757541656494,
+          "offline": 0.05850699543952942
+        },
+        {
+          "augmented": 0.10452351719141006,
+          "matched": 0.08754690736532211,
+          "offline": 0.06631028652191162
+        },
+        {
+          "augmented": 0.08794287592172623,
+          "matched": 0.07835152000188828,
+          "offline": 0.06812939792871475
+        },
+        {
+          "augmented": 0.12801216542720795,
+          "matched": 0.07207458466291428,
+          "offline": 0.0659196749329567
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.045796290040016174,
+        "matched": 0.07138703763484955,
+        "offline": 0.02910684607923031
+      },
+      "candidate_count": 450,
+      "class_id": 82,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.0922551155090332,
+          "matched": 0.09054134786128998,
+          "offline": 0.09163737297058105
+        },
+        {
+          "augmented": 0.09055763483047485,
+          "matched": 0.05965146794915199,
+          "offline": 0.05569879710674286
+        },
+        {
+          "augmented": 0.09160281717777252,
+          "matched": 0.0714523121714592,
+          "offline": 0.05582864582538605
+        },
+        {
+          "augmented": 0.08010190725326538,
+          "matched": 0.06992708146572113,
+          "offline": 0.061111919581890106
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.04909530654549599,
+        "matched": 0.04639185592532158,
+        "offline": 0.033582400530576706
+      },
+      "candidate_count": 450,
+      "class_id": 83,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.12389804422855377,
+          "matched": 0.11994625627994537,
+          "offline": 0.08136510103940964
+        },
+        {
+          "augmented": 0.06778808683156967,
+          "matched": 0.067701555788517,
+          "offline": 0.07037310302257538
+        },
+        {
+          "augmented": 0.0688667893409729,
+          "matched": 0.06539751589298248,
+          "offline": 0.061364538967609406
+        },
+        {
+          "augmented": 0.08943451941013336,
+          "matched": 0.1289236843585968,
+          "offline": 0.0800653025507927
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.056318946182727814,
+        "matched": 0.03883353993296623,
+        "offline": 0.030654912814497948
+      },
+      "candidate_count": 450,
+      "class_id": 84,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10960707068443298,
+          "matched": 0.0574919693171978,
+          "offline": 0.055628225207328796
+        },
+        {
+          "augmented": 0.08305653184652328,
+          "matched": 0.0775042399764061,
+          "offline": 0.06065652519464493
+        },
+        {
+          "augmented": 0.09343774616718292,
+          "matched": 0.0775022953748703,
+          "offline": 0.060948703438043594
+        },
+        {
+          "augmented": 0.10828332602977753,
+          "matched": 0.05189363658428192,
+          "offline": 0.06566298007965088
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.0639781579375267,
+        "matched": 0.0431634746491909,
+        "offline": 0.029777459800243378
+      },
+      "candidate_count": 450,
+      "class_id": 85,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10428044199943542,
+          "matched": 0.0731416642665863,
+          "offline": 0.04667079821228981
+        },
+        {
+          "augmented": 0.09937415271997452,
+          "matched": 0.08012741804122925,
+          "offline": 0.057888519018888474
+        },
+        {
+          "augmented": 0.11510958522558212,
+          "matched": 0.06915151327848434,
+          "offline": 0.06881117075681686
+        },
+        {
+          "augmented": 0.10513915121555328,
+          "matched": 0.06345807760953903,
+          "offline": 0.05034603551030159
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06314745545387268,
+        "matched": 0.04052267223596573,
+        "offline": 0.03062807396054268
+      },
+      "candidate_count": 450,
+      "class_id": 86,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.13036887347698212,
+          "matched": 0.07105878740549088,
+          "offline": 0.05940421670675278
+        },
+        {
+          "augmented": 0.11862732470035553,
+          "matched": 0.07977328449487686,
+          "offline": 0.061597295105457306
+        },
+        {
+          "augmented": 0.10268031060695648,
+          "matched": 0.0791810005903244,
+          "offline": 0.06697377562522888
+        },
+        {
+          "augmented": 0.11926919966936111,
+          "matched": 0.07861095666885376,
+          "offline": 0.04313622787594795
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05809566751122475,
+        "matched": 0.04762749746441841,
+        "offline": 0.032193779945373535
+      },
+      "candidate_count": 450,
+      "class_id": 87,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11105652898550034,
+          "matched": 0.07516703009605408,
+          "offline": 0.0687258392572403
+        },
+        {
+          "augmented": 0.09448853135108948,
+          "matched": 0.07567833364009857,
+          "offline": 0.0659252479672432
+        },
+        {
+          "augmented": 0.08970151096582413,
+          "matched": 0.07553526759147644,
+          "offline": 0.06563403457403183
+        },
+        {
+          "augmented": 0.11566038429737091,
+          "matched": 0.10211522877216339,
+          "offline": 0.05095693841576576
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05242098867893219,
+        "matched": 0.04883657768368721,
+        "offline": 0.03001575544476509
+      },
+      "candidate_count": 450,
+      "class_id": 88,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.09419601410627365,
+          "matched": 0.07205116003751755,
+          "offline": 0.0628146231174469
+        },
+        {
+          "augmented": 0.10435611009597778,
+          "matched": 0.09095647931098938,
+          "offline": 0.058152176439762115
+        },
+        {
+          "augmented": 0.08683344721794128,
+          "matched": 0.08819565922021866,
+          "offline": 0.06401275098323822
+        },
+        {
+          "augmented": 0.09816587716341019,
+          "matched": 0.06577186286449432,
+          "offline": 0.06693892925977707
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.060256700962781906,
+        "matched": 0.040073081851005554,
+        "offline": 0.028532879427075386
+      },
+      "candidate_count": 450,
+      "class_id": 89,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10888324677944183,
+          "matched": 0.05356216058135033,
+          "offline": 0.05581514909863472
+        },
+        {
+          "augmented": 0.10320732742547989,
+          "matched": 0.0751650482416153,
+          "offline": 0.06322603672742844
+        },
+        {
+          "augmented": 0.10318214446306229,
+          "matched": 0.07496234774589539,
+          "offline": 0.05568866804242134
+        },
+        {
+          "augmented": 0.11847766488790512,
+          "matched": 0.06227168068289757,
+          "offline": 0.05750555917620659
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05862141773104668,
+        "matched": 0.04736671224236488,
+        "offline": 0.02901230938732624
+      },
+      "candidate_count": 450,
+      "class_id": 90,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11007845401763916,
+          "matched": 0.05442628264427185,
+          "offline": 0.053197700530290604
+        },
+        {
+          "augmented": 0.09836672991514206,
+          "matched": 0.07634198665618896,
+          "offline": 0.05933406576514244
+        },
+        {
+          "augmented": 0.11519411206245422,
+          "matched": 0.09565211087465286,
+          "offline": 0.06070864200592041
+        },
+        {
+          "augmented": 0.0835321694612503,
+          "matched": 0.056797318160533905,
+          "offline": 0.05266743525862694
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05348527431488037,
+        "matched": 0.037582576274871826,
+        "offline": 0.02770751714706421
+      },
+      "candidate_count": 450,
+      "class_id": 91,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.104216568171978,
+          "matched": 0.06912901252508163,
+          "offline": 0.04559926688671112
+        },
+        {
+          "augmented": 0.09658030420541763,
+          "matched": 0.07999712973833084,
+          "offline": 0.06423840671777725
+        },
+        {
+          "augmented": 0.0966704711318016,
+          "matched": 0.06128305941820145,
+          "offline": 0.06297659128904343
+        },
+        {
+          "augmented": 0.08480958640575409,
+          "matched": 0.06814596056938171,
+          "offline": 0.04761464148759842
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.0433778241276741,
+        "matched": 0.0414297915995121,
+        "offline": 0.028684865683317184
+      },
+      "candidate_count": 450,
+      "class_id": 92,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10993842035531998,
+          "matched": 0.07717788219451904,
+          "offline": 0.05525866895914078
+        },
+        {
+          "augmented": 0.06484576314687729,
+          "matched": 0.07007914036512375,
+          "offline": 0.06393735855817795
+        },
+        {
+          "augmented": 0.06920929998159409,
+          "matched": 0.06951579451560974,
+          "offline": 0.05978332832455635
+        },
+        {
+          "augmented": 0.09527545422315598,
+          "matched": 0.07617873698472977,
+          "offline": 0.06555712968111038
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.0543513149023056,
+        "matched": 0.03995538502931595,
+        "offline": 0.02767997607588768
+      },
+      "candidate_count": 450,
+      "class_id": 93,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11013053357601166,
+          "matched": 0.06736829876899719,
+          "offline": 0.0430741012096405
+        },
+        {
+          "augmented": 0.08616529405117035,
+          "matched": 0.08582831174135208,
+          "offline": 0.06275708228349686
+        },
+        {
+          "augmented": 0.08936531096696854,
+          "matched": 0.07618144899606705,
+          "offline": 0.058659862726926804
+        },
+        {
+          "augmented": 0.08963900804519653,
+          "matched": 0.05683005973696709,
+          "offline": 0.05146076902747154
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.06983043998479843,
+        "matched": 0.04453936219215393,
+        "offline": 0.030518462881445885
+      },
+      "candidate_count": 450,
+      "class_id": 94,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.13956008851528168,
+          "matched": 0.08065726608037949,
+          "offline": 0.0656064972281456
+        },
+        {
+          "augmented": 0.09606312215328217,
+          "matched": 0.07178446650505066,
+          "offline": 0.06100587174296379
+        },
+        {
+          "augmented": 0.09518410265445709,
+          "matched": 0.08903350681066513,
+          "offline": 0.05712507665157318
+        },
+        {
+          "augmented": 0.1318802833557129,
+          "matched": 0.06351850181818008,
+          "offline": 0.06286997348070145
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.058792635798454285,
+        "matched": 0.033762384206056595,
+        "offline": 0.02826971374452114
+      },
+      "candidate_count": 450,
+      "class_id": 95,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11950550973415375,
+          "matched": 0.04931028187274933,
+          "offline": 0.04409005120396614
+        },
+        {
+          "augmented": 0.09709881991147995,
+          "matched": 0.07546106725931168,
+          "offline": 0.05493122711777687
+        },
+        {
+          "augmented": 0.09887567162513733,
+          "matched": 0.07191892713308334,
+          "offline": 0.059766799211502075
+        },
+        {
+          "augmented": 0.09398917853832245,
+          "matched": 0.05975893512368202,
+          "offline": 0.04781309887766838
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.058946628123521805,
+        "matched": 0.03416571021080017,
+        "offline": 0.02789139188826084
+      },
+      "candidate_count": 450,
+      "class_id": 96,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11566153913736343,
+          "matched": 0.06251095980405807,
+          "offline": 0.05087815597653389
+        },
+        {
+          "augmented": 0.0961124375462532,
+          "matched": 0.06344818323850632,
+          "offline": 0.05722000077366829
+        },
+        {
+          "augmented": 0.09229810535907745,
+          "matched": 0.06400159746408463,
+          "offline": 0.05591152608394623
+        },
+        {
+          "augmented": 0.1095118299126625,
+          "matched": 0.06188921630382538,
+          "offline": 0.05095916986465454
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.05654241517186165,
+        "matched": 0.04442319646477699,
+        "offline": 0.029428936541080475
+      },
+      "candidate_count": 450,
+      "class_id": 97,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10436760634183884,
+          "matched": 0.06108477711677551,
+          "offline": 0.04879552870988846
+        },
+        {
+          "augmented": 0.10608938336372375,
+          "matched": 0.0949242040514946,
+          "offline": 0.06348587572574615
+        },
+        {
+          "augmented": 0.09778999537229538,
+          "matched": 0.08352336287498474,
+          "offline": 0.07272569090127945
+        },
+        {
+          "augmented": 0.09641330689191818,
+          "matched": 0.052838318049907684,
+          "offline": 0.048766400665044785
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.055433109402656555,
+        "matched": 0.045970603823661804,
+        "offline": 0.03352901339530945
+      },
+      "candidate_count": 450,
+      "class_id": 98,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.11436842381954193,
+          "matched": 0.08400673419237137,
+          "offline": 0.061030443757772446
+        },
+        {
+          "augmented": 0.08742354810237885,
+          "matched": 0.0975869670510292,
+          "offline": 0.06256108731031418
+        },
+        {
+          "augmented": 0.0912288948893547,
+          "matched": 0.08444274961948395,
+          "offline": 0.05950824171304703
+        },
+        {
+          "augmented": 0.08902981877326965,
+          "matched": 0.07015769183635712,
+          "offline": 0.0641477033495903
+        }
+      ]
+    },
+    {
+      "aggregate": {
+        "augmented": 0.0537547841668129,
+        "matched": 0.041692864149808884,
+        "offline": 0.035307690501213074
+      },
+      "candidate_count": 450,
+      "class_id": 99,
+      "identical_duplicate_matches": 0,
+      "offline_count": 20,
+      "online_count": 20,
+      "parties": [
+        {
+          "augmented": 0.10019145160913467,
+          "matched": 0.07031893730163574,
+          "offline": 0.05117737129330635
+        },
+        {
+          "augmented": 0.10117805004119873,
+          "matched": 0.06716475635766983,
+          "offline": 0.06669417768716812
+        },
+        {
+          "augmented": 0.09492921829223633,
+          "matched": 0.06856458634138107,
+          "offline": 0.07033533602952957
+        },
+        {
+          "augmented": 0.08490161597728729,
+          "matched": 0.07592762261629105,
+          "offline": 0.0657566711306572
+        }
+      ]
+    }
+  ],
+  "data_sha256": {
+    "data:cifar-100-python/meta": "a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9",
+    "data:cifar-100-python/test": "4b67687d9933c4db8f0831104447f15b93774f4f464bd0516f0f0f2ac83b7864",
+    "data:cifar-100-python/train": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b"
+  },
+  "eligible_indices_sha256": "30f96089b22c9dc65c4a5db906d90224369a12ef47b3d408a74e4a635c3b3542",
+  "identical_duplicate_matches": 1,
+  "matcher_sha256": "ca28de7a92e384aa68c994f112a47dcf368091174e0ae1a337d5600ec15f40a3",
+  "offline_selected_ids_sha256": "331c771e9d5c64e7e6d3dd3e4ae93e90e6fc70ac952d2ab5319c7cdac7798a66",
+  "pilot_completion_sha256": "d74b1eec2ecca4774eb3ce7eb98a90dcc103f39c8e26fd8cec82d716077046b8",
+  "pilot_protocol_sha256": "e37b32fd21a22ecda404249ce5e470b4d689c97c10e0a1cf9575a378b6567dba",
+  "previous_audit_sha256": "c980e3347becc75984f91009aeccfe50fac8ffa87a022d43502690e194a6f5c3",
+  "recovered_online_ids_sha256": "a3786f80eb75635c5a7b6150d7d4e8ffdb85cf2aec9b77aaeb97551e5324e73a",
+  "run": "/home/c3080/YangXiaoXiang/VF-CL/results/cifar-view-matched-herding-seed48-20261008-v1/seed_48_training_only",
+  "schema_version": 1,
+  "script_sha256": "c8bdd7ab5401c0d545620635541663a17762fc27ce2edd86b3cdff4f8e90a528",
+  "seed": 48,
+  "source_commit": "7bfe6b1d724fb1206bc0053a9008126bad86332d",
+  "source_config_sha256": "5ef9984e091b83d7f84ac373cd702811c0ed15595dc6f4075ca23cc515535955",
+  "source_modules_sha256": {
+    "calibration_split.py": "b75eff934143defc7338b4b7cf56469d08792627a09d3b9be4e69f5cfeb98e24",
+    "cl_methods/proto_evolve.py": "8da778b07a3a3c7b8ddef698a8f7ba646653c02a9eae85bcf27c074a66f49234",
+    "data_utils.py": "bcc830f19978e14490fd0294470be30cc703e902e4dd89ca6aa9e50d30b4df17",
+    "determinism.py": "4b11b518ae33aeaf6584302328b17fab62509a05e874343a4f51cec653494742",
+    "models.py": "d240686b02b7dda16dd37068b2c1b60057b0b462f26c69631eeaec91b6395d89",
+    "vfl_trainer.py": "d7f9af5da617d6ed9cdbec1ba72d9d4d6f9d12631a019e988dc85550a6dddf19"
+  },
+  "source_record_sha256": "aad02da1ba8e87f29e79f5702e71fe8e99c8ef4cdf554976cc1b881af6dc0871",
+  "status": "training_only_view_matched_herding_pilot",
+  "summary": {
+    "aggregate": {
+      "augmented_mean": 0.0584440129622817,
+      "augmented_median": 0.05888335034251213,
+      "fraction_remaining_gap_positive": 1.0,
+      "fraction_view_gap_positive": 0.99,
+      "matched_mean": 0.04349140621721745,
+      "matched_median": 0.044219113886356354,
+      "offline_mean": 0.030327350310981275,
+      "offline_median": 0.03013316448777914,
+      "remaining_gap_mean": 0.013164055906236172,
+      "remaining_gap_median": 0.012777190655469894,
+      "view_gap_mean": 0.014952606745064259,
+      "view_gap_median": 0.01483592763543129
+    },
+    "classes": 100,
+    "parties": [
+      {
+        "augmented_mean": 0.11000218503177166,
+        "augmented_median": 0.10862000286579132,
+        "fraction_remaining_gap_positive": 0.91,
+        "fraction_view_gap_positive": 1.0,
+        "matched_mean": 0.0688592804968357,
+        "matched_median": 0.06819884851574898,
+        "offline_mean": 0.054245711229741575,
+        "offline_median": 0.05279024504125118,
+        "remaining_gap_mean": 0.014613569267094135,
+        "remaining_gap_median": 0.013007910922169685,
+        "view_gap_mean": 0.04114290453493595,
+        "view_gap_median": 0.03880339674651623
+      },
+      {
+        "augmented_mean": 0.09687849529087543,
+        "augmented_median": 0.097292710095644,
+        "fraction_remaining_gap_positive": 0.98,
+        "fraction_view_gap_positive": 0.95,
+        "matched_mean": 0.07832381173968316,
+        "matched_median": 0.0789281316101551,
+        "offline_mean": 0.06302415952086449,
+        "offline_median": 0.06283053755760193,
+        "remaining_gap_mean": 0.015299652218818665,
+        "remaining_gap_median": 0.015320466831326485,
+        "view_gap_mean": 0.018554683551192285,
+        "view_gap_median": 0.018434535712003708
+      },
+      {
+        "augmented_mean": 0.09586629539728164,
+        "augmented_median": 0.09622803330421448,
+        "fraction_remaining_gap_positive": 0.96,
+        "fraction_view_gap_positive": 0.92,
+        "matched_mean": 0.0793630050122738,
+        "matched_median": 0.07926895096898079,
+        "offline_mean": 0.06262527238577605,
+        "offline_median": 0.06270455569028854,
+        "remaining_gap_mean": 0.016737732626497744,
+        "remaining_gap_median": 0.016253143548965454,
+        "view_gap_mean": 0.01650329038500786,
+        "view_gap_median": 0.01555011048913002
+      },
+      {
+        "augmented_mean": 0.10497635520994664,
+        "augmented_median": 0.10606132447719574,
+        "fraction_remaining_gap_positive": 0.87,
+        "fraction_view_gap_positive": 0.96,
+        "matched_mean": 0.06926072269678116,
+        "matched_median": 0.06800319626927376,
+        "offline_mean": 0.05636407822370529,
+        "offline_median": 0.055148422718048096,
+        "remaining_gap_mean": 0.012896644473075867,
+        "remaining_gap_median": 0.011012649163603783,
+        "view_gap_mean": 0.03571563251316547,
+        "view_gap_median": 0.03936928138136864
+      }
+    ]
+  }
+}
