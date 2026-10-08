@@ -1,0 +1,3940 @@
+{
+  "checkpoint_sha256": "82318034eddeb994dc34e78f9acd93abda74949bccebd39c74336de3238b5c96",
+  "classes": [
+    {
+      "candidate_count": 450,
+      "class_id": 0,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.03356529772281647,
+        "offline": 0.026386307552456856,
+        "stochastic": 0.03823064640164375
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06369662284851074,
+          "offline": 0.07077911496162415,
+          "stochastic": 0.07615640014410019
+        },
+        {
+          "deterministic": 0.05892236903309822,
+          "offline": 0.057313960045576096,
+          "stochastic": 0.06199141964316368
+        },
+        {
+          "deterministic": 0.06384021788835526,
+          "offline": 0.055104851722717285,
+          "stochastic": 0.05530153214931488
+        },
+        {
+          "deterministic": 0.07496651262044907,
+          "offline": 0.05363708361983299,
+          "stochastic": 0.0744628980755806
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03507198020815849,
+        "stochastic": 0.044523775577545166
+      },
+      "task_id": 0
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 1,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.032756779342889786,
+        "offline": 0.027210809290409088,
+        "stochastic": 0.04188130795955658
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05870436504483223,
+          "offline": 0.056053441017866135,
+          "stochastic": 0.07168951630592346
+        },
+        {
+          "deterministic": 0.06620906293392181,
+          "offline": 0.058031998574733734,
+          "stochastic": 0.0690840482711792
+        },
+        {
+          "deterministic": 0.05546358600258827,
+          "offline": 0.05210922658443451,
+          "stochastic": 0.06216813623905182
+        },
+        {
+          "deterministic": 0.0589461475610733,
+          "offline": 0.06326503306627274,
+          "stochastic": 0.07373601198196411
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03653058409690857,
+        "stochastic": 0.04848158359527588
+      },
+      "task_id": 0
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 2,
+      "content_overlap_count": 3,
+      "final_aggregate": {
+        "deterministic": 0.03317900002002716,
+        "offline": 0.030894508585333824,
+        "stochastic": 0.04520922899246216
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.055308904498815536,
+          "offline": 0.06545649468898773,
+          "stochastic": 0.07359106093645096
+        },
+        {
+          "deterministic": 0.0677955374121666,
+          "offline": 0.06534754484891891,
+          "stochastic": 0.07674860209226608
+        },
+        {
+          "deterministic": 0.06721287965774536,
+          "offline": 0.06017070636153221,
+          "stochastic": 0.08180832862854004
+        },
+        {
+          "deterministic": 0.054788943380117416,
+          "offline": 0.06352084130048752,
+          "stochastic": 0.07186717540025711
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03690841794013977,
+        "stochastic": 0.05000991374254227
+      },
+      "task_id": 0
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 3,
+      "content_overlap_count": 3,
+      "final_aggregate": {
+        "deterministic": 0.036529652774333954,
+        "offline": 0.030994456261396408,
+        "stochastic": 0.04184984415769577
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.0722951889038086,
+          "offline": 0.057698316872119904,
+          "stochastic": 0.06442613899707794
+        },
+        {
+          "deterministic": 0.0640692412853241,
+          "offline": 0.06385418027639389,
+          "stochastic": 0.08464784920215607
+        },
+        {
+          "deterministic": 0.06709792464971542,
+          "offline": 0.06570972502231598,
+          "stochastic": 0.08873281627893448
+        },
+        {
+          "deterministic": 0.0534130297601223,
+          "offline": 0.061930980533361435,
+          "stochastic": 0.07058358937501907
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03821876272559166,
+        "stochastic": 0.052826885133981705
+      },
+      "task_id": 0
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 4,
+      "content_overlap_count": 4,
+      "final_aggregate": {
+        "deterministic": 0.039220180362463,
+        "offline": 0.03203822672367096,
+        "stochastic": 0.046223804354667664
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.07417625933885574,
+          "offline": 0.061149608343839645,
+          "stochastic": 0.0963781476020813
+        },
+        {
+          "deterministic": 0.07511283457279205,
+          "offline": 0.062861368060112,
+          "stochastic": 0.07948929071426392
+        },
+        {
+          "deterministic": 0.08604474365711212,
+          "offline": 0.06869251281023026,
+          "stochastic": 0.08223944902420044
+        },
+        {
+          "deterministic": 0.06011373549699783,
+          "offline": 0.059141650795936584,
+          "stochastic": 0.06294640153646469
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03784024715423584,
+        "stochastic": 0.055155135691165924
+      },
+      "task_id": 0
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 5,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.03860940411686897,
+        "offline": 0.03150539845228195,
+        "stochastic": 0.04657987877726555
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.07443878054618835,
+          "offline": 0.058411870151758194,
+          "stochastic": 0.0851173922419548
+        },
+        {
+          "deterministic": 0.06770241260528564,
+          "offline": 0.07206550985574722,
+          "stochastic": 0.07832267135381699
+        },
+        {
+          "deterministic": 0.07481545954942703,
+          "offline": 0.06808541715145111,
+          "stochastic": 0.06962493807077408
+        },
+        {
+          "deterministic": 0.06295663863420486,
+          "offline": 0.05720113217830658,
+          "stochastic": 0.06029440462589264
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.036450743675231934,
+        "stochastic": 0.058527473360300064
+      },
+      "task_id": 0
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 6,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.035229239612817764,
+        "offline": 0.031144918873906136,
+        "stochastic": 0.046849388629198074
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.07492435723543167,
+          "offline": 0.06169217452406883,
+          "stochastic": 0.09443528950214386
+        },
+        {
+          "deterministic": 0.06882501393556595,
+          "offline": 0.06310844421386719,
+          "stochastic": 0.07233386486768723
+        },
+        {
+          "deterministic": 0.06811129301786423,
+          "offline": 0.06539012491703033,
+          "stochastic": 0.07827626168727875
+        },
+        {
+          "deterministic": 0.04854992777109146,
+          "offline": 0.06560241430997849,
+          "stochastic": 0.0676141083240509
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03624974191188812,
+        "stochastic": 0.05881866440176964
+      },
+      "task_id": 0
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 7,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.0325007289648056,
+        "offline": 0.029772337526082993,
+        "stochastic": 0.040075354278087616
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05711652338504791,
+          "offline": 0.07313261926174164,
+          "stochastic": 0.08047111332416534
+        },
+        {
+          "deterministic": 0.06336739659309387,
+          "offline": 0.05853342264890671,
+          "stochastic": 0.07644198089838028
+        },
+        {
+          "deterministic": 0.06415466964244843,
+          "offline": 0.05772978812456131,
+          "stochastic": 0.07742946594953537
+        },
+        {
+          "deterministic": 0.0521729439496994,
+          "offline": 0.06090725585818291,
+          "stochastic": 0.07226135581731796
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03608454018831253,
+        "stochastic": 0.04929295927286148
+      },
+      "task_id": 0
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 8,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.03600294888019562,
+        "offline": 0.029774736613035202,
+        "stochastic": 0.04603938013315201
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06555181741714478,
+          "offline": 0.06342525035142899,
+          "stochastic": 0.06889701634645462
+        },
+        {
+          "deterministic": 0.06754005700349808,
+          "offline": 0.06404273957014084,
+          "stochastic": 0.07829494029283524
+        },
+        {
+          "deterministic": 0.07219671458005905,
+          "offline": 0.0664844959974289,
+          "stochastic": 0.08009835332632065
+        },
+        {
+          "deterministic": 0.04954758286476135,
+          "offline": 0.052254121750593185,
+          "stochastic": 0.06146180257201195
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03617120534181595,
+        "stochastic": 0.05632074922323227
+      },
+      "task_id": 0
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 9,
+      "content_overlap_count": 6,
+      "final_aggregate": {
+        "deterministic": 0.0369110032916069,
+        "offline": 0.030950095504522324,
+        "stochastic": 0.041742026805877686
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.08369910717010498,
+          "offline": 0.058670636266469955,
+          "stochastic": 0.08022068440914154
+        },
+        {
+          "deterministic": 0.07016091048717499,
+          "offline": 0.06130471080541611,
+          "stochastic": 0.07560274749994278
+        },
+        {
+          "deterministic": 0.06912284344434738,
+          "offline": 0.05654434114694595,
+          "stochastic": 0.07123866677284241
+        },
+        {
+          "deterministic": 0.06078517064452171,
+          "offline": 0.05163980647921562,
+          "stochastic": 0.0664861723780632
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.039295125752687454,
+        "stochastic": 0.053265053778886795
+      },
+      "task_id": 0
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 10,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.03771557658910751,
+        "offline": 0.036342792212963104,
+        "stochastic": 0.05187642201781273
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.07092837989330292,
+          "offline": 0.08510979264974594,
+          "stochastic": 0.10100141912698746
+        },
+        {
+          "deterministic": 0.07525742799043655,
+          "offline": 0.0699070617556572,
+          "stochastic": 0.08822435140609741
+        },
+        {
+          "deterministic": 0.0667128711938858,
+          "offline": 0.0749586895108223,
+          "stochastic": 0.08419067412614822
+        },
+        {
+          "deterministic": 0.04456557333469391,
+          "offline": 0.05985992029309273,
+          "stochastic": 0.07340849190950394
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03914279118180275,
+        "stochastic": 0.05827563628554344
+      },
+      "task_id": 1
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 11,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.03767237067222595,
+        "offline": 0.032173626124858856,
+        "stochastic": 0.04744899645447731
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.07467468082904816,
+          "offline": 0.05865740403532982,
+          "stochastic": 0.08236125856637955
+        },
+        {
+          "deterministic": 0.07109175622463226,
+          "offline": 0.07863139361143112,
+          "stochastic": 0.0791207104921341
+        },
+        {
+          "deterministic": 0.07646258175373077,
+          "offline": 0.06631923466920853,
+          "stochastic": 0.0821276605129242
+        },
+        {
+          "deterministic": 0.06000567600131035,
+          "offline": 0.07517454773187637,
+          "stochastic": 0.09556686878204346
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03853631392121315,
+        "stochastic": 0.05172866955399513
+      },
+      "task_id": 1
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 12,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.03496547415852547,
+        "offline": 0.029652532190084457,
+        "stochastic": 0.0404495894908905
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05819183960556984,
+          "offline": 0.05362282693386078,
+          "stochastic": 0.08101127296686172
+        },
+        {
+          "deterministic": 0.07595229893922806,
+          "offline": 0.06002994254231453,
+          "stochastic": 0.08139141649007797
+        },
+        {
+          "deterministic": 0.059271812438964844,
+          "offline": 0.06264952570199966,
+          "stochastic": 0.08379290997982025
+        },
+        {
+          "deterministic": 0.05191982537508011,
+          "offline": 0.048035990446805954,
+          "stochastic": 0.054831478744745255
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03434739261865616,
+        "stochastic": 0.04887010529637337
+      },
+      "task_id": 1
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 13,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.034153737127780914,
+        "offline": 0.028918128460645676,
+        "stochastic": 0.04653233289718628
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.059224314987659454,
+          "offline": 0.05362505093216896,
+          "stochastic": 0.08660157769918442
+        },
+        {
+          "deterministic": 0.0703483298420906,
+          "offline": 0.06433779746294022,
+          "stochastic": 0.0805051252245903
+        },
+        {
+          "deterministic": 0.06565143913030624,
+          "offline": 0.06549983471632004,
+          "stochastic": 0.08175185322761536
+        },
+        {
+          "deterministic": 0.05321087688207626,
+          "offline": 0.04855623468756676,
+          "stochastic": 0.07948468625545502
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03618312254548073,
+        "stochastic": 0.051205601543188095
+      },
+      "task_id": 1
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 14,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.0342518575489521,
+        "offline": 0.031952306628227234,
+        "stochastic": 0.051929935812950134
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06559023261070251,
+          "offline": 0.05826513096690178,
+          "stochastic": 0.08457310497760773
+        },
+        {
+          "deterministic": 0.06680996716022491,
+          "offline": 0.06439493596553802,
+          "stochastic": 0.10104037076234818
+        },
+        {
+          "deterministic": 0.06380609422922134,
+          "offline": 0.07082606852054596,
+          "stochastic": 0.08558718115091324
+        },
+        {
+          "deterministic": 0.062113210558891296,
+          "offline": 0.04730983451008797,
+          "stochastic": 0.11992763727903366
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.037758052349090576,
+        "stochastic": 0.05925421416759491
+      },
+      "task_id": 1
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 15,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.03429321572184563,
+        "offline": 0.03231613710522652,
+        "stochastic": 0.04701661318540573
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.0669916495680809,
+          "offline": 0.06877157837152481,
+          "stochastic": 0.08286138623952866
+        },
+        {
+          "deterministic": 0.067164346575737,
+          "offline": 0.07851040363311768,
+          "stochastic": 0.08701276034116745
+        },
+        {
+          "deterministic": 0.0665939450263977,
+          "offline": 0.060508809983730316,
+          "stochastic": 0.06908129900693893
+        },
+        {
+          "deterministic": 0.06184960901737213,
+          "offline": 0.06536588817834854,
+          "stochastic": 0.07510583102703094
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03645811975002289,
+        "stochastic": 0.05127151310443878
+      },
+      "task_id": 1
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 16,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.039380937814712524,
+        "offline": 0.034076862037181854,
+        "stochastic": 0.04834069311618805
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.08869701623916626,
+          "offline": 0.07199352234601974,
+          "stochastic": 0.10146676748991013
+        },
+        {
+          "deterministic": 0.07779592275619507,
+          "offline": 0.06309101730585098,
+          "stochastic": 0.09606979042291641
+        },
+        {
+          "deterministic": 0.07104246318340302,
+          "offline": 0.07090102881193161,
+          "stochastic": 0.06719649583101273
+        },
+        {
+          "deterministic": 0.06777121871709824,
+          "offline": 0.06109831854701042,
+          "stochastic": 0.09687933325767517
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.041077740490436554,
+        "stochastic": 0.05709276348352432
+      },
+      "task_id": 1
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 17,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.031140241771936417,
+        "offline": 0.027425888925790787,
+        "stochastic": 0.0422508530318737
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05825610086321831,
+          "offline": 0.0522838830947876,
+          "stochastic": 0.059093352407217026
+        },
+        {
+          "deterministic": 0.06990919262170792,
+          "offline": 0.06040489673614502,
+          "stochastic": 0.08415240794420242
+        },
+        {
+          "deterministic": 0.06604012846946716,
+          "offline": 0.057761650532484055,
+          "stochastic": 0.09237881749868393
+        },
+        {
+          "deterministic": 0.053056005388498306,
+          "offline": 0.04786589369177818,
+          "stochastic": 0.05482866242527962
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03442488610744476,
+        "stochastic": 0.04627339541912079
+      },
+      "task_id": 1
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 18,
+      "content_overlap_count": 4,
+      "final_aggregate": {
+        "deterministic": 0.03664352372288704,
+        "offline": 0.03345870599150658,
+        "stochastic": 0.04383331537246704
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.0702599585056305,
+          "offline": 0.06434635072946548,
+          "stochastic": 0.06732793152332306
+        },
+        {
+          "deterministic": 0.06899718195199966,
+          "offline": 0.06691846996545792,
+          "stochastic": 0.08457592129707336
+        },
+        {
+          "deterministic": 0.06762989610433578,
+          "offline": 0.06332658976316452,
+          "stochastic": 0.07726763933897018
+        },
+        {
+          "deterministic": 0.060990769416093826,
+          "offline": 0.06748750805854797,
+          "stochastic": 0.06265280395746231
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03941844776272774,
+        "stochastic": 0.04874832555651665
+      },
+      "task_id": 1
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 19,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.03612929955124855,
+        "offline": 0.031399041414260864,
+        "stochastic": 0.05482945218682289
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05056087300181389,
+          "offline": 0.0541379451751709,
+          "stochastic": 0.1045883372426033
+        },
+        {
+          "deterministic": 0.06818791478872299,
+          "offline": 0.06716889142990112,
+          "stochastic": 0.100049689412117
+        },
+        {
+          "deterministic": 0.08056908845901489,
+          "offline": 0.06550764292478561,
+          "stochastic": 0.07307460904121399
+        },
+        {
+          "deterministic": 0.060361869633197784,
+          "offline": 0.05833796411752701,
+          "stochastic": 0.0716802179813385
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03743430972099304,
+        "stochastic": 0.06251849979162216
+      },
+      "task_id": 1
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 20,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.03453974053263664,
+        "offline": 0.02884087897837162,
+        "stochastic": 0.05526703596115112
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.100074902176857,
+          "offline": 0.06664936989545822,
+          "stochastic": 0.10904113948345184
+        },
+        {
+          "deterministic": 0.06796006858348846,
+          "offline": 0.0610431469976902,
+          "stochastic": 0.10293728113174438
+        },
+        {
+          "deterministic": 0.060576584190130234,
+          "offline": 0.059855420142412186,
+          "stochastic": 0.0728674978017807
+        },
+        {
+          "deterministic": 0.04743824899196625,
+          "offline": 0.06583373993635178,
+          "stochastic": 0.07171082496643066
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03367933630943298,
+        "stochastic": 0.05720387399196625
+      },
+      "task_id": 2
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 21,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.0337304063141346,
+        "offline": 0.03245433792471886,
+        "stochastic": 0.05032602325081825
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.056433115154504776,
+          "offline": 0.05698254704475403,
+          "stochastic": 0.09242820739746094
+        },
+        {
+          "deterministic": 0.07619251310825348,
+          "offline": 0.0651087835431099,
+          "stochastic": 0.096894271671772
+        },
+        {
+          "deterministic": 0.06873206049203873,
+          "offline": 0.06661006808280945,
+          "stochastic": 0.07702822983264923
+        },
+        {
+          "deterministic": 0.061631809920072556,
+          "offline": 0.05724029615521431,
+          "stochastic": 0.07658311724662781
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.034445423632860184,
+        "stochastic": 0.05758974328637123
+      },
+      "task_id": 2
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 22,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.0366009883582592,
+        "offline": 0.031259700655937195,
+        "stochastic": 0.05169469490647316
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.061989665031433105,
+          "offline": 0.06444314122200012,
+          "stochastic": 0.08833703398704529
+        },
+        {
+          "deterministic": 0.07027387619018555,
+          "offline": 0.06765524297952652,
+          "stochastic": 0.08760293573141098
+        },
+        {
+          "deterministic": 0.06929956376552582,
+          "offline": 0.07511355727910995,
+          "stochastic": 0.07867050170898438
+        },
+        {
+          "deterministic": 0.07380539178848267,
+          "offline": 0.04852062836289406,
+          "stochastic": 0.06535015255212784
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.0386764295399189,
+        "stochastic": 0.0568118654191494
+      },
+      "task_id": 2
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 23,
+      "content_overlap_count": 3,
+      "final_aggregate": {
+        "deterministic": 0.03246114403009415,
+        "offline": 0.029514428228139877,
+        "stochastic": 0.038225989788770676
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.050677236169576645,
+          "offline": 0.05562601611018181,
+          "stochastic": 0.07712391018867493
+        },
+        {
+          "deterministic": 0.06444841623306274,
+          "offline": 0.06212672218680382,
+          "stochastic": 0.0682842954993248
+        },
+        {
+          "deterministic": 0.05852239578962326,
+          "offline": 0.05940626561641693,
+          "stochastic": 0.06378024816513062
+        },
+        {
+          "deterministic": 0.05267239362001419,
+          "offline": 0.04539541155099869,
+          "stochastic": 0.06540077924728394
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03378608450293541,
+        "stochastic": 0.04198331758379936
+      },
+      "task_id": 2
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 24,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.0292089581489563,
+        "offline": 0.02744632586836815,
+        "stochastic": 0.055252254009246826
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.047881484031677246,
+          "offline": 0.06295428425073624,
+          "stochastic": 0.11618704348802567
+        },
+        {
+          "deterministic": 0.06424892693758011,
+          "offline": 0.06236525624990463,
+          "stochastic": 0.08984101563692093
+        },
+        {
+          "deterministic": 0.06582778692245483,
+          "offline": 0.052423812448978424,
+          "stochastic": 0.08314970880746841
+        },
+        {
+          "deterministic": 0.04796001687645912,
+          "offline": 0.042038410902023315,
+          "stochastic": 0.048173148185014725
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.028748778626322746,
+        "stochastic": 0.05845007672905922
+      },
+      "task_id": 2
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 25,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.036350879818201065,
+        "offline": 0.034260887652635574,
+        "stochastic": 0.047159839421510696
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06489145010709763,
+          "offline": 0.0648866593837738,
+          "stochastic": 0.07967785745859146
+        },
+        {
+          "deterministic": 0.07093743234872818,
+          "offline": 0.06108371540904045,
+          "stochastic": 0.07795374095439911
+        },
+        {
+          "deterministic": 0.07049500942230225,
+          "offline": 0.06676853448152542,
+          "stochastic": 0.07835277915000916
+        },
+        {
+          "deterministic": 0.06392909586429596,
+          "offline": 0.05904996767640114,
+          "stochastic": 0.08109880983829498
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03683558106422424,
+        "stochastic": 0.05042770877480507
+      },
+      "task_id": 2
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 26,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.03292229026556015,
+        "offline": 0.030917292460799217,
+        "stochastic": 0.04161806404590607
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05483506619930267,
+          "offline": 0.05403662845492363,
+          "stochastic": 0.06680501997470856
+        },
+        {
+          "deterministic": 0.06377564370632172,
+          "offline": 0.06558915972709656,
+          "stochastic": 0.07500161230564117
+        },
+        {
+          "deterministic": 0.06344850361347198,
+          "offline": 0.06411207467317581,
+          "stochastic": 0.0992031916975975
+        },
+        {
+          "deterministic": 0.05083661526441574,
+          "offline": 0.05874757468700409,
+          "stochastic": 0.07444963604211807
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03576671704649925,
+        "stochastic": 0.04826526716351509
+      },
+      "task_id": 2
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 27,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.03250788152217865,
+        "offline": 0.033262837678194046,
+        "stochastic": 0.045335762202739716
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06081971153616905,
+          "offline": 0.05182606354355812,
+          "stochastic": 0.07301149517297745
+        },
+        {
+          "deterministic": 0.06525584310293198,
+          "offline": 0.0692380964756012,
+          "stochastic": 0.08140943944454193
+        },
+        {
+          "deterministic": 0.06714998930692673,
+          "offline": 0.07137295603752136,
+          "stochastic": 0.09207690507173538
+        },
+        {
+          "deterministic": 0.05829373747110367,
+          "offline": 0.04764644429087639,
+          "stochastic": 0.06109028309583664
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.034718990325927734,
+        "stochastic": 0.053342584520578384
+      },
+      "task_id": 2
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 28,
+      "content_overlap_count": 3,
+      "final_aggregate": {
+        "deterministic": 0.03639773279428482,
+        "offline": 0.034697022289037704,
+        "stochastic": 0.0505017526447773
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.0655340775847435,
+          "offline": 0.07466918975114822,
+          "stochastic": 0.08146701008081436
+        },
+        {
+          "deterministic": 0.07461484521627426,
+          "offline": 0.07435888051986694,
+          "stochastic": 0.07709603756666183
+        },
+        {
+          "deterministic": 0.07441631704568863,
+          "offline": 0.05705705285072327,
+          "stochastic": 0.08822482824325562
+        },
+        {
+          "deterministic": 0.062042079865932465,
+          "offline": 0.060997143387794495,
+          "stochastic": 0.06705351173877716
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03788049519062042,
+        "stochastic": 0.052030049264431
+      },
+      "task_id": 2
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 29,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.034519728273153305,
+        "offline": 0.03086742013692856,
+        "stochastic": 0.04518613591790199
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.07596944272518158,
+          "offline": 0.06409959495067596,
+          "stochastic": 0.06879299879074097
+        },
+        {
+          "deterministic": 0.0581250935792923,
+          "offline": 0.06003290414810181,
+          "stochastic": 0.07937327027320862
+        },
+        {
+          "deterministic": 0.07219120860099792,
+          "offline": 0.06572764366865158,
+          "stochastic": 0.08532857149839401
+        },
+        {
+          "deterministic": 0.056331947445869446,
+          "offline": 0.04376969859004021,
+          "stochastic": 0.07503099739551544
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03528251871466637,
+        "stochastic": 0.04869252070784569
+      },
+      "task_id": 2
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 30,
+      "content_overlap_count": 3,
+      "final_aggregate": {
+        "deterministic": 0.02927936241030693,
+        "offline": 0.029262498021125793,
+        "stochastic": 0.03746979683637619
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05410823971033096,
+          "offline": 0.047084517776966095,
+          "stochastic": 0.06576530635356903
+        },
+        {
+          "deterministic": 0.053771477192640305,
+          "offline": 0.054763250052928925,
+          "stochastic": 0.07192885875701904
+        },
+        {
+          "deterministic": 0.06086987257003784,
+          "offline": 0.06325768679380417,
+          "stochastic": 0.06191028282046318
+        },
+        {
+          "deterministic": 0.04714573547244072,
+          "offline": 0.04058758541941643,
+          "stochastic": 0.04329732805490494
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03073420561850071,
+        "stochastic": 0.041716139763593674
+      },
+      "task_id": 3
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 31,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.032161783427000046,
+        "offline": 0.030870063230395317,
+        "stochastic": 0.04776023328304291
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06036798655986786,
+          "offline": 0.05802588537335396,
+          "stochastic": 0.0662778839468956
+        },
+        {
+          "deterministic": 0.06797530502080917,
+          "offline": 0.06807094067335129,
+          "stochastic": 0.08740539103746414
+        },
+        {
+          "deterministic": 0.06571028381586075,
+          "offline": 0.06743777543306351,
+          "stochastic": 0.09088759124279022
+        },
+        {
+          "deterministic": 0.05162791907787323,
+          "offline": 0.05584535747766495,
+          "stochastic": 0.07993371784687042
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03259436413645744,
+        "stochastic": 0.049567580223083496
+      },
+      "task_id": 3
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 32,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.03650284558534622,
+        "offline": 0.03331124410033226,
+        "stochastic": 0.04984226077795029
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06434915214776993,
+          "offline": 0.06154462695121765,
+          "stochastic": 0.06535442173480988
+        },
+        {
+          "deterministic": 0.07635703682899475,
+          "offline": 0.06577463448047638,
+          "stochastic": 0.08422311395406723
+        },
+        {
+          "deterministic": 0.07274775207042694,
+          "offline": 0.0744481161236763,
+          "stochastic": 0.09148675948381424
+        },
+        {
+          "deterministic": 0.05462505668401718,
+          "offline": 0.05454019829630852,
+          "stochastic": 0.08131381124258041
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.037209272384643555,
+        "stochastic": 0.05291188880801201
+      },
+      "task_id": 3
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 33,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.03674591705203056,
+        "offline": 0.03299004212021828,
+        "stochastic": 0.045104630291461945
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05874507874250412,
+          "offline": 0.06506546586751938,
+          "stochastic": 0.05298690125346184
+        },
+        {
+          "deterministic": 0.06745310127735138,
+          "offline": 0.06263603270053864,
+          "stochastic": 0.09830310940742493
+        },
+        {
+          "deterministic": 0.07284048199653625,
+          "offline": 0.07110631465911865,
+          "stochastic": 0.07566424459218979
+        },
+        {
+          "deterministic": 0.05717160925269127,
+          "offline": 0.04475252330303192,
+          "stochastic": 0.07182098925113678
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03622003272175789,
+        "stochastic": 0.04625224322080612
+      },
+      "task_id": 3
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 34,
+      "content_overlap_count": 4,
+      "final_aggregate": {
+        "deterministic": 0.03509846702218056,
+        "offline": 0.03158814087510109,
+        "stochastic": 0.0443563386797905
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.058355119079351425,
+          "offline": 0.07328057289123535,
+          "stochastic": 0.07144498080015182
+        },
+        {
+          "deterministic": 0.07686057686805725,
+          "offline": 0.06888867914676666,
+          "stochastic": 0.08808822184801102
+        },
+        {
+          "deterministic": 0.06978029012680054,
+          "offline": 0.06731640547513962,
+          "stochastic": 0.09281779080629349
+        },
+        {
+          "deterministic": 0.06118747591972351,
+          "offline": 0.05484698340296745,
+          "stochastic": 0.07816377282142639
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03474585339426994,
+        "stochastic": 0.048738498240709305
+      },
+      "task_id": 3
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 35,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.03498942777514458,
+        "offline": 0.03340524807572365,
+        "stochastic": 0.05417676270008087
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06314343214035034,
+          "offline": 0.0658038929104805,
+          "stochastic": 0.08241045475006104
+        },
+        {
+          "deterministic": 0.06928133964538574,
+          "offline": 0.0709252655506134,
+          "stochastic": 0.0833483338356018
+        },
+        {
+          "deterministic": 0.07698509842157364,
+          "offline": 0.06405463814735413,
+          "stochastic": 0.09196216613054276
+        },
+        {
+          "deterministic": 0.059827160090208054,
+          "offline": 0.07158049196004868,
+          "stochastic": 0.09746602922677994
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03640483692288399,
+        "stochastic": 0.05909809097647667
+      },
+      "task_id": 3
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 36,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.031009655445814133,
+        "offline": 0.03161182627081871,
+        "stochastic": 0.04506167396903038
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05693618208169937,
+          "offline": 0.06355871260166168,
+          "stochastic": 0.08979576826095581
+        },
+        {
+          "deterministic": 0.06270840764045715,
+          "offline": 0.05750057473778725,
+          "stochastic": 0.10069849342107773
+        },
+        {
+          "deterministic": 0.06013517081737518,
+          "offline": 0.05844476819038391,
+          "stochastic": 0.07137998938560486
+        },
+        {
+          "deterministic": 0.057995155453681946,
+          "offline": 0.06409110128879547,
+          "stochastic": 0.07094409316778183
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03241283819079399,
+        "stochastic": 0.046899665147066116
+      },
+      "task_id": 3
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 37,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.030534332618117332,
+        "offline": 0.02865069918334484,
+        "stochastic": 0.04299027845263481
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05614655092358589,
+          "offline": 0.05585932731628418,
+          "stochastic": 0.062234845012426376
+        },
+        {
+          "deterministic": 0.0709909126162529,
+          "offline": 0.06725563853979111,
+          "stochastic": 0.08370885998010635
+        },
+        {
+          "deterministic": 0.0666540339589119,
+          "offline": 0.06206603720784187,
+          "stochastic": 0.06367392838001251
+        },
+        {
+          "deterministic": 0.052458714693784714,
+          "offline": 0.05022328346967697,
+          "stochastic": 0.06382779777050018
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.032352250069379807,
+        "stochastic": 0.04554646089673042
+      },
+      "task_id": 3
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 38,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.03412804380059242,
+        "offline": 0.033896636217832565,
+        "stochastic": 0.04139390215277672
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.0641290694475174,
+          "offline": 0.06844828277826309,
+          "stochastic": 0.05985165014863014
+        },
+        {
+          "deterministic": 0.07513581216335297,
+          "offline": 0.07395743578672409,
+          "stochastic": 0.08277405798435211
+        },
+        {
+          "deterministic": 0.06134670227766037,
+          "offline": 0.06401608139276505,
+          "stochastic": 0.08586112409830093
+        },
+        {
+          "deterministic": 0.05173017829656601,
+          "offline": 0.05770649015903473,
+          "stochastic": 0.07489101588726044
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.033368781208992004,
+        "stochastic": 0.04609197378158569
+      },
+      "task_id": 3
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 39,
+      "content_overlap_count": 3,
+      "final_aggregate": {
+        "deterministic": 0.038149911910295486,
+        "offline": 0.03630306199193001,
+        "stochastic": 0.04113878309726715
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.0662793219089508,
+          "offline": 0.06946047395467758,
+          "stochastic": 0.08245629817247391
+        },
+        {
+          "deterministic": 0.0711546465754509,
+          "offline": 0.07380380481481552,
+          "stochastic": 0.08018985390663147
+        },
+        {
+          "deterministic": 0.07414600253105164,
+          "offline": 0.07286965847015381,
+          "stochastic": 0.0748308002948761
+        },
+        {
+          "deterministic": 0.062432099133729935,
+          "offline": 0.06391099840402603,
+          "stochastic": 0.06583402305841446
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.037857528775930405,
+        "stochastic": 0.04505840316414833
+      },
+      "task_id": 3
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 40,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.041416481137275696,
+        "offline": 0.03612828627228737,
+        "stochastic": 0.04916536808013916
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.07740195840597153,
+          "offline": 0.06630222499370575,
+          "stochastic": 0.084693543612957
+        },
+        {
+          "deterministic": 0.07867845892906189,
+          "offline": 0.07121307402849197,
+          "stochastic": 0.07250262051820755
+        },
+        {
+          "deterministic": 0.07462217658758163,
+          "offline": 0.07341577112674713,
+          "stochastic": 0.08945279568433762
+        },
+        {
+          "deterministic": 0.06649933010339737,
+          "offline": 0.06192254275083542,
+          "stochastic": 0.06878297030925751
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.04059530049562454,
+        "stochastic": 0.04990498349070549
+      },
+      "task_id": 4
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 41,
+      "content_overlap_count": 3,
+      "final_aggregate": {
+        "deterministic": 0.030790293589234352,
+        "offline": 0.02754494734108448,
+        "stochastic": 0.05724165588617325
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.09712118655443192,
+          "offline": 0.05213215574622154,
+          "stochastic": 0.10665403306484222
+        },
+        {
+          "deterministic": 0.0678916648030281,
+          "offline": 0.055962104350328445,
+          "stochastic": 0.10659103095531464
+        },
+        {
+          "deterministic": 0.06452394276857376,
+          "offline": 0.06915780901908875,
+          "stochastic": 0.08380415290594101
+        },
+        {
+          "deterministic": 0.05458768084645271,
+          "offline": 0.05174704268574715,
+          "stochastic": 0.1196039691567421
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03093317523598671,
+        "stochastic": 0.05987842008471489
+      },
+      "task_id": 4
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 42,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.0328826829791069,
+        "offline": 0.03144778683781624,
+        "stochastic": 0.0482565201818943
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06089203432202339,
+          "offline": 0.06223330646753311,
+          "stochastic": 0.07862236350774765
+        },
+        {
+          "deterministic": 0.06827090680599213,
+          "offline": 0.08072228729724884,
+          "stochastic": 0.07864158600568771
+        },
+        {
+          "deterministic": 0.058732181787490845,
+          "offline": 0.0688433051109314,
+          "stochastic": 0.08027203381061554
+        },
+        {
+          "deterministic": 0.046609535813331604,
+          "offline": 0.048798296600580215,
+          "stochastic": 0.054807525128126144
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03457110375165939,
+        "stochastic": 0.05106246471405029
+      },
+      "task_id": 4
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 43,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.03644536808133125,
+        "offline": 0.03200697898864746,
+        "stochastic": 0.0428740493953228
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.07208863645792007,
+          "offline": 0.06339733302593231,
+          "stochastic": 0.06810148805379868
+        },
+        {
+          "deterministic": 0.06618029624223709,
+          "offline": 0.0672914981842041,
+          "stochastic": 0.07829873263835907
+        },
+        {
+          "deterministic": 0.05806669592857361,
+          "offline": 0.06988795101642609,
+          "stochastic": 0.08361858129501343
+        },
+        {
+          "deterministic": 0.05224791541695595,
+          "offline": 0.06140274927020073,
+          "stochastic": 0.07452204823493958
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03440171107649803,
+        "stochastic": 0.04415644705295563
+      },
+      "task_id": 4
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 44,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.032989125698804855,
+        "offline": 0.03430651128292084,
+        "stochastic": 0.04408494755625725
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05152599513530731,
+          "offline": 0.05841236561536789,
+          "stochastic": 0.07239770889282227
+        },
+        {
+          "deterministic": 0.0733143538236618,
+          "offline": 0.07284678518772125,
+          "stochastic": 0.07542872428894043
+        },
+        {
+          "deterministic": 0.06791451573371887,
+          "offline": 0.061920348554849625,
+          "stochastic": 0.08350358158349991
+        },
+        {
+          "deterministic": 0.05609694868326187,
+          "offline": 0.06696565449237823,
+          "stochastic": 0.06648459285497665
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03408096730709076,
+        "stochastic": 0.047021303325891495
+      },
+      "task_id": 4
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 45,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.03263620287179947,
+        "offline": 0.033274002373218536,
+        "stochastic": 0.04606293514370918
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05977224186062813,
+          "offline": 0.06699058413505554,
+          "stochastic": 0.06703078001737595
+        },
+        {
+          "deterministic": 0.0723554790019989,
+          "offline": 0.07068368792533875,
+          "stochastic": 0.08618859946727753
+        },
+        {
+          "deterministic": 0.07434060424566269,
+          "offline": 0.06970398873090744,
+          "stochastic": 0.08103445917367935
+        },
+        {
+          "deterministic": 0.06399659067392349,
+          "offline": 0.05949249118566513,
+          "stochastic": 0.06789616495370865
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03360031545162201,
+        "stochastic": 0.04700314253568649
+      },
+      "task_id": 4
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 46,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.033083055168390274,
+        "offline": 0.03279345855116844,
+        "stochastic": 0.0512702614068985
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06035411357879639,
+          "offline": 0.065452940762043,
+          "stochastic": 0.10913083702325821
+        },
+        {
+          "deterministic": 0.06718847900629044,
+          "offline": 0.07347935438156128,
+          "stochastic": 0.08259815722703934
+        },
+        {
+          "deterministic": 0.07314614206552505,
+          "offline": 0.06517766416072845,
+          "stochastic": 0.08688804507255554
+        },
+        {
+          "deterministic": 0.06281767785549164,
+          "offline": 0.0572863332927227,
+          "stochastic": 0.06322766840457916
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.033772192895412445,
+        "stochastic": 0.053176846355199814
+      },
+      "task_id": 4
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 47,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.03309056907892227,
+        "offline": 0.029895862564444542,
+        "stochastic": 0.039718564599752426
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.062043074518442154,
+          "offline": 0.05364730581641197,
+          "stochastic": 0.07174208760261536
+        },
+        {
+          "deterministic": 0.06251335889101028,
+          "offline": 0.061090823262929916,
+          "stochastic": 0.08059675246477127
+        },
+        {
+          "deterministic": 0.058656029403209686,
+          "offline": 0.0615379624068737,
+          "stochastic": 0.075613833963871
+        },
+        {
+          "deterministic": 0.05372859910130501,
+          "offline": 0.04936175048351288,
+          "stochastic": 0.06792906671762466
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03322702646255493,
+        "stochastic": 0.04195444658398628
+      },
+      "task_id": 4
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 48,
+      "content_overlap_count": 3,
+      "final_aggregate": {
+        "deterministic": 0.03070933371782303,
+        "offline": 0.029690034687519073,
+        "stochastic": 0.045474037528038025
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05890806019306183,
+          "offline": 0.06118958070874214,
+          "stochastic": 0.11905074119567871
+        },
+        {
+          "deterministic": 0.06875239312648773,
+          "offline": 0.05460822954773903,
+          "stochastic": 0.0805618166923523
+        },
+        {
+          "deterministic": 0.06984484195709229,
+          "offline": 0.06045505777001381,
+          "stochastic": 0.07190027087926865
+        },
+        {
+          "deterministic": 0.055274296551942825,
+          "offline": 0.04942496865987778,
+          "stochastic": 0.06677829474210739
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.0314948707818985,
+        "stochastic": 0.046668097376823425
+      },
+      "task_id": 4
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 49,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.030540920794010162,
+        "offline": 0.026778019964694977,
+        "stochastic": 0.037824079394340515
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05304596200585365,
+          "offline": 0.06827670335769653,
+          "stochastic": 0.07342439889907837
+        },
+        {
+          "deterministic": 0.05830571800470352,
+          "offline": 0.05337110906839371,
+          "stochastic": 0.07632166892290115
+        },
+        {
+          "deterministic": 0.06515771150588989,
+          "offline": 0.05641546472907066,
+          "stochastic": 0.06293204426765442
+        },
+        {
+          "deterministic": 0.050116680562496185,
+          "offline": 0.04213444143533707,
+          "stochastic": 0.045007769018411636
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.030452094972133636,
+        "stochastic": 0.039846938103437424
+      },
+      "task_id": 4
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 50,
+      "content_overlap_count": 3,
+      "final_aggregate": {
+        "deterministic": 0.034687504172325134,
+        "offline": 0.03341525420546532,
+        "stochastic": 0.0480898953974247
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06066923215985298,
+          "offline": 0.05936836078763008,
+          "stochastic": 0.08100791275501251
+        },
+        {
+          "deterministic": 0.0721534714102745,
+          "offline": 0.07003354281187057,
+          "stochastic": 0.10557833313941956
+        },
+        {
+          "deterministic": 0.06771855056285858,
+          "offline": 0.06596270948648453,
+          "stochastic": 0.08027632534503937
+        },
+        {
+          "deterministic": 0.056352730840444565,
+          "offline": 0.04487978667020798,
+          "stochastic": 0.07452062517404556
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.0345122367143631,
+        "stochastic": 0.0488024465739727
+      },
+      "task_id": 5
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 51,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.03463450074195862,
+        "offline": 0.032127223908901215,
+        "stochastic": 0.04890839010477066
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.0627860575914383,
+          "offline": 0.05105072632431984,
+          "stochastic": 0.07653094083070755
+        },
+        {
+          "deterministic": 0.07832182198762894,
+          "offline": 0.0667632669210434,
+          "stochastic": 0.0964270830154419
+        },
+        {
+          "deterministic": 0.0727149099111557,
+          "offline": 0.07081814110279083,
+          "stochastic": 0.08228719979524612
+        },
+        {
+          "deterministic": 0.05225164070725441,
+          "offline": 0.05713138356804848,
+          "stochastic": 0.04892510175704956
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.034260645508766174,
+        "stochastic": 0.04867623373866081
+      },
+      "task_id": 5
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 52,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.02711152285337448,
+        "offline": 0.027214305475354195,
+        "stochastic": 0.042217254638671875
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.04678841307759285,
+          "offline": 0.05440931394696236,
+          "stochastic": 0.07712145149707794
+        },
+        {
+          "deterministic": 0.06049337238073349,
+          "offline": 0.05560000240802765,
+          "stochastic": 0.061267733573913574
+        },
+        {
+          "deterministic": 0.06044908985495567,
+          "offline": 0.0718614012002945,
+          "stochastic": 0.08829379826784134
+        },
+        {
+          "deterministic": 0.047190386801958084,
+          "offline": 0.04939635470509529,
+          "stochastic": 0.06452479213476181
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.027019696310162544,
+        "stochastic": 0.045961856842041016
+      },
+      "task_id": 5
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 53,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.027313249185681343,
+        "offline": 0.031053122133016586,
+        "stochastic": 0.04347171634435654
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.059088706970214844,
+          "offline": 0.0676429495215416,
+          "stochastic": 0.08568894118070602
+        },
+        {
+          "deterministic": 0.05881628394126892,
+          "offline": 0.06537272781133652,
+          "stochastic": 0.07409483194351196
+        },
+        {
+          "deterministic": 0.05728819593787193,
+          "offline": 0.05765845626592636,
+          "stochastic": 0.062380146235227585
+        },
+        {
+          "deterministic": 0.06410381942987442,
+          "offline": 0.0827404037117958,
+          "stochastic": 0.08994585275650024
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.027626240625977516,
+        "stochastic": 0.044888414442539215
+      },
+      "task_id": 5
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 54,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.03473788872361183,
+        "offline": 0.03290357068181038,
+        "stochastic": 0.04146343097090721
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06596868485212326,
+          "offline": 0.05380740016698837,
+          "stochastic": 0.0739208534359932
+        },
+        {
+          "deterministic": 0.06749160587787628,
+          "offline": 0.06730785220861435,
+          "stochastic": 0.07342015206813812
+        },
+        {
+          "deterministic": 0.055863525718450546,
+          "offline": 0.06438806653022766,
+          "stochastic": 0.08607795089483261
+        },
+        {
+          "deterministic": 0.0664440393447876,
+          "offline": 0.05288776010274887,
+          "stochastic": 0.0730462446808815
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03355177864432335,
+        "stochastic": 0.043563395738601685
+      },
+      "task_id": 5
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 55,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.036755580455064774,
+        "offline": 0.03376353532075882,
+        "stochastic": 0.047102611511945724
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06698711961507797,
+          "offline": 0.05575597658753395,
+          "stochastic": 0.07333358377218246
+        },
+        {
+          "deterministic": 0.07735130190849304,
+          "offline": 0.0671812891960144,
+          "stochastic": 0.08382589370012283
+        },
+        {
+          "deterministic": 0.06462357193231583,
+          "offline": 0.07235534489154816,
+          "stochastic": 0.09930898994207382
+        },
+        {
+          "deterministic": 0.04905644804239273,
+          "offline": 0.05662132799625397,
+          "stochastic": 0.05531473830342293
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03549550473690033,
+        "stochastic": 0.0498993881046772
+      },
+      "task_id": 5
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 56,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.03281663358211517,
+        "offline": 0.03057091124355793,
+        "stochastic": 0.05243952199816704
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05490795150399208,
+          "offline": 0.05716879293322563,
+          "stochastic": 0.1112348735332489
+        },
+        {
+          "deterministic": 0.07923692464828491,
+          "offline": 0.06261122226715088,
+          "stochastic": 0.09807273000478745
+        },
+        {
+          "deterministic": 0.06772272288799286,
+          "offline": 0.07121554762125015,
+          "stochastic": 0.07573644816875458
+        },
+        {
+          "deterministic": 0.05518030375242233,
+          "offline": 0.05609291046857834,
+          "stochastic": 0.06795492023229599
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03373940289020538,
+        "stochastic": 0.05311787128448486
+      },
+      "task_id": 5
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 57,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.03375055640935898,
+        "offline": 0.03331149369478226,
+        "stochastic": 0.049441393464803696
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05858277902007103,
+          "offline": 0.06971846520900726,
+          "stochastic": 0.09213366359472275
+        },
+        {
+          "deterministic": 0.07731430232524872,
+          "offline": 0.06850064545869827,
+          "stochastic": 0.09622089564800262
+        },
+        {
+          "deterministic": 0.07364597171545029,
+          "offline": 0.07704819738864899,
+          "stochastic": 0.08677345514297485
+        },
+        {
+          "deterministic": 0.0606517419219017,
+          "offline": 0.0689084380865097,
+          "stochastic": 0.0555180199444294
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03277819976210594,
+        "stochastic": 0.05044041574001312
+      },
+      "task_id": 5
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 58,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.0303800068795681,
+        "offline": 0.02788356877863407,
+        "stochastic": 0.04308008402585983
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05885024741292,
+          "offline": 0.058288924396038055,
+          "stochastic": 0.06973504275083542
+        },
+        {
+          "deterministic": 0.06326986849308014,
+          "offline": 0.05853097513318062,
+          "stochastic": 0.07676727324724197
+        },
+        {
+          "deterministic": 0.0597146674990654,
+          "offline": 0.05601342022418976,
+          "stochastic": 0.07442168891429901
+        },
+        {
+          "deterministic": 0.06442813575267792,
+          "offline": 0.05909572169184685,
+          "stochastic": 0.07593066990375519
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.031190190464258194,
+        "stochastic": 0.04386095702648163
+      },
+      "task_id": 5
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 59,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.0327073335647583,
+        "offline": 0.029116174206137657,
+        "stochastic": 0.04213744401931763
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05744170397520065,
+          "offline": 0.047776419669389725,
+          "stochastic": 0.09198767691850662
+        },
+        {
+          "deterministic": 0.06580764055252075,
+          "offline": 0.057993534952402115,
+          "stochastic": 0.06968884915113449
+        },
+        {
+          "deterministic": 0.08079121261835098,
+          "offline": 0.06533338129520416,
+          "stochastic": 0.09110159426927567
+        },
+        {
+          "deterministic": 0.05127720907330513,
+          "offline": 0.050529878586530685,
+          "stochastic": 0.049858588725328445
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03105911798775196,
+        "stochastic": 0.04374698922038078
+      },
+      "task_id": 5
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 60,
+      "content_overlap_count": 4,
+      "final_aggregate": {
+        "deterministic": 0.028373420238494873,
+        "offline": 0.027886036783456802,
+        "stochastic": 0.03330138325691223
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05157265067100525,
+          "offline": 0.04195147007703781,
+          "stochastic": 0.05942472442984581
+        },
+        {
+          "deterministic": 0.05149275064468384,
+          "offline": 0.06310132890939713,
+          "stochastic": 0.06878398358821869
+        },
+        {
+          "deterministic": 0.05558357387781143,
+          "offline": 0.0541384294629097,
+          "stochastic": 0.05715786665678024
+        },
+        {
+          "deterministic": 0.04055333137512207,
+          "offline": 0.048504430800676346,
+          "stochastic": 0.052043367177248
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.027853459119796753,
+        "stochastic": 0.034546006470918655
+      },
+      "task_id": 6
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 61,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.032633326947689056,
+        "offline": 0.032367635518312454,
+        "stochastic": 0.04326779395341873
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06294812262058258,
+          "offline": 0.0629236251115799,
+          "stochastic": 0.06615293771028519
+        },
+        {
+          "deterministic": 0.05789812281727791,
+          "offline": 0.06322315335273743,
+          "stochastic": 0.07294123619794846
+        },
+        {
+          "deterministic": 0.06029980257153511,
+          "offline": 0.06321817636489868,
+          "stochastic": 0.06704137474298477
+        },
+        {
+          "deterministic": 0.04686598852276802,
+          "offline": 0.047348733991384506,
+          "stochastic": 0.07827340811491013
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03275171294808388,
+        "stochastic": 0.04437325522303581
+      },
+      "task_id": 6
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 62,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.028895657509565353,
+        "offline": 0.03175412490963936,
+        "stochastic": 0.04010455682873726
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06381994485855103,
+          "offline": 0.053340934216976166,
+          "stochastic": 0.10168220102787018
+        },
+        {
+          "deterministic": 0.06266049295663834,
+          "offline": 0.06085999310016632,
+          "stochastic": 0.07004542648792267
+        },
+        {
+          "deterministic": 0.04882683604955673,
+          "offline": 0.05517730489373207,
+          "stochastic": 0.0720696970820427
+        },
+        {
+          "deterministic": 0.056468427181243896,
+          "offline": 0.07302925735712051,
+          "stochastic": 0.0661577358841896
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.02768075093626976,
+        "stochastic": 0.041197821497917175
+      },
+      "task_id": 6
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 63,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.033487968146800995,
+        "offline": 0.03200402483344078,
+        "stochastic": 0.04733332246541977
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.07086681574583054,
+          "offline": 0.0636843591928482,
+          "stochastic": 0.0969352126121521
+        },
+        {
+          "deterministic": 0.06547174602746964,
+          "offline": 0.07118698954582214,
+          "stochastic": 0.07634783536195755
+        },
+        {
+          "deterministic": 0.06819164007902145,
+          "offline": 0.06741394102573395,
+          "stochastic": 0.0769217312335968
+        },
+        {
+          "deterministic": 0.0589672327041626,
+          "offline": 0.06037711352109909,
+          "stochastic": 0.06939247250556946
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03346647322177887,
+        "stochastic": 0.0505874939262867
+      },
+      "task_id": 6
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 64,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.03437555581331253,
+        "offline": 0.031060446053743362,
+        "stochastic": 0.04419320449233055
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06265795975923538,
+          "offline": 0.06851974129676819,
+          "stochastic": 0.08559221774339676
+        },
+        {
+          "deterministic": 0.06845064461231232,
+          "offline": 0.06981102377176285,
+          "stochastic": 0.08268245309591293
+        },
+        {
+          "deterministic": 0.07165154814720154,
+          "offline": 0.06316829472780228,
+          "stochastic": 0.0700487270951271
+        },
+        {
+          "deterministic": 0.05488112196326256,
+          "offline": 0.05627269670367241,
+          "stochastic": 0.06150664761662483
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03560053929686546,
+        "stochastic": 0.04700522497296333
+      },
+      "task_id": 6
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 65,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.03612374886870384,
+        "offline": 0.032560400664806366,
+        "stochastic": 0.044637281447649
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.07097408175468445,
+          "offline": 0.06610837578773499,
+          "stochastic": 0.074545718729496
+        },
+        {
+          "deterministic": 0.07290907949209213,
+          "offline": 0.0596260242164135,
+          "stochastic": 0.09205101430416107
+        },
+        {
+          "deterministic": 0.0694587305188179,
+          "offline": 0.06894213706254959,
+          "stochastic": 0.07439000904560089
+        },
+        {
+          "deterministic": 0.05531105771660805,
+          "offline": 0.06593319028615952,
+          "stochastic": 0.09540413320064545
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03552465885877609,
+        "stochastic": 0.047196608036756516
+      },
+      "task_id": 6
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 66,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.032394930720329285,
+        "offline": 0.03460681065917015,
+        "stochastic": 0.04675566032528877
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.052687857300043106,
+          "offline": 0.0563957616686821,
+          "stochastic": 0.08071988821029663
+        },
+        {
+          "deterministic": 0.0675545409321785,
+          "offline": 0.06652995198965073,
+          "stochastic": 0.07258623838424683
+        },
+        {
+          "deterministic": 0.06806328892707825,
+          "offline": 0.06560342758893967,
+          "stochastic": 0.08327268809080124
+        },
+        {
+          "deterministic": 0.056532274931669235,
+          "offline": 0.05616682395339012,
+          "stochastic": 0.07290970534086227
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.032793737947940826,
+        "stochastic": 0.04956876114010811
+      },
+      "task_id": 6
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 67,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.034279800951480865,
+        "offline": 0.0334230437874794,
+        "stochastic": 0.04262257739901543
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.061411574482917786,
+          "offline": 0.05983951687812805,
+          "stochastic": 0.07213187962770462
+        },
+        {
+          "deterministic": 0.06665277481079102,
+          "offline": 0.05864769592881203,
+          "stochastic": 0.0741691067814827
+        },
+        {
+          "deterministic": 0.06596773117780685,
+          "offline": 0.06744217127561569,
+          "stochastic": 0.07694950699806213
+        },
+        {
+          "deterministic": 0.055499687790870667,
+          "offline": 0.06814771890640259,
+          "stochastic": 0.06780757009983063
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03373509272933006,
+        "stochastic": 0.04590100049972534
+      },
+      "task_id": 6
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 68,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.026353580877184868,
+        "offline": 0.027817929163575172,
+        "stochastic": 0.032923564314842224
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05431497469544411,
+          "offline": 0.045417655259370804,
+          "stochastic": 0.06313272565603256
+        },
+        {
+          "deterministic": 0.051673416048288345,
+          "offline": 0.058438047766685486,
+          "stochastic": 0.06263406574726105
+        },
+        {
+          "deterministic": 0.0618048757314682,
+          "offline": 0.06681530177593231,
+          "stochastic": 0.07260182499885559
+        },
+        {
+          "deterministic": 0.05541025474667549,
+          "offline": 0.05002303048968315,
+          "stochastic": 0.048997968435287476
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.027573974803090096,
+        "stochastic": 0.033358410000801086
+      },
+      "task_id": 6
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 69,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.03180909529328346,
+        "offline": 0.03220416605472565,
+        "stochastic": 0.04495265334844589
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05348985642194748,
+          "offline": 0.07202454656362534,
+          "stochastic": 0.08595145493745804
+        },
+        {
+          "deterministic": 0.06485061347484589,
+          "offline": 0.06873145699501038,
+          "stochastic": 0.08981979638338089
+        },
+        {
+          "deterministic": 0.06556840986013412,
+          "offline": 0.05620528757572174,
+          "stochastic": 0.07275377959012985
+        },
+        {
+          "deterministic": 0.05306118726730347,
+          "offline": 0.052193768322467804,
+          "stochastic": 0.06469044089317322
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03260087966918945,
+        "stochastic": 0.04767843708395958
+      },
+      "task_id": 6
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 70,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.030940642580389977,
+        "offline": 0.031978726387023926,
+        "stochastic": 0.05738863721489906
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06030578911304474,
+          "offline": 0.0593959242105484,
+          "stochastic": 0.07207174599170685
+        },
+        {
+          "deterministic": 0.06549007445573807,
+          "offline": 0.060316868126392365,
+          "stochastic": 0.06151232123374939
+        },
+        {
+          "deterministic": 0.0631423369050026,
+          "offline": 0.06400484591722488,
+          "stochastic": 0.07912421226501465
+        },
+        {
+          "deterministic": 0.050138331949710846,
+          "offline": 0.05685511603951454,
+          "stochastic": 0.1396544724702835
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.02970506250858307,
+        "stochastic": 0.061930324882268906
+      },
+      "task_id": 7
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 71,
+      "content_overlap_count": 4,
+      "final_aggregate": {
+        "deterministic": 0.02967350371181965,
+        "offline": 0.0284650269895792,
+        "stochastic": 0.03847907483577728
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05087817832827568,
+          "offline": 0.058113809674978256,
+          "stochastic": 0.06570886075496674
+        },
+        {
+          "deterministic": 0.06123100221157074,
+          "offline": 0.057890865951776505,
+          "stochastic": 0.0769110843539238
+        },
+        {
+          "deterministic": 0.053526949137449265,
+          "offline": 0.05912964418530464,
+          "stochastic": 0.06112994998693466
+        },
+        {
+          "deterministic": 0.045980267226696014,
+          "offline": 0.04722173511981964,
+          "stochastic": 0.060867518186569214
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.029347097501158714,
+        "stochastic": 0.039271656423807144
+      },
+      "task_id": 7
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 72,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.032557230442762375,
+        "offline": 0.03450172021985054,
+        "stochastic": 0.051988162100315094
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.055601976811885834,
+          "offline": 0.07986976951360703,
+          "stochastic": 0.10727343708276749
+        },
+        {
+          "deterministic": 0.07170507311820984,
+          "offline": 0.0762830451130867,
+          "stochastic": 0.08844336867332458
+        },
+        {
+          "deterministic": 0.06833406537771225,
+          "offline": 0.0794248953461647,
+          "stochastic": 0.09531459957361221
+        },
+        {
+          "deterministic": 0.052759476006031036,
+          "offline": 0.059037547558546066,
+          "stochastic": 0.05988277494907379
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.031787991523742676,
+        "stochastic": 0.05312718451023102
+      },
+      "task_id": 7
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 73,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.030391471460461617,
+        "offline": 0.030107537284493446,
+        "stochastic": 0.04086066782474518
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.061026278883218765,
+          "offline": 0.04460038244724274,
+          "stochastic": 0.07557940483093262
+        },
+        {
+          "deterministic": 0.05799323692917824,
+          "offline": 0.06269337236881256,
+          "stochastic": 0.07003574073314667
+        },
+        {
+          "deterministic": 0.05376217141747475,
+          "offline": 0.06132113188505173,
+          "stochastic": 0.07065124809741974
+        },
+        {
+          "deterministic": 0.05579554662108421,
+          "offline": 0.04367079585790634,
+          "stochastic": 0.06527949124574661
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.030200155451893806,
+        "stochastic": 0.04182446375489235
+      },
+      "task_id": 7
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 74,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.031825270503759384,
+        "offline": 0.033781714737415314,
+        "stochastic": 0.04502866417169571
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06320664286613464,
+          "offline": 0.06211705878376961,
+          "stochastic": 0.07022373378276825
+        },
+        {
+          "deterministic": 0.06133633106946945,
+          "offline": 0.07415895164012909,
+          "stochastic": 0.08524162322282791
+        },
+        {
+          "deterministic": 0.06572435051202774,
+          "offline": 0.07293163239955902,
+          "stochastic": 0.07625433802604675
+        },
+        {
+          "deterministic": 0.04872455075383186,
+          "offline": 0.058165933936834335,
+          "stochastic": 0.051316890865564346
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03192222863435745,
+        "stochastic": 0.04636196419596672
+      },
+      "task_id": 7
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 75,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.03114522248506546,
+        "offline": 0.029886949807405472,
+        "stochastic": 0.0429275743663311
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05695737898349762,
+          "offline": 0.05287126079201698,
+          "stochastic": 0.08449218422174454
+        },
+        {
+          "deterministic": 0.06763531267642975,
+          "offline": 0.06659803539514542,
+          "stochastic": 0.08025475591421127
+        },
+        {
+          "deterministic": 0.05980805680155754,
+          "offline": 0.06413301825523376,
+          "stochastic": 0.07406823337078094
+        },
+        {
+          "deterministic": 0.04754731059074402,
+          "offline": 0.05364629626274109,
+          "stochastic": 0.06502149999141693
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03078211285173893,
+        "stochastic": 0.044441062957048416
+      },
+      "task_id": 7
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 76,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.03167123720049858,
+        "offline": 0.03233131393790245,
+        "stochastic": 0.047317590564489365
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06245392933487892,
+          "offline": 0.05896199122071266,
+          "stochastic": 0.08995906263589859
+        },
+        {
+          "deterministic": 0.06677071750164032,
+          "offline": 0.06053824722766876,
+          "stochastic": 0.08054821938276291
+        },
+        {
+          "deterministic": 0.06201591715216637,
+          "offline": 0.06280127912759781,
+          "stochastic": 0.07398668676614761
+        },
+        {
+          "deterministic": 0.052994970232248306,
+          "offline": 0.05455157905817032,
+          "stochastic": 0.0790054053068161
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03235100209712982,
+        "stochastic": 0.048968926072120667
+      },
+      "task_id": 7
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 77,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.03277691453695297,
+        "offline": 0.03247246518731117,
+        "stochastic": 0.04728583246469498
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06864466518163681,
+          "offline": 0.06700257956981659,
+          "stochastic": 0.07659627497196198
+        },
+        {
+          "deterministic": 0.07379046827554703,
+          "offline": 0.06754507124423981,
+          "stochastic": 0.08884017914533615
+        },
+        {
+          "deterministic": 0.07075345516204834,
+          "offline": 0.06258011609315872,
+          "stochastic": 0.08607256412506104
+        },
+        {
+          "deterministic": 0.05824598670005798,
+          "offline": 0.04715371131896973,
+          "stochastic": 0.06070750579237938
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03241239860653877,
+        "stochastic": 0.047126539051532745
+      },
+      "task_id": 7
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 78,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.03484587371349335,
+        "offline": 0.03506096825003624,
+        "stochastic": 0.03642770275473595
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05872843787074089,
+          "offline": 0.06125084310770035,
+          "stochastic": 0.07511842250823975
+        },
+        {
+          "deterministic": 0.06997524201869965,
+          "offline": 0.07240468263626099,
+          "stochastic": 0.06397978961467743
+        },
+        {
+          "deterministic": 0.07332558184862137,
+          "offline": 0.06590619683265686,
+          "stochastic": 0.07124919444322586
+        },
+        {
+          "deterministic": 0.05039888992905617,
+          "offline": 0.05846966803073883,
+          "stochastic": 0.05190552771091461
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03429733216762543,
+        "stochastic": 0.03760099038481712
+      },
+      "task_id": 7
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 79,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.03279845044016838,
+        "offline": 0.034273408353328705,
+        "stochastic": 0.04312519356608391
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06029657647013664,
+          "offline": 0.07343210279941559,
+          "stochastic": 0.060191161930561066
+        },
+        {
+          "deterministic": 0.07148902118206024,
+          "offline": 0.07245725393295288,
+          "stochastic": 0.0882006585597992
+        },
+        {
+          "deterministic": 0.0710558146238327,
+          "offline": 0.06796274334192276,
+          "stochastic": 0.08269508928060532
+        },
+        {
+          "deterministic": 0.06518658250570297,
+          "offline": 0.05344616621732712,
+          "stochastic": 0.07170731574296951
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.0336252823472023,
+        "stochastic": 0.04446493461728096
+      },
+      "task_id": 7
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 80,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.03123611770570278,
+        "offline": 0.03176480904221535,
+        "stochastic": 0.04371470585465431
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05468377098441124,
+          "offline": 0.058070044964551926,
+          "stochastic": 0.08407619595527649
+        },
+        {
+          "deterministic": 0.0601220577955246,
+          "offline": 0.06785065680742264,
+          "stochastic": 0.08145557343959808
+        },
+        {
+          "deterministic": 0.06441230326890945,
+          "offline": 0.06918617337942123,
+          "stochastic": 0.08103501051664352
+        },
+        {
+          "deterministic": 0.05048123002052307,
+          "offline": 0.058343373239040375,
+          "stochastic": 0.07452083379030228
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03154668211936951,
+        "stochastic": 0.04488128423690796
+      },
+      "task_id": 8
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 81,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.030603772029280663,
+        "offline": 0.029019750654697418,
+        "stochastic": 0.04343928024172783
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.07416367530822754,
+          "offline": 0.05916892737150192,
+          "stochastic": 0.0740552470088005
+        },
+        {
+          "deterministic": 0.06799697130918503,
+          "offline": 0.06478365510702133,
+          "stochastic": 0.0733315497636795
+        },
+        {
+          "deterministic": 0.06579899787902832,
+          "offline": 0.06161930039525032,
+          "stochastic": 0.08599597960710526
+        },
+        {
+          "deterministic": 0.051341887563467026,
+          "offline": 0.045386895537376404,
+          "stochastic": 0.06163400039076805
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.030887629836797714,
+        "stochastic": 0.04354129731655121
+      },
+      "task_id": 8
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 82,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.031932104378938675,
+        "offline": 0.031725671142339706,
+        "stochastic": 0.05204175412654877
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05360741913318634,
+          "offline": 0.054072026163339615,
+          "stochastic": 0.0977582037448883
+        },
+        {
+          "deterministic": 0.06681371480226517,
+          "offline": 0.06352759897708893,
+          "stochastic": 0.06751789152622223
+        },
+        {
+          "deterministic": 0.06926902383565903,
+          "offline": 0.06334962695837021,
+          "stochastic": 0.06932160258293152
+        },
+        {
+          "deterministic": 0.06956414133310318,
+          "offline": 0.07723679393529892,
+          "stochastic": 0.07215956598520279
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03159469738602638,
+        "stochastic": 0.052758459001779556
+      },
+      "task_id": 8
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 83,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.03211316093802452,
+        "offline": 0.03026624582707882,
+        "stochastic": 0.04461412504315376
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06424593925476074,
+          "offline": 0.0602068156003952,
+          "stochastic": 0.07643548399209976
+        },
+        {
+          "deterministic": 0.06717467308044434,
+          "offline": 0.07059459388256073,
+          "stochastic": 0.07865779846906662
+        },
+        {
+          "deterministic": 0.06549251079559326,
+          "offline": 0.06503110378980637,
+          "stochastic": 0.07403333485126495
+        },
+        {
+          "deterministic": 0.0714515894651413,
+          "offline": 0.0781894102692604,
+          "stochastic": 0.0702422708272934
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.031368665397167206,
+        "stochastic": 0.044356390833854675
+      },
+      "task_id": 8
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 84,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.030804548412561417,
+        "offline": 0.03200128301978111,
+        "stochastic": 0.047084465622901917
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05588914826512337,
+          "offline": 0.06164620444178581,
+          "stochastic": 0.09342863410711288
+        },
+        {
+          "deterministic": 0.06957340240478516,
+          "offline": 0.06941964477300644,
+          "stochastic": 0.08431772887706757
+        },
+        {
+          "deterministic": 0.06398364156484604,
+          "offline": 0.06394722312688828,
+          "stochastic": 0.0778917670249939
+        },
+        {
+          "deterministic": 0.057517096400260925,
+          "offline": 0.05692131444811821,
+          "stochastic": 0.07203397154808044
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.030706260353326797,
+        "stochastic": 0.047938354313373566
+      },
+      "task_id": 8
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 85,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.030988501384854317,
+        "offline": 0.028999866917729378,
+        "stochastic": 0.048777345567941666
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06565683335065842,
+          "offline": 0.0492345429956913,
+          "stochastic": 0.11405161768198013
+        },
+        {
+          "deterministic": 0.0689624696969986,
+          "offline": 0.061450548470020294,
+          "stochastic": 0.07279816269874573
+        },
+        {
+          "deterministic": 0.0796714499592781,
+          "offline": 0.06960777193307877,
+          "stochastic": 0.08663126081228256
+        },
+        {
+          "deterministic": 0.054913368076086044,
+          "offline": 0.059282246977090836,
+          "stochastic": 0.07649435847997665
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.031217055395245552,
+        "stochastic": 0.04900437220931053
+      },
+      "task_id": 8
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 86,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.030995745211839676,
+        "offline": 0.030344409868121147,
+        "stochastic": 0.048510219901800156
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06099174544215202,
+          "offline": 0.05095123499631882,
+          "stochastic": 0.07598676532506943
+        },
+        {
+          "deterministic": 0.06666859239339828,
+          "offline": 0.06392297148704529,
+          "stochastic": 0.0893566906452179
+        },
+        {
+          "deterministic": 0.06574492901563644,
+          "offline": 0.07528972625732422,
+          "stochastic": 0.09297429025173187
+        },
+        {
+          "deterministic": 0.057687725871801376,
+          "offline": 0.06256091594696045,
+          "stochastic": 0.06649091094732285
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.031454894691705704,
+        "stochastic": 0.0487150102853775
+      },
+      "task_id": 8
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 87,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.03317394107580185,
+        "offline": 0.03227205201983452,
+        "stochastic": 0.05370280519127846
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.0654909759759903,
+          "offline": 0.06174439564347267,
+          "stochastic": 0.08195698261260986
+        },
+        {
+          "deterministic": 0.06688816845417023,
+          "offline": 0.06394939869642258,
+          "stochastic": 0.0874575823545456
+        },
+        {
+          "deterministic": 0.0670267790555954,
+          "offline": 0.06538918614387512,
+          "stochastic": 0.10095039755105972
+        },
+        {
+          "deterministic": 0.05418188497424126,
+          "offline": 0.05257437750697136,
+          "stochastic": 0.07095835357904434
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03375781700015068,
+        "stochastic": 0.053547751158475876
+      },
+      "task_id": 8
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 88,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.03071443736553192,
+        "offline": 0.032482050359249115,
+        "stochastic": 0.04892077296972275
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05204615369439125,
+          "offline": 0.0669318363070488,
+          "stochastic": 0.07792923599481583
+        },
+        {
+          "deterministic": 0.05978238582611084,
+          "offline": 0.07179781794548035,
+          "stochastic": 0.08435143530368805
+        },
+        {
+          "deterministic": 0.06429126858711243,
+          "offline": 0.060927893966436386,
+          "stochastic": 0.08198583126068115
+        },
+        {
+          "deterministic": 0.056573834270238876,
+          "offline": 0.057841815054416656,
+          "stochastic": 0.08260437846183777
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.030870966613292694,
+        "stochastic": 0.04985029995441437
+      },
+      "task_id": 8
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 89,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.030476855114102364,
+        "offline": 0.02833433263003826,
+        "stochastic": 0.04802447184920311
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05845622718334198,
+          "offline": 0.06156498193740845,
+          "stochastic": 0.07138246297836304
+        },
+        {
+          "deterministic": 0.06589402258396149,
+          "offline": 0.06004917249083519,
+          "stochastic": 0.07988054305315018
+        },
+        {
+          "deterministic": 0.07544057071208954,
+          "offline": 0.06013960391283035,
+          "stochastic": 0.08652761578559875
+        },
+        {
+          "deterministic": 0.07005675882101059,
+          "offline": 0.06738768517971039,
+          "stochastic": 0.08789753168821335
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.030323505401611328,
+        "stochastic": 0.048729218542575836
+      },
+      "task_id": 8
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 90,
+      "content_overlap_count": 4,
+      "final_aggregate": {
+        "deterministic": 0.03004787303507328,
+        "offline": 0.03004787303507328,
+        "stochastic": 0.036560770124197006
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06184661015868187,
+          "offline": 0.06184661015868187,
+          "stochastic": 0.06539012491703033
+        },
+        {
+          "deterministic": 0.06955871731042862,
+          "offline": 0.06955871731042862,
+          "stochastic": 0.07116284966468811
+        },
+        {
+          "deterministic": 0.07320478558540344,
+          "offline": 0.07320478558540344,
+          "stochastic": 0.06586648523807526
+        },
+        {
+          "deterministic": 0.06377407163381577,
+          "offline": 0.06377407163381577,
+          "stochastic": 0.05903131887316704
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03004787303507328,
+        "stochastic": 0.036560770124197006
+      },
+      "task_id": 9
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 91,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.02984439767897129,
+        "offline": 0.02984439767897129,
+        "stochastic": 0.0402991883456707
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05350868031382561,
+          "offline": 0.05350868031382561,
+          "stochastic": 0.08569367229938507
+        },
+        {
+          "deterministic": 0.06078656017780304,
+          "offline": 0.06078656017780304,
+          "stochastic": 0.07968086749315262
+        },
+        {
+          "deterministic": 0.06370733678340912,
+          "offline": 0.06370733678340912,
+          "stochastic": 0.07374723255634308
+        },
+        {
+          "deterministic": 0.05026976391673088,
+          "offline": 0.05026976391673088,
+          "stochastic": 0.058330029249191284
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.02984439767897129,
+        "stochastic": 0.0402991883456707
+      },
+      "task_id": 9
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 92,
+      "content_overlap_count": 1,
+      "final_aggregate": {
+        "deterministic": 0.031889453530311584,
+        "offline": 0.031889453530311584,
+        "stochastic": 0.03984834998846054
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.07670077681541443,
+          "offline": 0.07670077681541443,
+          "stochastic": 0.09152507781982422
+        },
+        {
+          "deterministic": 0.05809437856078148,
+          "offline": 0.05809437856078148,
+          "stochastic": 0.06379508972167969
+        },
+        {
+          "deterministic": 0.060200538486242294,
+          "offline": 0.060200538486242294,
+          "stochastic": 0.07844554632902145
+        },
+        {
+          "deterministic": 0.07428770512342453,
+          "offline": 0.07428770512342453,
+          "stochastic": 0.07498814165592194
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.031889453530311584,
+        "stochastic": 0.03984834998846054
+      },
+      "task_id": 9
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 93,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.031344980001449585,
+        "offline": 0.031344980001449585,
+        "stochastic": 0.0446794368326664
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.056136928498744965,
+          "offline": 0.056136928498744965,
+          "stochastic": 0.07730463892221451
+        },
+        {
+          "deterministic": 0.05875464901328087,
+          "offline": 0.05875464901328087,
+          "stochastic": 0.08599346876144409
+        },
+        {
+          "deterministic": 0.06770211458206177,
+          "offline": 0.06770211458206177,
+          "stochastic": 0.07928485423326492
+        },
+        {
+          "deterministic": 0.05843881145119667,
+          "offline": 0.05843881145119667,
+          "stochastic": 0.058283913880586624
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.031344980001449585,
+        "stochastic": 0.0446794368326664
+      },
+      "task_id": 9
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 94,
+      "content_overlap_count": 6,
+      "final_aggregate": {
+        "deterministic": 0.03245850279927254,
+        "offline": 0.03245850279927254,
+        "stochastic": 0.05454059690237045
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.07223418354988098,
+          "offline": 0.07223418354988098,
+          "stochastic": 0.09461721777915955
+        },
+        {
+          "deterministic": 0.06419049203395844,
+          "offline": 0.06419049203395844,
+          "stochastic": 0.08213543891906738
+        },
+        {
+          "deterministic": 0.052178755402565,
+          "offline": 0.052178755402565,
+          "stochastic": 0.08417924493551254
+        },
+        {
+          "deterministic": 0.06050580367445946,
+          "offline": 0.06050580367445946,
+          "stochastic": 0.08454051613807678
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03245850279927254,
+        "stochastic": 0.05454059690237045
+      },
+      "task_id": 9
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 95,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.030396318063139915,
+        "offline": 0.030396318063139915,
+        "stochastic": 0.04161185398697853
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05817944556474686,
+          "offline": 0.05817944556474686,
+          "stochastic": 0.06840517371892929
+        },
+        {
+          "deterministic": 0.06067833676934242,
+          "offline": 0.06067833676934242,
+          "stochastic": 0.08192712813615799
+        },
+        {
+          "deterministic": 0.06305750459432602,
+          "offline": 0.06305750459432602,
+          "stochastic": 0.07254138588905334
+        },
+        {
+          "deterministic": 0.04581952467560768,
+          "offline": 0.04581952467560768,
+          "stochastic": 0.04715104028582573
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.030396318063139915,
+        "stochastic": 0.04161185398697853
+      },
+      "task_id": 9
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 96,
+      "content_overlap_count": 4,
+      "final_aggregate": {
+        "deterministic": 0.030728578567504883,
+        "offline": 0.030728578567504883,
+        "stochastic": 0.03519558534026146
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.062397971749305725,
+          "offline": 0.062397971749305725,
+          "stochastic": 0.0718073844909668
+        },
+        {
+          "deterministic": 0.066927470266819,
+          "offline": 0.066927470266819,
+          "stochastic": 0.056894417852163315
+        },
+        {
+          "deterministic": 0.06527218222618103,
+          "offline": 0.06527218222618103,
+          "stochastic": 0.0657535195350647
+        },
+        {
+          "deterministic": 0.059369057416915894,
+          "offline": 0.059369057416915894,
+          "stochastic": 0.05806466564536095
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.030728578567504883,
+        "stochastic": 0.03519558534026146
+      },
+      "task_id": 9
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 97,
+      "content_overlap_count": 2,
+      "final_aggregate": {
+        "deterministic": 0.03056177869439125,
+        "offline": 0.03056177869439125,
+        "stochastic": 0.04700184240937233
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.061291322112083435,
+          "offline": 0.061291322112083435,
+          "stochastic": 0.0671955943107605
+        },
+        {
+          "deterministic": 0.06057460233569145,
+          "offline": 0.06057460233569145,
+          "stochastic": 0.09020277857780457
+        },
+        {
+          "deterministic": 0.06163720414042473,
+          "offline": 0.06163720414042473,
+          "stochastic": 0.08536399900913239
+        },
+        {
+          "deterministic": 0.05889032036066055,
+          "offline": 0.05889032036066055,
+          "stochastic": 0.07202272117137909
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03056177869439125,
+        "stochastic": 0.04700184240937233
+      },
+      "task_id": 9
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 98,
+      "content_overlap_count": 0,
+      "final_aggregate": {
+        "deterministic": 0.03333963453769684,
+        "offline": 0.03333963453769684,
+        "stochastic": 0.04566217213869095
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.05959311127662659,
+          "offline": 0.05959311127662659,
+          "stochastic": 0.08575181663036346
+        },
+        {
+          "deterministic": 0.06185794994235039,
+          "offline": 0.06185794994235039,
+          "stochastic": 0.08967957645654678
+        },
+        {
+          "deterministic": 0.0664006844162941,
+          "offline": 0.0664006844162941,
+          "stochastic": 0.08142527937889099
+        },
+        {
+          "deterministic": 0.05869140848517418,
+          "offline": 0.05869140848517418,
+          "stochastic": 0.07965119183063507
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.03333963453769684,
+        "stochastic": 0.04566217213869095
+      },
+      "task_id": 9
+    },
+    {
+      "candidate_count": 450,
+      "class_id": 99,
+      "content_overlap_count": 3,
+      "final_aggregate": {
+        "deterministic": 0.03693879768252373,
+        "offline": 0.03693879768252373,
+        "stochastic": 0.049690619111061096
+      },
+      "final_parties": [
+        {
+          "deterministic": 0.06937598437070847,
+          "offline": 0.06937598437070847,
+          "stochastic": 0.10763110220432281
+        },
+        {
+          "deterministic": 0.07024384289979935,
+          "offline": 0.07024384289979935,
+          "stochastic": 0.0916890874505043
+        },
+        {
+          "deterministic": 0.07985672354698181,
+          "offline": 0.07985672354698181,
+          "stochastic": 0.08093501627445221
+        },
+        {
+          "deterministic": 0.0523676872253418,
+          "offline": 0.0523676872253418,
+          "stochastic": 0.06708474457263947
+        }
+      ],
+      "memory_per_selector": 20,
+      "selection_time": {
+        "deterministic": 0.036938976496458054,
+        "stochastic": 0.04969127103686333
+      },
+      "task_id": 9
+    }
+  ],
+  "data_sha256": {
+    "data:cifar-100-python/meta": "a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9",
+    "data:cifar-100-python/test": "4b67687d9933c4db8f0831104447f15b93774f4f464bd0516f0f0f2ac83b7864",
+    "data:cifar-100-python/train": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b"
+  },
+  "deterministic_ids_sha256": "573838b4d84d54609c6c06abe473d45cc5b812495d40d20d0b2e717dad064bc4",
+  "eligible_indices_sha256": "30f96089b22c9dc65c4a5db906d90224369a12ef47b3d408a74e4a635c3b3542",
+  "event_bottom_state_sha256": [
+    "dd592f81c640121b8988d0ae43509b6733d4aa4802f41378c1bb704f2ec0cb1c",
+    "3400443e177eec8833f2e77f11d626c79a972e01c911f6c65e1b16a32f0edab7",
+    "ff8b2feccbe9feab628daf22254d3c288f349514118032a3d25317ff8ef5c109",
+    "17222636e770454c2a8a772db55f41820a0d286d7884dcedf632989de051e4c9",
+    "cf25d1d1d8b4a468c8a3cc2b9162f42d9341ae042636c7cbdca7d4577edf61d0",
+    "55008c23a6073ef71768eb2fe268baee4896f3ef019aa5414c81f2dea294886a",
+    "0db5d9321a2d5a84b97d5156b3734cbde332d02639af136c500de2986e246b06",
+    "341d42dfdf25daa09e77477145b1a5b8b5c4400d6eb53b44635beee07080ffd5",
+    "55355778430024273d45dbd889d1571d4395b31368ddb40a946d67d43161fc28",
+    "3102bcb575682787d45dc0d3353a5f25abeb03f92a3db934346ade6355c3a015"
+  ],
+  "feature_audit_sha256": "c980e3347becc75984f91009aeccfe50fac8ffa87a022d43502690e194a6f5c3",
+  "final_bottom_state_sha256": "3102bcb575682787d45dc0d3353a5f25abeb03f92a3db934346ade6355c3a015",
+  "identical_duplicate_matches": 1,
+  "matcher_sha256": "ca28de7a92e384aa68c994f112a47dcf368091174e0ae1a337d5600ec15f40a3",
+  "offline_ids_sha256": "ee855b68b7bed9e11d1c2b2214a99aa5b25a1f5bd0972ed2a54b0dc36d38f8cb",
+  "pilot_completion_sha256": "f80bf02d3e947ec5908aab2cf3d87a8f969a06ae38fd9c0cd0bfec008f51acc5",
+  "pilot_protocol_sha256": "3c484efff44cea8534c1403f57416f36fea3eb941cb37bce7ca7144bb47bc6f5",
+  "run": "/home/c3080/YangXiaoXiang/VF-CL/results/cifar-selection-view-herding-seed49-20261008-v1/seed_49_training_only",
+  "schema_version": 1,
+  "script_sha256": "14ec4af1a53fed22171bc2333413a5075626c4c06e41db4d940337ee02805485",
+  "seed": 49,
+  "source_commit": "7bfe6b1d724fb1206bc0053a9008126bad86332d",
+  "source_config_sha256": "5ef9984e091b83d7f84ac373cd702811c0ed15595dc6f4075ca23cc515535955",
+  "source_modules_sha256": {
+    "calibration_split.py": "b75eff934143defc7338b4b7cf56469d08792627a09d3b9be4e69f5cfeb98e24",
+    "cl_methods/proto_evolve.py": "8da778b07a3a3c7b8ddef698a8f7ba646653c02a9eae85bcf27c074a66f49234",
+    "data_utils.py": "bcc830f19978e14490fd0294470be30cc703e902e4dd89ca6aa9e50d30b4df17",
+    "determinism.py": "4b11b518ae33aeaf6584302328b17fab62509a05e874343a4f51cec653494742",
+    "models.py": "d240686b02b7dda16dd37068b2c1b60057b0b462f26c69631eeaec91b6395d89",
+    "vfl_trainer.py": "d7f9af5da617d6ed9cdbec1ba72d9d4d6f9d12631a019e988dc85550a6dddf19"
+  },
+  "source_record_sha256": "aad02da1ba8e87f29e79f5702e71fe8e99c8ef4cdf554976cc1b881af6dc0871",
+  "status": "training_only_task_time_selection_view_pilot",
+  "stochastic_ids_sha256": "44785ba82307082b82a5e73eaad91eef378ed8ac411c1541bfb2d551ba6116d5",
+  "summary": {
+    "classes": 100,
+    "content_overlap_mean": 1.49,
+    "content_overlap_total": 149,
+    "final_aggregate": {
+      "d_minus_o_mean": 0.001737824846059084,
+      "d_minus_o_median": 0.0015339823439717293,
+      "deterministic_mean": 0.033161111772060395,
+      "deterministic_median": 0.03280754201114178,
+      "fraction_d_worse_offline": 0.71,
+      "fraction_s_better": 0.0,
+      "fraction_s_worse": 1.0,
+      "offline_mean": 0.03142328692600131,
+      "offline_median": 0.0315999835729599,
+      "s_minus_d_mean": 0.012281057201325893,
+      "s_minus_d_median": 0.012350566685199738,
+      "stochastic_mean": 0.045442168973386286,
+      "stochastic_median": 0.045197682455182076
+    },
+    "final_parties": [
+      {
+        "d_minus_o_mean": 0.0016223018243908883,
+        "d_minus_o_median": 1.4644116163253784e-05,
+        "deterministic_mean": 0.0626951801031828,
+        "deterministic_median": 0.06094188988208771,
+        "fraction_d_worse_offline": 0.51,
+        "fraction_s_better": 0.09,
+        "fraction_s_worse": 0.91,
+        "offline_mean": 0.0610728782787919,
+        "offline_median": 0.061220211908221245,
+        "s_minus_d_mean": 0.01833610188215971,
+        "s_minus_d_median": 0.01491285115480423,
+        "stochastic_mean": 0.0810312819853425,
+        "stochastic_median": 0.07827579975128174
+      },
+      {
+        "d_minus_o_mean": 0.0020776628702878952,
+        "d_minus_o_median": 0.0017361454665660858,
+        "deterministic_mean": 0.0672102227061987,
+        "deterministic_median": 0.06751583144068718,
+        "fraction_d_worse_offline": 0.62,
+        "fraction_s_better": 0.04,
+        "fraction_s_worse": 0.96,
+        "offline_mean": 0.06513255983591079,
+        "offline_median": 0.06436636671423912,
+        "s_minus_d_mean": 0.014025479033589363,
+        "s_minus_d_median": 0.013909820467233658,
+        "stochastic_mean": 0.08123570173978806,
+        "stochastic_median": 0.0805550180375576
+      },
+      {
+        "d_minus_o_mean": 0.0015752692520618439,
+        "d_minus_o_median": 0.0007494315505027771,
+        "deterministic_mean": 0.06660467460751533,
+        "deterministic_median": 0.0664973147213459,
+        "fraction_d_worse_offline": 0.56,
+        "fraction_s_better": 0.1,
+        "fraction_s_worse": 0.9,
+        "offline_mean": 0.06502940535545348,
+        "offline_median": 0.0653027817606926,
+        "s_minus_d_mean": 0.012263771370053292,
+        "s_minus_d_median": 0.01180502213537693,
+        "stochastic_mean": 0.07886844597756863,
+        "stochastic_median": 0.07920453324913979
+      },
+      {
+        "d_minus_o_mean": -0.00041045714169740677,
+        "d_minus_o_median": 0.0,
+        "deterministic_mean": 0.056496455669403076,
+        "deterministic_median": 0.05564761720597744,
+        "fraction_d_worse_offline": 0.44,
+        "fraction_s_better": 0.13,
+        "fraction_s_worse": 0.87,
+        "offline_mean": 0.05690691281110048,
+        "offline_median": 0.057220714166760445,
+        "s_minus_d_mean": 0.013571641370654107,
+        "s_minus_d_median": 0.011771736666560173,
+        "stochastic_mean": 0.07006809704005718,
+        "stochastic_median": 0.06836894527077675
+      }
+    ],
+    "selection_time": {
+      "deterministic_mean": 0.03362975226715207,
+      "deterministic_median": 0.033612798899412155,
+      "fraction_s_better": 0.0,
+      "fraction_s_worse": 1.0,
+      "s_minus_d_mean": 0.014847392719238996,
+      "s_minus_d_median": 0.01407109946012497,
+      "stochastic_mean": 0.048477144986391066,
+      "stochastic_median": 0.04868437722325325
+    }
+  }
+}
