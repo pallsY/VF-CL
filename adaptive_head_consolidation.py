@@ -47,6 +47,26 @@ def adaptive_candidate_configs(samples_per_class):
     return {'full': full, 'bias': bias}
 
 
+def validate_adaptive_v2_saved_state(state, result):
+    """Bind the saved method state to its final v2 consolidation result."""
+    if (type(state) is not dict or type(result) is not dict
+            or result.get('method_version') != ADAPTIVE_CAPACITY40_VERSION
+            or state.get('adaptive_method_version') != ADAPTIVE_CAPACITY40_VERSION
+            or state.get('adaptive_top_version') != ADAPTIVE_CAPACITY40_VERSION
+            or state.get('head_consolidation_history') != [result]
+            or state.get('head_validation_sha256')
+            != result.get('validation_manifest', {}).get('sha256')
+            or state.get('adaptive_class_order') != result.get('ordered_classes')
+            or state.get('adaptive_gate') != result.get('gate', {}).get('g')
+            or state.get('adaptive_pending_task_id') is not None):
+        raise ValueError('adaptive v2 saved method state mismatch')
+    bundle = state.get('adaptive_audit_bundle')
+    if (type(bundle) is not dict
+            or bundle.get('method_version') != ADAPTIVE_CAPACITY40_VERSION
+            or bundle.get('result') != result):
+        raise ValueError('adaptive audit bundle mismatch')
+
+
 _PRIMARY_GATE_FIELDS = frozenset({
     'gate_rule', 'is_primary', 'g', 'boundary_derivatives',
     'final_interval', 'final_interval_width', 'iterations', 'converged',

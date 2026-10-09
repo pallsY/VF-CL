@@ -20,6 +20,7 @@ from ul_methods import get_ul_method
 from adaptive_head_consolidation import (
     AdaptiveConsolidationResult,
     adaptive_version_for_capacity,
+    validate_adaptive_v2_saved_state,
 )
 from metrics import (
     MetricsTracker,
@@ -1211,6 +1212,8 @@ def _validate_adaptive_checkpoint_semantics(
                 or top_version != expected_version
                 or pending is not None):
             raise ValueError('adaptive method history mismatch')
+        if expected_version == 2:
+            validate_adaptive_v2_saved_state(state, last)
     elif (validation_hash or top_version != 0 or top_classes
           or top_gate is not None):
         raise ValueError('adaptive method history mismatch')

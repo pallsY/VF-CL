@@ -24,6 +24,7 @@ from adaptive_head_consolidation import (
     FrozenAdaptiveCandidates,
     adaptive_candidate_configs,
     adaptive_version_for_capacity,
+    validate_adaptive_v2_saved_state,
     adaptive_candidate_log_probabilities,
     build_adaptive_diagnostics,
     install_and_reload_verify,
@@ -1125,6 +1126,8 @@ def audit_adaptive_checkpoint(run_dir, expected_spec):
     if (bundle.get('method_version') != expected_spec['source_version']
             or result['method_version'] != expected_spec['source_version']):
         raise ValueError('adaptive checkpoint method version mismatch')
+    if capacity == 40:
+        validate_adaptive_v2_saved_state(cl_state, result)
 
     metadata = payload.get('top_model')
     pre = _top(metadata)
