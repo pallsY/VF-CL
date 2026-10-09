@@ -37,6 +37,9 @@ class ReplayPilotTests(unittest.TestCase):
         self.assertEqual(len(holdout), 4)
         self.assertFalse(gate & holdout)
         self.assertEqual(manifest['per_class'], 2)
+        fresh, fresh_indices = build_holdout_manifest(labels, gate, 2, 20261011)
+        self.assertNotEqual(manifest['sha256'], fresh['sha256'])
+        self.assertFalse(gate & fresh_indices)
         dataset = PilotDataset.__new__(PilotDataset)
         dataset.args = SimpleNamespace(
             deterministic=0, batch_size=4, num_workers=0,
@@ -84,8 +87,12 @@ class ReplayPilotTests(unittest.TestCase):
             'results_dir', 'output_dir', 'exp_name', 'proto_lambda_a',
             'distill_weight', 'feat_distill_weight',
         })
+        newer, _ = derive_config(source, '/tmp/pilot-new', 49, 'herding')
+        self.assertEqual(newer['seed'], 49)
         with self.assertRaises(ValueError):
             derive_config(source, '/tmp/pilot', 42, 'hybrid')
+        with self.assertRaises(ValueError):
+            derive_config(source, '/tmp/pilot', 51, 'herding')
         with self.assertRaises(ValueError):
             derive_config({**source, 'head_consolidation_samples_per_class': 40},
                           '/tmp/pilot', 47, 'hybrid')

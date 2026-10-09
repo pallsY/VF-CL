@@ -46,7 +46,7 @@ ALLOWED_OVERRIDES = {
 
 
 def derive_config(source, root, seed, variant):
-    if (int(seed) not in (47, 48) or variant not in ('herding', 'hybrid')
+    if (int(seed) not in (47, 48, 49, 50) or variant not in ('herding', 'hybrid')
             or any(source.get(key) != value for key, value in SOURCE_EXPECTED.items())
             or Path(source.get('vector_npz', '')).name != 'isolet_vfl.npz'):
         raise ValueError('pilot source, seed, or variant differs from locked design')
@@ -149,6 +149,8 @@ def stop_before_test(*_args, **_kwargs):
 
 def preflight(cli):
     root = cli.root.resolve()
+    if (cli.seed in (47, 48)) != (HOLDOUT_SEED == 20261010):
+        raise ValueError('pilot seed/holdout protocol differs')
     if root.exists():
         raise ValueError('pilot root must be new')
     if (subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
@@ -257,14 +259,18 @@ def evaluate_holdout(args, checkpoint_path, expected_manifest_hash):
 
 
 def main():
+    global HOLDOUT_SEED
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source-config', type=Path, required=True)
     parser.add_argument('--source-record', type=Path, required=True)
     parser.add_argument('--root', type=Path, required=True)
-    parser.add_argument('--seed', type=int, choices=(47, 48), required=True)
+    parser.add_argument('--seed', type=int, choices=(47, 48, 49, 50), required=True)
+    parser.add_argument('--holdout-seed', type=int, choices=(20261010, 20261011),
+                        default=20261010)
     parser.add_argument('--variant', choices=('herding', 'hybrid'), required=True)
     parser.add_argument('--check', action='store_true')
     cli = parser.parse_args()
+    HOLDOUT_SEED = cli.holdout_seed
     args, changed, data_hashes, gate_hash, holdout_hash = preflight(cli)
     if cli.check:
         print(json.dumps({'status': 'ready', 'seed': cli.seed,
