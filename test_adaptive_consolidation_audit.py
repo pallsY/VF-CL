@@ -17,6 +17,8 @@ from adaptive_head_consolidation import (
     FULL_BRANCH_CONFIG,
     AdaptiveConsolidationResult,
     FrozenAdaptiveCandidates,
+    adaptive_candidate_configs,
+    adaptive_version_for_capacity,
     adaptive_candidate_log_probabilities,
     build_adaptive_diagnostics,
     install_and_reload_verify,
@@ -228,8 +230,9 @@ class AdaptiveAuditTests(unittest.TestCase):
             b'[10,11,20,21]'
         ).hexdigest())
 
-    def _fixture(self, run_dir):
+    def _fixture(self, run_dir, capacity=20, replay_count=None):
         torch.manual_seed(17)
+        version = adaptive_version_for_capacity(capacity)
         pre = TopModel(3, 4)
         full = TopModel(3, 4)
         full.load_state_dict(pre.state_dict(), strict=True)
@@ -245,6 +248,7 @@ class AdaptiveAuditTests(unittest.TestCase):
             full_head_sha256=hash_top_state(full),
             bias_head_sha256=hash_top_state(bias),
             full_audit={}, bias_audit={}, ordered_classes=(0, 1, 2, 3),
+            samples_per_class=capacity, method_version=version,
         )
         validation_x = torch.tensor([
             [1.0, 0.0, 0.0], [0.8, 0.2, 0.0],
@@ -260,8 +264,10 @@ class AdaptiveAuditTests(unittest.TestCase):
             full_p, bias_p, validation_y, candidates.ordered_classes
         )
         installed = install_and_reload_verify(pre, candidates, gate)
+        count = (1 if capacity == 20 else capacity) if replay_count is None else replay_count
         replay = {
-            class_id: validation_x[validation_y == class_id][:1].clone()
+            class_id: (validation_x[validation_y == class_id][:1]
+                       + torch.arange(count, dtype=torch.float32)[:, None] * 0.001)
             for class_id in candidates.ordered_classes
         }
         task_classes = {0: [0, 1], 1: [2, 3]}
@@ -284,14 +290,15 @@ class AdaptiveAuditTests(unittest.TestCase):
                 'pre': hash_top_state(pre), 'full': hash_top_state(full),
                 'bias': hash_top_state(bias),
             },
-            candidate_configs={'full': FULL_BRANCH_CONFIG, 'bias': BIAS_BRANCH_CONFIG},
+            candidate_configs=adaptive_candidate_configs(capacity),
+            method_version=version,
             gate=gate, validation_manifest=manifest,
             ordered_classes=(0, 1, 2, 3), task_id=1,
             task_boundary='event_1_CIL',
         )
         replay_manifest = _replay_manifest(replay, replay)
         bundle = {
-            'method_version': ADAPTIVE_METHOD_VERSION,
+            'method_version': version,
             'result': result.to_dict(),
             'pre_state': dict(pre.state_dict()),
             'full_state': dict(full.state_dict()),
@@ -320,7 +327,7 @@ class AdaptiveAuditTests(unittest.TestCase):
             ['git', '-C', str(SOURCE_ROOT), 'rev-parse', 'HEAD'], text=True
         ).strip()
         core = {
-            'source_version': ADAPTIVE_METHOD_VERSION,
+            'source_version': version,
             'source_commit': commit,
             'source_sha256': source_files,
         }
@@ -329,12 +336,14 @@ class AdaptiveAuditTests(unittest.TestCase):
         atomic_write_new_json(planned, {'record': 'planned', **core})
         atomic_write_new_json(launched, {'record': 'launched', **core})
         protocol = {'num_parties': 0, 'num_tasks': 2}
+        if capacity == 40:
+            protocol['head_consolidation_samples_per_class'] = 40
         trainer_state = {'bottoms': [], 'top_model': installed.state_dict()}
         torch.save({
             'schema_version': 1,
             'kind': 'adaptive_final_checkpoint',
             'provenance': {
-                'source_version': ADAPTIVE_METHOD_VERSION,
+                'source_version': version,
                 'source_commit': commit,
                 'planned_sha256': _sha256(planned),
                 'launched_sha256': _sha256(launched),
@@ -382,6 +391,16 @@ class AdaptiveAuditTests(unittest.TestCase):
         }
         return checkpoint, spec
 
+    def test_v2_40_replay_audits_and_rejects_short_class(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _, spec = self._fixture(tmp, capacity=40)
+            evidence = audit_adaptive_checkpoint(tmp, spec)
+            self.assertEqual(evidence['result']['method_version'], 2)
+            self.assertEqual(evidence['replay']['count'], 4 * 40)
+        with tempfile.TemporaryDirectory() as tmp:
+            _, spec = self._fixture(tmp, capacity=40, replay_count=20)
+            with self.assertRaisesRegex(ValueError, '40 examples per class'):
+                audit_adaptive_checkpoint(tmp, spec)
     def test_atomic_json_is_exclusive_nofollow_and_leaves_no_temp(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / 'evidence.json'

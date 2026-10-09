@@ -65,7 +65,7 @@ class ProtoEvolveAdaptiveHeadTest(unittest.TestCase):
 
     @staticmethod
     def _args(output_dir, mode='adaptive_dual_branch', num_tasks=2,
-              final_ul=False):
+              final_ul=False, capacity=20):
         args = SimpleNamespace(
             num_parties=2,
             num_classes=2,
@@ -80,6 +80,7 @@ class ProtoEvolveAdaptiveHeadTest(unittest.TestCase):
             head_consolidation_enabled=1,
             head_consolidation_schedule='final',
             head_consolidation_mode=mode,
+            head_consolidation_samples_per_class=capacity,
             unlearn_after_tasks=[],
             unlearn_classes=[],
         )
@@ -89,9 +90,10 @@ class ProtoEvolveAdaptiveHeadTest(unittest.TestCase):
         return args
 
     def _method(self, output_dir, cls=ProtoEvolveCL,
-                mode='adaptive_dual_branch', final_ul=False):
+                mode='adaptive_dual_branch', final_ul=False, capacity=20):
         method = cls(
-            TinyTrainer(), self._args(output_dir, mode=mode, final_ul=final_ul)
+            TinyTrainer(), self._args(output_dir, mode=mode, final_ul=final_ul,
+                                      capacity=capacity)
         )
         method.head_raw_replay = {
             0: self.batch[:1].clone(),
@@ -149,6 +151,27 @@ class ProtoEvolveAdaptiveHeadTest(unittest.TestCase):
             ).encode('utf-8')).hexdigest(),
         }
 
+    def test_capacity40_uses_version2_for_both_candidate_configs_and_top(self):
+        with tempfile.TemporaryDirectory() as output_dir:
+            method = self._method(output_dir, capacity=40)
+            method.set_head_validation_provider(
+                lambda classes: [(self.batch, self.labels)], self._manifest,
+            )
+            calls = []
+            def fit(pre_top, *args, **kwargs):
+                calls.append(kwargs)
+                return dataclasses.replace(
+                    self._candidates(pre_top), samples_per_class=40,
+                    method_version=2,
+                )
+            with mock.patch.object(proto_evolve, 'fit_adaptive_candidates', side_effect=fit):
+                result = method._consolidate_head(1)
+            self.assertEqual(calls, [{'samples_per_class': 40}])
+            self.assertEqual(result.method_version, 2)
+            self.assertEqual(result.candidate_configs,
+                             adaptive.adaptive_candidate_configs(40))
+            self.assertEqual(int(method.trainer.top_model._adaptive_version), 2)
+            self.assertEqual(method.get_state()['adaptive_method_version'], 2)
     def test_pre_final_tasks_never_access_validation(self):
         with tempfile.TemporaryDirectory() as output_dir:
             method = self._method(output_dir)

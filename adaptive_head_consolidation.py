@@ -22,11 +22,30 @@ from head_consolidation import (
 
 
 ADAPTIVE_METHOD_VERSION = 1
+ADAPTIVE_CAPACITY40_VERSION = 2
 FULL_BRANCH_CONFIG = {'mode': 'full_classifier', 'lr': 0.01, 'steps': 500}
 BIAS_BRANCH_CONFIG = {'mode': 'task_class_bias', 'lr': 0.03, 'steps': 600}
 INACTIVE_BRANCH_CONFIG = {'mode': 'inactive', 'parameters': 0}
 SOLVER_TOLERANCE = 1e-12
 SOLVER_MAX_ITERATIONS = 80
+
+
+def adaptive_version_for_capacity(samples_per_class):
+    if type(samples_per_class) is not int or samples_per_class not in (20, 40):
+        raise ValueError('adaptive head capacity must be exactly 20 or 40')
+    return (ADAPTIVE_METHOD_VERSION if samples_per_class == 20
+            else ADAPTIVE_CAPACITY40_VERSION)
+
+
+def adaptive_candidate_configs(samples_per_class):
+    adaptive_version_for_capacity(samples_per_class)
+    full = dict(FULL_BRANCH_CONFIG)
+    bias = dict(BIAS_BRANCH_CONFIG)
+    if samples_per_class == 40:
+        full['samples_per_class'] = 40
+        bias['samples_per_class'] = 40
+    return {'full': full, 'bias': bias}
+
 
 _PRIMARY_GATE_FIELDS = frozenset({
     'gate_rule', 'is_primary', 'g', 'boundary_derivatives',
@@ -73,7 +92,7 @@ def _is_sha256(value):
             and all(character in '0123456789abcdef' for character in value))
 
 
-def _validate_candidate_evidence(pre_hash, hashes, configs):
+def _validate_candidate_evidence(pre_hash, hashes, configs, method_version):
     if (type(hashes) is not dict
             or set(hashes) != {'pre', 'full', 'bias'}
             or not _is_sha256(pre_hash)
@@ -82,8 +101,8 @@ def _validate_candidate_evidence(pre_hash, hashes, configs):
         raise ValueError('adaptive candidate hashes are invalid')
     if type(configs) is not dict or set(configs) != {'full', 'bias'}:
         raise ValueError('adaptive candidate configs are invalid')
-    for branch, expected in (
-            ('full', FULL_BRANCH_CONFIG), ('bias', BIAS_BRANCH_CONFIG)):
+    capacity = 20 if method_version == ADAPTIVE_METHOD_VERSION else 40
+    for branch, expected in adaptive_candidate_configs(capacity).items():
         actual = configs[branch]
         if (type(actual) is not dict or set(actual) != set(expected)
                 or any(type(actual[key]) is not type(value)
@@ -188,7 +207,8 @@ class AdaptiveConsolidationResult:
 
     def __post_init__(self):
         if (type(self.method_version) is not int
-                or self.method_version != ADAPTIVE_METHOD_VERSION):
+                or self.method_version not in (
+                    ADAPTIVE_METHOD_VERSION, ADAPTIVE_CAPACITY40_VERSION)):
             raise ValueError('adaptive method version mismatch')
         if type(self.pre_head_sha256) is not str or not self.pre_head_sha256:
             raise ValueError('adaptive pre-head hash is missing')
@@ -219,6 +239,7 @@ class AdaptiveConsolidationResult:
             self.pre_head_sha256,
             self.candidate_hashes,
             self.candidate_configs,
+            self.method_version,
         )
         _validate_primary_gate(self.gate)
         _validate_validation_manifest(self.validation_manifest)
@@ -271,24 +292,27 @@ class FrozenAdaptiveCandidates:
     full_audit: object
     bias_audit: object
     ordered_classes: tuple
+    samples_per_class: int = 20
+    method_version: int = ADAPTIVE_METHOD_VERSION
 
 
 def fit_adaptive_candidates(pre_top, replay_embeddings, prototypes,
                             task_classes, persistent_raw_example_count,
-                            seed, device):
+                            seed, device, samples_per_class=20):
     """Fit isolated Full and Bias candidates from one immutable head."""
+    method_version = adaptive_version_for_capacity(samples_per_class)
     pre_hash = hash_top_state(pre_top)
     full_top = copy.deepcopy(pre_top)
     bias_top = copy.deepcopy(pre_top)
     full_audit = consolidate_classifier(
-        full_top, prototypes, 0.01, 500, 0.01, 20, seed, device,
+        full_top, prototypes, 0.01, 500, 0.01, samples_per_class, seed, device,
         replay_embeddings=replay_embeddings,
         replay_source='balanced_current_encoder_raw_replay',
         persistent_raw_example_count=persistent_raw_example_count,
     )
     bias_audit = consolidate_task_class_bias(
         bias_top, replay_embeddings, task_classes, 0.01, 0.01, 1.3,
-        600, 0.03, 20, device,
+        600, 0.03, samples_per_class, device,
         persistent_raw_example_count=persistent_raw_example_count,
         replay_source='balanced_current_encoder_raw_replay',
     )
@@ -303,6 +327,8 @@ def fit_adaptive_candidates(pre_top, replay_embeddings, prototypes,
         full_audit=full_audit,
         bias_audit=bias_audit,
         ordered_classes=tuple(sorted(replay_embeddings)),
+        samples_per_class=samples_per_class,
+        method_version=method_version,
     )
 
 
@@ -407,7 +433,7 @@ def install_and_reload_verify(pre_top, candidates, gate):
     full_bias = candidates.full_state['classifier.bias'].index_select(0, classes)
     temporary.set_adaptive_mixture(
         full_weight, full_bias, gate['g'], candidates.ordered_classes,
-        version=ADAPTIVE_METHOD_VERSION,
+        version=candidates.method_version,
     )
     installed_state = freeze_state(temporary.state_dict())
     verified = copy.deepcopy(pre_top).eval()

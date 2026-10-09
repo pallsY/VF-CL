@@ -507,7 +507,7 @@ class AdaptiveTopModelTest(unittest.TestCase):
             {'gate': -0.01},
             {'gate': 1.01},
             {'gate': True},
-            {'gate': 0.5, 'version': 2},
+            {'gate': 0.5, 'version': 3},
         )
         for values in invalid_calls:
             with self.subTest(values=values), self.assertRaises((TypeError, ValueError)):
@@ -517,7 +517,7 @@ class AdaptiveTopModelTest(unittest.TestCase):
                 )
 
         state = self._install(model).state_dict()
-        state['_adaptive_version'] = torch.tensor(2, dtype=torch.long)
+        state['_adaptive_version'] = torch.tensor(3, dtype=torch.long)
         with self.assertRaises(RuntimeError):
             TopModel(3, 4, cosine=False).load_state_dict(state)
 

@@ -180,7 +180,7 @@ class TopModel(nn.Module):
             version = operator.index(version)
         except TypeError as error:
             raise TypeError('adaptive version must be an integer') from error
-        if version != 1:
+        if version not in (1, 2):
             raise ValueError('unsupported adaptive state version')
         if isinstance(gate, bool) or not isinstance(gate, numbers.Real):
             raise TypeError('adaptive gate must be a real scalar')

@@ -227,6 +227,7 @@ class AdaptiveBranchFitTest(unittest.TestCase):
         self.assertEqual(list(inspect.signature(fit).parameters), [
             'pre_top', 'replay_embeddings', 'prototypes', 'task_classes',
             'persistent_raw_example_count', 'seed', 'device',
+            'samples_per_class',
         ])
         source = inspect.getsource(fit)
         self.assertNotIn('validation_loader', source)

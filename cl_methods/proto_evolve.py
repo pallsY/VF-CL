@@ -4,10 +4,9 @@ from copy import deepcopy
 from data_utils import split_features
 from determinism import derive_seed
 from adaptive_head_consolidation import (
-    ADAPTIVE_METHOD_VERSION,
-    BIAS_BRANCH_CONFIG,
-    FULL_BRANCH_CONFIG,
     AdaptiveConsolidationResult,
+    adaptive_candidate_configs,
+    adaptive_version_for_capacity,
     adaptive_candidate_log_probabilities,
     build_adaptive_diagnostics,
     fit_adaptive_candidates,
@@ -280,6 +279,10 @@ class ProtoEvolveCL:
             raise ValueError(
                 f'unknown head consolidation mode: {self.head_consolidation_mode}'
             )
+        self.adaptive_method_version = (
+            adaptive_version_for_capacity(self.head_consolidation_samples_per_class)
+            if self.head_consolidation_mode == 'adaptive_dual_branch' else None
+        )
         if (self.head_consolidation_mode == 'adaptive_dual_branch'
                 and not bool(getattr(args, 'sanitize_cl_state', 1))):
             raise ValueError(
@@ -949,6 +952,10 @@ class ProtoEvolveCL:
                 self.head_raw_replay[class_id].size(0)
                 for class_id in retained_classes
             )
+            fit_options = (
+                {} if self.head_consolidation_samples_per_class == 20
+                else {'samples_per_class': self.head_consolidation_samples_per_class}
+            )
             candidates = fit_adaptive_candidates(
                 pre_top,
                 replay_embeddings,
@@ -957,6 +964,7 @@ class ProtoEvolveCL:
                 raw_count,
                 seed,
                 self.args.device,
+                **fit_options,
             )
             event_order = ['candidates_frozen']
             validation_x, validation_y, manifest = self._embed_head_validation(
@@ -998,10 +1006,10 @@ class ProtoEvolveCL:
                     'full': candidates.full_head_sha256,
                     'bias': candidates.bias_head_sha256,
                 },
-                candidate_configs={
-                    'full': FULL_BRANCH_CONFIG,
-                    'bias': BIAS_BRANCH_CONFIG,
-                },
+                candidate_configs=adaptive_candidate_configs(
+                    self.head_consolidation_samples_per_class
+                ),
+                method_version=self.adaptive_method_version,
                 gate=gate,
                 validation_manifest=manifest,
                 ordered_classes=candidates.ordered_classes,
@@ -1022,7 +1030,7 @@ class ProtoEvolveCL:
             )
             event_order.append('diagnostics_computed')
             audit_bundle = {
-                'method_version': ADAPTIVE_METHOD_VERSION,
+                'method_version': self.adaptive_method_version,
                 'result': result.to_dict(),
                 'pre_state': dict(canonical_pre.state_dict()),
                 'full_state': dict(candidates.full_state),
@@ -1233,7 +1241,7 @@ class ProtoEvolveCL:
             return None, None
         saved_method_version = state.get('adaptive_method_version')
         if (type(saved_method_version) is not int
-                or saved_method_version != ADAPTIVE_METHOD_VERSION):
+                or saved_method_version != self.adaptive_method_version):
             raise ValueError('adaptive method version mismatch')
         top_version, class_order, gate = self._adaptive_top_metadata()
         saved_top_version = state.get('adaptive_top_version')
@@ -1263,7 +1271,7 @@ class ProtoEvolveCL:
             if len(history) != 1:
                 raise ValueError('adaptive method history mismatch')
             last = history[-1]
-            if last.get('method_version') != ADAPTIVE_METHOD_VERSION:
+            if last.get('method_version') != self.adaptive_method_version:
                 raise ValueError('adaptive method version mismatch')
             if (last.get('task_id') != int(self.args.num_tasks) - 1
                     or not head_consolidation_due(
@@ -1280,7 +1288,7 @@ class ProtoEvolveCL:
                 raise ValueError('adaptive gate mismatch')
             if last.get('validation_manifest', {}).get('sha256') != validation_hash:
                 raise ValueError('adaptive validation hash mismatch')
-            if top_version != ADAPTIVE_METHOD_VERSION:
+            if top_version != self.adaptive_method_version:
                 raise ValueError('adaptive top version mismatch')
         elif validation_hash or top_version != 0 or class_order or gate is not None:
             raise ValueError('adaptive method history mismatch')
@@ -1320,7 +1328,7 @@ class ProtoEvolveCL:
             'head_task_classes': deepcopy(self.head_task_classes),
             'head_consolidation_history': deepcopy(self.head_consolidation_history),
             'adaptive_method_version': (
-                ADAPTIVE_METHOD_VERSION
+                self.adaptive_method_version
                 if self.head_consolidation_mode == 'adaptive_dual_branch'
                 else None
             ),

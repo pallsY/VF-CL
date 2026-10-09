@@ -18,8 +18,8 @@ from vfl_trainer import VFLTrainer
 from cl_methods import get_cl_method
 from ul_methods import get_ul_method
 from adaptive_head_consolidation import (
-    ADAPTIVE_METHOD_VERSION,
     AdaptiveConsolidationResult,
+    adaptive_version_for_capacity,
 )
 from metrics import (
     MetricsTracker,
@@ -404,6 +404,11 @@ def _checkpoint_protocol(args):
             'head_consolidation_enabled', 'head_consolidation_mode',
         )
     }
+    if getattr(args, 'head_consolidation_mode', None) == 'adaptive_dual_branch':
+        capacity = int(getattr(args, 'head_consolidation_samples_per_class', 20))
+        adaptive_version_for_capacity(capacity)
+        if capacity == 40:
+            protocol['head_consolidation_samples_per_class'] = 40
     if getattr(args, 'formal_deferred_evaluation', False) is True:
         from adaptive_consolidation_audit import _formal_source_provenance
         provenance = _formal_source_provenance()
@@ -1161,7 +1166,10 @@ def _validate_rng_checkpoint_state(state):
 
 def _validate_adaptive_checkpoint_semantics(
         state, trainer_state, protocol, args):
-    if state['adaptive_method_version'] != ADAPTIVE_METHOD_VERSION:
+    expected_version = adaptive_version_for_capacity(
+        int(protocol.get('head_consolidation_samples_per_class', 20))
+    )
+    if state['adaptive_method_version'] != expected_version:
         raise ValueError('adaptive method version mismatch')
     top = trainer_state['top_model']
     required_top = {
@@ -1194,13 +1202,13 @@ def _validate_adaptive_checkpoint_semantics(
         if len(normalized) != 1:
             raise ValueError('adaptive method history mismatch')
         last = normalized[0]
-        if (last.get('method_version') != ADAPTIVE_METHOD_VERSION
+        if (last.get('method_version') != expected_version
                 or last.get('task_id') != protocol['num_tasks'] - 1
                 or last.get('ordered_classes') != top_classes
                 or last.get('gate', {}).get('g') != top_gate
                 or last.get('validation_manifest', {}).get('sha256')
                 != validation_hash
-                or top_version != ADAPTIVE_METHOD_VERSION
+                or top_version != expected_version
                 or pending is not None):
             raise ValueError('adaptive method history mismatch')
     elif (validation_hash or top_version != 0 or top_classes
@@ -1959,7 +1967,10 @@ def _prepare_adaptive_provenance(
             checkpoint_dir, args, trainer, cl_method, task_mgr,
             tracker, bic_calibrator,
         )
-    return prepare_adaptive_run_provenance(args.output_dir)
+    return prepare_adaptive_run_provenance(
+        args.output_dir,
+        samples_per_class=int(getattr(args, 'head_consolidation_samples_per_class', 20)),
+    )
 
 
 def _save_party_kd_audit(cl_method, args, step):

@@ -59,6 +59,16 @@ class AdaptiveProtocolConfigTest(unittest.TestCase):
         self.assertEqual(args.head_gate_solver_tolerance, 1e-12)
         self.assertEqual(args.head_gate_solver_max_iterations, 80)
 
+    def test_capacity_40_is_versioned_and_other_budgets_rejected(self):
+        selected = self.parse_config(self.adaptive_args + [
+            '--head_consolidation_samples_per_class', '40',
+        ])
+        self.assertEqual(selected.head_consolidation_samples_per_class, 40)
+        for invalid in ('0', '30', '80'):
+            with self.subTest(invalid=invalid):
+                self.assert_config_rejected(self.adaptive_args + [
+                    '--head_consolidation_samples_per_class', invalid,
+                ])
     def test_validation_seed_is_dataset_specific(self):
         development = self.parse_config(
             self.adaptive_args + ['--data', 'cifar100']

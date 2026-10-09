@@ -105,9 +105,11 @@ def validate_adaptive_head_consolidation(args):
     if args.head_consolidation_mode != 'adaptive_dual_branch':
         return
     tinyimagenet = args.data == 'tinyimagenet'
+    if (type(args.head_consolidation_samples_per_class) is not int
+            or args.head_consolidation_samples_per_class not in (20, 40)):
+        raise ValueError('adaptive head capacity must be exactly 20 or 40')
     required = {
         'head_consolidation_schedule': 'final',
-        'head_consolidation_samples_per_class': 20,
         'head_consolidation_regularization': 0.01,
         'head_consolidation_class_regularization': 0.01,
         'head_consolidation_task_regularization': 0.01,

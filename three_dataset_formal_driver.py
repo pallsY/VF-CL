@@ -2079,14 +2079,17 @@ def _method_resource_state(spec, checkpoint_path):
                          'task_bases', 'task_classes'},
     }
     if method == 'proto_evolve':
-        from adaptive_head_consolidation import ADAPTIVE_METHOD_VERSION
+        from adaptive_head_consolidation import adaptive_version_for_capacity
         schema_state = state
         if contract['head_consolidation_mode'] != 'adaptive_dual_branch':
             require(state.get('adaptive_method_version') is None, 'nonadaptive version')
             schema_state = {**state, 'adaptive_method_version': 0}
         else:
-            require(state.get('adaptive_method_version') == ADAPTIVE_METHOD_VERSION
-                    and state.get('adaptive_top_version') in (0, ADAPTIVE_METHOD_VERSION),
+            expected_version = adaptive_version_for_capacity(
+                int(contract.get('head_consolidation_samples_per_class', 20))
+            )
+            require(state.get('adaptive_method_version') == expected_version
+                    and state.get('adaptive_top_version') in (0, expected_version),
                     'unsupported adaptive version')
         require(_valid_method_checkpoint_state(method, schema_state, True, num_parties),
                 'prototype continuation schema')

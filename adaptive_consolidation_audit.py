@@ -17,11 +17,10 @@ from collections.abc import Mapping
 import torch
 
 from adaptive_head_consolidation import (
-    ADAPTIVE_METHOD_VERSION,
-    BIAS_BRANCH_CONFIG,
-    FULL_BRANCH_CONFIG,
     AdaptiveConsolidationResult,
     FrozenAdaptiveCandidates,
+    adaptive_candidate_configs,
+    adaptive_version_for_capacity,
     adaptive_candidate_log_probabilities,
     build_adaptive_diagnostics,
     install_and_reload_verify,
@@ -908,8 +907,9 @@ def _snapshot_manifest(run_dir, protocol_kind='adaptive'):
     return records
 
 
-def prepare_adaptive_run_provenance(run_dir):
+def prepare_adaptive_run_provenance(run_dir, samples_per_class=20):
     """Create or verify the immutable pre-checkpoint source records."""
+    version = adaptive_version_for_capacity(samples_per_class)
     recover_atomic_write_temps(run_dir)
     run_dir = _reject_unsafe_tree(run_dir)
     record_paths = [
@@ -939,7 +939,7 @@ def prepare_adaptive_run_provenance(run_dir):
             )
     source_root = Path(__file__).resolve().parent
     core = {
-        'source_version': ADAPTIVE_METHOD_VERSION,
+        'source_version': version,
         'source_commit': _source_commit(source_root),
         'source_sha256': {
             name: _sha256(source_root / name) for name in SOURCE_FILES
@@ -980,7 +980,7 @@ def audit_adaptive_checkpoint(run_dir, expected_spec):
     if set(expected_spec) != required:
         raise ValueError('adaptive audit spec is incomplete')
     if (type(expected_spec['source_version']) is not int
-            or expected_spec['source_version'] != ADAPTIVE_METHOD_VERSION
+            or expected_spec['source_version'] not in (1, 2)
             or type(expected_spec['source_commit']) is not str
             or type(expected_spec['checkpoint']) is not str
             or Path(expected_spec['checkpoint']).name != expected_spec['checkpoint']
@@ -1042,6 +1042,9 @@ def audit_adaptive_checkpoint(run_dir, expected_spec):
             'launched_sha256': expected_spec['launched_sha256'],
             }:
         raise ValueError('adaptive checkpoint provenance is missing or stale')
+    capacity = payload['protocol'].get('head_consolidation_samples_per_class', 20)
+    if adaptive_version_for_capacity(capacity) != expected_spec['source_version']:
+        raise ValueError('adaptive source version does not match replay capacity')
     cl_state = payload.get('cl_state')
     bundle = cl_state.get('adaptive_audit_bundle') if type(cl_state) is dict else None
     if type(bundle) is not dict:
@@ -1116,7 +1119,8 @@ def audit_adaptive_checkpoint(run_dir, expected_spec):
     if base_data_flow != _DATA_FLOW:
         raise ValueError('adaptive checkpoint data-flow flags mismatch')
     result = AdaptiveConsolidationResult.from_dict(bundle.get('result')).to_dict()
-    if bundle.get('method_version') != ADAPTIVE_METHOD_VERSION:
+    if (bundle.get('method_version') != expected_spec['source_version']
+            or result['method_version'] != expected_spec['source_version']):
         raise ValueError('adaptive checkpoint method version mismatch')
 
     metadata = payload.get('top_model')
@@ -1149,14 +1153,18 @@ def audit_adaptive_checkpoint(run_dir, expected_spec):
         'bias': hash_top_state(branch_states['bias']),
     }
     if (actual_hashes != result['candidate_hashes']
-            or result['candidate_configs'] != {
-                'full': FULL_BRANCH_CONFIG, 'bias': BIAS_BRANCH_CONFIG,
-            }):
+            or result['candidate_configs'] != adaptive_candidate_configs(capacity)):
         raise ValueError('adaptive candidate hash/config mismatch')
 
     replay = bundle.get('replay_embeddings')
     replay_raw = bundle.get('replay_raw')
     replay_manifest = _replay_manifest(replay_raw, replay)
+    if (capacity == 40
+            and (set(replay_raw) != set(result['ordered_classes'])
+                 or any(replay_raw[class_id].size(0) != 40
+                        or replay[class_id].size(0) != 40
+                        for class_id in replay_raw))):
+        raise ValueError('v2 replay does not contain exactly 40 examples per class')
     claimed_replay = bundle.get('replay_manifest')
     if (type(claimed_replay) is not dict
             or len(set(claimed_replay.get('ordered_sample_ids', ())))
