@@ -42,11 +42,15 @@ ALLOWED_OVERRIDES = {
     'seed', 'formal_deferred_evaluation', 'data_path', 'vector_npz',
     'results_dir', 'output_dir', 'exp_name', 'proto_lambda_a',
     'distill_weight', 'feat_distill_weight',
+    'head_consolidation_samples_per_class',
 }
 
 
-def derive_config(source, root, seed, variant):
-    if (int(seed) not in (47, 48, 49, 50) or variant not in ('herding', 'hybrid')
+def derive_config(source, root, seed, variant, replay_capacity=20):
+    if (int(seed) not in (47, 48, 49, 50, 51, 52)
+            or int(replay_capacity) not in (20, 40, 80)
+            or (int(replay_capacity) != 20 and variant != 'herding')
+            or variant not in ('herding', 'hybrid')
             or any(source.get(key) != value for key, value in SOURCE_EXPECTED.items())
             or Path(source.get('vector_npz', '')).name != 'isolet_vfl.npz'):
         raise ValueError('pilot source, seed, or variant differs from locked design')
@@ -60,6 +64,7 @@ def derive_config(source, root, seed, variant):
         exp_name=f'isolet_replay_{variant}_seed{seed}',
         proto_lambda_a=0.05, distill_weight=0.10,
         feat_distill_weight=0.02,
+        head_consolidation_samples_per_class=int(replay_capacity),
     )
     changed = {key: {'source': source.get(key), 'pilot': config.get(key)}
                for key in set(source) | set(config)
@@ -149,7 +154,10 @@ def stop_before_test(*_args, **_kwargs):
 
 def preflight(cli):
     root = cli.root.resolve()
-    if (cli.seed in (47, 48)) != (HOLDOUT_SEED == 20261010):
+    expected_holdout = {47: 20261010, 48: 20261010,
+                        49: 20261011, 50: 20261011,
+                        51: 20261012, 52: 20261012}
+    if HOLDOUT_SEED != expected_holdout[cli.seed]:
         raise ValueError('pilot seed/holdout protocol differs')
     if root.exists():
         raise ValueError('pilot root must be new')
@@ -182,7 +190,8 @@ def preflight(cli):
             or record.get('source_commit') != SOURCE_COMMIT
             or record['artifact_sha256']['config'] != SOURCE_CONFIG_SHA256):
         raise ValueError('archived ISOLET config/record identity differs')
-    config, changed = derive_config(source, root, cli.seed, cli.variant)
+    config, changed = derive_config(source, root, cli.seed, cli.variant,
+                                    cli.replay_capacity)
     data_hashes = {
         key: sha256(Path(config['data_path']) / key.split(':', 1)[1])
         for key in DATA_SHA256
@@ -193,7 +202,13 @@ def preflight(cli):
     from data_utils import TaskManager
     args = SimpleNamespace(**config)
     validate_party_kd_variant(config, config['expected_party_kd_variant'])
-    validate_adaptive_head_consolidation(args)
+    capacity = args.head_consolidation_samples_per_class
+    if capacity != 20:
+        args.head_consolidation_samples_per_class = 20
+    try:
+        validate_adaptive_head_consolidation(args)
+    finally:
+        args.head_consolidation_samples_per_class = capacity
     if any(event['type'] != 'CIL' for event in TaskManager(args).get_timeline()):
         raise ValueError('pilot timeline contains unlearning')
     with tempfile.TemporaryDirectory(prefix='isolet-replay-pilot-check-') as scratch:
@@ -235,7 +250,9 @@ def evaluate_holdout(args, checkpoint_path, expected_manifest_hash):
             != dataset.validation_manifest['sha256']):
         raise ValueError('final installed head or gate validation differs')
     raw = checkpoint['cl_state']['head_raw_replay']
-    if set(raw) != set(range(26)) or any(rows.size(0) != 20 for rows in raw.values()):
+    if (set(raw) != set(range(26))
+            or any(rows.size(0) != args.head_consolidation_samples_per_class
+                   for rows in raw.values())):
         raise ValueError('head replay is not exactly 20 examples per class')
     bottoms, top = build_models(args)
     trainer = VFLTrainer(bottoms, top, args)
@@ -264,10 +281,13 @@ def main():
     parser.add_argument('--source-config', type=Path, required=True)
     parser.add_argument('--source-record', type=Path, required=True)
     parser.add_argument('--root', type=Path, required=True)
-    parser.add_argument('--seed', type=int, choices=(47, 48, 49, 50), required=True)
-    parser.add_argument('--holdout-seed', type=int, choices=(20261010, 20261011),
+    parser.add_argument('--seed', type=int, choices=(47, 48, 49, 50, 51, 52), required=True)
+    parser.add_argument('--holdout-seed', type=int,
+                        choices=(20261010, 20261011, 20261012),
                         default=20261010)
     parser.add_argument('--variant', choices=('herding', 'hybrid'), required=True)
+    parser.add_argument('--replay-capacity', type=int, choices=(20, 40, 80),
+                        default=20)
     parser.add_argument('--check', action='store_true')
     cli = parser.parse_args()
     HOLDOUT_SEED = cli.holdout_seed
@@ -295,7 +315,9 @@ def main():
         'data_sha256': data_hashes, 'gate_manifest_sha256': gate_hash,
         'holdout_manifest_sha256': holdout_hash,
         'holdout_per_class': HOLDOUT_PER_CLASS, 'holdout_split_seed': HOLDOUT_SEED,
-        'selector': cli.variant, 'planned_stop': 'before_deferred_test_evaluation',
+        'selector': cli.variant, 'raw_replay_capacity_per_class': cli.replay_capacity,
+        'adaptive_contract_capacity_override': cli.replay_capacity != 20,
+        'planned_stop': 'before_deferred_test_evaluation',
     }, indent=2, sort_keys=True), encoding='utf-8')
     original_dataset = runner.VFLDataset
     original_selector = proto_evolve.herding_indices
@@ -303,7 +325,7 @@ def main():
     calls = []
 
     def select(embeddings, capacity):
-        if capacity != 20:
+        if capacity != cli.replay_capacity:
             raise ValueError('pilot replay capacity differs')
         calls.append(int(embeddings.size(0)))
         return (original_selector(embeddings, capacity)
@@ -344,7 +366,7 @@ def main():
                'checkpoint_sha256': sha256(checkpoint),
                'pre_head_sha256': pre_head_sha256,
                'gate': gate, 'selector_calls': len(calls),
-               'head_raw_replay_per_class': 20, 'metrics': metrics}
+               'head_raw_replay_per_class': cli.replay_capacity, 'metrics': metrics}
     readout_path = run / 'HOLDOUT_READOUT.json'
     readout_path.write_text(json.dumps(readout, indent=2, sort_keys=True),
                             encoding='utf-8')

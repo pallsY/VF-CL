@@ -40,6 +40,9 @@ class ReplayPilotTests(unittest.TestCase):
         fresh, fresh_indices = build_holdout_manifest(labels, gate, 2, 20261011)
         self.assertNotEqual(manifest['sha256'], fresh['sha256'])
         self.assertFalse(gate & fresh_indices)
+        newer, newer_indices = build_holdout_manifest(labels, gate, 2, 20261012)
+        self.assertNotEqual(fresh['sha256'], newer['sha256'])
+        self.assertFalse(gate & newer_indices)
         dataset = PilotDataset.__new__(PilotDataset)
         dataset.args = SimpleNamespace(
             deterministic=0, batch_size=4, num_workers=0,
@@ -89,10 +92,19 @@ class ReplayPilotTests(unittest.TestCase):
         })
         newer, _ = derive_config(source, '/tmp/pilot-new', 49, 'herding')
         self.assertEqual(newer['seed'], 49)
+        expanded, expanded_changes = derive_config(source, '/tmp/pilot-capacity', 51, 'herding', 40)
+        self.assertEqual(expanded['seed'], 51)
+        self.assertEqual(expanded['head_consolidation_samples_per_class'], 40)
+        self.assertIn('head_consolidation_samples_per_class', expanded_changes)
+        with self.assertRaises(ValueError):
+            derive_config(source, '/tmp/pilot-capacity', 51, 'herding', 30)
+        with self.assertRaises(ValueError):
+            derive_config(source, '/tmp/pilot-capacity', 51, 'hybrid', 40)
+        with self.assertRaises(ValueError):
+            derive_config(source, '/tmp/pilot-capacity', 53, 'herding', 40)
         with self.assertRaises(ValueError):
             derive_config(source, '/tmp/pilot', 42, 'hybrid')
-        with self.assertRaises(ValueError):
-            derive_config(source, '/tmp/pilot', 51, 'herding')
+
         with self.assertRaises(ValueError):
             derive_config({**source, 'head_consolidation_samples_per_class': 40},
                           '/tmp/pilot', 47, 'hybrid')
