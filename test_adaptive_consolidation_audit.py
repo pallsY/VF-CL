@@ -1,3 +1,4 @@
+import copy
 import hashlib
 import json
 import os
@@ -10,6 +11,7 @@ from types import SimpleNamespace
 from unittest import mock
 
 import torch
+import runner
 
 from adaptive_head_consolidation import (
     ADAPTIVE_METHOD_VERSION,
@@ -339,6 +341,21 @@ class AdaptiveAuditTests(unittest.TestCase):
         if capacity == 40:
             protocol['head_consolidation_samples_per_class'] = 40
         trainer_state = {'bottoms': [], 'top_model': installed.state_dict()}
+        cl_state = {
+            'adaptive_audit_bundle': bundle,
+            'head_raw_replay': replay,
+            'head_task_classes': task_classes,
+        }
+        if capacity == 40:
+            cl_state.update({
+                'adaptive_method_version': version,
+                'adaptive_top_version': version,
+                'head_consolidation_history': [result.to_dict()],
+                'head_validation_sha256': manifest['sha256'],
+                'adaptive_class_order': list(result.ordered_classes),
+                'adaptive_gate': gate['g'],
+                'adaptive_pending_task_id': None,
+            })
         torch.save({
             'schema_version': 1,
             'kind': 'adaptive_final_checkpoint',
@@ -351,11 +368,7 @@ class AdaptiveAuditTests(unittest.TestCase):
             'protocol': protocol,
             'top_model': {'input_dim': 3, 'num_classes': 4, 'cosine': False},
             'trainer_state': trainer_state,
-            'cl_state': {
-                'adaptive_audit_bundle': bundle,
-                'head_raw_replay': replay,
-                'head_task_classes': task_classes,
-            },
+            'cl_state': cl_state,
         }, checkpoint)
         snapshots = Path(run_dir) / 'adaptive_snapshots'
         snapshots.mkdir()
@@ -401,6 +414,42 @@ class AdaptiveAuditTests(unittest.TestCase):
             _, spec = self._fixture(tmp, capacity=40, replay_count=20)
             with self.assertRaisesRegex(ValueError, '40 examples per class'):
                 audit_adaptive_checkpoint(tmp, spec)
+
+    def test_v2_rejects_mismatched_saved_method_state(self):
+        for field, stale in (
+                ('adaptive_method_version', 1),
+                ('adaptive_top_version', 1),
+                ('head_consolidation_history', []),
+                ('head_validation_sha256', 'stale'),
+                ('adaptive_class_order', []),
+                ('adaptive_gate', 0.123),
+                ('adaptive_pending_task_id', 1)):
+            with self.subTest(field=field), tempfile.TemporaryDirectory() as tmp:
+                checkpoint, spec = self._fixture(tmp, capacity=40)
+                payload = torch.load(checkpoint, weights_only=False)
+                payload['cl_state'][field] = stale
+                torch.save(payload, checkpoint)
+                with self.assertRaisesRegex(ValueError, 'saved method state'):
+                    audit_adaptive_checkpoint(tmp, spec)
+
+    def test_v2_resume_rejects_mismatched_audit_bundle(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            checkpoint, _ = self._fixture(tmp, capacity=40)
+            payload = torch.load(checkpoint, weights_only=False)
+            state = payload['cl_state']
+            protocol = payload['protocol']
+            args = SimpleNamespace(unlearn_after_tasks=[], unlearn_classes=[])
+            runner._validate_adaptive_checkpoint_semantics(
+                state, payload['trainer_state'], protocol, args,
+            )
+            for field, stale in (('method_version', 1), ('result', {})):
+                with self.subTest(field=field):
+                    mutated = copy.deepcopy(state)
+                    mutated['adaptive_audit_bundle'][field] = stale
+                    with self.assertRaisesRegex(ValueError, 'audit bundle'):
+                        runner._validate_adaptive_checkpoint_semantics(
+                            mutated, payload['trainer_state'], protocol, args,
+                        )
     def test_atomic_json_is_exclusive_nofollow_and_leaves_no_temp(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / 'evidence.json'
