@@ -1,0 +1,295 @@
+{
+  "schema_version": 1,
+  "experiment": "three-dataset-selected-hparam-formal-aa-final",
+  "candidate": {
+    "proto_lambda_a": 0.05,
+    "distill_weight": 0.1,
+    "feat_distill_weight": 0.02
+  },
+  "selection_source": "ISOLET seed45/46 development validation sweep, frozen before test",
+  "metric": "AA_final class-incremental accuracy after final task",
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "selected_runs": [
+    {
+      "dataset": "isolet",
+      "seed": 42,
+      "source_commit": "a575bbf446ae501cf8e580ba62c2cc5492a25f30",
+      "source_record_sha256": "7dc5bf930600d097134948d6ee166fd55490327d16cde1fe2496ac374a73299b",
+      "source_config_sha256": "5702b8846ca8e9d279728a725550c1b053b8580fec832a9695b56d6ea7f2af34",
+      "config_sha256": "9a43d942f37025761ab4da33bdcdfa320906ec9ebcb3ed78a8fdfbb5fd57a5ac",
+      "results_sha256": "888ecbff33cfa22dd23ea22da74a4815ed6c814f2bea12d8b3eb4478d25fd59e",
+      "published_sha256": "5e2f0087b77e3b7d52fe0ca6bc151053667a9de8ca978526991bb28a82e26bfe",
+      "aa_final": 0.8858,
+      "baseline_aa_final": 0.8819,
+      "bwt": 0.786,
+      "taskil_final": 0.9878,
+      "overrides": [
+        "data_path",
+        "vector_npz",
+        "distill_weight",
+        "proto_lambda_a",
+        "feat_distill_weight",
+        "exp_name",
+        "results_dir",
+        "output_dir"
+      ],
+      "baseline_source": "same-host-3080-rerun",
+      "baseline_results_sha256": "d8798270fdfedfaf069ca7ee8211e95877320ae8c60d8cfa7d6256786a287dc1",
+      "baseline_published_sha256": "dbb79922dfaf7433620568faa1b7978c078b5d2d4f049d6f876cd1162073a266",
+      "baseline_config_sha256": "9736ef1397d41e421c8e35ec4b9fa857042badfd28bd7c462f05126d6cba0993",
+      "baseline_bwt": 0.7894
+    },
+    {
+      "dataset": "isolet",
+      "seed": 43,
+      "source_commit": "a575bbf446ae501cf8e580ba62c2cc5492a25f30",
+      "source_record_sha256": "0395b09f999132fe7361ac9a6ca6f1979789661c3199c708e2fd1998bef61ae2",
+      "source_config_sha256": "c76a238d18a722e63c866c3525f5109ba7724702b69d0b95ea2502d5b5a23da3",
+      "config_sha256": "e9999388f515be814e6f478a2f85996125cf2e5ef8ea41262629873857981ffc",
+      "results_sha256": "c64d53f3dfc81fc5e775a4ecce0b7cb7131804a02534568adefb86620ab10d12",
+      "published_sha256": "6d5e4b9b15b08cb33118b17efd4a4d8516350a407c6f519da756c1cc7522e6a0",
+      "aa_final": 0.8871,
+      "baseline_aa_final": 0.8883,
+      "bwt": 0.7894,
+      "taskil_final": 0.989,
+      "overrides": [
+        "data_path",
+        "vector_npz",
+        "distill_weight",
+        "proto_lambda_a",
+        "feat_distill_weight",
+        "exp_name",
+        "results_dir",
+        "output_dir"
+      ],
+      "baseline_source": "same-host-3080-rerun",
+      "baseline_results_sha256": "cf90b53637e6a54a4ebffaea90b10b8fdd8d45a4f2e762e5f6cb0470bdd66afc",
+      "baseline_published_sha256": "3159c8ca9cd59e1fe3bdeb6f06d9e7757287032f90a120eb13552c0c50ddc798",
+      "baseline_config_sha256": "c033f3bc186177c59e50b9c9610fc871091b99b5072dccd51a47c51099f725af",
+      "baseline_bwt": 0.7985
+    },
+    {
+      "dataset": "isolet",
+      "seed": 44,
+      "source_commit": "a575bbf446ae501cf8e580ba62c2cc5492a25f30",
+      "source_record_sha256": "19ff3f7937696059f4f8c5cd5526f08b1c24d198455a3b78df19e4b52def35ba",
+      "source_config_sha256": "f6fe2da241271029db29e69c45ae8b16cadaebb09af747a079f76dc7c1983fce",
+      "config_sha256": "b92ef753f5d477eab2cdabee675748900714350007341175c0ffef22ab298b79",
+      "results_sha256": "b3d9cf5170dcd476b0ad19d0b5a3864c15b1bb68ac2bdde5f19ab509b622e72f",
+      "published_sha256": "aa1f8a46bef8c40be5ab217519a14c084ac46c173629f4a04ebf626c09fded4f",
+      "aa_final": 0.8999,
+      "baseline_aa_final": 0.8948,
+      "bwt": 0.8013,
+      "taskil_final": 0.9923,
+      "overrides": [
+        "data_path",
+        "vector_npz",
+        "distill_weight",
+        "proto_lambda_a",
+        "feat_distill_weight",
+        "exp_name",
+        "results_dir",
+        "output_dir"
+      ],
+      "baseline_source": "same-host-3080-rerun",
+      "baseline_results_sha256": "da83e9247fd58d7f9e06e0334947bff5f44a8d5081db0ae57d0ed62ef60383ec",
+      "baseline_published_sha256": "b5bc12c0f86e304555f95d123a01303054693d71622a13d16b725cc73e57eb8a",
+      "baseline_config_sha256": "a71ec09febbc8f9d084cafeadf0b9760b90625f4fc000c307ca0c7cc8e5bd600",
+      "baseline_bwt": 0.7999
+    },
+    {
+      "dataset": "upmc",
+      "seed": 42,
+      "source_commit": "4de6fcd8874e5af9a813dc3e66a9d515bdb55b54",
+      "source_record_sha256": "746abc33283757384ade460963fb96866ce5815c2e059061d0291b916e3f0da2",
+      "source_config_sha256": "a1a2ee893845db4faa5109bfe0f6b14ca8cd6f00d35c343c50d88f4d9cee7f34",
+      "config_sha256": "11da5dca2bd49219cec051c6242783292844bee3c6cd37764437eb0866326f02",
+      "results_sha256": "1c520dba1cebc4685b29f5491a779474c3620725f086d21fb050309e9018de73",
+      "published_sha256": "220f2b000320338b21ab621756b187fda74cce9efe8e26511dd09c91033b7ada",
+      "aa_final": 0.8159,
+      "baseline_aa_final": 0.8162900000000001,
+      "bwt": 0.6531,
+      "taskil_final": 0.9317,
+      "overrides": [
+        "distill_weight",
+        "proto_lambda_a",
+        "feat_distill_weight",
+        "exp_name",
+        "results_dir",
+        "output_dir"
+      ],
+      "baseline_source": "archived-formal-record",
+      "baseline_bwt": 0.6738777777777778
+    },
+    {
+      "dataset": "upmc",
+      "seed": 43,
+      "source_commit": "4de6fcd8874e5af9a813dc3e66a9d515bdb55b54",
+      "source_record_sha256": "d3858adb7b2e2ae9a3dfd229ec4ebdb3aff93468ff641c3fc31a99aa13205827",
+      "source_config_sha256": "41a8755cfc9c326bdaaba57d19ef077e2e1bc4bb80bdac8e1dc741c4618fbde4",
+      "config_sha256": "a72c821d32344fd8847140531d1bfb8b9b1428d61d84ac816497b6f0e85ac3eb",
+      "results_sha256": "03ec519a582ac757580cc798567aeab16bef5feaa5d3d79aa6809d10fb01c810",
+      "published_sha256": "b94a6511c456fa1233ff05cf5addc93d4536c687ab2b1595fd7eed4e2a09056d",
+      "aa_final": 0.8185,
+      "baseline_aa_final": 0.8163199999999999,
+      "bwt": 0.6641,
+      "taskil_final": 0.9315,
+      "overrides": [
+        "distill_weight",
+        "proto_lambda_a",
+        "feat_distill_weight",
+        "exp_name",
+        "results_dir",
+        "output_dir"
+      ],
+      "baseline_source": "archived-formal-record",
+      "baseline_bwt": 0.6760333333333333
+    },
+    {
+      "dataset": "upmc",
+      "seed": 44,
+      "source_commit": "4de6fcd8874e5af9a813dc3e66a9d515bdb55b54",
+      "source_record_sha256": "491f7f1feff8b9bb4a5149838536e8974c758fdd959a23c2169a11f7a48251fe",
+      "source_config_sha256": "f0ba766fdcf108dc923cf55349567b26b1c67b91261f5a67d66ab7f2161d4a9b",
+      "config_sha256": "4d5779f29ba80ca55e071d064b8fa8caa981a63ab7502eb835cc5334fa49980a",
+      "results_sha256": "6602956f56006d8c4c8024a8ad4995c8146d957eb9d84bcda183068068e0c3be",
+      "published_sha256": "9ca69b3cca1bb6d5188f649354b65691dfe980020ffdc0dd647b738fdfda222e",
+      "aa_final": 0.8195,
+      "baseline_aa_final": 0.81273,
+      "bwt": 0.6606,
+      "taskil_final": 0.9326,
+      "overrides": [
+        "distill_weight",
+        "proto_lambda_a",
+        "feat_distill_weight",
+        "exp_name",
+        "results_dir",
+        "output_dir"
+      ],
+      "baseline_source": "archived-formal-record",
+      "baseline_bwt": 0.6711
+    },
+    {
+      "dataset": "cifar",
+      "seed": 42,
+      "source_commit": "7bfe6b1d724fb1206bc0053a9008126bad86332d",
+      "source_record_sha256": "aad02da1ba8e87f29e79f5702e71fe8e99c8ef4cdf554976cc1b881af6dc0871",
+      "source_config_sha256": "5ef9984e091b83d7f84ac373cd702811c0ed15595dc6f4075ca23cc515535955",
+      "config_sha256": "e904d7d3151c8170f231064647e8aedfebc0bc8693715d4b470a16780e54e2f3",
+      "results_sha256": "f23897a0b273fc1c4af5dcb4d7a2788099b4c774143f1bd8320fe5ab5c530623",
+      "published_sha256": "6d3610c336c7b6160f87934c722f7b470840d9923606dc767e831bc4babd0437",
+      "aa_final": 0.3635,
+      "baseline_aa_final": 0.3493,
+      "bwt": -0.3517,
+      "taskil_final": 0.7506,
+      "overrides": [
+        "distill_weight",
+        "proto_lambda_a",
+        "feat_distill_weight",
+        "exp_name",
+        "results_dir",
+        "output_dir"
+      ],
+      "baseline_source": "archived-formal-record",
+      "baseline_bwt": -0.31055555555555553
+    },
+    {
+      "dataset": "cifar",
+      "seed": 43,
+      "source_commit": "7bfe6b1d724fb1206bc0053a9008126bad86332d",
+      "source_record_sha256": "e7f518330dad3442120d17e0ac078ad732f42978bd6c1028bafa7bbc647f9848",
+      "source_config_sha256": "2871ddd8d41d9d2ec31d95083532358399eb79cc13e456607aa3f03a61ab3faf",
+      "config_sha256": "b2719a1a21fdeb830dfebf5ab0d302b16b9ccd93699ff545c6b15c21ff6439d8",
+      "results_sha256": "f0dbfe450a41f24362cde6e420ac834a48cae8d2e7d59e28a79858bb02bd92bd",
+      "published_sha256": "75422dbcd1d297b096cf55e0993ada9aeb665a394df3079c7faf19164c9c0035",
+      "aa_final": 0.3652,
+      "baseline_aa_final": 0.35019999999999996,
+      "bwt": -0.3522,
+      "taskil_final": 0.7561,
+      "overrides": [
+        "distill_weight",
+        "proto_lambda_a",
+        "feat_distill_weight",
+        "exp_name",
+        "results_dir",
+        "output_dir"
+      ],
+      "baseline_source": "archived-formal-record",
+      "baseline_bwt": -0.3128888888888889
+    },
+    {
+      "dataset": "cifar",
+      "seed": 44,
+      "source_commit": "7bfe6b1d724fb1206bc0053a9008126bad86332d",
+      "source_record_sha256": "edccfa72339d7512f20397fb55ba1004905babe4787d2d52481d1fc7b3c12a29",
+      "source_config_sha256": "f504f1d636416bb1e53b6eb3a5f2aef6022528d3dccb13d886bc1d47c02cc5d1",
+      "config_sha256": "d003f3ecf50230225b9f3167e41bec6445bea1946138f12154af8885d1e0b323",
+      "results_sha256": "d681d1f54ecd45a6632eb7d349a66fd129577ae30c2ee491aeca83d641908e6a",
+      "published_sha256": "5d055a435efa9fd39555c98d99c8ded65be4cba1418368e96ff9ff84022914ef",
+      "aa_final": 0.3632,
+      "baseline_aa_final": 0.3509,
+      "bwt": -0.3599,
+      "taskil_final": 0.7572,
+      "overrides": [
+        "distill_weight",
+        "proto_lambda_a",
+        "feat_distill_weight",
+        "exp_name",
+        "results_dir",
+        "output_dir"
+      ],
+      "baseline_source": "archived-formal-record",
+      "baseline_bwt": -0.3142222222222222
+    }
+  ],
+  "summary": [
+    {
+      "dataset": "isolet",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "baseline_mean": 0.8883333333333333,
+      "baseline_sample_std": 0.006450064599159724,
+      "selected_mean": 0.8909333333333334,
+      "selected_sample_std": 0.00779251777882691,
+      "mean_delta": 0.0026000000000000467,
+      "all_selected_positive": false
+    },
+    {
+      "dataset": "upmc",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "baseline_mean": 0.8151133333333332,
+      "baseline_sample_std": 0.00206408171672864,
+      "selected_mean": 0.8179666666666666,
+      "selected_sample_std": 0.0018583146486355403,
+      "mean_delta": 0.0028533333333333744,
+      "all_selected_positive": false
+    },
+    {
+      "dataset": "cifar",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "baseline_mean": 0.35013333333333335,
+      "baseline_sample_std": 0.000802080627701058,
+      "selected_mean": 0.3639666666666667,
+      "selected_sample_std": 0.001078579312490904,
+      "mean_delta": 0.013833333333333364,
+      "all_selected_positive": true
+    }
+  ],
+  "isolet_comparison": "paired same-host 3080 baseline reruns; original formal ISOLET baseline was on 4090",
+  "other_comparison": "archived formal baseline on same host and source commit as selected runs"
+}
