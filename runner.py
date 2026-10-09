@@ -1967,9 +1967,11 @@ def _prepare_adaptive_provenance(
             checkpoint_dir, args, trainer, cl_method, task_mgr,
             tracker, bic_calibrator,
         )
+    capacity = int(getattr(args, 'head_consolidation_samples_per_class', 20))
+    if capacity == 20:
+        return prepare_adaptive_run_provenance(args.output_dir)
     return prepare_adaptive_run_provenance(
-        args.output_dir,
-        samples_per_class=int(getattr(args, 'head_consolidation_samples_per_class', 20)),
+        args.output_dir, samples_per_class=capacity,
     )
 
 

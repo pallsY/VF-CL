@@ -4,6 +4,9 @@ from copy import deepcopy
 from data_utils import split_features
 from determinism import derive_seed
 from adaptive_head_consolidation import (
+    ADAPTIVE_METHOD_VERSION,
+    BIAS_BRANCH_CONFIG,
+    FULL_BRANCH_CONFIG,
     AdaptiveConsolidationResult,
     adaptive_candidate_configs,
     adaptive_version_for_capacity,

@@ -17,6 +17,9 @@ from collections.abc import Mapping
 import torch
 
 from adaptive_head_consolidation import (
+    ADAPTIVE_METHOD_VERSION,
+    BIAS_BRANCH_CONFIG,
+    FULL_BRANCH_CONFIG,
     AdaptiveConsolidationResult,
     FrozenAdaptiveCandidates,
     adaptive_candidate_configs,
@@ -1209,6 +1212,8 @@ def audit_adaptive_checkpoint(run_dir, expected_spec):
         bias_head_sha256=actual_hashes['bias'],
         full_audit={}, bias_audit={},
         ordered_classes=tuple(result['ordered_classes']),
+        samples_per_class=capacity,
+        method_version=expected_spec['source_version'],
     )
     full_p, bias_p = adaptive_candidate_log_probabilities(
         pre, candidates, validation_x
