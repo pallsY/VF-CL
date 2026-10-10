@@ -35,7 +35,8 @@
 
 ### Task 3: Verify and report
 
-- [ ] For each run, require `exit.code=0`, `results.json`, `FORMAL_EVALUATION_PUBLISHED.json`, final checkpoint and a v2 `ADAPTIVE_STATE_FROZEN.json`; verify bound hashes and no test access before state freeze.
+- [ ] For each run, require `exit.code=0`, `results.json`, `FORMAL_EVALUATION_PUBLISHED.json`, `FORMAL_STATE_FROZEN.json` and `checkpoints/formal_final.pt`; verify bound hashes and no test access before state freeze. The formal deferred path produces `FORMAL_STATE_FROZEN.json`; the separate training-only smoke produced `ADAPTIVE_STATE_FROZEN.json`.
+- [ ] Read the final checkpoint with the restricted loader and verify its saved Adaptive result, top and method versions are 2, and its persistent raw and re-encoded replay contain exactly 40 examples for every retained class.
 - [ ] Verify the actual source commit, selected tuple, capacity/version and dataset identity for each run.
 - [ ] Report per-seed `AA_final`, mean ± sample standard deviation, and paired differences against the same-seed selected 20/class runs on the same host. Include BWT and resource/memory costs so the larger replay budget is explicit.
 - [ ] Save a machine-readable ledger and human-readable report on `codex/isolet-hparam-sweep`, then push GitHub.
