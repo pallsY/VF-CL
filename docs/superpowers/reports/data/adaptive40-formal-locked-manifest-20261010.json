@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "code_commit": "2d441589d96b55d8cb6b9511f4a227abf52bb8ec",
+  "loss_tuple": {
+    "proto_lambda_a": 0.05,
+    "distill_weight": 0.1,
+    "feat_distill_weight": 0.02
+  },
+  "adaptive_capacity_per_class": 40,
+  "adaptive_method_version": 2,
+  "data_sha256": {
+    "isolet": {
+      "isolet_vfl.npz": "d34312670de93198afcd2b126c95b79bae2b4cffeb30d480f097faf046b69514"
+    },
+    "cifar": {
+      "train": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b",
+      "test": "4b67687d9933c4db8f0831104447f15b93774f4f464bd0516f0f0f2ac83b7864",
+      "meta": "a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9"
+    },
+    "upmc": {
+      "upmc_food101_vfl.npz": "dea0569f0d4195eaaecc9cab3a6cce533f07b8d88472e7dbca5113152a314339"
+    }
+  },
+  "allowed_changes_from_selected_20": [
+    "head_consolidation_samples_per_class",
+    "results_dir",
+    "output_dir",
+    "exp_name"
+  ],
+  "runs": [
+    {
+      "run": "isolet_seed42",
+      "host": "vf-cl-3080",
+      "physical_gpu": 1,
+      "source_config_sha256": "9a43d942f37025761ab4da33bdcdfa320906ec9ebcb3ed78a8fdfbb5fd57a5ac",
+      "locked_config_sha256": "d9433ee35b166358f49445df40e40dbd48db9061eb29f97b5f69e41a64925031",
+      "selected_comparator": "/home/c3080/YangXiaoXiang/VF-CL/results/three-dataset-selected-hparam-20261009-v1/isolet_seed42"
+    },
+    {
+      "run": "isolet_seed43",
+      "host": "vf-cl-3080",
+      "physical_gpu": 1,
+      "source_config_sha256": "e9999388f515be814e6f478a2f85996125cf2e5ef8ea41262629873857981ffc",
+      "locked_config_sha256": "071b6c581bfb9781d049834328297aa14ce6674516a6d050d39b1f7edc398eab",
+      "selected_comparator": "/home/c3080/YangXiaoXiang/VF-CL/results/three-dataset-selected-hparam-20261009-v1/isolet_seed43"
+    },
+    {
+      "run": "isolet_seed44",
+      "host": "vf-cl-3080",
+      "physical_gpu": 1,
+      "source_config_sha256": "b92ef753f5d477eab2cdabee675748900714350007341175c0ffef22ab298b79",
+      "locked_config_sha256": "7e937b937d1a461c7343624eee4e5674b310621725ee0973e6985390fc2e7b32",
+      "selected_comparator": "/home/c3080/YangXiaoXiang/VF-CL/results/three-dataset-selected-hparam-20261009-v1/isolet_seed44"
+    },
+    {
+      "run": "cifar_seed42",
+      "host": "vf-cl-3080",
+      "physical_gpu": 0,
+      "source_config_sha256": "e904d7d3151c8170f231064647e8aedfebc0bc8693715d4b470a16780e54e2f3",
+      "locked_config_sha256": "4a034f69c671d1e18112a55056d4d33aeee891c118d9663ad28a5a0b1699d58e",
+      "selected_comparator": "/home/c3080/YangXiaoXiang/VF-CL/results/three-dataset-selected-hparam-20261009-v1/cifar_seed42"
+    },
+    {
+      "run": "cifar_seed43",
+      "host": "vf-cl-3080",
+      "physical_gpu": 0,
+      "source_config_sha256": "b2719a1a21fdeb830dfebf5ab0d302b16b9ccd93699ff545c6b15c21ff6439d8",
+      "locked_config_sha256": "9069bcd768d2d68773b4ffa349268af6c5ae13f812a8f9db7bd172e106038598",
+      "selected_comparator": "/home/c3080/YangXiaoXiang/VF-CL/results/three-dataset-selected-hparam-20261009-v1/cifar_seed43"
+    },
+    {
+      "run": "cifar_seed44",
+      "host": "vf-cl-3080",
+      "physical_gpu": 0,
+      "source_config_sha256": "d003f3ecf50230225b9f3167e41bec6445bea1946138f12154af8885d1e0b323",
+      "locked_config_sha256": "d19a6fde343c6bf7afdf401af8c76671d13c22d1fdf82f1fa8d447b6b4f05561",
+      "selected_comparator": "/home/c3080/YangXiaoXiang/VF-CL/results/three-dataset-selected-hparam-20261009-v1/cifar_seed44"
+    },
+    {
+      "run": "upmc_seed42",
+      "host": "vf-cl-4090-1",
+      "physical_gpu": 0,
+      "source_config_sha256": "11da5dca2bd49219cec051c6242783292844bee3c6cd37764437eb0866326f02",
+      "locked_config_sha256": "ce39afb6a62ed0a15caebeda2aac26775fe33c8dbfcf176c60e79ab57d4700a0",
+      "selected_comparator": "/home/chase/Yangxx/VF-CL/results/three-dataset-selected-hparam-20261009-v1/upmc_seed42"
+    },
+    {
+      "run": "upmc_seed43",
+      "host": "vf-cl-4090-1",
+      "physical_gpu": 0,
+      "source_config_sha256": "a72c821d32344fd8847140531d1bfb8b9b1428d61d84ac816497b6f0e85ac3eb",
+      "locked_config_sha256": "6fd2d430a8f818d974c149fd2a2e3440822b87d9602768e32f0c06d6cea35e60",
+      "selected_comparator": "/home/chase/Yangxx/VF-CL/results/three-dataset-selected-hparam-20261009-v1/upmc_seed43"
+    },
+    {
+      "run": "upmc_seed44",
+      "host": "vf-cl-4090-1",
+      "physical_gpu": 0,
+      "source_config_sha256": "4d5779f29ba80ca55e071d064b8fa8caa981a63ab7502eb835cc5334fa49980a",
+      "locked_config_sha256": "bb7b0a10d8cb1f1aa9e7d8efa4481376d013d2bc1cf095d1f213e41110bbb87e",
+      "selected_comparator": "/home/chase/Yangxx/VF-CL/results/three-dataset-selected-hparam-20261009-v1/upmc_seed44"
+    }
+  ]
+}
