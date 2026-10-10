@@ -1,0 +1,368 @@
+{
+  "schema_version": 1,
+  "method": "adaptive_dual_branch",
+  "method_version": 2,
+  "capacity_per_class": 40,
+  "source_commit": "2d441589d96b55d8cb6b9511f4a227abf52bb8ec",
+  "locked_manifest_sha256": "94e08dee0b119ae31ba4876e98cb8b5a15eba93bb0f5583cf71bf41746903dc6",
+  "selected_loss_tuple": {
+    "proto_lambda_a": 0.05,
+    "distill_weight": 0.1,
+    "feat_distill_weight": 0.02
+  },
+  "data_sha256": {
+    "isolet": {
+      "isolet_vfl.npz": "d34312670de93198afcd2b126c95b79bae2b4cffeb30d480f097faf046b69514"
+    },
+    "cifar": {
+      "train": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b",
+      "test": "4b67687d9933c4db8f0831104447f15b93774f4f464bd0516f0f0f2ac83b7864",
+      "meta": "a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9"
+    },
+    "upmc": {
+      "upmc_food101_vfl.npz": "dea0569f0d4195eaaecc9cab3a6cce533f07b8d88472e7dbca5113152a314339"
+    }
+  },
+  "metric": "final-event class-incremental accuracy averaged across tasks",
+  "runs": [
+    {
+      "dataset": "isolet",
+      "seed": 42,
+      "host": "vf-cl-3080",
+      "physical_gpu": 1,
+      "source_config_sha256": "9a43d942f37025761ab4da33bdcdfa320906ec9ebcb3ed78a8fdfbb5fd57a5ac",
+      "locked_config_sha256": "d9433ee35b166358f49445df40e40dbd48db9061eb29f97b5f69e41a64925031",
+      "baseline": {
+        "physical_gpu": 1,
+        "result_sha256": "888ecbff33cfa22dd23ea22da74a4815ed6c814f2bea12d8b3eb4478d25fd59e",
+        "source_commit": "a575bbf446ae501cf8e580ba62c2cc5492a25f30",
+        "AA_final": 0.8858,
+        "BWT": 0.786,
+        "raw_replay_per_class": 20,
+        "raw_replay_bytes": 1283360,
+        "event_timing_seconds": 148.67
+      },
+      "adaptive40": {
+        "result_sha256": "1e2cb1fb9b548f7a591ccab5c4fc91d98044025c8fb152a25d9ec932e9c7c02d",
+        "published_sha256": "b93547bfebeb59474e8bef6a05e0f7f0df42a06962fcc9d6f360409243db45e0",
+        "checkpoint_sha256": "d5f4ea5bbfe39222f73418d001c2554d4369adf1813d5888b720d6c77eb737a2",
+        "freeze_sha256": "af770882792ef1711dad3fc3fc05c2cd782b9edae4fe981de27a481142483840",
+        "AA_final": 0.9166,
+        "BWT": 0.8158,
+        "raw_replay_per_class": 40,
+        "raw_replay_bytes": 2566720,
+        "event_timing_seconds": 142.55,
+        "observed_wall_seconds": 174
+      },
+      "paired_AA_final_change_pp": 3.08,
+      "paired_BWT_change_pp": 2.98
+    },
+    {
+      "dataset": "isolet",
+      "seed": 43,
+      "host": "vf-cl-3080",
+      "physical_gpu": 1,
+      "source_config_sha256": "e9999388f515be814e6f478a2f85996125cf2e5ef8ea41262629873857981ffc",
+      "locked_config_sha256": "071b6c581bfb9781d049834328297aa14ce6674516a6d050d39b1f7edc398eab",
+      "baseline": {
+        "physical_gpu": 0,
+        "result_sha256": "c64d53f3dfc81fc5e775a4ecce0b7cb7131804a02534568adefb86620ab10d12",
+        "source_commit": "a575bbf446ae501cf8e580ba62c2cc5492a25f30",
+        "AA_final": 0.8871,
+        "BWT": 0.7894,
+        "raw_replay_per_class": 20,
+        "raw_replay_bytes": 1283360,
+        "event_timing_seconds": 659.76
+      },
+      "adaptive40": {
+        "result_sha256": "460b84a3cf1a6e0cd6b1e29783c1b6bc3dae90cc4ef09f51b6b02357f21b74d8",
+        "published_sha256": "f9381b67c5768a02fd20b5328e98dfbe44a9d77d0f4919462de6d4ea0a746e3e",
+        "checkpoint_sha256": "aacc6479bc3cd87f4855996032b292462753a0b2043a030e2661a4f05b71b3e6",
+        "freeze_sha256": "3f0043eaf7efff4f4f1baa0f9c09d26be34ab9468cdac48c10f6ab5b2e9100b0",
+        "AA_final": 0.9108,
+        "BWT": 0.8145,
+        "raw_replay_per_class": 40,
+        "raw_replay_bytes": 2566720,
+        "event_timing_seconds": 156.29,
+        "observed_wall_seconds": 188
+      },
+      "paired_AA_final_change_pp": 2.37,
+      "paired_BWT_change_pp": 2.51
+    },
+    {
+      "dataset": "isolet",
+      "seed": 44,
+      "host": "vf-cl-3080",
+      "physical_gpu": 1,
+      "source_config_sha256": "b92ef753f5d477eab2cdabee675748900714350007341175c0ffef22ab298b79",
+      "locked_config_sha256": "7e937b937d1a461c7343624eee4e5674b310621725ee0973e6985390fc2e7b32",
+      "baseline": {
+        "physical_gpu": 1,
+        "result_sha256": "b3d9cf5170dcd476b0ad19d0b5a3864c15b1bb68ac2bdde5f19ab509b622e72f",
+        "source_commit": "a575bbf446ae501cf8e580ba62c2cc5492a25f30",
+        "AA_final": 0.8999,
+        "BWT": 0.8013,
+        "raw_replay_per_class": 20,
+        "raw_replay_bytes": 1283360,
+        "event_timing_seconds": 544.47
+      },
+      "adaptive40": {
+        "result_sha256": "35a7cfc5c2c4a541dd8e0b554c60765bb1603903be871146ed9f0d19da7f195f",
+        "published_sha256": "4c96743b4ad35ca8352020970a6f7e663a61e7a18ae9eb83427bb8f561069765",
+        "checkpoint_sha256": "6d24aaf458eae1d98833ba396bb4a2f7a343a5e25290cf5ee7d83cc800f298d6",
+        "freeze_sha256": "8fa8c562617958998325c6042feeeecff1bfbac9a6cb573efb7bd42421b05d0c",
+        "AA_final": 0.9153,
+        "BWT": 0.8166,
+        "raw_replay_per_class": 40,
+        "raw_replay_bytes": 2566720,
+        "event_timing_seconds": 159.14,
+        "observed_wall_seconds": 191
+      },
+      "paired_AA_final_change_pp": 1.54,
+      "paired_BWT_change_pp": 1.53
+    },
+    {
+      "dataset": "cifar",
+      "seed": 42,
+      "host": "vf-cl-3080",
+      "physical_gpu": 0,
+      "source_config_sha256": "e904d7d3151c8170f231064647e8aedfebc0bc8693715d4b470a16780e54e2f3",
+      "locked_config_sha256": "4a034f69c671d1e18112a55056d4d33aeee891c118d9663ad28a5a0b1699d58e",
+      "baseline": {
+        "physical_gpu": 1,
+        "result_sha256": "f23897a0b273fc1c4af5dcb4d7a2788099b4c774143f1bd8320fe5ab5c530623",
+        "source_commit": "7bfe6b1d724fb1206bc0053a9008126bad86332d",
+        "AA_final": 0.3635,
+        "BWT": -0.3517,
+        "raw_replay_per_class": 20,
+        "raw_replay_bytes": 24576000,
+        "event_timing_seconds": 13684.2
+      },
+      "adaptive40": {
+        "result_sha256": "041ae78d1f542304c6f2af666e047156be385df7ab8a9ec178cb3116e81259d3",
+        "published_sha256": "3cd3b79ce3cfaf90650f5b74308564d72d6b738a7e74eec0079883b2dabf7519",
+        "checkpoint_sha256": "8e822a3508c5067a176a2aa5e1f571b0f8b0f6cb7f49991352e44242cb46c673",
+        "freeze_sha256": "b9ffd4f87bfe2a73acef684e560efd6e927cd2477f2d85b5421a9891de173606",
+        "AA_final": 0.3783,
+        "BWT": -0.3388,
+        "raw_replay_per_class": 40,
+        "raw_replay_bytes": 49152000,
+        "event_timing_seconds": 9269.07,
+        "observed_wall_seconds": 12387
+      },
+      "paired_AA_final_change_pp": 1.48,
+      "paired_BWT_change_pp": 1.29
+    },
+    {
+      "dataset": "cifar",
+      "seed": 43,
+      "host": "vf-cl-3080",
+      "physical_gpu": 0,
+      "source_config_sha256": "b2719a1a21fdeb830dfebf5ab0d302b16b9ccd93699ff545c6b15c21ff6439d8",
+      "locked_config_sha256": "9069bcd768d2d68773b4ffa349268af6c5ae13f812a8f9db7bd172e106038598",
+      "baseline": {
+        "physical_gpu": 0,
+        "result_sha256": "f0dbfe450a41f24362cde6e420ac834a48cae8d2e7d59e28a79858bb02bd92bd",
+        "source_commit": "7bfe6b1d724fb1206bc0053a9008126bad86332d",
+        "AA_final": 0.3652,
+        "BWT": -0.3522,
+        "raw_replay_per_class": 20,
+        "raw_replay_bytes": 24576000,
+        "event_timing_seconds": 16419.57
+      },
+      "adaptive40": {
+        "result_sha256": "1741c65e75fc688c433a9e5d4d0a75519efd9900c8a5dac2f1a47ccaef7b5b54",
+        "published_sha256": "94ff18a8baa937478702541477430f9b7fb75f8ebd9c2ec5548801c8a2a34630",
+        "checkpoint_sha256": "c365f62ab45f54a44af658e3223f9085eb0b7eff77d6a0bf248478fe3a70b212",
+        "freeze_sha256": "d07955c61c99238b13a1a0d054e8a0fe594229f8bdac3eed0a6b6581d8e66fe0",
+        "AA_final": 0.3754,
+        "BWT": -0.3432,
+        "raw_replay_per_class": 40,
+        "raw_replay_bytes": 49152000,
+        "event_timing_seconds": 10603.3,
+        "observed_wall_seconds": 13778
+      },
+      "paired_AA_final_change_pp": 1.02,
+      "paired_BWT_change_pp": 0.9
+    },
+    {
+      "dataset": "cifar",
+      "seed": 44,
+      "host": "vf-cl-3080",
+      "physical_gpu": 0,
+      "source_config_sha256": "d003f3ecf50230225b9f3167e41bec6445bea1946138f12154af8885d1e0b323",
+      "locked_config_sha256": "d19a6fde343c6bf7afdf401af8c76671d13c22d1fdf82f1fa8d447b6b4f05561",
+      "baseline": {
+        "physical_gpu": 1,
+        "result_sha256": "d681d1f54ecd45a6632eb7d349a66fd129577ae30c2ee491aeca83d641908e6a",
+        "source_commit": "7bfe6b1d724fb1206bc0053a9008126bad86332d",
+        "AA_final": 0.3632,
+        "BWT": -0.3599,
+        "raw_replay_per_class": 20,
+        "raw_replay_bytes": 24576000,
+        "event_timing_seconds": 13430.47
+      },
+      "adaptive40": {
+        "result_sha256": "1b76bd1d82930b04f4c1ed3415a980156e00e8df02c2c6e465bdb0f805d3c788",
+        "published_sha256": "ca4cf5b4d11cbee6923354fdf30b56e8d8d13e1eeb199f59cf89219203d23456",
+        "checkpoint_sha256": "28f7f9d2d60417267356efc49ab70c1447225d4fe3f1dfbdc4a330e1f69a5d57",
+        "freeze_sha256": "de44add1b07ecfd9b8bfbca1db13bcaffc28b5c0499b665845af22396894e8e3",
+        "AA_final": 0.3776,
+        "BWT": -0.3451,
+        "raw_replay_per_class": 40,
+        "raw_replay_bytes": 49152000,
+        "event_timing_seconds": 9157.62,
+        "observed_wall_seconds": 12326
+      },
+      "paired_AA_final_change_pp": 1.44,
+      "paired_BWT_change_pp": 1.48
+    },
+    {
+      "dataset": "upmc",
+      "seed": 42,
+      "host": "vf-cl-4090-1",
+      "physical_gpu": 0,
+      "source_config_sha256": "11da5dca2bd49219cec051c6242783292844bee3c6cd37764437eb0866326f02",
+      "locked_config_sha256": "ce39afb6a62ed0a15caebeda2aac26775fe33c8dbfcf176c60e79ab57d4700a0",
+      "baseline": {
+        "physical_gpu": 0,
+        "result_sha256": "1c520dba1cebc4685b29f5491a779474c3620725f086d21fb050309e9018de73",
+        "source_commit": "4de6fcd8874e5af9a813dc3e66a9d515bdb55b54",
+        "AA_final": 0.8159,
+        "BWT": 0.6531,
+        "raw_replay_per_class": 20,
+        "raw_replay_bytes": 12410880,
+        "event_timing_seconds": 119.78
+      },
+      "adaptive40": {
+        "result_sha256": "596b35fe98156bea31686e9e4e7e6f9319475c40d1610423be1c77c8ce1ad655",
+        "published_sha256": "d7f5755dfb0b4c7beb0a790a213a6ada5f71c54525d3f66b2b1bd5ad180693fb",
+        "checkpoint_sha256": "b7236395c4ebf5a535605ee72904b967f5ffd2d28506bc894b2ba188b6beb04f",
+        "freeze_sha256": "902cd4def193b7205e1b8da56055a62bd319817c506e09975d3e6204cb779eab",
+        "AA_final": 0.8257,
+        "BWT": 0.6639,
+        "raw_replay_per_class": 40,
+        "raw_replay_bytes": 24821760,
+        "event_timing_seconds": 124.28,
+        "observed_wall_seconds": 148
+      },
+      "paired_AA_final_change_pp": 0.98,
+      "paired_BWT_change_pp": 1.08
+    },
+    {
+      "dataset": "upmc",
+      "seed": 43,
+      "host": "vf-cl-4090-1",
+      "physical_gpu": 0,
+      "source_config_sha256": "a72c821d32344fd8847140531d1bfb8b9b1428d61d84ac816497b6f0e85ac3eb",
+      "locked_config_sha256": "6fd2d430a8f818d974c149fd2a2e3440822b87d9602768e32f0c06d6cea35e60",
+      "baseline": {
+        "physical_gpu": 0,
+        "result_sha256": "03ec519a582ac757580cc798567aeab16bef5feaa5d3d79aa6809d10fb01c810",
+        "source_commit": "4de6fcd8874e5af9a813dc3e66a9d515bdb55b54",
+        "AA_final": 0.8185,
+        "BWT": 0.6641,
+        "raw_replay_per_class": 20,
+        "raw_replay_bytes": 12410880,
+        "event_timing_seconds": 120.51
+      },
+      "adaptive40": {
+        "result_sha256": "dc6684c2ba9ed41293443e602245108cb59ad6877e65df79a81bd3d51c6c99cf",
+        "published_sha256": "d242094cbbaa43aa3d8d41035ba414049ea833494b9ce8076431f3a438883cc6",
+        "checkpoint_sha256": "d4552428aa2477b1ac51ee2fa1516a2c61858a6ddd031e8c1695bf3e13e8c3b6",
+        "freeze_sha256": "9526ca667f0e2ef41cb0a9bdeecf7449c062753114558921ca7c6395c4b5d330",
+        "AA_final": 0.8275,
+        "BWT": 0.6733,
+        "raw_replay_per_class": 40,
+        "raw_replay_bytes": 24821760,
+        "event_timing_seconds": 122.92,
+        "observed_wall_seconds": 146
+      },
+      "paired_AA_final_change_pp": 0.9,
+      "paired_BWT_change_pp": 0.92
+    },
+    {
+      "dataset": "upmc",
+      "seed": 44,
+      "host": "vf-cl-4090-1",
+      "physical_gpu": 0,
+      "source_config_sha256": "4d5779f29ba80ca55e071d064b8fa8caa981a63ab7502eb835cc5334fa49980a",
+      "locked_config_sha256": "bb7b0a10d8cb1f1aa9e7d8efa4481376d013d2bc1cf095d1f213e41110bbb87e",
+      "baseline": {
+        "physical_gpu": 0,
+        "result_sha256": "6602956f56006d8c4c8024a8ad4995c8146d957eb9d84bcda183068068e0c3be",
+        "source_commit": "4de6fcd8874e5af9a813dc3e66a9d515bdb55b54",
+        "AA_final": 0.8195,
+        "BWT": 0.6606,
+        "raw_replay_per_class": 20,
+        "raw_replay_bytes": 12410880,
+        "event_timing_seconds": 121.13
+      },
+      "adaptive40": {
+        "result_sha256": "1eba28c008b2ac64bca9ae01e40e61f453234b950db88249e55b104d54657d56",
+        "published_sha256": "b58d977d67768944717bacc489006108c13e79c3ad77725f27cc9a6af5d30e0f",
+        "checkpoint_sha256": "6f1cd8d0073e06fb344d507eca4e6c4cd41c1121bea10c765ecfc03cddc5fe6a",
+        "freeze_sha256": "c5d7bfb3a3445429fef3912775b8211d75ea54bf35e16ca858aa859b28f9d460",
+        "AA_final": 0.8255,
+        "BWT": 0.6661,
+        "raw_replay_per_class": 40,
+        "raw_replay_bytes": 24821760,
+        "event_timing_seconds": 124.23,
+        "observed_wall_seconds": 147
+      },
+      "paired_AA_final_change_pp": 0.6,
+      "paired_BWT_change_pp": 0.55
+    }
+  ],
+  "summary": {
+    "isolet": {
+      "baseline_AA_final_mean_pct": 89.093333,
+      "baseline_AA_final_sample_sd_pp": 0.779252,
+      "adaptive40_AA_final_mean_pct": 91.423333,
+      "adaptive40_AA_final_sample_sd_pp": 0.304357,
+      "paired_AA_final_mean_change_pp": 2.33,
+      "paired_AA_final_sample_sd_pp": 0.770779,
+      "baseline_BWT_mean_pp": 79.223333,
+      "adaptive40_BWT_mean_pp": 81.563333,
+      "paired_BWT_mean_change_pp": 2.34,
+      "baseline_raw_replay_bytes": 1283360,
+      "adaptive40_raw_replay_bytes": 2566720,
+      "adaptive40_observed_wall_seconds_mean": 184.333333,
+      "baseline_event_timing_seconds_mean": 450.966667,
+      "adaptive40_event_timing_seconds_mean": 152.66
+    },
+    "upmc": {
+      "baseline_AA_final_mean_pct": 81.796667,
+      "baseline_AA_final_sample_sd_pp": 0.185831,
+      "adaptive40_AA_final_mean_pct": 82.623333,
+      "adaptive40_AA_final_sample_sd_pp": 0.110151,
+      "paired_AA_final_mean_change_pp": 0.826667,
+      "paired_AA_final_sample_sd_pp": 0.200333,
+      "baseline_BWT_mean_pp": 65.926667,
+      "adaptive40_BWT_mean_pp": 66.776667,
+      "paired_BWT_mean_change_pp": 0.85,
+      "baseline_raw_replay_bytes": 12410880,
+      "adaptive40_raw_replay_bytes": 24821760,
+      "adaptive40_observed_wall_seconds_mean": 147,
+      "baseline_event_timing_seconds_mean": 120.473333,
+      "adaptive40_event_timing_seconds_mean": 123.81
+    },
+    "cifar": {
+      "baseline_AA_final_mean_pct": 36.396667,
+      "baseline_AA_final_sample_sd_pp": 0.107858,
+      "adaptive40_AA_final_mean_pct": 37.71,
+      "adaptive40_AA_final_sample_sd_pp": 0.151327,
+      "paired_AA_final_mean_change_pp": 1.313333,
+      "paired_AA_final_sample_sd_pp": 0.25482,
+      "baseline_BWT_mean_pp": -35.46,
+      "adaptive40_BWT_mean_pp": -34.236667,
+      "paired_BWT_mean_change_pp": 1.223333,
+      "baseline_raw_replay_bytes": 24576000,
+      "adaptive40_raw_replay_bytes": 49152000,
+      "adaptive40_observed_wall_seconds_mean": 12830.333333,
+      "baseline_event_timing_seconds_mean": 14511.413333,
+      "adaptive40_event_timing_seconds_mean": 9676.663333
+    }
+  },
+  "interpretation_limit": "This is an observed capacity-40 versus capacity-20 comparison; memory-matched fixed Full/Bias controls are not included."
+}
