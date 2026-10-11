@@ -1,0 +1,350 @@
+{
+  "schema_version": 1,
+  "source_commit": "684f4447f36f9c0d993c5a7f2dcef47fee256d21",
+  "parent_adaptive40_manifest_sha256": "94e08dee0b119ae31ba4876e98cb8b5a15eba93bb0f5583cf71bf41746903dc6",
+  "loss_tuple": {
+    "proto_lambda_a": 0.05,
+    "distill_weight": 0.1,
+    "feat_distill_weight": 0.02
+  },
+  "capacity_per_class": 40,
+  "data_sha256": {
+    "isolet": {
+      "isolet_vfl.npz": "d34312670de93198afcd2b126c95b79bae2b4cffeb30d480f097faf046b69514"
+    },
+    "cifar": {
+      "train": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b",
+      "test": "4b67687d9933c4db8f0831104447f15b93774f4f464bd0516f0f0f2ac83b7864",
+      "meta": "a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9"
+    },
+    "upmc": {
+      "upmc_food101_vfl.npz": "dea0569f0d4195eaaecc9cab3a6cce533f07b8d88472e7dbca5113152a314339"
+    }
+  },
+  "runs": [
+    {
+      "run": "full_isolet_seed42",
+      "dataset": "isolet",
+      "seed": 42,
+      "arm": "full",
+      "host": "vf-cl-3080",
+      "physical_gpu": 1,
+      "adaptive40_comparator": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive40-three-dataset-formal-20261010-v1/isolet_seed42",
+      "adaptive40_config_sha256": "d9433ee35b166358f49445df40e40dbd48db9061eb29f97b5f69e41a64925031",
+      "locked_config_sha256": "d9397e1b2292797d0db9370614050b6b7210ab7674de50a81df6ba8edfe896d6",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_mode",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "bias_isolet_seed42",
+      "dataset": "isolet",
+      "seed": 42,
+      "arm": "bias",
+      "host": "vf-cl-3080",
+      "physical_gpu": 1,
+      "adaptive40_comparator": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive40-three-dataset-formal-20261010-v1/isolet_seed42",
+      "adaptive40_config_sha256": "d9433ee35b166358f49445df40e40dbd48db9061eb29f97b5f69e41a64925031",
+      "locked_config_sha256": "e634cea1eee8babbca54026fd3e945e5288f26b7f4b697dc6b12e746b5ffb82c",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_lr",
+        "head_consolidation_mode",
+        "head_consolidation_steps",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "full_isolet_seed43",
+      "dataset": "isolet",
+      "seed": 43,
+      "arm": "full",
+      "host": "vf-cl-3080",
+      "physical_gpu": 1,
+      "adaptive40_comparator": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive40-three-dataset-formal-20261010-v1/isolet_seed43",
+      "adaptive40_config_sha256": "071b6c581bfb9781d049834328297aa14ce6674516a6d050d39b1f7edc398eab",
+      "locked_config_sha256": "886754581569f325b011bb9ef22050c535cf8b50ae18957dbeb8e750ff2e0fbe",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_mode",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "bias_isolet_seed43",
+      "dataset": "isolet",
+      "seed": 43,
+      "arm": "bias",
+      "host": "vf-cl-3080",
+      "physical_gpu": 1,
+      "adaptive40_comparator": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive40-three-dataset-formal-20261010-v1/isolet_seed43",
+      "adaptive40_config_sha256": "071b6c581bfb9781d049834328297aa14ce6674516a6d050d39b1f7edc398eab",
+      "locked_config_sha256": "eea5af3d1e8a9535d7d8509e6794acc06cecd4acb8db5965355ab7e30db83517",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_lr",
+        "head_consolidation_mode",
+        "head_consolidation_steps",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "full_isolet_seed44",
+      "dataset": "isolet",
+      "seed": 44,
+      "arm": "full",
+      "host": "vf-cl-3080",
+      "physical_gpu": 1,
+      "adaptive40_comparator": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive40-three-dataset-formal-20261010-v1/isolet_seed44",
+      "adaptive40_config_sha256": "7e937b937d1a461c7343624eee4e5674b310621725ee0973e6985390fc2e7b32",
+      "locked_config_sha256": "a463fb6afc2c7a34aa2ed177f639aebca533f76c8c94da9f41ee81822bf39cb3",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_mode",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "bias_isolet_seed44",
+      "dataset": "isolet",
+      "seed": 44,
+      "arm": "bias",
+      "host": "vf-cl-3080",
+      "physical_gpu": 1,
+      "adaptive40_comparator": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive40-three-dataset-formal-20261010-v1/isolet_seed44",
+      "adaptive40_config_sha256": "7e937b937d1a461c7343624eee4e5674b310621725ee0973e6985390fc2e7b32",
+      "locked_config_sha256": "d1ce4fc392af8c355f7438efb71eb56c56085a3513420d92a7d5387f1dc1dade",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_lr",
+        "head_consolidation_mode",
+        "head_consolidation_steps",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "full_upmc_seed42",
+      "dataset": "upmc",
+      "seed": 42,
+      "arm": "full",
+      "host": "vf-cl-4090-1",
+      "physical_gpu": 0,
+      "adaptive40_comparator": "/home/chase/Yangxx/VF-CL/results/adaptive40-three-dataset-formal-20261010-v1/upmc_seed42",
+      "adaptive40_config_sha256": "ce39afb6a62ed0a15caebeda2aac26775fe33c8dbfcf176c60e79ab57d4700a0",
+      "locked_config_sha256": "b2ebc6af7927bab72d79020c460cb40387dc9f4265bcb7b46b08231379aea063",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_mode",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "bias_upmc_seed42",
+      "dataset": "upmc",
+      "seed": 42,
+      "arm": "bias",
+      "host": "vf-cl-4090-1",
+      "physical_gpu": 0,
+      "adaptive40_comparator": "/home/chase/Yangxx/VF-CL/results/adaptive40-three-dataset-formal-20261010-v1/upmc_seed42",
+      "adaptive40_config_sha256": "ce39afb6a62ed0a15caebeda2aac26775fe33c8dbfcf176c60e79ab57d4700a0",
+      "locked_config_sha256": "941ce33980889ab9031c6163de56f8629a3d3f5fb5df8aa91252d8c731a73de2",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_lr",
+        "head_consolidation_mode",
+        "head_consolidation_steps",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "full_upmc_seed43",
+      "dataset": "upmc",
+      "seed": 43,
+      "arm": "full",
+      "host": "vf-cl-4090-1",
+      "physical_gpu": 0,
+      "adaptive40_comparator": "/home/chase/Yangxx/VF-CL/results/adaptive40-three-dataset-formal-20261010-v1/upmc_seed43",
+      "adaptive40_config_sha256": "6fd2d430a8f818d974c149fd2a2e3440822b87d9602768e32f0c06d6cea35e60",
+      "locked_config_sha256": "e8dcc3487dd12e05ebdbf1ba9fcc19b5c5f9302c91ddc2c050b96337b1b00a15",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_mode",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "bias_upmc_seed43",
+      "dataset": "upmc",
+      "seed": 43,
+      "arm": "bias",
+      "host": "vf-cl-4090-1",
+      "physical_gpu": 0,
+      "adaptive40_comparator": "/home/chase/Yangxx/VF-CL/results/adaptive40-three-dataset-formal-20261010-v1/upmc_seed43",
+      "adaptive40_config_sha256": "6fd2d430a8f818d974c149fd2a2e3440822b87d9602768e32f0c06d6cea35e60",
+      "locked_config_sha256": "2df459f7c17e085c43502c34427991436bd03d265e42359374a330f8b98a0be8",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_lr",
+        "head_consolidation_mode",
+        "head_consolidation_steps",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "full_upmc_seed44",
+      "dataset": "upmc",
+      "seed": 44,
+      "arm": "full",
+      "host": "vf-cl-4090-1",
+      "physical_gpu": 0,
+      "adaptive40_comparator": "/home/chase/Yangxx/VF-CL/results/adaptive40-three-dataset-formal-20261010-v1/upmc_seed44",
+      "adaptive40_config_sha256": "bb7b0a10d8cb1f1aa9e7d8efa4481376d013d2bc1cf095d1f213e41110bbb87e",
+      "locked_config_sha256": "24c15c10db1232cafb0e1e3c75e5e8f8ba7090c4a17c467e8a5e9380d6ad4377",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_mode",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "bias_upmc_seed44",
+      "dataset": "upmc",
+      "seed": 44,
+      "arm": "bias",
+      "host": "vf-cl-4090-1",
+      "physical_gpu": 0,
+      "adaptive40_comparator": "/home/chase/Yangxx/VF-CL/results/adaptive40-three-dataset-formal-20261010-v1/upmc_seed44",
+      "adaptive40_config_sha256": "bb7b0a10d8cb1f1aa9e7d8efa4481376d013d2bc1cf095d1f213e41110bbb87e",
+      "locked_config_sha256": "44f947f672e87a5de2697c155b98a82ab5c3039c5998ff3d9995616b83c96339",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_lr",
+        "head_consolidation_mode",
+        "head_consolidation_steps",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "full_cifar_seed42",
+      "dataset": "cifar",
+      "seed": 42,
+      "arm": "full",
+      "host": "vf-cl-3080",
+      "physical_gpu": 0,
+      "adaptive40_comparator": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive40-three-dataset-formal-20261010-v1/cifar_seed42",
+      "adaptive40_config_sha256": "4a034f69c671d1e18112a55056d4d33aeee891c118d9663ad28a5a0b1699d58e",
+      "locked_config_sha256": "4a0218857b931f60fc8a7acb256a8b99396e651a6b114dd03b0fcccb25b07202",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_mode",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "bias_cifar_seed42",
+      "dataset": "cifar",
+      "seed": 42,
+      "arm": "bias",
+      "host": "vf-cl-3080",
+      "physical_gpu": 0,
+      "adaptive40_comparator": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive40-three-dataset-formal-20261010-v1/cifar_seed42",
+      "adaptive40_config_sha256": "4a034f69c671d1e18112a55056d4d33aeee891c118d9663ad28a5a0b1699d58e",
+      "locked_config_sha256": "595db7ae8efd4db67b17e5228e9c93993a94547f49c84914a8e5d36f85fab757",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_lr",
+        "head_consolidation_mode",
+        "head_consolidation_steps",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "full_cifar_seed43",
+      "dataset": "cifar",
+      "seed": 43,
+      "arm": "full",
+      "host": "vf-cl-3080",
+      "physical_gpu": 0,
+      "adaptive40_comparator": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive40-three-dataset-formal-20261010-v1/cifar_seed43",
+      "adaptive40_config_sha256": "9069bcd768d2d68773b4ffa349268af6c5ae13f812a8f9db7bd172e106038598",
+      "locked_config_sha256": "aa1cb3ff9876894c9552b2346ca5117f9dccb7f87c2b4909b5e5648b44400d44",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_mode",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "bias_cifar_seed43",
+      "dataset": "cifar",
+      "seed": 43,
+      "arm": "bias",
+      "host": "vf-cl-3080",
+      "physical_gpu": 0,
+      "adaptive40_comparator": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive40-three-dataset-formal-20261010-v1/cifar_seed43",
+      "adaptive40_config_sha256": "9069bcd768d2d68773b4ffa349268af6c5ae13f812a8f9db7bd172e106038598",
+      "locked_config_sha256": "6761232e8beac8b8d6190dc0cccfbe0a1f29526106f73b466eee3675e78913b6",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_lr",
+        "head_consolidation_mode",
+        "head_consolidation_steps",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "full_cifar_seed44",
+      "dataset": "cifar",
+      "seed": 44,
+      "arm": "full",
+      "host": "vf-cl-3080",
+      "physical_gpu": 0,
+      "adaptive40_comparator": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive40-three-dataset-formal-20261010-v1/cifar_seed44",
+      "adaptive40_config_sha256": "d19a6fde343c6bf7afdf401af8c76671d13c22d1fdf82f1fa8d447b6b4f05561",
+      "locked_config_sha256": "96225bcb48b0f0b8b60c17fa7a7dabab5e84bc568c39aba90d64017932b47533",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_mode",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "bias_cifar_seed44",
+      "dataset": "cifar",
+      "seed": 44,
+      "arm": "bias",
+      "host": "vf-cl-3080",
+      "physical_gpu": 0,
+      "adaptive40_comparator": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive40-three-dataset-formal-20261010-v1/cifar_seed44",
+      "adaptive40_config_sha256": "d19a6fde343c6bf7afdf401af8c76671d13c22d1fdf82f1fa8d447b6b4f05561",
+      "locked_config_sha256": "a1fcfd944012aef5317f2456fbc58d14f0ed1969afe7f49f4831c23cf7f817d9",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_lr",
+        "head_consolidation_mode",
+        "head_consolidation_steps",
+        "output_dir",
+        "results_dir"
+      ]
+    }
+  ]
+}
