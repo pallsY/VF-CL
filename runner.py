@@ -405,11 +405,16 @@ def _checkpoint_protocol(args):
             'head_consolidation_enabled', 'head_consolidation_mode',
         )
     }
-    if getattr(args, 'head_consolidation_mode', None) == 'adaptive_dual_branch':
+    mode = getattr(args, 'head_consolidation_mode', None)
+    if mode == 'adaptive_dual_branch':
         capacity = int(getattr(args, 'head_consolidation_samples_per_class', 20))
         adaptive_version_for_capacity(capacity)
         if capacity == 40:
             protocol['head_consolidation_samples_per_class'] = 40
+    elif (mode in ('full_classifier', 'task_class_bias')
+          and bool(getattr(args, 'head_consolidation_enabled', 0))
+          and int(getattr(args, 'head_consolidation_samples_per_class', 20)) == 40):
+        protocol['head_consolidation_samples_per_class'] = 40
     if getattr(args, 'formal_deferred_evaluation', False) is True:
         from adaptive_consolidation_audit import _formal_source_provenance
         provenance = _formal_source_provenance()
@@ -2256,7 +2261,7 @@ def _is_formal_internal_method(args):
         getattr(args, 'cl_method', None) == 'proto_evolve'
         and bool(getattr(args, 'head_consolidation_enabled', 0))
         and getattr(args, 'head_consolidation_mode', 'full_classifier')
-        != 'full_classifier'
+        == 'adaptive_dual_branch'
     )
 
 

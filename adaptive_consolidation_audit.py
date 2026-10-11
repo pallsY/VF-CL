@@ -2469,7 +2469,7 @@ def _formal_bic_fit_corpus(
     internal = (
         protocol.get('cl_method') == 'proto_evolve'
         and bool(protocol.get('head_consolidation_enabled'))
-        and protocol.get('head_consolidation_mode') != 'full_classifier'
+        and protocol.get('head_consolidation_mode') == 'adaptive_dual_branch'
     )
     split = 'validation' if internal else 'calibration'
     phase = ('final_validation_pre_install' if internal else
@@ -2497,7 +2497,7 @@ def _validate_formal_bic_fit_corpus(value, identity, cache_identity=None):
     internal = (
         protocol.get('cl_method') == 'proto_evolve'
         and bool(protocol.get('head_consolidation_enabled'))
-        and protocol.get('head_consolidation_mode') != 'full_classifier'
+        and protocol.get('head_consolidation_mode') == 'adaptive_dual_branch'
     )
     expected = (
         ('validation', 'final_validation_pre_install',
@@ -2630,7 +2630,7 @@ def evaluate_formal_deferred_trajectory(
             identity['protocol'].get('cl_method') == 'proto_evolve'
             and bool(identity['protocol'].get('head_consolidation_enabled'))
             and identity['protocol'].get('head_consolidation_mode')
-            != 'full_classifier'
+            == 'adaptive_dual_branch'
         )
         calibration_cache_identity = {
             'split': 'validation' if internal else 'calibration',
