@@ -21,12 +21,13 @@
 
 ### Task 1: Fix formal fixed-Bias installation and capacity identity
 
-**Files:** `runner.py`, `adaptive_consolidation_audit.py`, `test_fixed40_formal_controls.py`.
+**Files:** `runner.py`, `adaptive_consolidation_audit.py`, `data_utils.py`, `test_fixed40_formal_controls.py`.
 
 - [ ] Add a failing test showing a formal `task_class_bias` method fits exactly once in `after_task` and `_finalize_formal_internal_state` does not call it again. Use a tiny method spy and a dataset that raises on unexpected validation access.
 - [ ] Add a failing test showing enabled fixed Full/Bias capacity 40 appears in `_checkpoint_protocol`, while capacity 20 keeps the old protocol without that field.
+- [ ] Add a failing test showing fixed Full/Bias can reach the formal test authorization phase without a validation record when BiC is off, while Adaptive still requires its validation phase.
 - [ ] Run `python -m unittest -q test_fixed40_formal_controls`; confirm both failures are from the missing behavior.
-- [ ] Change `_is_formal_internal_method` to accept only `adaptive_dual_branch`. Change the matching internal-method checks in `adaptive_consolidation_audit.py` from “not Full” to exactly Adaptive. Extend `_checkpoint_protocol` to record capacity 40 for enabled fixed Full/Bias modes; keep 20 omitted.
+- [ ] Change `_is_formal_internal_method` to accept only `adaptive_dual_branch`. Change the matching internal-method checks in `adaptive_consolidation_audit.py` and the formal validation requirement in `data_utils.py` from “any enabled/non-Full head” to exactly Adaptive. Extend `_checkpoint_protocol` to record capacity 40 for enabled fixed Full/Bias modes; keep 20 omitted.
 - [ ] Run the focused tests, existing Adaptive 20/40 tests and formal deferred audit tests on Linux; verify no v1 or Adaptive40 regression.
 
 ### Task 2: Exercise real 40/class fixed heads without formal test access
@@ -34,7 +35,7 @@
 **Files:** one new training-only launcher outside the source worktree; save run identities and audit evidence in a new results root.
 
 - [ ] Create a clean isolated source worktree on each host at the reviewed control commit and verify the dataset hashes and locked loss tuple.
-- [ ] Run one ISOLET smoke per fixed mode, stopping before formal test access. Require 13 task checkpoints, exactly 40 persistent raw examples/class, exactly one final fit, matching fit sample count and no `results.json` or test-loader record.
+- [ ] Run one ISOLET smoke per fixed mode, checking the formal test-phase transition and then stopping before authorization or iteration. Require 13 task checkpoints, exactly 40 persistent raw examples/class, exactly one final fit, matching fit sample count and no `results.json` or test-loader record.
 - [ ] Compare fixed branch fit settings and the pre-fit model identity with Adaptive40 where the saved evidence permits. Fix a real failure before any formal launch; do not alter source/config after formal results begin.
 
 ### Task 3: Lock and launch 18 formal jobs

@@ -65,6 +65,22 @@ class Fixed40FormalControlTests(unittest.TestCase):
         )
         self.assertTrue(runner._is_formal_internal_method(args))
 
+    def test_fixed_heads_need_no_validation_phase_before_formal_test(self):
+        dataset = runner.VFLDataset.__new__(runner.VFLDataset)
+        for mode in ('full_classifier', 'task_class_bias'):
+            with self.subTest(mode=mode):
+                dataset.args = SimpleNamespace(
+                    head_consolidation_enabled=1,
+                    head_consolidation_mode=mode,
+                    bic_enabled=0,
+                )
+                dataset._validate_formal_phase_transition(
+                    {'split': 'test'}, [],
+                )
+        dataset.args.head_consolidation_mode = 'adaptive_dual_branch'
+        with self.assertRaisesRegex(ValueError, 'ordered validation'):
+            dataset._validate_formal_phase_transition({'split': 'test'}, [])
+
 
 if __name__ == '__main__':
     unittest.main()
