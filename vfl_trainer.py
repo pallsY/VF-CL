@@ -1,5 +1,5 @@
 """Core VFL trainer supporting N parties with sum/concat aggregation."""
-import json, os, torch, torch.nn as nn, torch.nn.functional as F, time
+import json, math, os, torch, torch.nn as nn, torch.nn.functional as F, time
 from copy import deepcopy
 from data_utils import split_features
 from determinism import tensor_sha256
@@ -54,7 +54,8 @@ class VFLTrainer:
         opt_t = build(self.top_model.parameters(), lr)
         return opts_b, opt_t
 
-    def train_epoch(self, train_loader, optimizers, extra_loss_fn=None):
+    def train_epoch(self, train_loader, optimizers, extra_loss_fn=None,
+                    grad_clip_norm=None):
         opts_b, opt_t = optimizers
         for b in self.bottoms: b.train()
         self.top_model.train()
@@ -119,6 +120,9 @@ class VFLTrainer:
             if ocw > 0:
                 loss = loss + ocw * self._ownership_concentration_penalty(embeddings, batch_y)
 
+            if grad_clip_norm is not None and not torch.isfinite(loss).item():
+                raise FloatingPointError('non-finite clipped training loss')
+
             # retain_graph when the concentration penalty is on: it backprops through
             # `embeddings`, which the split-protocol `agg.backward(grad_agg)` below also
             # traverses; without retaining, that shared subgraph is freed first.
@@ -126,7 +130,8 @@ class VFLTrainer:
             transform_top = getattr(self, 'gradient_transform_top', None)
             if transform_top is not None:
                 transform_top([self.top_model])
-            opt_t.step()
+            if grad_clip_norm is None:
+                opt_t.step()
 
             # Backward to bottom models via split protocol
             # Check if any bottom param requires grad (FIM may freeze all)
@@ -143,8 +148,24 @@ class VFLTrainer:
                     transform_bottom(self.bottoms)
                 # Replacement losses may backprop directly through bottoms
                 # without touching agg_detached. Apply those gradients too.
+                if grad_clip_norm is not None:
+                    parameters = [
+                        parameter
+                        for module in (*self.bottoms, self.top_model)
+                        for parameter in module.parameters()
+                        if parameter.grad is not None
+                    ]
+                    torch.nn.utils.clip_grad_norm_(
+                        parameters, grad_clip_norm, error_if_nonfinite=True)
+                    opt_t.step()
                 for opt in opts_b: opt.step()
                 for opt in opts_b: opt.zero_grad()  # clean up after step
+            elif grad_clip_norm is not None:
+                torch.nn.utils.clip_grad_norm_(
+                    [parameter for parameter in self.top_model.parameters()
+                     if parameter.grad is not None],
+                    grad_clip_norm, error_if_nonfinite=True)
+                opt_t.step()
 
             total_loss += loss.item() * batch_y.size(0)
             correct += (output.argmax(1) == batch_y).sum().item()
@@ -180,12 +201,20 @@ class VFLTrainer:
         with open(path, 'a', encoding='utf-8') as handle:
             handle.write(json.dumps(record, sort_keys=True) + '\n')
 
-    def train_task(self, train_loader, epochs, extra_loss_fn=None, lr=None):
+    def train_task(self, train_loader, epochs, extra_loss_fn=None, lr=None,
+                   grad_clip_norm=None):
+        if (grad_clip_norm is not None
+                and (type(grad_clip_norm) not in (int, float)
+                     or isinstance(grad_clip_norm, bool)
+                     or not math.isfinite(grad_clip_norm)
+                     or grad_clip_norm <= 0)):
+            raise ValueError('gradient clip norm must be a positive finite number')
         optimizers = self._create_optimizers(lr)
         start = time.time()
         history = []
         for ep in range(epochs):
-            loss, acc = self.train_epoch(train_loader, optimizers, extra_loss_fn)
+            loss, acc = self.train_epoch(
+                train_loader, optimizers, extra_loss_fn, grad_clip_norm)
             history.append({'epoch':ep, 'loss':loss, 'acc':acc})
         return history, time.time()-start
 
