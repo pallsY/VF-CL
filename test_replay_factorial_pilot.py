@@ -58,6 +58,14 @@ class ReplayFactorialPilotTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'dataset'):
                 derive_config(source, Path(folder), "isolet", 54, "P1R1")
 
+    def test_linux_result_root_stays_linux_when_configured_on_windows(self):
+        config = derive_config(
+            self.source(), "/home/runner/results/replay-factorial", 
+            "isolet", 54, "P1R1")
+        self.assertEqual(
+            config["output_dir"],
+            "/home/runner/results/replay-factorial/isolet_seed54_P1R1")
+
     def test_holdout_excludes_gate_and_calibration(self):
         labels = [0] * 100 + [1] * 100
         excluded = set(range(10)) | set(range(100, 110))

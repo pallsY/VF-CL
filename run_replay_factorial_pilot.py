@@ -3,7 +3,7 @@
 import argparse
 import hashlib
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from types import SimpleNamespace
 
 import torch
@@ -50,7 +50,8 @@ def derive_config(source, root, dataset, seed, arm):
             or source.get('party_drift_telemetry', 0)):
         raise ValueError('pilot source or arm differs from locked design')
     p, r, mode = ARMS[arm]
-    root = Path(root).resolve()
+    root = (PurePosixPath(root) if str(root).startswith('/')
+            else Path(root).resolve())
     name = f'{dataset}_seed{seed}_{arm}'
     return {
         **source,
