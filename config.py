@@ -201,7 +201,7 @@ def get_config():
     p.add_argument('--device', default='cuda:0')
     # CL
     p.add_argument('--cl_method', default='proto_evolve',
-                   choices=['finetune','proto_aug','proto_evolve','proto_fedspace','der_pp','er_ace','er','ewc','lwf','target','gpm','fedprotip_vfl','prl','afc','lwf_fim','lwf_wa','adagauss','proto_evolve_radapt'])
+                   choices=['finetune','proto_aug','proto_evolve','proto_fedspace','der_pp','er_ace','er','mir','icarl','balanced_contrast','lpr','hpcr','alsar','ocar','ewc','lwf','target','gpm','fedprotip_vfl','prl','afc','lwf_fim','lwf_wa','adagauss','proto_evolve_radapt'])
     p.add_argument('--formal_deferred_evaluation', type=int,
                    choices=(0, 1), default=0)
     # Redundancy-Adaptive (radapt) knobs ??used by proto_evolve_radapt CL +
@@ -351,6 +351,27 @@ def get_config():
                    help='Reservoir buffer size per class (standard iCaRL/Mammoth CIFAR-10 budget; '
                         'was 20, which starved replay and let middle tasks collapse)')
     p.add_argument('--er_batch', default=64, type=int, help='Buffer mini-batch size at replay step')
+    p.add_argument('--mir_candidates', default=128, type=int,
+                   help='Number of stored examples scored for MIR per replay step')
+    p.add_argument('--balanced_gamma', default=4.0, type=float)
+    p.add_argument('--balanced_temperature', default=0.1, type=float)
+    p.add_argument('--lpr_omega0', default=1.0, type=float)
+    p.add_argument('--lpr_beta', default=1.0, type=float)
+    p.add_argument('--lpr_interval', default=10, type=int)
+    p.add_argument('--lpr_reference_size', default=8, type=int)
+    p.add_argument('--lpr_max_rows', default=64, type=int)
+    p.add_argument('--hpcr_temperature', default=0.09, type=float)
+    p.add_argument('--hpcr_temp_max', default=1.8, type=float)
+    p.add_argument('--hpcr_temp_min', default=0.5625, type=float)
+    p.add_argument('--hpcr_pcd_alpha', default=0.1, type=float)
+    p.add_argument('--hpcr_scd_beta', default=0.5, type=float)
+    p.add_argument('--alsar_temperature', default=1.0, type=float)
+    p.add_argument('--alsar_decay', default=0.99, type=float)
+    p.add_argument('--alsar_fisher_rate', default=0.01, type=float)
+    p.add_argument('--alsar_gradient_rate', default=0.01, type=float)
+    p.add_argument('--ocar_ema', default=0.01, type=float)
+    p.add_argument('--ocar_delta_tau', default=1e-5, type=float)
+    p.add_argument('--ocar_max_rows', default=32, type=int)
     p.add_argument('--er_alpha', default=1.0, type=float,
                    help='Replay-loss up-weight: total = CE_new + alpha * CE_replay (alpha=1 is standard ER)')
     # ER-ACE baseline
