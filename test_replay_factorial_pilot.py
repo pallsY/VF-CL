@@ -60,7 +60,7 @@ class ReplayFactorialPilotTests(unittest.TestCase):
 
     def test_linux_result_root_stays_linux_when_configured_on_windows(self):
         config = derive_config(
-            self.source(), "/home/runner/results/replay-factorial", 
+            self.source(), "/home/runner/results/replay-factorial",
             "isolet", 54, "P1R1")
         self.assertEqual(
             config["output_dir"],
