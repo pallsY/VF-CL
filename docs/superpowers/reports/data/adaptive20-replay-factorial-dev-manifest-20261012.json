@@ -1,0 +1,369 @@
+{
+  "schema_version": 1,
+  "source_commit": "29de04603ae6bdcc0ede8c951eb18318c1a8a055",
+  "status": "training_only_development",
+  "holdout_seed": 20261013,
+  "capacity_per_class_when_enabled": 20,
+  "data_sha256": {
+    "isolet": {
+      "isolet_vfl.npz": "d34312670de93198afcd2b126c95b79bae2b4cffeb30d480f097faf046b69514"
+    },
+    "upmc": {
+      "upmc_food101_vfl.npz": "dea0569f0d4195eaaecc9cab3a6cce533f07b8d88472e7dbca5113152a314339"
+    }
+  },
+  "runs": [
+    {
+      "run": "isolet_seed54_P1R1",
+      "dataset": "isolet",
+      "seed": 54,
+      "arm": "P1R1",
+      "host": "vf-cl-3080",
+      "config_sha256": "d8f9c16068b54fcaf3df71e549e5cb8f6d992f404b4a74edd892d613aaa38775",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_samples_per_class",
+        "output_dir",
+        "pilot_dataset",
+        "pilot_holdout_per_class",
+        "pilot_holdout_seed",
+        "proto_replay_gradient_enabled",
+        "results_dir",
+        "seed"
+      ],
+      "output_dir": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive20-replay-factorial-smoke-20261012-v1/isolet_seed54_P1R1"
+    },
+    {
+      "run": "isolet_seed54_P0R1",
+      "dataset": "isolet",
+      "seed": 54,
+      "arm": "P0R1",
+      "host": "vf-cl-3080",
+      "config_sha256": "7f6dd023f31fb4b8c423bfa7b2889c595a8134ea9a84f08bc668847ea3374b0e",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_samples_per_class",
+        "output_dir",
+        "pilot_dataset",
+        "pilot_holdout_per_class",
+        "pilot_holdout_seed",
+        "proto_replay_gradient_enabled",
+        "results_dir",
+        "seed"
+      ],
+      "output_dir": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive20-replay-factorial-smoke-20261012-v1/isolet_seed54_P0R1"
+    },
+    {
+      "run": "isolet_seed54_P1R0",
+      "dataset": "isolet",
+      "seed": 54,
+      "arm": "P1R0",
+      "host": "vf-cl-3080",
+      "config_sha256": "4b49b12fc7c131657b50a5ea97170ec1c6908f0689ca581d918ecc4d240ce72d",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_enabled",
+        "head_consolidation_mode",
+        "head_consolidation_samples_per_class",
+        "output_dir",
+        "pilot_dataset",
+        "pilot_holdout_per_class",
+        "pilot_holdout_seed",
+        "proto_replay_gradient_enabled",
+        "results_dir",
+        "seed"
+      ],
+      "output_dir": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive20-replay-factorial-smoke-20261012-v1/isolet_seed54_P1R0"
+    },
+    {
+      "run": "isolet_seed54_P0R0",
+      "dataset": "isolet",
+      "seed": 54,
+      "arm": "P0R0",
+      "host": "vf-cl-3080",
+      "config_sha256": "5f43107ad686132fdce0f898146658bace8bce9ac45253f14fb2d37bfaff36e9",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_enabled",
+        "head_consolidation_mode",
+        "head_consolidation_samples_per_class",
+        "output_dir",
+        "pilot_dataset",
+        "pilot_holdout_per_class",
+        "pilot_holdout_seed",
+        "proto_replay_gradient_enabled",
+        "results_dir",
+        "seed"
+      ],
+      "output_dir": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive20-replay-factorial-smoke-20261012-v1/isolet_seed54_P0R0"
+    },
+    {
+      "run": "isolet_seed55_P1R1",
+      "dataset": "isolet",
+      "seed": 55,
+      "arm": "P1R1",
+      "host": "vf-cl-3080",
+      "config_sha256": "eed763c1bff21dd37d7be1fe96f2cf617394773dc35acce706f9140271c640c8",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_samples_per_class",
+        "output_dir",
+        "pilot_dataset",
+        "pilot_holdout_per_class",
+        "pilot_holdout_seed",
+        "proto_replay_gradient_enabled",
+        "results_dir",
+        "seed"
+      ],
+      "output_dir": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive20-replay-factorial-smoke-20261012-v1/isolet_seed55_P1R1"
+    },
+    {
+      "run": "isolet_seed55_P0R1",
+      "dataset": "isolet",
+      "seed": 55,
+      "arm": "P0R1",
+      "host": "vf-cl-3080",
+      "config_sha256": "10d38a57dc8e0285868ae409b46e8ff66383e361d3a5b69435b4c725eb652290",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_samples_per_class",
+        "output_dir",
+        "pilot_dataset",
+        "pilot_holdout_per_class",
+        "pilot_holdout_seed",
+        "proto_replay_gradient_enabled",
+        "results_dir",
+        "seed"
+      ],
+      "output_dir": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive20-replay-factorial-smoke-20261012-v1/isolet_seed55_P0R1"
+    },
+    {
+      "run": "isolet_seed55_P1R0",
+      "dataset": "isolet",
+      "seed": 55,
+      "arm": "P1R0",
+      "host": "vf-cl-3080",
+      "config_sha256": "e138029f2aa77c203e0b591d2795e06aba47938231660c9489420cf0513291d8",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_enabled",
+        "head_consolidation_mode",
+        "head_consolidation_samples_per_class",
+        "output_dir",
+        "pilot_dataset",
+        "pilot_holdout_per_class",
+        "pilot_holdout_seed",
+        "proto_replay_gradient_enabled",
+        "results_dir",
+        "seed"
+      ],
+      "output_dir": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive20-replay-factorial-smoke-20261012-v1/isolet_seed55_P1R0"
+    },
+    {
+      "run": "isolet_seed55_P0R0",
+      "dataset": "isolet",
+      "seed": 55,
+      "arm": "P0R0",
+      "host": "vf-cl-3080",
+      "config_sha256": "2443ace8fb90d32b6459e9793de5527704c1c62511ff32d5306d84b1fd824dae",
+      "allowed_changed_fields": [
+        "exp_name",
+        "head_consolidation_enabled",
+        "head_consolidation_mode",
+        "head_consolidation_samples_per_class",
+        "output_dir",
+        "pilot_dataset",
+        "pilot_holdout_per_class",
+        "pilot_holdout_seed",
+        "proto_replay_gradient_enabled",
+        "results_dir",
+        "seed"
+      ],
+      "output_dir": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive20-replay-factorial-smoke-20261012-v1/isolet_seed55_P0R0"
+    },
+    {
+      "run": "upmc_seed54_P1R1",
+      "dataset": "upmc",
+      "seed": 54,
+      "arm": "P1R1",
+      "host": "vf-cl-3080",
+      "config_sha256": "0ec0e88813de605050025d3ce3d0f9d3400b59c06575887cf6f4f59d12c5a21d",
+      "allowed_changed_fields": [
+        "data_path",
+        "exp_name",
+        "head_consolidation_samples_per_class",
+        "output_dir",
+        "pilot_dataset",
+        "pilot_holdout_per_class",
+        "pilot_holdout_seed",
+        "proto_replay_gradient_enabled",
+        "results_dir",
+        "seed",
+        "vector_npz"
+      ],
+      "output_dir": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive20-replay-factorial-dev-20261012-v1/upmc_seed54_P1R1"
+    },
+    {
+      "run": "upmc_seed54_P0R1",
+      "dataset": "upmc",
+      "seed": 54,
+      "arm": "P0R1",
+      "host": "vf-cl-3080",
+      "config_sha256": "ba6d5b7e1e7119fed3f20a9410d37e9321e9cb1f8e2250d8b13375b1682d4f8c",
+      "allowed_changed_fields": [
+        "data_path",
+        "exp_name",
+        "head_consolidation_samples_per_class",
+        "output_dir",
+        "pilot_dataset",
+        "pilot_holdout_per_class",
+        "pilot_holdout_seed",
+        "proto_replay_gradient_enabled",
+        "results_dir",
+        "seed",
+        "vector_npz"
+      ],
+      "output_dir": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive20-replay-factorial-dev-20261012-v1/upmc_seed54_P0R1"
+    },
+    {
+      "run": "upmc_seed54_P1R0",
+      "dataset": "upmc",
+      "seed": 54,
+      "arm": "P1R0",
+      "host": "vf-cl-3080",
+      "config_sha256": "748e3a1b3cc1c6288795a0c94f643c790a5aa8d665ac8ae0331714a4b85b23fb",
+      "allowed_changed_fields": [
+        "data_path",
+        "exp_name",
+        "head_consolidation_enabled",
+        "head_consolidation_mode",
+        "head_consolidation_samples_per_class",
+        "output_dir",
+        "pilot_dataset",
+        "pilot_holdout_per_class",
+        "pilot_holdout_seed",
+        "proto_replay_gradient_enabled",
+        "results_dir",
+        "seed",
+        "vector_npz"
+      ],
+      "output_dir": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive20-replay-factorial-dev-20261012-v1/upmc_seed54_P1R0"
+    },
+    {
+      "run": "upmc_seed54_P0R0",
+      "dataset": "upmc",
+      "seed": 54,
+      "arm": "P0R0",
+      "host": "vf-cl-3080",
+      "config_sha256": "31bdd5075342674a1a0af52d1ce85737c704078fde58b0b7e1bd2cd1b3a51907",
+      "allowed_changed_fields": [
+        "data_path",
+        "exp_name",
+        "head_consolidation_enabled",
+        "head_consolidation_mode",
+        "head_consolidation_samples_per_class",
+        "output_dir",
+        "pilot_dataset",
+        "pilot_holdout_per_class",
+        "pilot_holdout_seed",
+        "proto_replay_gradient_enabled",
+        "results_dir",
+        "seed",
+        "vector_npz"
+      ],
+      "output_dir": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive20-replay-factorial-dev-20261012-v1/upmc_seed54_P0R0"
+    },
+    {
+      "run": "upmc_seed55_P1R1",
+      "dataset": "upmc",
+      "seed": 55,
+      "arm": "P1R1",
+      "host": "vf-cl-3080",
+      "config_sha256": "a123fd6a66d7af553ce775c0abd5ff4c57119d16b18a25bd498e53c06d5426e8",
+      "allowed_changed_fields": [
+        "data_path",
+        "exp_name",
+        "head_consolidation_samples_per_class",
+        "output_dir",
+        "pilot_dataset",
+        "pilot_holdout_per_class",
+        "pilot_holdout_seed",
+        "proto_replay_gradient_enabled",
+        "results_dir",
+        "seed",
+        "vector_npz"
+      ],
+      "output_dir": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive20-replay-factorial-dev-20261012-v1/upmc_seed55_P1R1"
+    },
+    {
+      "run": "upmc_seed55_P0R1",
+      "dataset": "upmc",
+      "seed": 55,
+      "arm": "P0R1",
+      "host": "vf-cl-3080",
+      "config_sha256": "ce5469098306488bc247e16cfb29169b8271c0f12888f517db879d09947ff4b8",
+      "allowed_changed_fields": [
+        "data_path",
+        "exp_name",
+        "head_consolidation_samples_per_class",
+        "output_dir",
+        "pilot_dataset",
+        "pilot_holdout_per_class",
+        "pilot_holdout_seed",
+        "proto_replay_gradient_enabled",
+        "results_dir",
+        "seed",
+        "vector_npz"
+      ],
+      "output_dir": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive20-replay-factorial-dev-20261012-v1/upmc_seed55_P0R1"
+    },
+    {
+      "run": "upmc_seed55_P1R0",
+      "dataset": "upmc",
+      "seed": 55,
+      "arm": "P1R0",
+      "host": "vf-cl-3080",
+      "config_sha256": "4cc3a3da5a1bd9dfcea02d59664540b177918d52b254a3e88067b1a09fffe37b",
+      "allowed_changed_fields": [
+        "data_path",
+        "exp_name",
+        "head_consolidation_enabled",
+        "head_consolidation_mode",
+        "head_consolidation_samples_per_class",
+        "output_dir",
+        "pilot_dataset",
+        "pilot_holdout_per_class",
+        "pilot_holdout_seed",
+        "proto_replay_gradient_enabled",
+        "results_dir",
+        "seed",
+        "vector_npz"
+      ],
+      "output_dir": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive20-replay-factorial-dev-20261012-v1/upmc_seed55_P1R0"
+    },
+    {
+      "run": "upmc_seed55_P0R0",
+      "dataset": "upmc",
+      "seed": 55,
+      "arm": "P0R0",
+      "host": "vf-cl-3080",
+      "config_sha256": "70c38a4bd34323f9b92aeb3f702c7f44783a7b4cc955b730a1ae196f11aaae5b",
+      "allowed_changed_fields": [
+        "data_path",
+        "exp_name",
+        "head_consolidation_enabled",
+        "head_consolidation_mode",
+        "head_consolidation_samples_per_class",
+        "output_dir",
+        "pilot_dataset",
+        "pilot_holdout_per_class",
+        "pilot_holdout_seed",
+        "proto_replay_gradient_enabled",
+        "results_dir",
+        "seed",
+        "vector_npz"
+      ],
+      "output_dir": "/home/c3080/YangXiaoXiang/VF-CL/results/adaptive20-replay-factorial-dev-20261012-v1/upmc_seed55_P0R0"
+    }
+  ]
+}
