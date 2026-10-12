@@ -1,8 +1,4 @@
-"""Four-party replay pilot commands and job identities.
-
-This runner evaluates after every task and does not provide the repository's
-deferred formal-test access audit. Its metrics are pilot measurements only.
-"""
+"""Four-party replay commands, pilot checks, and deferred result identities."""
 import argparse
 import csv
 import hashlib
@@ -15,6 +11,7 @@ import subprocess
 import sys
 from itertools import product
 from pathlib import Path
+from types import SimpleNamespace
 
 import fair_main_table_3datasets as fair
 import formal_cifar100_metrics as formal_metrics
@@ -29,6 +26,7 @@ METHODS = (
 )
 SEEDS = (42, 43, 44)
 PILOT_TABLE_NAME = 'REPLAY11_PILOT_TABLE.csv'
+DEFERRED_TABLE_NAME = 'REPLAY11_DEFERRED_TABLE.csv'
 UPMC_FOUR_CACHE = ('upmc_food101_image_clean_4party_v1'
                    '/upmc_food101_vfl.npz')
 _UPMC_FOUR_DATA = {
@@ -101,7 +99,7 @@ def verify_data(dataset, data_root):
             raise ValueError(f'dataset hash differs: {target}')
 
 
-def validate_completed_run(job, run_dir, expected_tasks):
+def validate_completed_run(job, run_dir, expected_tasks, *, deferred=False):
     dataset, method, seed = job
     run_dir = Path(run_dir)
     config = json.loads((run_dir / 'config.json').read_text(encoding='utf-8'))
@@ -117,9 +115,29 @@ def validate_completed_run(job, run_dir, expected_tasks):
     if dataset == 'upmc_food101' and not str(
             config.get('vector_npz', '')).endswith(UPMC_FOUR_CACHE):
         raise ValueError('UPMC run did not use the four-party clean cache')
-    checkpoint = run_dir / 'checkpoints' / f'event_{expected_tasks - 1}_CIL.pt'
+    if deferred and config.get('formal_deferred_evaluation') is not True:
+        raise ValueError('full run did not use deferred test access')
+    checkpoint = run_dir / 'checkpoints' / (
+        'formal_final.pt' if deferred else f'event_{expected_tasks - 1}_CIL.pt')
     if checkpoint.is_symlink() or not checkpoint.is_file() or not checkpoint.stat().st_size:
         raise ValueError('final task checkpoint is missing')
+    if deferred:
+        from adaptive_consolidation_audit import prepare_formal_deferred_evaluation
+        from runner import _safe_torch_load
+        payload = _safe_torch_load(str(checkpoint))
+        if (payload.get('schema_version') != 4
+                or payload.get('protocol', {}).get('formal_deferred_evaluation') is not True
+                or result.get('source_provenance')
+                != payload['protocol'].get('source_provenance')):
+            raise ValueError('deferred checkpoint or source provenance differs')
+        snapshots = [run_dir / 'formal_snapshots' / f'event_{index}_CIL.pt'
+                     for index in range(expected_tasks)]
+        transaction = prepare_formal_deferred_evaluation(
+            args=SimpleNamespace(**config), snapshot_paths=snapshots,
+            final_checkpoint=checkpoint,
+            task_classes=payload['seen_task_classes'], output_dir=run_dir)
+        if transaction['status'] != 'published':
+            raise ValueError('deferred evaluation was not published')
     metrics = metrics_from_history(
         result.get('task_acc_history', []), expected_tasks)
     if any(not math.isfinite(value) for value in metrics.values()):
@@ -136,8 +154,11 @@ def verify_success_record(job_dir, record):
         raise ValueError('success record has ambiguous run directories')
     tasks = (2 if record['smoke'] else
              {'cifar100': 10, 'isolet': 13, 'upmc_food101': 10}[job[0]])
-    actual = validate_completed_run(job, run_dirs[0], tasks)
-    checkpoint = run_dirs[0] / 'checkpoints' / f'event_{tasks - 1}_CIL.pt'
+    deferred = not record['smoke']
+    actual = validate_completed_run(job, run_dirs[0], tasks,
+                                    deferred=deferred)
+    checkpoint = run_dirs[0] / 'checkpoints' / (
+        'formal_final.pt' if deferred else f'event_{tasks - 1}_CIL.pt')
     if (actual != record['metrics']
             or sha256_file(run_dirs[0] / 'results.json')
             != record['results_sha256']
@@ -173,7 +194,7 @@ def command_for(job, results_root, *, python, worktree,
         device=str(device),
         results_dir=str(results_root),
         exp_name='run',
-        formal_deferred_evaluation=False,
+        formal_deferred_evaluation=not smoke,
     )
     if data_root is not None:
         options['data_path'] = str(data_root)
@@ -244,12 +265,15 @@ def run_one(job, results_root, *, data_root, device, smoke=False):
         raise ValueError('job produced an ambiguous result directory')
     tasks = 2 if smoke else {'cifar100': 10, 'isolet': 13,
                              'upmc_food101': 10}[dataset]
-    metrics = validate_completed_run(job, run_dirs[0], tasks)
+    metrics = validate_completed_run(job, run_dirs[0], tasks,
+                                     deferred=not smoke)
+    checkpoint_name = ('formal_final.pt' if not smoke else
+                       f'event_{tasks - 1}_CIL.pt')
     success = {
         **plan, 'metrics': metrics,
         'results_sha256': sha256_file(run_dirs[0] / 'results.json'),
         'checkpoint_sha256': sha256_file(
-            run_dirs[0] / 'checkpoints' / f'event_{tasks - 1}_CIL.pt'),
+            run_dirs[0] / 'checkpoints' / checkpoint_name),
     }
     (job_dir / 'JOB_SUCCESS.json').write_text(
         json.dumps(success, indent=2, sort_keys=True) + '\n',
@@ -285,7 +309,7 @@ def summarize(results_root):
             rows.append(row)
     if len(commits) != 1:
         raise ValueError('replay-11 results mix code commits')
-    output = root / PILOT_TABLE_NAME
+    output = root / DEFERRED_TABLE_NAME
     with output.open('x', newline='', encoding='utf-8') as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
         writer.writeheader()

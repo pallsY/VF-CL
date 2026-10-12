@@ -113,10 +113,24 @@ class Replay11MatrixTest(unittest.TestCase):
         self.assertIn('upmc_food101_image_clean_4party_v1',
                       command[command.index('--vector_npz') + 1])
         self.assertEqual(command[command.index('--cl_method') + 1], 'ocar')
-        self.assertEqual(command[command.index('--formal_deferred_evaluation') + 1], '0')
+        self.assertEqual(command[command.index('--formal_deferred_evaluation') + 1], '1')
 
     def test_summary_is_explicitly_labeled_pilot(self):
         self.assertEqual(matrix.PILOT_TABLE_NAME, 'REPLAY11_PILOT_TABLE.csv')
+
+    def test_full_job_uses_deferred_test_access(self):
+        command = matrix.command_for(
+            ('upmc_food101', 'mir', 42), Path('/tmp/replay11-test'),
+            python=Path('/opt/python'), worktree=Path('/opt/worktree'),
+            device='cuda:0')
+        self.assertEqual(command[command.index('--formal_deferred_evaluation') + 1], '1')
+        self.assertEqual(command[command.index('--exp_name') + 1], 'run')
+
+    def test_deferred_provenance_covers_new_algorithms(self):
+        from adaptive_consolidation_audit import FORMAL_SOURCE_FILES
+        for method in ('alsar', 'balanced_contrast', 'hpcr', 'icarl',
+                       'lpr', 'mir', 'ocar'):
+            self.assertIn('cl_methods/' + method + '.py', FORMAL_SOURCE_FILES)
 
     def test_cifar_smoke_uses_two_tasks_without_custom_task_list(self):
         command = matrix.command_for(
@@ -125,6 +139,7 @@ class Replay11MatrixTest(unittest.TestCase):
             device='cuda:0', smoke=True)
         self.assertEqual(command[command.index('--num_tasks') + 1], '2')
         self.assertEqual(command[command.index('--epochs_per_task') + 1], '1')
+        self.assertEqual(command[command.index('--formal_deferred_evaluation') + 1], '0')
 
     def test_shards_partition_jobs_without_overlap(self):
         first = set(matrix.jobs_for_shard(0, 3))

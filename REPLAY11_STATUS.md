@@ -11,14 +11,16 @@ parties. `prepare_upmc_four_party.py` derives the new cache from the
 selected clean source and preserves row order, labels, sample IDs, and
 train/test indices. The original two-party cache remains available.
 
-`replay11_matrix.py` defines 3 datasets × 11 methods × 3 seeds. Its current
-`run-one` and `run-shard` commands are **pilot** runners: they evaluate the
-test set after each task (`formal_deferred_evaluation=0`). The resulting
-`REPLAY11_PILOT_TABLE.csv` must not be presented as a formally audited paper
-table. The existing deferred evaluator and audit must be extended to all
-seven new method checkpoint states and the four-party UPMC cache before a
-formal 99-cell comparison is run. Full pilot jobs can still check runtime,
-memory, and model behavior.
+`replay11_matrix.py` defines 3 datasets × 11 methods × 3 seeds. `--smoke`
+uses a two-task, one-epoch pilot with evaluation after each task. Full jobs
+use the existing deferred test evaluator: training freezes every stage
+snapshot before the sole test access, and the runner validates the published
+transaction before accepting the result. The seven new algorithm files are
+included in the frozen source provenance. `REPLAY11_DEFERRED_TABLE.csv` is
+created only after all 99 full jobs have been checked. This matrix does not
+yet use the separate independent three-dataset formal admission driver, so
+that extra audit would still be needed before claiming equivalence to its
+published protocol.
 
 The VFL adaptation uses the shared model and optimizer protocol. MIR's
 virtual SGD step follows the original retrieval algorithm, while the real
