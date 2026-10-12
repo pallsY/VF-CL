@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "source_commit": "29de04603ae6bdcc0ede8c951eb18318c1a8a055",
+  "status": "training_only_development",
+  "supersedes_failed_v2_manifest_sha256": "83336f8cf5b88d77a4a552c62503136c14b8a7506419e5d9ca1224200a25c072",
+  "v2_failure": "num_workers=0 rejected by deterministic protocol before training",
+  "host": "vf-cl-3080",
+  "gpu": 0,
+  "scratch_output_root": "/dev/shm/vfcl-replay-factorial-cifar-20261012-v3",
+  "holdout_seed": 20261013,
+  "holdout_per_class": 25,
+  "capacity_per_class_when_enabled": 20,
+  "data_sha256": {
+    "train": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b",
+    "test": "4b67687d9933c4db8f0831104447f15b93774f4f464bd0516f0f0f2ac83b7864",
+    "meta": "a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9"
+  },
+  "runs": [
+    {
+      "run": "cifar_seed54_P1R1",
+      "seed": 54,
+      "arm": "P1R1",
+      "config_sha256": "4b4ca05bb0180c2ad7d6c060caf409835a1af3255c60f43211978e995be6c59a",
+      "output_dir": "/dev/shm/vfcl-replay-factorial-cifar-20261012-v3/cifar_seed54_P1R1",
+      "old_4090_config_sha256": "cb1007fce602b2aa650f180e0be2fe76e7c0ecd8f98bfb2184fae0b365610264",
+      "only_changed_fields_from_old": [
+        "data_path",
+        "num_workers",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "cifar_seed54_P0R1",
+      "seed": 54,
+      "arm": "P0R1",
+      "config_sha256": "50f5c53cf6730a8621716db90a81d48ef65d0df1f29589b54a29da8a18bcd529",
+      "output_dir": "/dev/shm/vfcl-replay-factorial-cifar-20261012-v3/cifar_seed54_P0R1",
+      "old_4090_config_sha256": "8facf4458499a884cafea7e0776a0eea2990f768c47a86d54080b24b79f25ab9",
+      "only_changed_fields_from_old": [
+        "data_path",
+        "num_workers",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "cifar_seed54_P1R0",
+      "seed": 54,
+      "arm": "P1R0",
+      "config_sha256": "45b3ced556969e3f88285c39de25771de482f823e19c1be5bbb0d20aebeb61d1",
+      "output_dir": "/dev/shm/vfcl-replay-factorial-cifar-20261012-v3/cifar_seed54_P1R0",
+      "old_4090_config_sha256": "e5a2d5a9a2ffc4b8f5dea4efad4e003afb258bb150ae13966721054211ee59e3",
+      "only_changed_fields_from_old": [
+        "data_path",
+        "num_workers",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "cifar_seed54_P0R0",
+      "seed": 54,
+      "arm": "P0R0",
+      "config_sha256": "830dbeacfbc70f65dc5808ba1192d49c9711fdbefaea48ca9277659cbff9a5b2",
+      "output_dir": "/dev/shm/vfcl-replay-factorial-cifar-20261012-v3/cifar_seed54_P0R0",
+      "old_4090_config_sha256": "c2c7873b4e6ca38180afa90a578193e6aa27ba67ed8eb5b2d016385c6ef56090",
+      "only_changed_fields_from_old": [
+        "data_path",
+        "num_workers",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "cifar_seed55_P1R1",
+      "seed": 55,
+      "arm": "P1R1",
+      "config_sha256": "d18f87c206dbbed5fea3b790eba23947290d8b5f9ac44c8b03f610d29c18ca74",
+      "output_dir": "/dev/shm/vfcl-replay-factorial-cifar-20261012-v3/cifar_seed55_P1R1",
+      "old_4090_config_sha256": "a2bab423983b65de35461066d0ffd26667649a38bb97ccc4302078eef8735f59",
+      "only_changed_fields_from_old": [
+        "data_path",
+        "num_workers",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "cifar_seed55_P0R1",
+      "seed": 55,
+      "arm": "P0R1",
+      "config_sha256": "0efec06953fd344b9b6b5c013af898a0d0719febe5990115750207b948a01c8e",
+      "output_dir": "/dev/shm/vfcl-replay-factorial-cifar-20261012-v3/cifar_seed55_P0R1",
+      "old_4090_config_sha256": "84229fec97929d392416ee004ad5f1a75bf72a36a36ca056b192095724993cdd",
+      "only_changed_fields_from_old": [
+        "data_path",
+        "num_workers",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "cifar_seed55_P1R0",
+      "seed": 55,
+      "arm": "P1R0",
+      "config_sha256": "40f507d8b1082368a903dd965af8652d008359038cafbcb27df893d4dd14e47c",
+      "output_dir": "/dev/shm/vfcl-replay-factorial-cifar-20261012-v3/cifar_seed55_P1R0",
+      "old_4090_config_sha256": "4818f37557807ef437d71b4387f33f5da2f99dcab6d5662f2872a0907c675ef1",
+      "only_changed_fields_from_old": [
+        "data_path",
+        "num_workers",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "cifar_seed55_P0R0",
+      "seed": 55,
+      "arm": "P0R0",
+      "config_sha256": "6f2f20835be16082079270c1dcab3246f98b8bdf3e489a92a6a5844a7f76765e",
+      "output_dir": "/dev/shm/vfcl-replay-factorial-cifar-20261012-v3/cifar_seed55_P0R0",
+      "old_4090_config_sha256": "a5bba1bbd73c423409c2871894901c8f0cee0d4b7e86fe9e7e5ec606eccc84a8",
+      "only_changed_fields_from_old": [
+        "data_path",
+        "num_workers",
+        "output_dir",
+        "results_dir"
+      ]
+    }
+  ]
+}
