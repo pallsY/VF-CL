@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "source_commit": "29de04603ae6bdcc0ede8c951eb18318c1a8a055",
+  "status": "training_only_development",
+  "replacement_for_4090_manifest_sha256": "9542d1bc2d3275d3a987a2372a8ade56818345f5235b5e402ea89904e263893e",
+  "reason": "4090 GPU is occupied by an external process; no CIFAR arm started there",
+  "host": "vf-cl-3080",
+  "gpu": 0,
+  "scratch_output_root": "/dev/shm/vfcl-replay-factorial-cifar-20261012-v2",
+  "holdout_seed": 20261013,
+  "holdout_per_class": 25,
+  "capacity_per_class_when_enabled": 20,
+  "data_sha256": {
+    "train": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b",
+    "test": "4b67687d9933c4db8f0831104447f15b93774f4f464bd0516f0f0f2ac83b7864",
+    "meta": "a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9"
+  },
+  "runs": [
+    {
+      "run": "cifar_seed54_P1R1",
+      "seed": 54,
+      "arm": "P1R1",
+      "config_sha256": "e802c88a2d540d53fbf9a2cdd8221987bccb670e3932d4f8efbe4d17626c4013",
+      "output_dir": "/dev/shm/vfcl-replay-factorial-cifar-20261012-v2/cifar_seed54_P1R1",
+      "old_4090_config_sha256": "cb1007fce602b2aa650f180e0be2fe76e7c0ecd8f98bfb2184fae0b365610264",
+      "only_changed_fields_from_old": [
+        "data_path",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "cifar_seed54_P0R1",
+      "seed": 54,
+      "arm": "P0R1",
+      "config_sha256": "64b36f162dd3211b343d9ef725bce5a2ab0ec60aecf213f411b644414a6d4466",
+      "output_dir": "/dev/shm/vfcl-replay-factorial-cifar-20261012-v2/cifar_seed54_P0R1",
+      "old_4090_config_sha256": "8facf4458499a884cafea7e0776a0eea2990f768c47a86d54080b24b79f25ab9",
+      "only_changed_fields_from_old": [
+        "data_path",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "cifar_seed54_P1R0",
+      "seed": 54,
+      "arm": "P1R0",
+      "config_sha256": "15fef38b8ccd35bae54fd09c0e7ffd2f44fcf0a4fba9c5662ef2aa6d1958ef05",
+      "output_dir": "/dev/shm/vfcl-replay-factorial-cifar-20261012-v2/cifar_seed54_P1R0",
+      "old_4090_config_sha256": "e5a2d5a9a2ffc4b8f5dea4efad4e003afb258bb150ae13966721054211ee59e3",
+      "only_changed_fields_from_old": [
+        "data_path",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "cifar_seed54_P0R0",
+      "seed": 54,
+      "arm": "P0R0",
+      "config_sha256": "ddb1d3f9cc0a1266109ea41a718f6c2c1a5ae48e5128d77accfb1f243b358606",
+      "output_dir": "/dev/shm/vfcl-replay-factorial-cifar-20261012-v2/cifar_seed54_P0R0",
+      "old_4090_config_sha256": "c2c7873b4e6ca38180afa90a578193e6aa27ba67ed8eb5b2d016385c6ef56090",
+      "only_changed_fields_from_old": [
+        "data_path",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "cifar_seed55_P1R1",
+      "seed": 55,
+      "arm": "P1R1",
+      "config_sha256": "85901999c78744086caa76a605b6df3fa3dc41514370bf857f1d53b75828df7a",
+      "output_dir": "/dev/shm/vfcl-replay-factorial-cifar-20261012-v2/cifar_seed55_P1R1",
+      "old_4090_config_sha256": "a2bab423983b65de35461066d0ffd26667649a38bb97ccc4302078eef8735f59",
+      "only_changed_fields_from_old": [
+        "data_path",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "cifar_seed55_P0R1",
+      "seed": 55,
+      "arm": "P0R1",
+      "config_sha256": "cb1796a581f4e34808c1d27b7c5a8bceb4a5e1831c355671ca597813c9236443",
+      "output_dir": "/dev/shm/vfcl-replay-factorial-cifar-20261012-v2/cifar_seed55_P0R1",
+      "old_4090_config_sha256": "84229fec97929d392416ee004ad5f1a75bf72a36a36ca056b192095724993cdd",
+      "only_changed_fields_from_old": [
+        "data_path",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "cifar_seed55_P1R0",
+      "seed": 55,
+      "arm": "P1R0",
+      "config_sha256": "ad1e1d28614aecc54047d6e65c21f6ca1b022e3de548e1412c24d98382562fad",
+      "output_dir": "/dev/shm/vfcl-replay-factorial-cifar-20261012-v2/cifar_seed55_P1R0",
+      "old_4090_config_sha256": "4818f37557807ef437d71b4387f33f5da2f99dcab6d5662f2872a0907c675ef1",
+      "only_changed_fields_from_old": [
+        "data_path",
+        "output_dir",
+        "results_dir"
+      ]
+    },
+    {
+      "run": "cifar_seed55_P0R0",
+      "seed": 55,
+      "arm": "P0R0",
+      "config_sha256": "1b9c6315295d30d7509bde15a855e66428f71e4d6816e98d3085faac1f3712d6",
+      "output_dir": "/dev/shm/vfcl-replay-factorial-cifar-20261012-v2/cifar_seed55_P0R0",
+      "old_4090_config_sha256": "a5bba1bbd73c423409c2871894901c8f0cee0d4b7e86fe9e7e5ec606eccc84a8",
+      "only_changed_fields_from_old": [
+        "data_path",
+        "output_dir",
+        "results_dir"
+      ]
+    }
+  ]
+}
