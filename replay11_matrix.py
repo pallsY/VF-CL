@@ -202,6 +202,9 @@ def command_for(job, results_root, *, python, worktree,
         options['num_parties'] = 4
         options['vector_npz'] = str(
             Path(options['data_path']) / UPMC_FOUR_CACHE)
+    elif dataset == 'isolet':
+        options['vector_npz'] = str(
+            Path(options['data_path']) / 'isolet/isolet_vfl.npz')
     if smoke:
         if 'custom_tasks' in options:
             options['custom_tasks'] = options['custom_tasks'][:2]

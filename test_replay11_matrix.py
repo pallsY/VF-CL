@@ -126,6 +126,14 @@ class Replay11MatrixTest(unittest.TestCase):
         self.assertEqual(command[command.index('--formal_deferred_evaluation') + 1], '1')
         self.assertEqual(command[command.index('--exp_name') + 1], 'run')
 
+    def test_isolet_uses_host_local_cache_path(self):
+        command = matrix.command_for(
+            ('isolet', 'ocar', 42), Path('/tmp/replay11-test'),
+            python=Path('/opt/python'), worktree=Path('/opt/worktree'),
+            device='cuda:1', data_root=Path('/other-host/data'))
+        self.assertEqual(command[command.index('--vector_npz') + 1],
+                         str(Path('/other-host/data') / 'isolet/isolet_vfl.npz'))
+
     def test_deferred_provenance_covers_new_algorithms(self):
         from adaptive_consolidation_audit import FORMAL_SOURCE_FILES
         for method in ('alsar', 'balanced_contrast', 'hpcr', 'icarl',
