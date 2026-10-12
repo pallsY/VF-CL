@@ -415,6 +415,8 @@ def _checkpoint_protocol(args):
           and bool(getattr(args, 'head_consolidation_enabled', 0))
           and int(getattr(args, 'head_consolidation_samples_per_class', 20)) == 40):
         protocol['head_consolidation_samples_per_class'] = 40
+    if not bool(getattr(args, 'proto_replay_gradient_enabled', 1)):
+        protocol['proto_replay_gradient_enabled'] = False
     if getattr(args, 'formal_deferred_evaluation', False) is True:
         from adaptive_consolidation_audit import _formal_source_provenance
         provenance = _formal_source_provenance()

@@ -221,6 +221,9 @@ def get_config():
                    help='Task-local schedule for proto_evolve logit distillation')
     p.add_argument('--proto_lambda_a', default=0.1, type=float,
                    help='proto_evolve: weight of prototype-replay head-protection loss_A')
+    p.add_argument('--proto_replay_gradient_enabled', default=1, type=int,
+                   choices=[0, 1],
+                   help='proto_evolve: include the sampled prototype loss gradient')
     p.add_argument('--proto_replay_loss_norm',
                    default='legacy_class_normalized',
                    choices=['legacy_class_normalized', 'sample_mean'],

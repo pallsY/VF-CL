@@ -175,6 +175,9 @@ class ProtoEvolveCL:
         self.prev_protos = {}
         self.fim_masks = [{} for _ in range(args.num_parties)]
         self.lambda_A = getattr(args, 'proto_lambda_a', 0.1)
+        self.proto_replay_gradient_enabled = bool(
+            getattr(args, 'proto_replay_gradient_enabled', 1)
+        )
         self.proto_replay_loss_norm = getattr(
             args, 'proto_replay_loss_norm', 'legacy_class_normalized'
         )
@@ -639,9 +642,12 @@ class ProtoEvolveCL:
                 loss_A = reduce_proto_replay_loss(
                     per_sample_ce, len(pc), self.proto_replay_loss_norm
                 )
-            dbg_A = float(self.lambda_A * loss_A)
-            total = ((1 - self.lambda_A) * loss_ce + self.lambda_A * loss_A
-                     if loss_ce is not None else self.lambda_A * loss_A)
+            proto_term = (self.lambda_A * loss_A
+                          if self.proto_replay_gradient_enabled
+                          else loss_A.detach() * 0)
+            dbg_A = float(proto_term.detach())
+            total = ((1 - self.lambda_A) * loss_ce + proto_term
+                     if loss_ce is not None else proto_term)
         else:
             total = loss_ce if loss_ce is not None else torch.tensor(0.0, device=device)
         # (2) knowledge distillation to stop bottom drift
