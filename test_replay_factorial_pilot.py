@@ -78,13 +78,17 @@ class ReplayFactorialPilotTests(unittest.TestCase):
 
     def test_test_authorization_stops_before_real_access(self):
         dataset = PilotDataset.__new__(PilotDataset)
-        with mock.patch.object(VFLDataset, "authorize_formal_access",
-                               side_effect=AssertionError("test accessed")):
+        dataset._formal_durable_state = lambda: ([{'split': 'validation'}], None)
+        with mock.patch.object(dataset, '_validate_formal_phase_transition') as phase, \
+                mock.patch.object(VFLDataset, "authorize_formal_access",
+                                  side_effect=AssertionError("test accessed")):
             with self.assertRaises(StopBeforeTest):
                 dataset.authorize_formal_access(
                     split="test", phase="final_test_post_install",
                     event_idx=1, task_id=1, timeline_step="event_1_CIL",
                     classes=[0, 1])
+            phase.assert_called_once_with(
+                {'split': 'test'}, [{'split': 'validation'}])
 
     def test_artifact_gate_rejects_any_formal_test_publication(self):
         with tempfile.TemporaryDirectory() as folder:

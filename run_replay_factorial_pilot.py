@@ -110,6 +110,10 @@ class PilotDataset(VFLDataset):
 
     def authorize_formal_access(self, **kwargs):
         if kwargs.get('split') == 'test':
+            history, pending = self._formal_durable_state()
+            if pending:
+                raise RuntimeError('pilot has an unconsumed formal access')
+            self._validate_formal_phase_transition({'split': 'test'}, history)
             raise StopBeforeTest
         return super().authorize_formal_access(**kwargs)
 
