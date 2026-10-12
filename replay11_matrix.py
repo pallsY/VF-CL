@@ -76,9 +76,37 @@ def expected_data(dataset):
             else dict(audit._AUTHORITATIVE_DATA[dataset]))
 
 
-def metrics_from_history(history, expected_tasks):
-    return formal_metrics.compute_formal_metrics(
-        history, expected_tasks=expected_tasks)
+def metrics_from_history(history, expected_tasks, *, deferred=False):
+    if not deferred:
+        return formal_metrics.compute_formal_metrics(
+            history, expected_tasks=expected_tasks)
+    if type(history) is not list or len(history) != expected_tasks:
+        raise ValueError('deferred history has an invalid number of tasks')
+    diagonal = []
+    for index, entry in enumerate(history):
+        expected = ({f'task_{task}' for task in range(expected_tasks)}
+                    if index == expected_tasks - 1 else {f'task_{index}'})
+        values = entry.get('per_task_accs')
+        if (entry.get('step') != f'event_{index}_CIL'
+                or type(values) is not dict or set(values) != expected
+                or any(type(value) not in (int, float) or not math.isfinite(value)
+                       for value in values.values())):
+            raise ValueError('deferred Class-IL trajectory is invalid')
+        diagonal.append(float(values[f'task_{index}']))
+    final = history[-1]['per_task_accs']
+    taskil = history[-1].get('per_task_accs_taskil')
+    if (type(taskil) is not dict or set(taskil) != set(final)
+            or any(type(value) not in (int, float) or not math.isfinite(value)
+                   for value in taskil.values())):
+        raise ValueError('deferred final Task-IL row is invalid')
+    return {
+        'aa_final_cil': statistics.fmean(final.values()),
+        'bwt_cil': (statistics.fmean(
+            final[f'task_{index}'] - diagonal[index]
+            for index in range(expected_tasks - 1))
+            if expected_tasks > 1 else 0.0),
+        'task_il_final': statistics.fmean(taskil.values()),
+    }
 
 
 def sha256_file(path):
@@ -139,17 +167,25 @@ def validate_completed_run(job, run_dir, expected_tasks, *, deferred=False):
         if transaction['status'] != 'published':
             raise ValueError('deferred evaluation was not published')
     metrics = metrics_from_history(
-        result.get('task_acc_history', []), expected_tasks)
+        result.get('task_acc_history', []), expected_tasks,
+        deferred=deferred)
     if any(not math.isfinite(value) for value in metrics.values()):
         raise ValueError('nonfinite class-incremental metric')
     return metrics
+
+
+def run_directories(job_dir, *, smoke):
+    job_dir = Path(job_dir)
+    candidates = (list(job_dir.glob('run_*')) if smoke
+                  else [job_dir / 'run'])
+    return [path for path in candidates if path.is_dir() and not path.is_symlink()]
 
 
 def verify_success_record(job_dir, record):
     job = (record['dataset'], record['method'], record['seed'])
     if job not in jobs() or record['data_hashes'] != expected_data(job[0]):
         raise ValueError('success record job or data authority differs')
-    run_dirs = list(Path(job_dir).glob('run_*'))
+    run_dirs = run_directories(job_dir, smoke=record['smoke'])
     if len(run_dirs) != 1:
         raise ValueError('success record has ambiguous run directories')
     tasks = (2 if record['smoke'] else
@@ -263,7 +299,7 @@ def run_one(job, results_root, *, data_root, device, smoke=False):
     with (job_dir / 'training.log').open('x', encoding='utf-8') as log:
         subprocess.run(command, cwd=worktree, env=env, stdout=log,
                        stderr=subprocess.STDOUT, check=True)
-    run_dirs = list(job_dir.glob('run_*'))
+    run_dirs = run_directories(job_dir, smoke=smoke)
     if len(run_dirs) != 1:
         raise ValueError('job produced an ambiguous result directory')
     tasks = 2 if smoke else {'cifar100': 10, 'isolet': 13,
@@ -304,8 +340,7 @@ def summarize(results_root):
                 commits.add(record['code_commit'])
                 records.append(record)
             row = {'dataset': dataset, 'method': method}
-            for metric in ('aa_final_cil', 'aa_avg_cil', 'bwt_cil',
-                           'task_il_final'):
+            for metric in ('aa_final_cil', 'bwt_cil', 'task_il_final'):
                 values = [record['metrics'][metric] for record in records]
                 row[metric + '_mean'] = statistics.fmean(values)
                 row[metric + '_std'] = statistics.stdev(values)

@@ -97,6 +97,29 @@ class Replay11MatrixTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             matrix.metrics_from_history(history[:1], expected_tasks=2)
 
+    def test_deferred_metrics_use_diagonal_and_final_row(self):
+        history = [
+            {'step': 'event_0_CIL', 'per_task_accs': {'task_0': 0.8}},
+            {'step': 'event_1_CIL',
+             'per_task_accs': {'task_0': 0.6, 'task_1': 0.7},
+             'per_task_accs_taskil': {'task_0': 0.9, 'task_1': 0.8}},
+        ]
+        metrics = matrix.metrics_from_history(history, 2, deferred=True)
+        self.assertEqual(set(metrics), {'aa_final_cil', 'bwt_cil',
+                                        'task_il_final'})
+        self.assertAlmostEqual(metrics['aa_final_cil'], 0.65)
+        self.assertAlmostEqual(metrics['bwt_cil'], -0.2)
+        with self.assertRaises(ValueError):
+            matrix.metrics_from_history(history[:1], 2, deferred=True)
+
+    def test_deferred_run_has_fixed_directory_name(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'run').mkdir()
+            self.assertEqual(matrix.run_directories(root, smoke=False),
+                             [root / 'run'])
+            self.assertEqual(matrix.run_directories(root, smoke=True), [])
+
     def test_exact_99_cells_and_no_two_party_upmc(self):
         jobs = matrix.jobs()
         self.assertEqual(len(jobs), 99)

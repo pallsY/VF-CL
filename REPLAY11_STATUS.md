@@ -16,8 +16,11 @@ uses a two-task, one-epoch pilot with evaluation after each task. Full jobs
 use the existing deferred test evaluator: training freezes every stage
 snapshot before the sole test access, and the runner validates the published
 transaction before accepting the result. The seven new algorithm files are
-included in the frozen source provenance. `REPLAY11_DEFERRED_TABLE.csv` is
-created only after all 99 full jobs have been checked. This matrix does not
+included in the frozen source provenance. `REPLAY11_DEFERRED_TABLE.csv`
+reports final Class-IL accuracy, final-minus-diagonal BWT, and final Task-IL
+accuracy only after all 99 full jobs have been checked. The intermediate
+rows retain only each task's diagonal value, so the average of intermediate
+Class-IL accuracies is unavailable. This matrix does not
 yet use the separate independent three-dataset formal admission driver, so
 that extra audit would still be needed before claiming equivalence to its
 published protocol.
