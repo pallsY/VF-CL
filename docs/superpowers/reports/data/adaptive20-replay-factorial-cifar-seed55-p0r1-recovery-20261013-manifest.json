@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "status": "training_only_development_recovery",
+  "source_commit": "29de04603ae6bdcc0ede8c951eb18318c1a8a055",
+  "host": "vf-cl-3080",
+  "gpu": 0,
+  "seed": 55,
+  "arm": "P0R1",
+  "run": "cifar_seed55_P0R1",
+  "scratch_root": "/dev/shm/vfcl-replay-factorial-cifar-seed55-p0r1-recovery-20261013-v1",
+  "config_sha256": "952b1d275a350d924cc354d6ed50d2390bb82a8f1b6952227487ae7aaeba4bc6",
+  "supersedes_v3_config_sha256": "0efec06953fd344b9b6b5c013af898a0d0719febe5990115750207b948a01c8e",
+  "only_changed_fields": [
+    "output_dir",
+    "results_dir"
+  ],
+  "reason": "v3 run exited 0 but /dev/shm was globally cleared after completion and before per-file archive; no formal test access",
+  "v3_unverified_launch_log_sha256": "3f7f9519c9ca4fa3dc48ed46e120b21008e7245f38c3c91b3ef45574d76ccc11",
+  "v3_unverified_logged_readout_sha256": "a8cbd193683a13648ed247023895e9b059d58c9b4526c3e91d89638113bf216b",
+  "data_sha256": {
+    "train": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b",
+    "test": "4b67687d9933c4db8f0831104447f15b93774f4f464bd0516f0f0f2ac83b7864",
+    "meta": "a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9"
+  },
+  "holdout_seed": 20261013,
+  "holdout_per_class": 25,
+  "capacity_per_class": 20
+}

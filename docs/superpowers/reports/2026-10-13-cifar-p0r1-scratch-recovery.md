@@ -1,0 +1,5 @@
+# CIFAR seed55 P0R1 scratch-loss recovery
+
+The original v3 training-only run `cifar_seed55_P0R1` exited 0 and printed a development holdout readout. The host did not reboot, but all `/dev/shm` entries disappeared at 2026-10-13 18:55:52 CST, shortly after the run completed. Its frozen checkpoint, holdout manifest, and readout file were lost before a complete archive could be copied. The persistent launch log is retained and SHA-256 bound in the recovery manifest, but the log-only readout is **unverified** and excluded from all aggregates. No formal test was accessed or published.
+
+A new training-only run uses the same locked source commit, seed, data, holdout design, and model parameters. Only `results_dir` and `output_dir` change to a fresh scratch root. Its launcher copies small audit metadata to the persistent result directory immediately upon successful completion before it reports exit 0. A full per-file archive is still required before the result is accepted and before its scratch files are cleaned. This recovery does not repeat a published formal test.
