@@ -248,6 +248,9 @@ class Replay11V3Test(unittest.TestCase):
             frozen['identity']['task_classes']['9'] = list(range(90, 99))
             with self.assertRaisesRegex(ValueError, 'frozen task classes'):
                 _verify_frozen_task_classes(frozen, config, 10)
+            frozen['identity']['task_classes']['9'] = list(range(90, 100)) + [0]
+            with self.assertRaisesRegex(ValueError, 'frozen task classes'):
+                _verify_frozen_task_classes(frozen, config, 10)
 
     def test_frozen_state_hashes_reject_resealed_checkpoint_mutations(self):
         from adaptive_consolidation_audit import trainer_state_sha256
@@ -274,9 +277,6 @@ class Replay11V3Test(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'frozen checkpoint state'):
             _verify_frozen_checkpoint_state(payload, frozen,
                                             {'history': [2]})
-            frozen['identity']['task_classes']['9'] = list(range(90, 99)) + [0]
-            with self.assertRaisesRegex(ValueError, 'frozen task classes'):
-                _verify_frozen_task_classes(frozen, config, 10)
 
     def test_strict_checkpoint_rejects_wrong_method_state(self):
         from replay11_evidence import (_expected_protocol,
