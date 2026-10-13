@@ -175,6 +175,19 @@ class Replay11MatrixTest(unittest.TestCase):
                     self.assertEqual(er_options['--optimizer'], 'adamw')
                     self.assertEqual(er_options['--task_ce_mode'], 'current')
 
+    def test_ocar_uses_plain_sgd_for_preconditioned_step(self):
+        for dataset in matrix.DATASETS:
+            with self.subTest(dataset=dataset):
+                command = matrix.command_for(
+                    (dataset, 'ocar', 42), Path('/tmp/replay11-test'),
+                    python=Path('/opt/python'), worktree=Path('/opt/worktree'),
+                    device='cuda:0')
+                options = dict(zip(command[2::2], command[3::2]))
+                self.assertEqual(options['--task_ce_mode'], 'full')
+                self.assertEqual(options['--optimizer'], 'sgd')
+                self.assertEqual(float(options['--momentum']), 0.0)
+                self.assertEqual(float(options['--weight_decay']), 0.0)
+
     def test_isolet_uses_host_local_cache_path(self):
         command = matrix.command_for(
             ('isolet', 'ocar', 42), Path('/tmp/replay11-test'),

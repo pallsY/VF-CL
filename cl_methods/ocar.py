@@ -10,23 +10,29 @@ from .er import ERCL
 
 
 def kfac_precondition(gradient, activation_rows, output_covariance, damping):
-    """Apply damped G^-1 grad A^-1 with low-rank A via Woodbury."""
+    """Solve G X (R.T R) + tau X = gradient for a low-rank row factor R."""
     if (gradient.ndim != 2 or activation_rows.ndim != 2
             or output_covariance.ndim != 2
             or gradient.size(1) != activation_rows.size(1)
             or output_covariance.shape != (gradient.size(0), gradient.size(0))
             or activation_rows.size(0) == 0 or damping <= 0):
         raise ValueError('invalid OCAR K-FAC factors')
-    out_dim = gradient.size(0)
-    left = torch.linalg.solve(
-        output_covariance + damping * torch.eye(
-            out_dim, dtype=gradient.dtype, device=gradient.device), gradient)
     rows = activation_rows.to(dtype=gradient.dtype, device=gradient.device)
-    n = len(rows)
-    small = torch.eye(n, dtype=gradient.dtype, device=gradient.device)
-    small = small + rows @ rows.T / (n * damping)
-    correction = (left @ rows.T) @ torch.linalg.solve(small, rows)
-    return left / damping - correction / (n * damping * damping)
+    covariance = output_covariance.to(
+        dtype=gradient.dtype, device=gradient.device)
+    eigenvalues, eigenvectors = torch.linalg.eigh(
+        (covariance + covariance.T) / 2)
+    eigenvalues = eigenvalues.clamp_min(0)
+    _, singular_values, right_vectors = torch.linalg.svd(
+        rows, full_matrices=False)
+    rotated = eigenvectors.T @ gradient
+    projected = rotated @ right_vectors.T
+    denominators = (damping + eigenvalues[:, None]
+                    * singular_values.square()[None, :])
+    adjusted = rotated / damping
+    adjusted += (projected * (denominators.reciprocal() - 1 / damping)
+                 ) @ right_vectors
+    return eigenvectors @ adjusted
 
 
 class OCARCL(ERCL):
@@ -61,7 +67,8 @@ class OCARCL(ERCL):
         old_top = self.trainer.top_model.classifier
         old_factor = self.factors.get(old_top)
         super().before_task(task_id, new_classes, seen_classes)
-        self.lambda_buffer = len(seen_classes) / max(len(new_classes), 1)
+        old_classes = set(seen_classes) - set(new_classes)
+        self.lambda_buffer = len(old_classes) / max(len(new_classes), 1)
         new_top = self.trainer.top_model.classifier
         if old_top is not new_top and old_factor is not None:
             self.factors[new_top] = (old_factor[0], None)
@@ -100,8 +107,7 @@ class OCARCL(ERCL):
             z = patches.transpose(1, 2).reshape(-1, patches.size(1))
             g = grad_output.permute(0, 2, 3, 1).reshape(-1, grad_output.size(1))
         if len(z) > max_rows:
-            indices = torch.linspace(0, len(z) - 1,
-                                     max_rows, device=z.device).long()
+            indices = torch.randperm(len(z), device=z.device)[:max_rows]
             z, g = z[indices], g[indices]
         if module.bias is not None:
             z = torch.cat((z, torch.ones_like(z[:, :1])), dim=1)
@@ -157,6 +163,7 @@ class OCARCL(ERCL):
                     continue
                 z, g = self._rows(module, inputs[module],
                                   outputs[module], self.max_rows)
+                z = z / math.sqrt(len(z))
                 new_g = g.T @ g / len(g)
                 previous = self.factors.get(module)
                 if previous is None:
@@ -171,10 +178,10 @@ class OCARCL(ERCL):
                         old_z * math.sqrt(1 - self.ema),
                         z * math.sqrt(self.ema)), 0)
                     if len(combined) > self.max_rows:
-                        indices = torch.linspace(
-                            0, len(combined) - 1, self.max_rows,
-                            device=combined.device).long()
-                        combined = combined[indices]
+                        _, singular_values, right_vectors = torch.linalg.svd(
+                            combined, full_matrices=False)
+                        combined = (singular_values[:self.max_rows, None]
+                                    * right_vectors[:self.max_rows])
                     self.factors[module] = (combined, updated_g)
         finally:
             for handle in handles:
@@ -185,7 +192,7 @@ class OCARCL(ERCL):
                 parameter.grad = gradient
 
     def _precondition(self, models):
-        damping = math.sqrt(self.tau)
+        damping = self.tau
         for model in models:
             for module in model.modules():
                 factor = self.factors.get(module)
@@ -224,6 +231,7 @@ class OCARCL(ERCL):
     def get_state(self):
         state = super().get_state()
         state.update(
+            factor_schema_version=2,
             tau=self.tau, steps=self.steps,
             factors={name: (rows.detach().cpu(),
                             None if covariance is None else covariance.detach().cpu())
@@ -234,6 +242,8 @@ class OCARCL(ERCL):
         return state
 
     def load_state(self, state):
+        if state.get('factor_schema_version') != 2:
+            raise ValueError('OCAR factor schema differs from the paper update')
         super().load_state(state)
         self.tau, self.steps = float(state['tau']), int(state['steps'])
         modules = self._modules()
