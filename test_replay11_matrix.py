@@ -102,23 +102,53 @@ class Replay11MatrixTest(unittest.TestCase):
 
     def test_pilot_record_cannot_enter_full_summary(self):
         from unittest import mock
+        for flag in ('pilot_deferred', 'pilot_bic'):
+            with self.subTest(flag=flag), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                job_dir = root / 'cifar100' / 'hpcr' / '42'
+                job_dir.mkdir(parents=True)
+                (job_dir / 'JOB_SUCCESS.json').write_text(json.dumps({
+                    'dataset': 'cifar100', 'method': 'hpcr', 'seed': 42,
+                    'smoke': False, flag: True,
+                    'code_commit': 'historical',
+                    'metrics': {'aa_final_cil': 0.5, 'bwt_cil': 0.0,
+                                'task_il_final': 0.5},
+                }))
+                with (mock.patch.object(matrix, 'DATASETS', ('cifar100',)),
+                      mock.patch.object(matrix, 'METHODS', ('hpcr',)),
+                      mock.patch.object(matrix, 'SEEDS', (42,)),
+                      mock.patch.object(matrix, 'verify_success_record')):
+                    with self.assertRaisesRegex(ValueError, 'pilot'):
+                        matrix.summarize(root)
+
+    def test_bic_pilot_record_keeps_ten_task_formal_identity(self):
+        import inspect
+        from unittest import mock
+        self.assertIn('pilot_bic', inspect.signature(matrix.run_one).parameters)
+        job = ('cifar100', 'hpcr', 42)
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            job_dir = root / 'cifar100' / 'hpcr' / '42'
-            job_dir.mkdir(parents=True)
-            (job_dir / 'JOB_SUCCESS.json').write_text(json.dumps({
-                'dataset': 'cifar100', 'method': 'hpcr', 'seed': 42,
-                'smoke': False, 'pilot_deferred': True,
-                'code_commit': 'historical',
-                'metrics': {'aa_final_cil': 0.5, 'bwt_cil': 0.0,
-                            'task_il_final': 0.5},
-            }))
-            with (mock.patch.object(matrix, 'DATASETS', ('cifar100',)),
-                  mock.patch.object(matrix, 'METHODS', ('hpcr',)),
-                  mock.patch.object(matrix, 'SEEDS', (42,)),
-                  mock.patch.object(matrix, 'verify_success_record')):
-                with self.assertRaisesRegex(ValueError, 'pilot'):
-                    matrix.summarize(root)
+            job_dir = Path(directory)
+            run = job_dir / 'run'
+            checkpoint = run / 'checkpoints' / 'formal_final.pt'
+            checkpoint.parent.mkdir(parents=True)
+            checkpoint.write_bytes(b'formal bic pilot checkpoint')
+            results = run / 'results.json'
+            results.write_bytes(b'formal bic pilot result')
+            metrics = {'aa_final_cil': 0.5, 'bwt_cil': 0.0,
+                       'task_il_final': 0.5}
+            record = {
+                'dataset': job[0], 'method': job[1], 'seed': job[2],
+                'smoke': False, 'pilot_deferred': False,
+                'pilot_bic': True,
+                'data_hashes': matrix.expected_data(job[0]),
+                'metrics': metrics,
+                'results_sha256': matrix.sha256_file(results),
+                'checkpoint_sha256': matrix.sha256_file(checkpoint),
+            }
+            with mock.patch.object(matrix, 'validate_completed_run',
+                                   return_value=metrics) as validate:
+                matrix.verify_success_record(job_dir, record)
+            validate.assert_called_once_with(job, run, 10, deferred=True)
 
     def test_upmc_authority_binds_new_cache_and_clean_source(self):
         expected = matrix.expected_data('upmc_food101')
@@ -308,6 +338,31 @@ class Replay11MatrixTest(unittest.TestCase):
         self.assertEqual(options['--formal_deferred_evaluation'], '1')
         self.assertEqual(options['--bic_enabled'], '0')
         self.assertEqual(options['--lambda_validation_enabled'], '0')
+
+    def test_cifar_bic_pilot_keeps_full_holdouts_with_one_epoch(self):
+        import inspect
+        self.assertIn('pilot_bic', inspect.signature(matrix.command_for).parameters)
+        job = ('cifar100', 'hpcr', 42)
+        command = matrix.command_for(
+            job, Path('/tmp/replay11-bic-pilot'),
+            python=Path('/opt/python'), worktree=Path('/opt/worktree'),
+            device='cuda:0', pilot_bic=True)
+        options = dict(zip(command[2::2], command[3::2]))
+        self.assertEqual(options['--num_tasks'], '10')
+        self.assertEqual(options['--epochs_per_task'], '1')
+        self.assertEqual(options['--formal_deferred_evaluation'], '1')
+        self.assertEqual(options['--bic_enabled'], '1')
+        self.assertEqual(options['--lambda_validation_enabled'], '1')
+        with self.assertRaises(ValueError):
+            matrix.command_for(
+                ('isolet', 'hpcr', 42), Path('/tmp/replay11-bic-pilot'),
+                python=Path('/opt/python'), worktree=Path('/opt/worktree'),
+                device='cuda:0', pilot_bic=True)
+        with self.assertRaises(ValueError):
+            matrix.command_for(
+                job, Path('/tmp/replay11-bic-pilot'),
+                python=Path('/opt/python'), worktree=Path('/opt/worktree'),
+                device='cuda:0', pilot_bic=True, pilot_deferred=True)
 
     def test_shards_partition_jobs_without_overlap(self):
         first = set(matrix.jobs_for_shard(0, 3))

@@ -186,9 +186,11 @@ def run_directories(job_dir, *, smoke):
 def verify_success_record(job_dir, record):
     job = (record['dataset'], record['method'], record['seed'])
     pilot_deferred = record.get('pilot_deferred', False)
-    if (type(pilot_deferred) is not bool
-            or (pilot_deferred and record['smoke'])):
-        raise ValueError('invalid deferred pilot record')
+    pilot_bic = record.get('pilot_bic', False)
+    if (type(pilot_deferred) is not bool or type(pilot_bic) is not bool
+            or sum((record['smoke'], pilot_deferred, pilot_bic)) > 1
+            or (pilot_bic and job[0] != 'cifar100')):
+        raise ValueError('invalid pilot record')
     if job not in jobs() or record['data_hashes'] != expected_data(job[0]):
         raise ValueError('success record job or data authority differs')
     run_dirs = run_directories(job_dir, smoke=record['smoke'])
@@ -217,14 +219,18 @@ def jobs_for_shard(index, count):
 
 
 def command_for(job, results_root, *, python, worktree,
-                device, data_root=None, smoke=False, pilot_deferred=False):
+                device, data_root=None, smoke=False, pilot_deferred=False,
+                pilot_bic=False):
     dataset, method, seed = job
     if dataset not in DATASETS or method not in METHODS or seed not in SEEDS:
         raise ValueError('unregistered replay-11 job')
-    if type(smoke) is not bool or type(pilot_deferred) is not bool:
-        raise TypeError('smoke and pilot_deferred must be bool')
-    if smoke and pilot_deferred:
-        raise ValueError('smoke and pilot_deferred cannot be combined')
+    if any(type(flag) is not bool for flag in
+           (smoke, pilot_deferred, pilot_bic)):
+        raise TypeError('pilot and smoke flags must be bool')
+    if sum((smoke, pilot_deferred, pilot_bic)) > 1:
+        raise ValueError('pilot and smoke modes cannot be combined')
+    if pilot_bic and dataset != 'cifar100':
+        raise ValueError('BiC pilot requires CIFAR100')
     # Reuse the reviewed dataset-specific settings. ER supplies the shared
     # replay-class protocol; only the method-specific algorithm changes.
     base = registry.protocol_for(
@@ -257,6 +263,8 @@ def command_for(job, results_root, *, python, worktree,
         if pilot_deferred and dataset == 'cifar100':
             options['bic_enabled'] = 0
             options['lambda_validation_enabled'] = 0
+    if pilot_bic:
+        options['epochs_per_task'] = 1
     options.update(METHOD_OPTIONS[method])
     command = [str(python), str(Path(worktree) / 'main.py')]
     for option, value in options.items():
@@ -283,7 +291,7 @@ def _git_commit(worktree):
 
 
 def run_one(job, results_root, *, data_root, device, smoke=False,
-            pilot_deferred=False):
+            pilot_deferred=False, pilot_bic=False):
     dataset, method, seed = job
     worktree = Path(__file__).resolve().parent
     commit = _git_commit(worktree)
@@ -299,13 +307,13 @@ def run_one(job, results_root, *, data_root, device, smoke=False,
     command = command_for(
         job, job_dir, python=Path(sys.executable), worktree=worktree,
         device=device, data_root=data_root, smoke=smoke,
-        pilot_deferred=pilot_deferred)
+        pilot_deferred=pilot_deferred, pilot_bic=pilot_bic)
     job_dir.mkdir(parents=True)
     plan = {
         'dataset': dataset, 'method': method, 'seed': seed,
         'code_commit': commit, 'command': command,
         'data_hashes': expected_data(dataset), 'smoke': smoke,
-        'pilot_deferred': pilot_deferred,
+        'pilot_deferred': pilot_deferred, 'pilot_bic': pilot_bic,
     }
     (job_dir / 'JOB_PLAN.json').write_text(
         json.dumps(plan, indent=2, sort_keys=True) + '\n', encoding='utf-8')
@@ -353,7 +361,8 @@ def summarize(results_root):
                 if ((record['dataset'], record['method'], record['seed'])
                         != (dataset, method, seed)
                         or record['smoke']
-                        or record.get('pilot_deferred', False)):
+                        or record.get('pilot_deferred', False)
+                        or record.get('pilot_bic', False)):
                     raise ValueError('result identity or pilot status differs')
                 verify_success_record(path.parent, record)
                 commits.add(record['code_commit'])
@@ -388,6 +397,7 @@ def main():
     parser.add_argument('--shard-count', type=int)
     parser.add_argument('--smoke', action='store_true')
     parser.add_argument('--pilot-deferred', action='store_true')
+    parser.add_argument('--pilot-bic', action='store_true')
     args = parser.parse_args()
     if args.action == 'plan':
         print(json.dumps(jobs()))
@@ -406,7 +416,7 @@ def main():
         print(json.dumps(run_one(
             (args.dataset, args.method, args.seed), args.results_root,
             data_root=args.data_root, device=args.device, smoke=args.smoke,
-            pilot_deferred=args.pilot_deferred),
+            pilot_deferred=args.pilot_deferred, pilot_bic=args.pilot_bic),
             sort_keys=True))
     else:
         if (args.shard_index is None or args.shard_count is None
@@ -416,7 +426,8 @@ def main():
             if args.dataset is None or job[0] == args.dataset:
                 run_one(job, args.results_root, data_root=args.data_root,
                         device=args.device, smoke=args.smoke,
-                        pilot_deferred=args.pilot_deferred)
+                        pilot_deferred=args.pilot_deferred,
+                        pilot_bic=args.pilot_bic)
 
 
 if __name__ == '__main__':
