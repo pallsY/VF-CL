@@ -3,6 +3,8 @@
 import hashlib
 import json
 import os
+import subprocess
+from functools import lru_cache
 from pathlib import Path
 
 import replay11_matrix as matrix
@@ -10,6 +12,11 @@ import replay11_matrix as matrix
 
 PRODUCER_COMMIT = '99e81b28e0544e182f777a34d7e7a786a1c3b920'
 TASKS = {'cifar100': 10, 'isolet': 13, 'upmc_food101': 10}
+PRODUCER_ENTRYPOINTS = {
+    '/home/chase/Yangxx/VF-CL-worktrees/github-target-clone/main.py',
+    '/home/c3080/YangXiaoXiang/VF-CL-worktrees/replay11-clip-test/main.py',
+    '/tmp/vfcl-replay11-code99/main.py',
+}
 
 
 class InconclusiveEvidence(Exception):
@@ -28,6 +35,22 @@ def _json(path):
     return json.loads(_file(path).read_text(encoding='utf-8'))
 
 
+def _canonical_sha(value):
+    content = json.dumps(
+        value, indent=2, sort_keys=True, allow_nan=False,
+        separators=(',', ': ')) + '\n'
+    return hashlib.sha256(content.encode('utf-8')).hexdigest()
+
+
+@lru_cache(maxsize=1)
+def _producer_main_sha256():
+    source = subprocess.check_output([
+        'git', '-C', str(Path(matrix.__file__).parent),
+        'show', f'{PRODUCER_COMMIT}:main.py',
+    ])
+    return hashlib.sha256(source).hexdigest()
+
+
 def _options(command):
     if (type(command) is not list or len(command) < 4
             or len(command[2:]) % 2):
@@ -43,7 +66,7 @@ def _options(command):
     return result
 
 
-def _verify_transaction(run, frozen, published, provenance):
+def _verify_transaction(run, frozen, published, provenance, result):
     names = (
         'PENDING', 'CONSUMING', 'COMPLETE', 'SEALED', 'PUBLISHING')
     markers = {
@@ -57,6 +80,16 @@ def _verify_transaction(run, frozen, published, provenance):
     if not all(type(value) is str and len(value) == 64
                for value in (transaction, evaluation)):
         raise ValueError('formal transaction hash is missing')
+    if transaction != _canonical_sha({
+            'identity': frozen['identity'],
+            'freeze': markers['PENDING']['freeze']}):
+        raise ValueError('formal transaction digest differs')
+    complete = markers['COMPLETE']
+    if (not isinstance(complete.get('evaluation'), dict)
+            or evaluation != _canonical_sha(complete['evaluation'])
+            or ('bic' in complete and complete.get('bic_sha256')
+                != _canonical_sha(complete['bic']))):
+        raise ValueError('formal evaluation digest differs')
     for name, marker in (*markers.items(), ('PUBLISHED', published)):
         if (marker.get('schema_version') != 1
                 or marker.get('status') != name.lower()
@@ -91,7 +124,8 @@ def _verify_transaction(run, frozen, published, provenance):
             raise ValueError('formal publication link differs')
     if (sealed.get('source_provenance') != provenance
             or publishing.get('results_sha256')
-            != published.get('results_sha256')):
+            != published.get('results_sha256')
+            or published.get('results_sha256') != _canonical_sha(result)):
         raise ValueError('formal publication identity differs')
 
 
@@ -113,7 +147,8 @@ def verify_local_job(job_dir):
             or plan.get('data_hashes') != matrix.expected_data(dataset)):
         raise ValueError('job plan or authority differs')
     options = _options(plan.get('command'))
-    if Path(plan['command'][1]).name != 'main.py':
+    if (plan['command'][1].replace('\\', '/')
+            not in PRODUCER_ENTRYPOINTS):
         raise ValueError('training entrypoint differs')
     if any(options.get(key) != expected for key, expected in {
             'cl_method': method, 'seed': str(seed),
@@ -121,6 +156,14 @@ def verify_local_job(job_dir):
             'formal_deferred_evaluation': '1',
     }.items()):
         raise ValueError('job command differs')
+    if dataset in ('isolet', 'upmc_food101'):
+        relative = (matrix.UPMC_FOUR_CACHE if dataset == 'upmc_food101'
+                    else 'isolet/isolet_vfl.npz')
+        expected_vector = (
+            options['data_path'].replace('\\', '/').rstrip('/')
+            + '/' + relative)
+        if options.get('vector_npz', '').replace('\\', '/') != expected_vector:
+            raise ValueError('vector cache path differs')
     expected_options = _options(matrix.command_for(
         job, Path(options['results_dir']),
         python=Path(plan['command'][0]),
@@ -192,7 +235,7 @@ def verify_local_job(job_dir):
                     != record.get('sha256')):
                 raise ValueError('frozen checkpoint bytes differ')
     provenance = result.get('source_provenance')
-    _verify_transaction(run, frozen, published, provenance)
+    _verify_transaction(run, frozen, published, provenance, result)
     if (frozen.get('status') != 'frozen'
             or frozen.get('identity', {}).get('source_commit')
             != PRODUCER_COMMIT
@@ -200,6 +243,8 @@ def verify_local_job(job_dir):
             or published.get('source_provenance') != provenance
             or type(provenance) is not dict
             or provenance.get('source_commit') != PRODUCER_COMMIT
+            or provenance.get('source_sha256', {}).get('main.py')
+            != _producer_main_sha256()
             or published.get('checkpoint', {}).get('path')
             != 'checkpoints/formal_final.pt'
             or published['checkpoint'].get('sha256')

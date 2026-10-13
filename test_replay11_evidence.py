@@ -11,6 +11,7 @@ from replay11_evidence import (
 
 
 COMMIT = '99e81b28e0544e182f777a34d7e7a786a1c3b920'
+MAIN_BLOB_SHA = '115e8c0ac31054de1ff657b5b4f5024d088017c4b3bb4d0b2019ec84d8ea4e89'
 
 
 def _write(path, value):
@@ -22,8 +23,16 @@ def _sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def _job(root):
-    job = root / 'cifar100' / 'mir' / '42'
+def _canonical_sha(value):
+    content = json.dumps(
+        value, indent=2, sort_keys=True, allow_nan=False,
+        separators=(',', ': ')) + '\n'
+    return hashlib.sha256(content.encode()).hexdigest()
+
+
+def _job(root, dataset='cifar100'):
+    tasks = {'cifar100': 10, 'isolet': 13}[dataset]
+    job = root / dataset / 'mir' / '42'
     run = job / 'run'
     checkpoint = run / 'checkpoints' / 'formal_final.pt'
     checkpoint.parent.mkdir(parents=True)
@@ -32,17 +41,17 @@ def _job(root):
         {
             'step': f'event_{i}_CIL',
             'per_task_accs': (
-                {f'task_{j}': 0.5 - 0.01 * j for j in range(10)}
-                if i == 9 else {f'task_{i}': 0.8}
+                {f'task_{j}': 0.5 - 0.01 * j for j in range(tasks)}
+                if i == tasks - 1 else {f'task_{i}': 0.8}
             ),
             **({'per_task_accs_taskil': {
-                f'task_{j}': 0.7 for j in range(10)
-            }} if i == 9 else {}),
+                f'task_{j}': 0.7 for j in range(tasks)
+            }} if i == tasks - 1 else {}),
         }
-        for i in range(10)
+        for i in range(tasks)
     ]
     frozen_snapshots = []
-    for i in range(10):
+    for i in range(tasks):
         snapshot = run / 'formal_snapshots' / f'event_{i}_CIL.pt'
         snapshot.parent.mkdir(parents=True, exist_ok=True)
         snapshot.write_bytes(f'snapshot-{i}'.encode())
@@ -59,12 +68,18 @@ def _job(root):
             },
         })
     config = {
-        'cl_method': 'mir', 'seed': 42, 'num_tasks': 10,
+        'cl_method': 'mir', 'seed': 42, 'num_tasks': tasks,
         'num_parties': 4, 'formal_deferred_evaluation': True,
+    }
+    provenance = {
+        'source_commit': COMMIT,
+        'source_sha256': {
+            'main.py': MAIN_BLOB_SHA,
+        },
     }
     result = {
         'config': dict(config), 'task_acc_history': history,
-        'source_provenance': {'source_commit': COMMIT},
+        'source_provenance': provenance,
     }
     _write(run / 'config.json', config)
     _write(run / 'results.json', result)
@@ -79,9 +94,10 @@ def _job(root):
         'path': 'FORMAL_STATE_FROZEN.json',
         'sha256': _sha(run / 'FORMAL_STATE_FROZEN.json'),
     }
-    transaction = 'a' * 64
-    evaluation = 'b' * 64
-    provenance = {'source_commit': COMMIT}
+    transaction = _canonical_sha({
+        'identity': frozen_identity, 'freeze': freeze})
+    evaluation_payload = {'history': history}
+    evaluation = _canonical_sha(evaluation_payload)
     _write(run / 'FORMAL_EVALUATION_PENDING.json', {
         'schema_version': 1, 'status': 'pending',
         'identity': frozen_identity, 'freeze': freeze,
@@ -97,6 +113,7 @@ def _job(root):
         'identity': frozen_identity, 'freeze': freeze,
         'transaction_sha256': transaction,
         'evaluation_sha256': evaluation,
+        'evaluation': evaluation_payload,
     })
     record = lambda name: {
         'path': name + '.json', 'sha256': _sha(run / (name + '.json')),
@@ -114,14 +131,14 @@ def _job(root):
         'schema_version': 1, 'status': 'publishing',
         'transaction_sha256': transaction,
         'evaluation_sha256': evaluation,
-        'results_sha256': 'c' * 64, 'seal': seal,
+        'results_sha256': _canonical_sha(result), 'seal': seal,
         'source_provenance': provenance,
     })
     _write(run / 'FORMAL_EVALUATION_PUBLISHED.json', {
         'schema_version': 1, 'status': 'published',
         'transaction_sha256': transaction,
         'evaluation_sha256': evaluation,
-        'results_sha256': 'c' * 64, 'seal': seal,
+        'results_sha256': _canonical_sha(result), 'seal': seal,
         'source_provenance': provenance,
         'checkpoint': {'path': 'checkpoints/formal_final.pt',
                        'sha256': _sha(checkpoint)},
@@ -130,12 +147,12 @@ def _job(root):
     })
     _write(run / 'formal_access' / 'test.consumed.json', {
         'schema_version': 1, 'status': 'consumed',
-        'access': {'split': 'test', 'event_idx': 9,
+        'access': {'split': 'test', 'event_idx': tasks - 1,
                    'phase': 'final_test_post_install'},
     })
     command = matrix.command_for(
-        ('cifar100', 'mir', 42), job,
-        python=Path('python'), worktree=Path('/tmp/code'),
+        (dataset, 'mir', 42), job,
+        python=Path('python'), worktree=Path('/tmp/vfcl-replay11-code99'),
         device='cuda:0', data_root=root / 'data')
     for i in range(2, len(command), 2):
         key, token = command[i][2:], command[i + 1]
@@ -154,15 +171,15 @@ def _job(root):
             config[key] = token
     _write(run / 'config.json', config)
     plan = {
-        'dataset': 'cifar100', 'method': 'mir', 'seed': 42,
+        'dataset': dataset, 'method': 'mir', 'seed': 42,
         'smoke': False, 'code_commit': COMMIT, 'command': command,
-        'data_hashes': matrix.expected_data('cifar100'),
+        'data_hashes': matrix.expected_data(dataset),
     }
     _write(job / 'JOB_PLAN.json', plan)
     _write(job / 'JOB_SUCCESS.json', {
         **plan,
         'metrics': matrix.metrics_from_history(
-            history, expected_tasks=10, deferred=True),
+            history, expected_tasks=tasks, deferred=True),
         'results_sha256': _sha(run / 'results.json'),
         'checkpoint_sha256': _sha(checkpoint),
     })
@@ -215,7 +232,12 @@ class Replay11EvidenceTest(unittest.TestCase):
             published = job / 'run' / 'FORMAL_EVALUATION_PUBLISHED.json'
             marker = json.loads(published.read_text())
             marker['results']['sha256'] = _sha(results)
+            marker['results_sha256'] = _canonical_sha(value)
             _write(published, marker)
+            publishing = job / 'run' / 'FORMAL_EVALUATION_PUBLISHING.json'
+            marker = json.loads(publishing.read_text())
+            marker['results_sha256'] = _canonical_sha(value)
+            _write(publishing, marker)
             self.assertEqual(
                 verify_local_job(job)['job'], 'cifar100/mir/42')
 
@@ -267,6 +289,47 @@ class Replay11EvidenceTest(unittest.TestCase):
             value = json.loads(marker.read_text())
             value['transaction_sha256'] = 'd' * 64
             _write(marker, value)
+            with self.assertRaises(ValueError):
+                verify_local_job(job)
+
+    def test_forged_consistent_transaction_hash_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            job = _job(Path(directory))
+            run = job / 'run'
+            for name in ('PENDING', 'CONSUMING', 'COMPLETE'):
+                path = job / 'run' / f'FORMAL_EVALUATION_{name}.json'
+                value = json.loads(path.read_text())
+                value['transaction_sha256'] = 'd' * 64
+                _write(path, value)
+            sealed = run / 'FORMAL_EVALUATION_SEALED.json'
+            value = json.loads(sealed.read_text())
+            value['transaction_sha256'] = 'd' * 64
+            for name in ('pending', 'consuming', 'complete'):
+                value[name]['sha256'] = _sha(
+                    run / f'FORMAL_EVALUATION_{name.upper()}.json')
+            _write(sealed, value)
+            for name in ('PUBLISHING', 'PUBLISHED'):
+                path = run / f'FORMAL_EVALUATION_{name}.json'
+                value = json.loads(path.read_text())
+                value['transaction_sha256'] = 'd' * 64
+                value['seal']['sha256'] = _sha(sealed)
+                _write(path, value)
+            with self.assertRaises(ValueError):
+                verify_local_job(job)
+
+    def test_wrong_isolet_vector_cache_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            job = _job(Path(directory), dataset='isolet')
+            for name in ('JOB_PLAN.json', 'JOB_SUCCESS.json'):
+                path = job / name
+                value = json.loads(path.read_text())
+                command = value['command']
+                command[command.index('--vector_npz') + 1] = '/wrong/cache.npz'
+                _write(path, value)
+            config = job / 'run' / 'config.json'
+            value = json.loads(config.read_text())
+            value['vector_npz'] = '/wrong/cache.npz'
+            _write(config, value)
             with self.assertRaises(ValueError):
                 verify_local_job(job)
 
@@ -328,7 +391,7 @@ class Replay11EvidenceTest(unittest.TestCase):
             for filename in ('JOB_PLAN.json', 'JOB_SUCCESS.json'):
                 path = job / filename
                 value = json.loads(path.read_text())
-                value['command'][1] = '/unrelated/entry.py'
+                value['command'][1] = '/unrelated/main.py'
                 _write(path, value)
             with self.assertRaises(ValueError):
                 verify_local_job(job)
