@@ -149,6 +149,32 @@ class Replay11MatrixTest(unittest.TestCase):
         self.assertEqual(command[command.index('--formal_deferred_evaluation') + 1], '1')
         self.assertEqual(command[command.index('--exp_name') + 1], 'run')
 
+    def test_mir_uses_paper_sgd_and_full_head_with_dataset_budget(self):
+        budgets = {'cifar100': '50', 'isolet': '50',
+                   'upmc_food101': '20'}
+        for dataset, epochs in budgets.items():
+            with self.subTest(dataset=dataset):
+                command = matrix.command_for(
+                    (dataset, 'mir', 42), Path('/tmp/replay11-test'),
+                    python=Path('/opt/python'), worktree=Path('/opt/worktree'),
+                    device='cuda:0')
+                options = dict(zip(command[2::2], command[3::2]))
+                self.assertEqual(options['--task_ce_mode'], 'full')
+                self.assertEqual(options['--optimizer'], 'sgd')
+                self.assertEqual(float(options['--momentum']), 0.0)
+                self.assertEqual(float(options['--weight_decay']), 0.0)
+                self.assertEqual(options['--epochs_per_task'], epochs)
+
+                er = matrix.command_for(
+                    (dataset, 'er', 42), Path('/tmp/replay11-test'),
+                    python=Path('/opt/python'), worktree=Path('/opt/worktree'),
+                    device='cuda:0')
+                er_options = dict(zip(er[2::2], er[3::2]))
+                self.assertEqual(er_options['--epochs_per_task'], epochs)
+                if dataset != 'cifar100':
+                    self.assertEqual(er_options['--optimizer'], 'adamw')
+                    self.assertEqual(er_options['--task_ce_mode'], 'current')
+
     def test_isolet_uses_host_local_cache_path(self):
         command = matrix.command_for(
             ('isolet', 'ocar', 42), Path('/tmp/replay11-test'),
