@@ -445,16 +445,11 @@ def _tree_identity(root):
     return len(rows), sum(row[1] for row in rows), digest
 
 
-def verify_archive_manifest(job_dir, manifest_path):
-    """Verify an archived job's declared byte tree, not its old inode."""
+def _archive_job_scope(job_dir, record, destination):
     job_dir = Path(os.path.abspath(job_dir))
-    record = _json(manifest_path)
-    destination = Path(os.path.abspath(record['destination']))
     if (any(part.is_symlink() for part in (job_dir, *job_dir.parents))
-            or any(part.is_symlink()
-                   for part in (destination, *destination.parents))
-            or not destination.is_dir()):
-        raise ValueError('archive destination differs')
+            or not job_dir.is_dir()):
+        raise ValueError('archive job path differs')
     job = f'{job_dir.parent.parent.name}/{job_dir.parent.name}/{job_dir.name}'
     dataset, method, seed = job.split('/')
     if (destination != job_dir
@@ -475,6 +470,24 @@ def verify_archive_manifest(job_dir, manifest_path):
                 and f'{method}/{seed}' not in record['jobs']
                 and job not in record['jobs'])):
         raise ValueError('archive job identity differs')
+    return job
+
+
+def verify_archive_group(manifest_path, job_dirs):
+    """Hash one archived tree once and bind every requested job to it."""
+    record = _json(manifest_path)
+    destination = Path(os.path.abspath(record['destination']))
+    if (any(part.is_symlink()
+            for part in (destination, *destination.parents))
+            or not destination.is_dir()):
+        raise ValueError('archive destination differs')
+    job_dirs = list(job_dirs)
+    if not job_dirs:
+        raise ValueError('archive group is empty')
+    jobs = [_archive_job_scope(path, record, destination)
+            for path in job_dirs]
+    if len(jobs) != len(set(jobs)):
+        raise ValueError('duplicate archive job')
     files, size, digest = _tree_identity(destination)
     if record.get('files') != files or record.get('bytes') != size:
         raise ValueError('archive file inventory differs')
@@ -484,10 +497,15 @@ def verify_archive_manifest(job_dir, manifest_path):
             raise ValueError('archive bytes differ')
     elif record.get('tree_sha256') != digest:
         raise ValueError('archive bytes differ')
-    return {
+    return [{
         'job': job, 'code_commit': PRODUCER_COMMIT,
         'files': files, 'bytes': size, 'tree_sha256': digest,
-    }
+    } for job in jobs]
+
+
+def verify_archive_manifest(job_dir, manifest_path):
+    """Verify one archived job, reusing the group implementation."""
+    return verify_archive_group(manifest_path, [job_dir])[0]
 
 
 def merge_attestations(records):
