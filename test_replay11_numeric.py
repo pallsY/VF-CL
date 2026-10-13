@@ -135,6 +135,50 @@ class NumericAuditTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'seed 42'):
             numeric.audit_job('isolet/mir/43', 'a' * 40, '.', '.')
 
+    def test_public_numeric_gate_requires_pinned_basic_admission(self):
+        import replay11_evidence as evidence
+        with patch.object(evidence, 'verify_v3_formal_job',
+                          side_effect=ValueError('basic evidence rejected')) as basic:
+            with patch.object(numeric.subprocess, 'run') as worker:
+                with self.assertRaisesRegex(ValueError, 'basic evidence rejected'):
+                    numeric.audit_job('isolet/mir/42', evidence.CORRECTED_COMMIT,
+                                      '.', evidence.FROZEN_DATA_ROOT)
+                basic.assert_called_once()
+                worker.assert_not_called()
+
+    def test_method_task_il_uses_direct_prediction_count(self):
+        class Trainer:
+            def evaluate(self, batches):
+                labels = torch.cat([y for _, y in batches])
+                probabilities = torch.tensor([[0.9, 0.1], [0.1, 0.9]])
+                return 0.0, probabilities, labels
+
+        class Method:
+            name = 'HPCR_VFL'
+
+            def evaluate_class_il_readouts_cached(self, batches, task_classes):
+                return {
+                    'class_il_pred_task_counts': {
+                        'task_0': {'correct': 2, 'total': 2}},
+                    'class_il_pred_task': {'task_0': 1.0},
+                    'task_il_oracle': {'task_0': 0.0},
+                }
+
+        batches = ((torch.tensor([[1.0], [2.0]]), torch.tensor([0, 1])),)
+        with self.assertRaisesRegex(ValueError, 'Task-IL.*differs'):
+            numeric.score_state(Trainer(), Method(), batches, {0: [0, 1]})
+
+    def test_frozen_tasks_must_match_full_planned_class_partition(self):
+        planned = [[0, 1], [2, 3]]
+        self.assertEqual(numeric.validate_task_classes(
+            {0: [0, 1], 1: [2, 3]}, planned, 4),
+            {0: [0, 1], 1: [2, 3]})
+        self.assertEqual(numeric.validate_task_classes(
+            {0: [0, 1], 1: [2, 3]}, {0: [0, 1], 1: [2, 3]}, 4),
+            {0: [0, 1], 1: [2, 3]})
+        with self.assertRaisesRegex(ValueError, 'task classes'):
+            numeric.validate_task_classes({0: [0], 1: [2, 3]}, planned, 4)
+
 
 if __name__ == '__main__':
     unittest.main()

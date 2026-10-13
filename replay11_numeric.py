@@ -146,11 +146,77 @@ def verify_cache(batches, expected):
     return dict(labels)
 
 
+def validate_task_classes(recorded, planned, num_classes):
+    """Bind frozen test partition to the complete configured class schedule."""
+    pairs = planned.items() if type(planned) is dict else enumerate(planned)
+    expected = {task: list(classes) for task, classes in pairs}
+    flattened = [label for classes in expected.values() for label in classes]
+    if (recorded != expected or type(num_classes) is not int
+            or sorted(flattened) != list(range(num_classes))):
+        raise ValueError('frozen task classes differ from full planned partition')
+    return expected
+
+
+@torch.no_grad()
+def _direct_method_task_il(trainer, method, batches, task_classes):
+    """Count oracle-task predictions without inverting a rounded readout."""
+    answer = {}
+    icarl = getattr(method, 'name', None) == 'iCaRL_VFL'
+    if icarl:
+        modules = [*trainer.bottoms, trainer.top_model]
+        modes = [module.training for module in modules]
+        for module in modules:
+            module.eval()
+        try:
+            class_ids, means = method._class_means()
+            for task, classes in task_classes.items():
+                allowed = torch.tensor(
+                    [int(label) in classes for label in class_ids.tolist()],
+                    dtype=torch.bool, device=class_ids.device)
+                selected = torch.where(allowed)[0]
+                if not len(selected):
+                    raise ValueError('iCaRL oracle task has no exemplar means')
+                correct = 0
+                for x, y in batches:
+                    mask = torch.zeros_like(y, dtype=torch.bool)
+                    for label in classes:
+                        mask |= y == int(label)
+                    if bool(mask.any()):
+                        features = method._features(x[mask], record_comm=False)
+                        distances = torch.cdist(features, means)
+                        predictions = class_ids[selected[distances[:, allowed].argmin(1)]]
+                        correct += int(predictions.eq(y[mask].to(predictions.device)).sum())
+                answer[f'task_{task}'] = correct
+        finally:
+            for module, mode in zip(modules, modes):
+                module.train(mode)
+        return answer
+    for task, classes in task_classes.items():
+        selected = []
+        for x, y in batches:
+            mask = torch.zeros_like(y, dtype=torch.bool)
+            for label in classes:
+                mask |= y == int(label)
+            if bool(mask.any()):
+                selected.append((x[mask], y[mask]))
+        if not selected:
+            raise ValueError('oracle task has no test examples')
+        _, probabilities, labels = trainer.evaluate(tuple(selected))
+        labels = labels.cpu().long()
+        probabilities = probabilities.cpu()
+        allowed = torch.tensor(classes, dtype=torch.long)
+        predictions = allowed[probabilities.index_select(1, allowed).argmax(1)]
+        answer[f'task_{task}'] = int(predictions.eq(labels).sum())
+    return answer
+
+
 def score_state(trainer, method, batches, task_classes):
     """Count fresh Class-IL and Task-IL predictions on selected CPU batches."""
     if hasattr(method, 'evaluate_class_il_readouts_cached'):
         readouts = method.evaluate_class_il_readouts_cached(batches, task_classes)
         primary = readouts['class_il_pred_task_counts']
+        direct_task_il = _direct_method_task_il(
+            trainer, method, batches, task_classes)
         answer = {'primary': {}, 'task_il': {}}
         for task, classes in task_classes.items():
             key = f'task_{task}'
@@ -162,8 +228,10 @@ def score_state(trainer, method, batches, task_classes):
             if round(counts['correct'] / total, 4) != readouts['class_il_pred_task'][key]:
                 raise ValueError('method exact readout ratio differs')
             answer['primary'][key] = counts['correct']
-            answer['task_il'][key] = unique_correct(
-                readouts['task_il_oracle'][key], total)
+            answer['task_il'][key] = direct_task_il[key]
+            if (round(direct_task_il[key] / total, 4)
+                    != readouts['task_il_oracle'][key]):
+                raise ValueError('Task-IL direct count differs from method readout')
         return answer
     answer = {'primary': {}, 'task_il': {}}
     for task, classes in task_classes.items():
@@ -259,6 +327,7 @@ def _producer_sources(root, commit, provenance):
 
 def _numeric_worker(job_dir, producer_commit, producer_root, data_root):
     started = time.perf_counter()
+    torch.set_num_threads(1)
     job_dir = Path(job_dir)
     evidence = read_job_evidence(job_dir)
     identity, config = evidence['identity'], evidence['config']
@@ -269,7 +338,7 @@ def _numeric_worker(job_dir, producer_commit, producer_root, data_root):
                       identity['source_provenance'])
     sys.path.insert(0, str(Path(producer_root).resolve()))
     from adaptive_consolidation_audit import _formal_state_hash, _fresh_formal_state
-    from data_utils import VFLDataset
+    from data_utils import TaskManager, VFLDataset
     from metrics import cache_formal_batches
 
     task_classes = {
@@ -305,6 +374,8 @@ def _numeric_worker(job_dir, producer_commit, producer_root, data_root):
             if '..' in relative.parts:
                 raise ValueError('vector data path escapes data root')
             args.vector_npz = str(Path(data_root).joinpath(*relative.parts))
+        validate_task_classes(
+            task_classes, TaskManager(args).task_classes, args.num_classes)
         dataset = VFLDataset(args)
         indices = dataset.get_class_indices(dataset.testset, classes)
         loader = dataset._loader(
@@ -380,6 +451,14 @@ def audit_job(job_dir, producer_commit, producer_root, data_root):
     if (type(producer_commit) is not str or len(producer_commit) != 40
             or any(letter not in '0123456789abcdef' for letter in producer_commit)):
         raise ValueError('invalid producer commit')
+    import replay11_evidence as basic_audit
+    if (producer_commit != basic_audit.CORRECTED_COMMIT
+            or not basic_audit._same_path(data_root,
+                                          basic_audit.FROZEN_DATA_ROOT)):
+        raise ValueError('numeric replay source or data root differs from fixed protocol')
+    basic = basic_audit.verify_v3_formal_job(job_dir)
+    if basic.get('admission') != 'formal':
+        raise ValueError('numeric replay lacks formal basic admission')
     completed = subprocess.run(
         [sys.executable, str(Path(__file__).resolve()), '--worker',
          str(job_dir.resolve()), producer_commit, str(Path(producer_root).resolve()),
@@ -392,7 +471,9 @@ def audit_job(job_dir, producer_commit, producer_root, data_root):
              if line.startswith(marker)]
     if len(lines) != 1:
         raise ValueError('numeric worker produced no single result')
-    return json.loads(lines[0])
+    result = json.loads(lines[0])
+    result['basic_admission'] = 'formal'
+    return result
 
 
 if __name__ == '__main__':
