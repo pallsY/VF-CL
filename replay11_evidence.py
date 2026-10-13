@@ -6,6 +6,7 @@ import math
 import os
 import re
 import subprocess
+import types
 from functools import lru_cache
 from pathlib import Path
 
@@ -14,6 +15,11 @@ from adaptive_consolidation_audit import FORMAL_SOURCE_FILES
 
 
 PRODUCER_COMMIT = '99e81b28e0544e182f777a34d7e7a786a1c3b920'
+CORRECTED_COMMIT = '467611a603c9604ad57861920495a3ad05612037'
+PRODUCER_COMMITS = {PRODUCER_COMMIT, CORRECTED_COMMIT}
+LEGACY_REUSE_METHODS = frozenset({
+    'balanced_contrast', 'er', 'der_pp', 'er_ace', 'adagauss',
+})
 TASKS = {'cifar100': 10, 'isolet': 13, 'upmc_food101': 10}
 PRODUCER_ENTRYPOINTS = {
     '/home/chase/Yangxx/VF-CL-worktrees/github-target-clone/main.py',
@@ -44,30 +50,112 @@ def _canonical_sha(value):
     return hashlib.sha256(content.encode('utf-8')).hexdigest()
 
 
-@lru_cache(maxsize=1)
-def _producer_source_sha256():
+@lru_cache(maxsize=2)
+def _producer_source_sha256(commit=PRODUCER_COMMIT):
     root = str(Path(matrix.__file__).parent)
     return {
         name: hashlib.sha256(subprocess.check_output([
-            'git', '-C', root, 'show', f'{PRODUCER_COMMIT}:{name}',
+            'git', '-C', root, 'show', f'{commit}:{name}',
         ])).hexdigest()
         for name in FORMAL_SOURCE_FILES
     }
 
 
+@lru_cache(maxsize=2)
+def _committed_matrix(commit):
+    root = str(Path(matrix.__file__).parent)
+    source = subprocess.check_output([
+        'git', '-C', root, 'show', f'{commit}:replay11_matrix.py',
+    ])
+    module = types.ModuleType(f'replay11_matrix_{commit[:12]}')
+    module.__file__ = str(Path(root) / 'replay11_matrix.py')
+    module.__source_sha256__ = hashlib.sha256(source).hexdigest()
+    exec(compile(source, module.__file__, 'exec'), module.__dict__)
+    return module
+
+
+def _normalized_command(command):
+    options = _options(command)
+    if 'vector_npz' in options:
+        root = options['data_path'].replace('\\', '/').rstrip('/') + '/'
+        vector = options['vector_npz'].replace('\\', '/')
+        if not vector.startswith(root):
+            raise ValueError('vector cache is outside data root')
+        options['vector_npz'] = '<data_path>/' + vector[len(root):]
+    for key in ('results_dir', 'device', 'data_path'):
+        if key in options:
+            options[key] = f'<{key}>'
+    return options
+
+
+def equivalence_certificate(job, command):
+    """Attest an eligible legacy method against corrected formal code."""
+    dataset, method, seed = job
+    if job not in matrix.jobs() or method not in LEGACY_REUSE_METHODS:
+        raise ValueError('legacy method is not eligible for reuse')
+    actual = _normalized_command(command)
+    normalized = []
+    for commit in (PRODUCER_COMMIT, CORRECTED_COMMIT):
+        generator = _committed_matrix(commit)
+        expected = generator.command_for(
+            job, Path('/audit/results'), python=Path('/audit/python'),
+            worktree=Path('/audit/source'), device='audit-device',
+            data_root=Path('/audit/data'))
+        normalized.append(_normalized_command(expected))
+    if actual != normalized[0] or normalized[0] != normalized[1]:
+        raise ValueError('formal commands are not equivalent')
+    scope = [name for name in FORMAL_SOURCE_FILES
+             if not name.startswith('cl_methods/')
+             or name in ('cl_methods/__init__.py',
+                         f'cl_methods/{method}.py')]
+    old = _producer_source_sha256(PRODUCER_COMMIT)
+    new = _producer_source_sha256(CORRECTED_COMMIT)
+    if any(old[name] != new[name] for name in scope):
+        raise ValueError('executed source blobs are not equivalent')
+    return {
+        'equivalent': True, 'method': method,
+        'old_commit': PRODUCER_COMMIT,
+        'corrected_commit': CORRECTED_COMMIT,
+        'command_generator_sha256': {
+            commit: _committed_matrix(commit).__source_sha256__
+            for commit in (PRODUCER_COMMIT, CORRECTED_COMMIT)
+        },
+        'normalized_command': normalized[0],
+        'normalized_command_sha256': _canonical_sha(normalized[0]),
+        'source_sha256': {name: old[name] for name in scope},
+    }
+
+
 def _options(command):
-    if (type(command) is not list or len(command) < 4
-            or len(command[2:]) % 2):
+    if type(command) is not list or len(command) < 4:
         raise ValueError('invalid job command')
-    pairs = command[2:]
-    if any(type(pairs[i]) is not str or not pairs[i].startswith('--')
-           for i in range(0, len(pairs), 2)):
-        raise ValueError('invalid job option')
-    result = {pairs[i][2:]: str(pairs[i + 1])
-              for i in range(0, len(pairs), 2)}
-    if len(result) != len(pairs) // 2:
-        raise ValueError('duplicate job option')
+    result = {}
+    index = 2
+    while index < len(command):
+        option = command[index]
+        if type(option) is not str or not option.startswith('--'):
+            raise ValueError('invalid job option')
+        name = option[2:]
+        if name in result:
+            raise ValueError('duplicate job option')
+        if name == 'cosine_head':
+            result[name] = '1'
+            index += 1
+        else:
+            if index + 1 >= len(command):
+                raise ValueError('missing job option value')
+            result[name] = str(command[index + 1])
+            index += 2
     return result
+
+
+@lru_cache(maxsize=99)
+def _expected_certificate(job):
+    command = _committed_matrix(PRODUCER_COMMIT).command_for(
+        job, Path('/audit/results'), python=Path('/audit/python'),
+        worktree=Path('/audit/source'), device='audit-device',
+        data_root=Path('/audit/data'))
+    return equivalence_certificate(job, command)
 
 
 def _expected_protocol(config, provenance):
@@ -266,16 +354,24 @@ def verify_local_job(job_dir):
     dataset, method, seed = job
     plan = _json(job_dir / 'JOB_PLAN.json')
     success = _json(job_dir / 'JOB_SUCCESS.json')
+    if (plan.get('pilot_deferred', False) is not False
+            or plan.get('pilot_bic', False) is not False
+            or success.get('pilot_deferred', False) is not False
+            or success.get('pilot_bic', False) is not False):
+        raise ValueError('pilot result is excluded from formal matrix')
+    producer_commit = plan.get('code_commit')
     if (success.get('smoke') is not False
             or any(success.get(key) != value for key, value in plan.items())
             or (plan.get('dataset'), plan.get('method'), plan.get('seed'))
             != job
-            or plan.get('code_commit') != PRODUCER_COMMIT
+            or producer_commit not in PRODUCER_COMMITS
             or plan.get('data_hashes') != matrix.expected_data(dataset)):
         raise ValueError('job plan or authority differs')
     options = _options(plan.get('command'))
-    if (plan['command'][1].replace('\\', '/')
-            not in PRODUCER_ENTRYPOINTS):
+    entrypoint = plan['command'][1].replace('\\', '/')
+    if (not entrypoint.endswith('/main.py')
+            or (producer_commit == PRODUCER_COMMIT
+                and entrypoint not in PRODUCER_ENTRYPOINTS)):
         raise ValueError('training entrypoint differs')
     if any(options.get(key) != expected for key, expected in {
             'cl_method': method, 'seed': str(seed),
@@ -291,7 +387,7 @@ def verify_local_job(job_dir):
             + '/' + relative)
         if options.get('vector_npz', '').replace('\\', '/') != expected_vector:
             raise ValueError('vector cache path differs')
-    expected_options = _options(matrix.command_for(
+    expected_options = _options(_committed_matrix(producer_commit).command_for(
         job, Path(options['results_dir']),
         python=Path(plan['command'][0]),
         worktree=Path(plan['command'][1]).parent,
@@ -327,6 +423,8 @@ def verify_local_job(job_dir):
                 for class_id in group)
         elif name == 'custom_tasks' and isinstance(config[name], str):
             encoded = config[name]
+        elif name == 'cosine_head':
+            encoded = '1' if config[name] is True else '0'
         elif name in matrix.registry.OPTION_SCHEMA:
             encoded = matrix.registry._option_token(name, config[name])
         else:
@@ -388,14 +486,14 @@ def verify_local_job(job_dir):
         raise ValueError('formal test access identity differs')
     if (frozen.get('status') != 'frozen'
             or frozen.get('identity', {}).get('source_commit')
-            != PRODUCER_COMMIT
+            != producer_commit
             or published.get('status') != 'published'
             or published.get('source_provenance') != provenance
             or type(provenance) is not dict
             or provenance.get('schema_version') != 1
-            or provenance.get('source_commit') != PRODUCER_COMMIT
+            or provenance.get('source_commit') != producer_commit
             or type(source_hashes) is not dict
-            or source_hashes != _producer_source_sha256()
+            or source_hashes != _producer_source_sha256(producer_commit)
             or frozen['identity'].get('source_provenance') != provenance
             or published.get('checkpoint', {}).get('path')
             != 'checkpoints/formal_final.pt'
@@ -419,13 +517,23 @@ def verify_local_job(job_dir):
         result.get('task_acc_history'), TASKS[dataset], deferred=True)
     if metrics != success.get('metrics'):
         raise ValueError('metric formula differs')
-    return {
+    attestation = {
         'job': f'{dataset}/{method}/{seed}',
-        'code_commit': PRODUCER_COMMIT,
+        'code_commit': producer_commit,
+        'admission': ('formal' if producer_commit == CORRECTED_COMMIT
+                      or method in LEGACY_REUSE_METHODS else 'historical'),
+        'source_sha256': source_hashes,
+        'command_sha256': _canonical_sha(plan['command']),
+        'data_hashes': plan['data_hashes'],
+        'transaction_sha256': published['transaction_sha256'],
         'metrics': metrics,
         'results_sha256': success['results_sha256'],
         'checkpoint_sha256': success['checkpoint_sha256'],
     }
+    if producer_commit == PRODUCER_COMMIT and method in LEGACY_REUSE_METHODS:
+        attestation['reuse_certificate'] = equivalence_certificate(
+            job, plan['command'])
+    return attestation
 
 
 def _tree_identity(root):
@@ -452,11 +560,15 @@ def _archive_job_scope(job_dir, record, destination):
         raise ValueError('archive job path differs')
     job = f'{job_dir.parent.parent.name}/{job_dir.parent.name}/{job_dir.name}'
     dataset, method, seed = job.split('/')
+    plan = _json(job_dir / 'JOB_PLAN.json')
+    success = _json(job_dir / 'JOB_SUCCESS.json')
     if (destination != job_dir
             and not (destination.name == dataset
                      and job_dir == destination / method / seed)):
         raise ValueError('archive scope differs')
-    if (record.get('code_commit') != PRODUCER_COMMIT
+    if (record.get('code_commit') not in PRODUCER_COMMITS
+            or plan.get('code_commit') != record['code_commit']
+            or success.get('code_commit') != record['code_commit']
             or not record.get('source')
             or ('job' in record and record['job'] != job)
             or ('dataset' in record and record['dataset'] != dataset)
@@ -498,7 +610,7 @@ def verify_archive_group(manifest_path, job_dirs):
     elif record.get('tree_sha256') != digest:
         raise ValueError('archive bytes differ')
     return [{
-        'job': job, 'code_commit': PRODUCER_COMMIT,
+        'job': job, 'code_commit': record['code_commit'],
         'files': files, 'bytes': size, 'tree_sha256': digest,
     } for job in jobs]
 
@@ -514,14 +626,18 @@ def merge_attestations(records):
     expected = {f'{dataset}/{method}/{seed}'
                 for dataset, method, seed in jobs}
     found = set()
+    producers = {}
     for record in records:
         if type(record) is not dict:
             raise ValueError('invalid attestation')
         job = record.get('job')
         metrics = record.get('metrics')
         if (job not in expected or job in found
-                or record.get('code_commit') != PRODUCER_COMMIT
+                or record.get('code_commit') not in PRODUCER_COMMITS
+                or record.get('admission') != 'formal'
                 or record.get('smoke', False) is not False
+                or record.get('pilot_deferred', False) is not False
+                or record.get('pilot_bic', False) is not False
                 or type(metrics) is not dict
                 or set(metrics) != {
                     'aa_final_cil', 'bwt_cil', 'task_il_final'}
@@ -533,12 +649,21 @@ def merge_attestations(records):
                            r'[0-9a-f]{64}', record[key]) is None
                        for key in ('results_sha256', 'checkpoint_sha256'))):
             raise ValueError('invalid or duplicate attestation')
+        dataset, method, seed = job.split('/')
+        if record['code_commit'] == PRODUCER_COMMIT:
+            if (method not in LEGACY_REUSE_METHODS
+                    or record.get('reuse_certificate')
+                    != _expected_certificate((dataset, method, int(seed)))):
+                raise ValueError('legacy result lacks exact equivalence certificate')
+        elif record.get('reuse_certificate') is not None:
+            raise ValueError('corrected result must not claim legacy reuse')
         found.add(job)
+        producers[job] = record['code_commit']
     if found != expected:
         raise ValueError('replay-11 attestation matrix is incomplete')
     return {
         'jobs': len(found),
-        'code_commit': PRODUCER_COMMIT,
+        'producer_commits': producers,
         'strict_replays': [
             f'{dataset}/{method}/{seed}'
             for dataset, method, seed in jobs if seed == 42

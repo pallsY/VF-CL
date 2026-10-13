@@ -587,8 +587,13 @@ class Replay11EvidenceTest(unittest.TestCase):
             mir = _job(root)
             er = root / 'cifar100' / 'er' / '42'
             er.mkdir(parents=True)
+            _write(er / 'JOB_PLAN.json', {
+                'dataset': 'cifar100', 'method': 'er', 'seed': 42,
+                'code_commit': COMMIT,
+            })
             _write(er / 'JOB_SUCCESS.json', {
                 'dataset': 'cifar100', 'method': 'er', 'seed': 42,
+                'code_commit': COMMIT,
             })
             dataset_root = root / 'cifar100'
             rows = []
@@ -664,7 +669,8 @@ class Replay11EvidenceTest(unittest.TestCase):
 def _all_attestations():
     return [{
         'job': f'{dataset}/{method}/{seed}',
-        'code_commit': COMMIT,
+        'code_commit': '467611a603c9604ad57861920495a3ad05612037',
+        'admission': 'formal',
         'metrics': {'aa_final_cil': 0.5, 'bwt_cil': -0.1,
                     'task_il_final': 0.7},
         'results_sha256': 'a' * 64,
