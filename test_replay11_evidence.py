@@ -44,7 +44,7 @@ def _source_hashes():
     }
 
 
-def _job(root, dataset='cifar100'):
+def _job(root, dataset='cifar100', *, wrong_protocol=False, bad_cache=False):
     tasks = {'cifar100': 10, 'isolet': 13}[dataset]
     job = root / dataset / 'mir' / '42'
     run = job / 'run'
@@ -85,6 +85,25 @@ def _job(root, dataset='cifar100'):
         'cl_method': 'mir', 'seed': 42, 'num_tasks': tasks,
         'num_parties': 4, 'formal_deferred_evaluation': True,
     }
+    command = matrix.command_for(
+        (dataset, 'mir', 42), job,
+        python=Path('python'), worktree=Path('/tmp/vfcl-replay11-code99'),
+        device='cuda:0', data_root=root / 'data')
+    for i in range(2, len(command), 2):
+        key, token = command[i][2:], command[i + 1]
+        kind = matrix.registry.OPTION_SCHEMA.get(key, 'str')
+        if key == 'unlearn_after_tasks':
+            config[key] = [int(token)]
+        elif key == 'unlearn_classes':
+            config[key] = [[int(token)]]
+        elif kind == 'bool':
+            config[key] = token == '1'
+        elif kind == 'int':
+            config[key] = int(token)
+        elif kind == 'float':
+            config[key] = float(token)
+        else:
+            config[key] = token
     provenance = {
         'schema_version': 1, 'source_commit': COMMIT,
         'source_sha256': _source_hashes(),
@@ -95,11 +114,53 @@ def _job(root, dataset='cifar100'):
     }
     _write(run / 'config.json', config)
     _write(run / 'results.json', result)
+    protocol = {
+        key: config.get(key) for key in (
+            'seed', 'data', 'cl_method', 'num_tasks', 'num_parties',
+            'head_consolidation_enabled', 'head_consolidation_mode',
+        )
+    }
+    protocol.update(
+        formal_deferred_evaluation=True, source_provenance=provenance)
+    if config['bic_enabled']:
+        protocol.update({
+            'bic_enabled': True,
+            'bic_fit_mode': config['bic_fit_mode'],
+            'bic_lr': float(config['bic_lr']),
+            'bic_steps': int(config['bic_steps']),
+            'bic_per_class': int(config['bic_per_class']),
+            'lambda_validation_enabled':
+                bool(config['lambda_validation_enabled']),
+            'lambda_validation_per_class':
+                int(config['lambda_validation_per_class']),
+            'lambda_validation_split_seed':
+                int(config['lambda_validation_split_seed']),
+        })
+    if wrong_protocol:
+        protocol['num_tasks'] = 2
+    batch = {
+        'input_sha256': 'a' * 64, 'label_sha256': 'b' * 64,
+        'input_shape': [1, 4], 'label_shape': [1],
+        'input_dtype': 'torch.float32', 'label_dtype': 'torch.int64',
+    }
+    test_cache = {
+        'batch_count': 1, 'sample_count': 1, 'batches': [batch],
+    }
+    calibration_cache = {
+        'split': 'calibration',
+        'phase': 'final_bic_calibration_post_freeze',
+        'cache': test_cache,
+    }
+    cache_identity = (
+        {'test': test_cache, 'calibration': calibration_cache}
+        if config['bic_enabled'] else test_cache)
+    if bad_cache:
+        cache_identity = {'test': 'fixture'}
     frozen_identity = {
         'source_commit': COMMIT, 'snapshots': frozen_snapshots,
         'source_provenance': provenance,
-        'protocol': {'bic_enabled': False},
-        'protocol_sha256': 'e' * 64,
+        'protocol': protocol,
+        'protocol_sha256': _canonical_sha(protocol),
     }
     _write(run / 'FORMAL_STATE_FROZEN.json', {
         'schema_version': 1, 'status': 'frozen',
@@ -122,16 +183,23 @@ def _job(root, dataset='cifar100'):
         'schema_version': 1, 'status': 'consuming',
         'identity': frozen_identity, 'freeze': freeze,
         'transaction_sha256': transaction,
-        'cache_identity': {'test': 'fixture'},
+        'cache_identity': cache_identity,
     })
-    _write(run / 'FORMAL_EVALUATION_COMPLETE.json', {
+    complete = {
         'schema_version': 1, 'status': 'complete',
         'identity': frozen_identity, 'freeze': freeze,
         'transaction_sha256': transaction,
         'evaluation_sha256': evaluation,
         'evaluation': evaluation_payload,
-        'cache_identity': {'test': 'fixture'},
-    })
+        'cache_identity': cache_identity,
+    }
+    if config['bic_enabled']:
+        complete.update({
+            'calibration_cache_identity': calibration_cache,
+            'bic': {'fixture': True},
+            'bic_sha256': _canonical_sha({'fixture': True}),
+        })
+    _write(run / 'FORMAL_EVALUATION_COMPLETE.json', complete)
     record = lambda name: {
         'path': name + '.json', 'sha256': _sha(run / (name + '.json')),
     }
@@ -143,8 +211,8 @@ def _job(root, dataset='cifar100'):
         'complete': record('FORMAL_EVALUATION_COMPLETE'),
         'source_provenance': provenance,
         'identity_sha256': _canonical_sha(frozen_identity),
-        'protocol_sha256': 'e' * 64,
-        'cache_identity': {'test': 'fixture'},
+        'protocol_sha256': _canonical_sha(protocol),
+        'cache_identity': cache_identity,
     })
     seal = record('FORMAL_EVALUATION_SEALED')
     _write(run / 'FORMAL_EVALUATION_PUBLISHING.json', {
@@ -177,26 +245,6 @@ def _job(root, dataset='cifar100'):
                 'test', tuple(range(100 if dataset == 'cifar100' else 26)))),
         },
     })
-    command = matrix.command_for(
-        (dataset, 'mir', 42), job,
-        python=Path('python'), worktree=Path('/tmp/vfcl-replay11-code99'),
-        device='cuda:0', data_root=root / 'data')
-    for i in range(2, len(command), 2):
-        key, token = command[i][2:], command[i + 1]
-        kind = matrix.registry.OPTION_SCHEMA.get(key, 'str')
-        if key == 'unlearn_after_tasks':
-            config[key] = [int(token)]
-        elif key == 'unlearn_classes':
-            config[key] = [[int(token)]]
-        elif kind == 'bool':
-            config[key] = token == '1'
-        elif kind == 'int':
-            config[key] = int(token)
-        elif kind == 'float':
-            config[key] = float(token)
-        else:
-            config[key] = token
-    _write(run / 'config.json', config)
     plan = {
         'dataset': dataset, 'method': 'mir', 'seed': 42,
         'smoke': False, 'code_commit': COMMIT, 'command': command,
@@ -352,6 +400,18 @@ class Replay11EvidenceTest(unittest.TestCase):
                 _write(path, marker)
             with self.assertRaises(ValueError):
                 verify_local_job(job)
+
+    def test_consistently_hashed_wrong_protocol_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaises(ValueError):
+                verify_local_job(_job(
+                    Path(directory), wrong_protocol=True))
+
+    def test_consistently_hashed_bad_cache_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaises(ValueError):
+                verify_local_job(_job(
+                    Path(directory), bad_cache=True))
 
     def test_broken_transaction_link_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -558,6 +618,10 @@ class Replay11CatalogTest(unittest.TestCase):
             merge_attestations(rows)
         rows = _all_attestations()
         rows[0] = {**rows[0], 'smoke': True}
+        with self.assertRaises(ValueError):
+            merge_attestations(rows)
+        rows = _all_attestations()
+        rows[0] = {**rows[0], 'smoke': 1}
         with self.assertRaises(ValueError):
             merge_attestations(rows)
 

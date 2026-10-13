@@ -74,6 +74,72 @@ def _options(command):
     return result
 
 
+def _expected_protocol(config, provenance):
+    protocol = {
+        key: config.get(key) for key in (
+            'seed', 'data', 'cl_method', 'num_tasks', 'num_parties',
+            'head_consolidation_enabled', 'head_consolidation_mode',
+        )
+    }
+    protocol.update(
+        formal_deferred_evaluation=True,
+        source_provenance=provenance)
+    if config['cl_method'] == 'er_ace':
+        protocol.update({
+            'num_classes': config['num_classes'],
+            'er_ace_buffer_size': config['er_ace_buffer_size'],
+            'er_ace_batch': config['er_ace_batch'],
+        })
+    if bool(config.get('bic_enabled')):
+        protocol.update({
+            'bic_enabled': True,
+            'bic_fit_mode': config['bic_fit_mode'],
+            'bic_lr': float(config['bic_lr']),
+            'bic_steps': int(config['bic_steps']),
+            'bic_per_class': int(config['bic_per_class']),
+            'lambda_validation_enabled':
+                bool(config['lambda_validation_enabled']),
+            'lambda_validation_per_class':
+                int(config['lambda_validation_per_class']),
+            'lambda_validation_split_seed':
+                int(config['lambda_validation_split_seed']),
+        })
+    return protocol
+
+
+def _validate_cache_record(record):
+    required = {
+        'input_sha256', 'label_sha256', 'input_shape', 'label_shape',
+        'input_dtype', 'label_dtype',
+    }
+    if (type(record) is not dict
+            or set(record) != {
+                'batch_count', 'sample_count', 'batches'}
+            or type(record['batch_count']) is not int
+            or type(record['sample_count']) is not int
+            or type(record['batches']) is not list
+            or record['batch_count'] != len(record['batches'])
+            or record['batch_count'] < 1
+            or record['sample_count'] < 1):
+        raise ValueError('formal cache identity schema differs')
+    total = 0
+    for batch in record['batches']:
+        if (type(batch) is not dict or set(batch) != required
+                or any(type(batch[key]) is not str
+                       or re.fullmatch(r'[0-9a-f]{64}', batch[key]) is None
+                       for key in ('input_sha256', 'label_sha256'))
+                or type(batch['input_shape']) is not list
+                or type(batch['label_shape']) is not list
+                or not batch['input_shape'] or len(batch['label_shape']) != 1
+                or batch['input_shape'][0] != batch['label_shape'][0]
+                or type(batch['label_shape'][0]) is not int
+                or batch['label_shape'][0] < 1):
+            raise ValueError('formal cache batch identity differs')
+        total += batch['label_shape'][0]
+    if total != record['sample_count']:
+        raise ValueError('formal cache sample count differs')
+
+
 def _verify_transaction(run, frozen, published, provenance, result):
     names = (
         'PENDING', 'CONSUMING', 'COMPLETE', 'SEALED', 'PUBLISHING')
@@ -137,6 +203,24 @@ def _verify_transaction(run, frozen, published, provenance, result):
             or markers['SEALED']['protocol_sha256']
             != identity.get('protocol_sha256')):
         raise ValueError('formal cache or seal identity differs')
+    cache = complete['cache_identity']
+    if bic:
+        if (type(cache) is not dict
+                or set(cache) != {'test', 'calibration'}
+                or cache['calibration']
+                != complete['calibration_cache_identity']):
+            raise ValueError('formal BiC cache identity differs')
+        _validate_cache_record(cache['test'])
+        calibration = cache['calibration']
+        if (type(calibration) is not dict
+                or set(calibration) != {'split', 'phase', 'cache'}
+                or calibration['split'] != 'calibration'
+                or calibration['phase']
+                != 'final_bic_calibration_post_freeze'):
+            raise ValueError('formal calibration cache identity differs')
+        _validate_cache_record(calibration['cache'])
+    else:
+        _validate_cache_record(cache)
     for name, marker in (*markers.items(), ('PUBLISHED', published)):
         if (marker.get('schema_version') != 1
                 or marker.get('status') != name.lower()
@@ -284,6 +368,11 @@ def verify_local_job(job_dir):
     provenance = result.get('source_provenance')
     _verify_transaction(run, frozen, published, provenance, result)
     source_hashes = provenance.get('source_sha256') if type(provenance) is dict else None
+    expected_protocol = _expected_protocol(config, provenance)
+    if (frozen['identity'].get('protocol') != expected_protocol
+            or frozen['identity'].get('protocol_sha256')
+            != _canonical_sha(expected_protocol)):
+        raise ValueError('frozen scientific protocol differs')
     access_record = access.get('access')
     expected_classes = list(range(config['num_classes']))
     if (set(access) != {'schema_version', 'status', 'access'}
@@ -407,7 +496,7 @@ def merge_attestations(records):
         metrics = record.get('metrics')
         if (job not in expected or job in found
                 or record.get('code_commit') != PRODUCER_COMMIT
-                or record.get('smoke') is True
+                or record.get('smoke', False) is not False
                 or type(metrics) is not dict
                 or set(metrics) != {
                     'aa_final_cil', 'bwt_cil', 'task_il_final'}
