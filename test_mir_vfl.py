@@ -11,6 +11,45 @@ from models import TopModel
 
 
 class MIRSelectionTest(unittest.TestCase):
+    def test_real_update_matches_ce_of_fresh_replay_union(self):
+        bottom = torch.nn.Linear(1, 1, bias=False)
+        top = torch.nn.Linear(1, 2, bias=False)
+        with torch.no_grad():
+            bottom.weight.fill_(1.2)
+            top.weight.copy_(torch.tensor([[0.7], [-0.4]]))
+        expected_bottom, expected_top = copy.deepcopy(bottom), copy.deepcopy(top)
+        trainer = SimpleNamespace(
+            bottoms=[bottom], top_model=top,
+            _aggregate=lambda values: values[0],
+            bytes_transmitted=0, comm_rounds=0,
+        )
+        args = SimpleNamespace(
+            data='tabvfl', party_col_ranges=[(0, 1)],
+            device='cpu', lr=0.1, batch_size=2,
+            er_per_class=3, er_batch=1, mir_candidates=3,
+        )
+        method = MIRCL(trainer, args)
+        method.buffer.data = {1: [torch.tensor([-1.0]) for _ in range(3)]}
+        method._interference_scores = lambda *_: torch.tensor([3.0, 2.0, 1.0])
+        fresh_x = torch.tensor([[1.0], [2.0]])
+        fresh_y = torch.tensor([0, 1])
+        fresh_ce = F.cross_entropy(top(bottom(fresh_x)), fresh_y)
+
+        actual = method._replay_loss(
+            [bottom], top, fresh_x, fresh_y, fresh_ce)
+        expected = F.cross_entropy(
+            expected_top(expected_bottom(
+                torch.cat((fresh_x, torch.tensor([[-1.0]]))))),
+            torch.tensor([0, 1, 1]),
+        )
+        torch.testing.assert_close(actual, expected)
+        actual_grad = torch.autograd.grad(
+            actual, [bottom.weight, top.weight])
+        expected_grad = torch.autograd.grad(
+            expected, [expected_bottom.weight, expected_top.weight])
+        for got, want in zip(actual_grad, expected_grad):
+            torch.testing.assert_close(got, want)
+
     def test_replay_uses_highest_interference_subset(self):
         bottom = torch.nn.Linear(1, 1)
         top = TopModel(1, 4)

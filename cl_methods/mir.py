@@ -95,4 +95,6 @@ class MIRCL(ERCL):
             embedding.numel() * embedding.element_size() * 2
             for embedding in embeddings)
         self.trainer.comm_rounds += 1
-        return loss_ce + self.alpha * replay_loss
+        fresh_count, replay_count = batch_y.numel(), replay_y.numel()
+        return ((fresh_count * loss_ce + replay_count * replay_loss)
+                / (fresh_count + replay_count))
