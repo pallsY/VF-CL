@@ -105,13 +105,32 @@ def _file_hashes(job_dir):
     return found
 
 
+def _tree_snapshot(job_dir):
+    try:
+        files, size, digest = evidence._tree_identity(job_dir)
+        return {'sha256': digest, 'files': files, 'bytes': size, 'error': None}
+    except Exception as problem:
+        return {'sha256': None, 'files': None, 'bytes': None,
+                'error': f'{type(problem).__name__}: {problem}'}
+
+
+def _seed42_numeric_is_latest(ledger, dataset, method, audit_commit):
+    target = f'{dataset}/{method}/42'
+    matches = [row for row in ledger
+               if row.get('job') == target
+               and row.get('audit_commit') == audit_commit
+               and row.get('producer_commit') == evidence.CORRECTED_COMMIT
+               and row.get('stage') in ('basic', 'numeric')]
+    return bool(matches and matches[-1]['stage'] == 'numeric'
+                and matches[-1]['status'] == 'passed')
+
+
 def audit_one(job, producer_root):
     """Run basic, then only preselected seed-42 numeric, logging each verdict."""
     if tuple(job) not in matrix.jobs():
         raise ValueError('job is outside the frozen 99-cell matrix')
     dataset, method, seed = job
     job_dir = evidence.FROZEN_RESULTS_ROOT / dataset / method / str(seed)
-    audit_commit = _audit_commit()
     common = {
         'schema_version': 1,
         'job': f'{dataset}/{method}/{seed}',
@@ -119,27 +138,50 @@ def audit_one(job, producer_root):
         'source_path': str(job_dir),
         'archive_path': None,
         'producer_commit': evidence.CORRECTED_COMMIT,
-        'audit_commit': audit_commit,
+        'audit_commit': None,
         'host': platform.node(),
-        'file_sha256': _file_hashes(job_dir),
-        'original_tree_sha256': None,
-        'original_tree_files': None,
-        'original_tree_bytes': None,
+        'file_sha256': None,
     }
+    started = time.perf_counter()
+    try:
+        common['audit_commit'] = _audit_commit()
+        common['file_sha256'] = _file_hashes(job_dir)
+    except Exception as problem:
+        snapshot = _tree_snapshot(job_dir)
+        append_event(LEDGER_PATH, dict(
+            common, stage='preflight', status='failed',
+            audited_at_utc=datetime.now(timezone.utc).isoformat(),
+            seconds=round(time.perf_counter() - started, 3), result=None,
+            original_tree_sha256=snapshot['sha256'],
+            original_tree_after_sha256=snapshot['sha256'],
+            original_tree_error=snapshot['error'],
+            error={'type': type(problem).__name__, 'message': str(problem)}))
+        raise ValueError(f'preflight audit failed: {problem}') from problem
+    if seed != 42 and not _seed42_numeric_is_latest(
+            read_ledger(LEDGER_PATH), dataset, method, common['audit_commit']):
+        snapshot = _tree_snapshot(job_dir)
+        append_event(LEDGER_PATH, dict(
+            common, stage='prerequisite', status='failed',
+            audited_at_utc=datetime.now(timezone.utc).isoformat(),
+            seconds=0.0, result=None,
+            original_tree_sha256=snapshot['sha256'],
+            original_tree_after_sha256=snapshot['sha256'],
+            original_tree_error=snapshot['error'],
+            error={'type': 'ValueError',
+                   'message': 'seed 42 numeric admission is not the latest verdict'}))
+        raise ValueError('seed 42 numeric admission is required before seed 43/44')
     outputs = []
     for stage in ('basic', 'numeric') if seed == 42 else ('basic',):
         started = time.perf_counter()
+        before = _tree_snapshot(job_dir)
         try:
+            if before['error'] is not None:
+                raise ValueError('original tree cannot be hashed: ' + before['error'])
             result = (evidence.verify_v3_formal_job(job_dir)
                       if stage == 'basic' else
                       numeric.audit_job(job_dir, evidence.CORRECTED_COMMIT,
                                         producer_root, evidence.FROZEN_DATA_ROOT))
-            if stage == 'basic':
-                files, size, digest = evidence._tree_identity(job_dir)
-                common.update(original_tree_sha256=digest,
-                              original_tree_files=files,
-                              original_tree_bytes=size)
-            elif result.get('basic_admission') != 'formal':
+            if stage == 'numeric' and result.get('basic_admission') != 'formal':
                 raise ValueError('numeric worker lacks formal basic admission')
             status = 'passed'
             error = None
@@ -147,9 +189,20 @@ def audit_one(job, producer_root):
             result = None
             status = 'failed'
             error = {'type': type(problem).__name__, 'message': str(problem)}
+        after = _tree_snapshot(job_dir)
+        if before != after:
+            status = 'failed'
+            result = None
+            error = {'type': 'ValueError',
+                     'message': 'original tree changed during audit'}
         event = dict(common, stage=stage, status=status,
                      audited_at_utc=datetime.now(timezone.utc).isoformat(),
                      seconds=round(time.perf_counter() - started, 3),
+                     original_tree_sha256=before['sha256'],
+                     original_tree_after_sha256=after['sha256'],
+                     original_tree_files=before['files'],
+                     original_tree_bytes=before['bytes'],
+                     original_tree_error=before['error'] or after['error'],
                      result=result, error=error)
         outputs.append(append_event(LEDGER_PATH, event))
         if status == 'failed':

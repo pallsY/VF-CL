@@ -57,6 +57,50 @@ class AuditLedgerTests(unittest.TestCase):
                              'f' * 64)
             numeric.assert_called_once()
 
+    def test_seed_43_waits_for_latest_seed_42_numeric_pass(self):
+        with tempfile.TemporaryDirectory() as directory:
+            ledger = Path(directory) / 'attestations.jsonl'
+            with patch.object(attest, 'LEDGER_PATH', ledger), \
+                    patch.object(attest, '_audit_commit', return_value='a' * 40), \
+                    patch.object(attest.evidence, 'verify_v3_formal_job') as basic:
+                with self.assertRaisesRegex(ValueError, 'seed 42 numeric'):
+                    attest.audit_one(('isolet', 'mir', 43), Path('/producer'))
+                basic.assert_not_called()
+            self.assertEqual([(row['stage'], row['status'])
+                              for row in attest.read_ledger(ledger)],
+                             [('prerequisite', 'failed')])
+
+    def test_preflight_failure_is_appended(self):
+        with tempfile.TemporaryDirectory() as directory:
+            ledger = Path(directory) / 'attestations.jsonl'
+            with patch.object(attest, 'LEDGER_PATH', ledger), \
+                    patch.object(attest, '_audit_commit',
+                                 side_effect=ValueError('dirty checkout')):
+                with self.assertRaisesRegex(ValueError, 'dirty checkout'):
+                    attest.audit_one(('isolet', 'mir', 42), Path('/producer'))
+            row = attest.read_ledger(ledger)[0]
+            self.assertEqual((row['stage'], row['status']), ('preflight', 'failed'))
+
+    def test_tree_change_during_numeric_is_failed_and_recorded(self):
+        with tempfile.TemporaryDirectory() as directory:
+            ledger = Path(directory) / 'attestations.jsonl'
+            first = (5, 100, 'a' * 64)
+            changed = (5, 100, 'b' * 64)
+            with patch.object(attest, 'LEDGER_PATH', ledger), \
+                    patch.object(attest, '_audit_commit', return_value='a' * 40), \
+                    patch.object(attest.evidence, 'verify_v3_formal_job',
+                                 return_value={'admission': 'formal'}), \
+                    patch.object(attest.evidence, '_tree_identity',
+                                 side_effect=[first, first, first, changed]), \
+                    patch.object(attest.numeric, 'audit_job',
+                                 return_value={'basic_admission': 'formal'}):
+                with self.assertRaisesRegex(ValueError, 'tree changed'):
+                    attest.audit_one(('isolet', 'mir', 42), Path('/producer'))
+            rows = attest.read_ledger(ledger)
+            self.assertEqual([row['status'] for row in rows], ['passed', 'failed'])
+            self.assertEqual(rows[-1]['original_tree_sha256'], 'a' * 64)
+            self.assertEqual(rows[-1]['original_tree_after_sha256'], 'b' * 64)
+
 
 if __name__ == '__main__':
     unittest.main()
