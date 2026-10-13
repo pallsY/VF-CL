@@ -9,6 +9,17 @@ from cl_methods.balanced_contrast import (
 
 
 class BalancedContrastTest(unittest.TestCase):
+    def test_paper_weighted_proxy_loss_matches_analytic_zero_logits(self):
+        features = torch.zeros(3, 2, requires_grad=True)
+        proxies = torch.zeros(2, 2, requires_grad=True)
+        labels = torch.tensor([0, 0, 1])
+        loss = proxy_contrastive_loss(
+            features, proxies, labels,
+            task_number=1, gamma=1.0, temperature=1.0,
+        )
+        expected = torch.tensor(2.0 / 3.0) * torch.log(torch.tensor(3.0))
+        torch.testing.assert_close(loss, expected)
+
     def test_rare_class_gets_larger_attraction_weight(self):
         labels = torch.tensor([0, 0, 0, 1])
         weights = batch_balance_weights(labels, task_number=2, gamma=4.0)
