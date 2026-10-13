@@ -9,8 +9,7 @@ from pathlib import Path
 from adaptive_consolidation_audit import FORMAL_SOURCE_FILES
 import replay11_matrix as matrix
 from replay11_evidence import (
-    InconclusiveEvidence, merge_attestations,
-    verify_archive_manifest, verify_local_job,
+    merge_attestations, verify_archive_manifest, verify_local_job,
 )
 
 
@@ -263,7 +262,9 @@ def _job(root, dataset='cifar100', *, wrong_protocol=False, bad_cache=False):
 
 def _archive_manifest(job):
     rows = []
-    for path in sorted(job.rglob('*')):
+    for path in sorted(
+            job.rglob('*'),
+            key=lambda item: item.relative_to(job).as_posix()):
         if path.is_file():
             rows.append([
                 path.relative_to(job).as_posix(),
@@ -544,7 +545,41 @@ class Replay11EvidenceTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 verify_archive_manifest(job, manifest)
 
-    def test_unknown_legacy_tree_algorithm_is_inconclusive(self):
+    def test_dataset_archive_manifest_covers_named_method(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            job = _job(root)
+            dataset_root = root / 'cifar100'
+            rows = []
+            for path in sorted(
+                    dataset_root.rglob('*'),
+                    key=lambda item: item.relative_to(dataset_root).as_posix()):
+                if path.is_file():
+                    rows.append([
+                        path.relative_to(dataset_root).as_posix(),
+                        path.stat().st_size, _sha(path),
+                    ])
+            digest = hashlib.sha256(json.dumps(
+                rows, ensure_ascii=False,
+                separators=(',', ':')).encode()).hexdigest()
+            manifest = root / 'ARCHIVE_MANIFEST.json'
+            _write(manifest, {
+                'source': '/source/cifar100',
+                'destination': str(dataset_root),
+                'code_commit': COMMIT, 'methods': ['mir'],
+                'files': len(rows), 'bytes': sum(row[1] for row in rows),
+                'tree_sha256': digest,
+            })
+            self.assertEqual(
+                verify_archive_manifest(job, manifest)['job'],
+                'cifar100/mir/42')
+            value = json.loads(manifest.read_text())
+            value['methods'] = ['er']
+            _write(manifest, value)
+            with self.assertRaises(ValueError):
+                verify_archive_manifest(job, manifest)
+
+    def test_legacy_tree_hash_mismatch_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             job = _job(Path(directory))
             manifest = _archive_manifest(job)
@@ -553,7 +588,7 @@ class Replay11EvidenceTest(unittest.TestCase):
             del value['source_tree_sha256']
             del value['destination_tree_sha256']
             _write(manifest, value)
-            with self.assertRaises(InconclusiveEvidence):
+            with self.assertRaises(ValueError):
                 verify_archive_manifest(job, manifest)
 
     def test_unrelated_parent_tree_cannot_attest_a_job(self):
@@ -563,7 +598,9 @@ class Replay11EvidenceTest(unittest.TestCase):
                 job = _job(root)
                 _archive_manifest(job)
                 rows = []
-                for path in sorted(root.rglob('*')):
+                for path in sorted(
+                        root.rglob('*'),
+                        key=lambda item: item.relative_to(root).as_posix()):
                     if path.is_file():
                         rows.append([
                             path.relative_to(root).as_posix(),

@@ -22,10 +22,6 @@ PRODUCER_ENTRYPOINTS = {
 }
 
 
-class InconclusiveEvidence(Exception):
-    """Evidence format cannot yet be checked without changing acceptance."""
-
-
 def _file(path):
     path = Path(path)
     if (any(part.is_symlink() for part in (path, *path.parents))
@@ -434,7 +430,9 @@ def verify_local_job(job_dir):
 
 def _tree_identity(root):
     rows = []
-    for path in sorted(root.rglob('*')):
+    for path in sorted(
+            root.rglob('*'),
+            key=lambda item: item.relative_to(root).as_posix()):
         if path.is_symlink():
             raise ValueError(f'archive contains symlink: {path}')
         if path.is_file():
@@ -463,9 +461,19 @@ def verify_archive_manifest(job_dir, manifest_path):
             and not (destination.name == dataset
                      and job_dir == destination / method / seed)):
         raise ValueError('archive scope differs')
-    if (record.get('job') != job
-            or record.get('code_commit') != PRODUCER_COMMIT
-            or not record.get('source')):
+    if (record.get('code_commit') != PRODUCER_COMMIT
+            or not record.get('source')
+            or ('job' in record and record['job'] != job)
+            or ('dataset' in record and record['dataset'] != dataset)
+            or ('method' in record and record['method'] != method)
+            or ('seed' in record and record['seed'] != int(seed))
+            or (isinstance(record.get('methods'), list)
+                and method not in record['methods'])
+            or (isinstance(record.get('seeds'), list)
+                and int(seed) not in record['seeds'])
+            or (isinstance(record.get('jobs'), list)
+                and f'{method}/{seed}' not in record['jobs']
+                and job not in record['jobs'])):
         raise ValueError('archive job identity differs')
     files, size, digest = _tree_identity(destination)
     if record.get('files') != files or record.get('bytes') != size:
@@ -475,8 +483,7 @@ def verify_archive_manifest(job_dir, manifest_path):
                 or record.get('source_tree_sha256') != digest):
             raise ValueError('archive bytes differ')
     elif record.get('tree_sha256') != digest:
-        raise InconclusiveEvidence(
-            'legacy archive tree digest algorithm is not yet reproduced')
+        raise ValueError('archive bytes differ')
     return {
         'job': job, 'code_commit': PRODUCER_COMMIT,
         'files': files, 'bytes': size, 'tree_sha256': digest,
