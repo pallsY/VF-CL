@@ -41,4 +41,6 @@ each of the 11 methods on each of the three datasets. A numerical result
 without its paired basic pass, or a producer run without `JOB_SUCCESS.json`,
 is not admitted. The final aggregate requires 99 basic passes and 33
 numerical passes, all from a single audit commit and the fixed producer
-commit. Pilot results are excluded.
+commit. Run `python replay11_attest.py finalize` on the clean Linux audit
+checkout to enforce that requirement against the latest chained verdicts.
+Pilot results are excluded.

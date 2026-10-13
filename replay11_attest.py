@@ -47,7 +47,7 @@ def read_ledger(path=LEDGER_PATH):
     return records
 
 
-def append_event(path, event):
+def append_event(path, event, *, require_seed42=None):
     """Preserve every previous verdict; verify the chain before appending."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -60,6 +60,7 @@ def append_event(path, event):
         handle.seek(0)
         existing = handle.read()
         previous = None
+        existing_records = []
         for line in existing.splitlines():
             record = json.loads(line)
             declared = record.pop('event_sha256', None)
@@ -67,9 +68,17 @@ def append_event(path, event):
                     or record.get('previous_event_sha256') != previous):
                 raise ValueError('audit ledger hash chain differs')
             previous = declared
+            record['event_sha256'] = declared
+            existing_records.append(record)
         if 'event_sha256' in event or 'previous_event_sha256' in event:
             raise ValueError('audit event has reserved hash fields')
-        record = dict(event, previous_event_sha256=previous)
+        record = dict(event)
+        if require_seed42 is not None and not _seed42_numeric_is_latest(
+                existing_records, *require_seed42):
+            record.update(stage='prerequisite', status='failed', result=None,
+                          error={'type': 'ValueError',
+                                 'message': 'seed 42 numeric admission changed during audit'})
+        record['previous_event_sha256'] = previous
         record['event_sha256'] = _digest(record)
         handle.seek(0, os.SEEK_END)
         handle.write(json.dumps(record, sort_keys=True, ensure_ascii=False,
@@ -107,6 +116,8 @@ def _file_hashes(job_dir):
 
 def _tree_snapshot(job_dir):
     try:
+        if job_dir.is_symlink() or not job_dir.is_dir():
+            raise ValueError('original directory is missing or a symlink')
         files, size, digest = evidence._tree_identity(job_dir)
         return {'sha256': digest, 'files': files, 'bytes': size, 'error': None}
     except Exception as problem:
@@ -123,6 +134,56 @@ def _seed42_numeric_is_latest(ledger, dataset, method, audit_commit):
                and row.get('stage') in ('basic', 'numeric')]
     return bool(matches and matches[-1]['stage'] == 'numeric'
                 and matches[-1]['status'] == 'passed')
+
+
+def finalize_records(records, audit_commit, *, jobs=None):
+    """Require the latest verdict for all 99 basic and 33 numeric cells."""
+    selected = list(matrix.jobs() if jobs is None else jobs)
+    basic_count = numeric_count = 0
+    for dataset, method, seed in selected:
+        key = f'{dataset}/{method}/{seed}'
+        relevant = [row for row in records if row.get('job') == key]
+        if not relevant:
+            raise ValueError(f'latest basic verdict is missing: {key}')
+        latest = relevant[-1]
+        stage = 'numeric' if seed == 42 else 'basic'
+        if latest.get('stage') != stage or latest.get('status') != 'passed':
+            raise ValueError(f'latest {stage} verdict is not passed: {key}')
+        required = [latest]
+        if seed == 42:
+            prior_basic = next((row for row in reversed(relevant[:-1])
+                                if row.get('stage') == 'basic'), None)
+            if prior_basic is None or prior_basic.get('status') != 'passed':
+                raise ValueError(f'latest basic verdict is not passed: {key}')
+            required.append(prior_basic)
+            numeric_count += 1
+        for row in required:
+            expected_path = (evidence.FROZEN_RESULTS_ROOT / dataset / method /
+                             str(seed))
+            digest = row.get('original_tree_sha256')
+            if (row.get('audit_commit') != audit_commit
+                    or row.get('producer_commit') != evidence.CORRECTED_COMMIT
+                    or row.get('source_kind') != 'original'
+                    or row.get('source_path') != str(expected_path)
+                    or not isinstance(digest, str) or len(digest) != 64
+                    or digest != row.get('original_tree_after_sha256')
+                    or row.get('original_tree_error') is not None
+                    or not row.get('file_sha256')):
+                raise ValueError(f'latest evidence identity differs: {key}')
+            result = row.get('result') or {}
+            expected_admission = ('basic_admission' if row['stage'] == 'numeric'
+                                  else 'admission')
+            if result.get(expected_admission) != 'formal':
+                raise ValueError(f'latest {row["stage"]} admission differs: {key}')
+        if len(required) == 2 and (required[0]['original_tree_sha256']
+                                    != required[1]['original_tree_sha256']):
+            raise ValueError(f'basic/numeric original tree differs: {key}')
+        basic_count += 1
+    return {'basic_passed': basic_count, 'numeric_passed': numeric_count,
+            'audit_commit': audit_commit,
+            'producer_commit': evidence.CORRECTED_COMMIT,
+            'ledger_head_sha256': (records[-1]['event_sha256'] if records
+                                   else None)}
 
 
 def audit_one(job, producer_root):
@@ -177,6 +238,9 @@ def audit_one(job, producer_root):
         try:
             if before['error'] is not None:
                 raise ValueError('original tree cannot be hashed: ' + before['error'])
+            if (stage == 'numeric' and before['sha256']
+                    != outputs[-1]['original_tree_after_sha256']):
+                raise ValueError('original tree changed since basic admission')
             result = (evidence.verify_v3_formal_job(job_dir)
                       if stage == 'basic' else
                       numeric.audit_job(job_dir, evidence.CORRECTED_COMMIT,
@@ -204,17 +268,27 @@ def audit_one(job, producer_root):
                      original_tree_bytes=before['bytes'],
                      original_tree_error=before['error'] or after['error'],
                      result=result, error=error)
-        outputs.append(append_event(LEDGER_PATH, event))
-        if status == 'failed':
-            raise ValueError(f'{stage} audit failed: {error["message"]}')
+        require = ((dataset, method, common['audit_commit'])
+                   if seed != 42 and stage == 'basic' else None)
+        saved = append_event(LEDGER_PATH, event, require_seed42=require)
+        outputs.append(saved)
+        if saved['status'] == 'failed':
+            raise ValueError(f'{saved["stage"]} audit failed: '
+                             f'{saved["error"]["message"]}')
     return outputs
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('job', help='dataset/method/seed from the frozen matrix')
-    parser.add_argument('--producer-root', required=True, type=Path)
+    parser.add_argument('job', help='dataset/method/seed or finalize')
+    parser.add_argument('--producer-root', type=Path)
     args = parser.parse_args()
+    if args.job == 'finalize':
+        print(json.dumps(finalize_records(read_ledger(LEDGER_PATH),
+                                          _audit_commit()), sort_keys=True))
+        return
+    if args.producer_root is None:
+        parser.error('--producer-root is required for a job audit')
     parts = args.job.split('/')
     if len(parts) != 3:
         parser.error('job must be dataset/method/seed')
