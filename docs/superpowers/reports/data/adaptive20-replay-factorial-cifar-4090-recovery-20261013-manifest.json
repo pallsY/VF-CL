@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "status": "training_only_development_host_migration",
+  "source_commit": "29de04603ae6bdcc0ede8c951eb18318c1a8a055",
+  "host": "vf-cl-4090-1",
+  "gpu": 0,
+  "seed": 55,
+  "arms": ["P0R1", "P1R0", "P0R0"],
+  "results_root": "/home/chase/Yangxx/VF-CL/results/adaptive20-replay-factorial-cifar-seed55-4090-recovery-20261013-v1",
+  "only_changed_config_fields_from_v3": ["data_path", "results_dir", "output_dir"],
+  "config_sha256": {
+    "P0R1": "c15c83a2d203bf34139f574c288b81f203f7ee74c933d29800b5c9cc6b8a910e",
+    "P1R0": "9a20f6c34b30a038007bb52fabc0aa92699680c23ecc36db11735ef5a63583a2",
+    "P0R0": "692355dd3bf3b23404ba824218638a84ae24ccdf5fe2232a3da6a07b7b0a7345"
+  },
+  "data_sha256": {
+    "train": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b",
+    "test": "4b67687d9933c4db8f0831104447f15b93774f4f464bd0516f0f0f2ac83b7864",
+    "meta": "a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9"
+  },
+  "holdout_seed": 20261013,
+  "holdout_per_class": 25,
+  "capacity_per_class": 20,
+  "reason": "3080 scratch was globally purged twice without a host reboot; persistent 4090 output is needed to protect checkpoints and readouts",
+  "unverified_v3_seed55_p0r1_log_sha256": "3f7f9519c9ca4fa3dc48ed46e120b21008e7245f38c3c91b3ef45574d76ccc11",
+  "pairing_rule": "Require identical holdout manifest and pre_head_trainer_sha256 for each seed/P R1-R0 comparison"
+}
