@@ -20,21 +20,29 @@ args = parser.parse_args()
 
 with open(args.archive, "rb") as stream:
     actual_archive = digest(stream)
-assert actual_archive == args.archive_sha256, "archive SHA-256 mismatch"
+if actual_archive != args.archive_sha256:
+    raise ValueError("archive SHA-256 mismatch")
 
 expected = {}
 with open(args.manifest, encoding="utf-8") as stream:
     for line in stream:
         value, name = line.rstrip("\n").split("  ", 1)
-        assert name not in expected, "duplicate path in manifest"
+        if name in expected:
+            raise ValueError("duplicate path in manifest")
         expected[name] = value
 
-with tarfile.open(args.archive, "r:gz") as archive:
-    members = [member for member in archive if member.isfile()]
-    assert len(members) == len(expected), "file count mismatch"
-    assert {member.name for member in members} == set(expected), "file path mismatch"
-    for member in members:
+seen = set()
+with tarfile.open(args.archive, "r|gz") as archive:
+    for member in archive:
+        if member.isdir():
+            continue
+        if not member.isfile() or member.name not in expected or member.name in seen:
+            raise ValueError(f"unexpected archive member: {member.name}")
         with archive.extractfile(member) as stream:
-            assert digest(stream) == expected[member.name], member.name
+            if digest(stream) != expected[member.name]:
+                raise ValueError(f"file SHA-256 mismatch: {member.name}")
+        seen.add(member.name)
+if seen != set(expected):
+    raise ValueError("archive file count or path mismatch")
 
 print(f"VERIFIED archive={actual_archive} files={len(expected)}")
