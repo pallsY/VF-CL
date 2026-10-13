@@ -1,3 +1,4 @@
+import copy
 import unittest
 
 import torch
@@ -58,7 +59,10 @@ class HPCRLossTest(unittest.TestCase):
         )
         stored = method.memory[0][0][2]
         self.assertTrue(torch.isfinite(stored[:2]).all())
-        self.assertTrue(torch.isnan(stored[2:]).all())
+        self.assertTrue(torch.isneginf(stored[2:]).all())
+        from runner import _checkpoint_values_equal
+        self.assertTrue(_checkpoint_values_equal(
+            method.get_state(), copy.deepcopy(method.get_state())))
         current = torch.tensor([[1.0, 2.0, 3.0, 4.0]],
                                requires_grad=True)
         loss = hpcr.proxy_logit_distillation_loss(
@@ -257,7 +261,7 @@ class HPCRLossTest(unittest.TestCase):
                       torch.ones(3, 2), torch.arange(6.0).reshape(3, 2))
         self.assertEqual(len(first.memory[0]), 2)
         self.assertEqual(first.seen_count[0], 3)
-        self.assertTrue(torch.isnan(first.memory[0][0][2][2]))
+        self.assertTrue(torch.isneginf(first.memory[0][0][2][2]))
         second = HPCRCL(SimpleNamespace(), args)
         second.load_state(first.get_state())
         self.assertEqual(len(second.memory[0]), 2)

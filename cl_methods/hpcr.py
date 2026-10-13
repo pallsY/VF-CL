@@ -167,7 +167,7 @@ class HPCRCL:
             class_id = int(label)
             count = self.seen_count.get(class_id, 0)
             entries = self.memory.setdefault(class_id, [])
-            packed_logits = torch.full((self.args.num_classes,), float('nan'))
+            packed_logits = torch.full((self.args.num_classes,), float('-inf'))
             packed_logits[active] = logit.detach().cpu()[active]
             entry = (example.detach().cpu().clone(), class_id,
                      packed_logits, feature.detach().cpu().clone())
