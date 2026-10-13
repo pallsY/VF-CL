@@ -11,6 +11,10 @@ case "$arm" in
     config_sha=678bd45722557c0807c1f7fdda3b91408c2891d58fb46388da6fc264d401b868
     predecessor=P1R0
     ;;
+  P1R1)
+    config_sha=d1d28cc36995005d39329f4537a7c6832bc79c2146d6ddc08f018ecac0540c3a
+    predecessor=P1R0
+    ;;
   *) echo "unsupported arm: $arm" >&2; exit 2 ;;
 esac
 

@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "status": "training_only_development_same_host_pair_recovery",
+  "source_commit": "29de04603ae6bdcc0ede8c951eb18318c1a8a055",
+  "host": "vf-cl-4090-1",
+  "gpu": 0,
+  "seed": 55,
+  "arm": "P1R1",
+  "run": "cifar_seed55_P1R1",
+  "results_root": "/home/chase/Yangxx/VF-CL/results/adaptive20-replay-factorial-cifar-seed55-4090-recovery-20261013-v2",
+  "config_sha256": "d1d28cc36995005d39329f4537a7c6832bc79c2146d6ddc08f018ecac0540c3a",
+  "only_changed_config_fields_from_3080_v3": ["data_path", "results_dir", "output_dir"],
+  "paired_4090_p1r0_pre_head_sha256": "5189727aedbc3161b872d75146996c83121fbe588720b63adbc97748f6c53c09",
+  "archived_3080_p1r1_pre_head_sha256": "6c9e92d2927428f95e4254e3a41e48f8fbda70003a31e5413891b66754b418bb",
+  "data_sha256": {
+    "train": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b",
+    "test": "4b67687d9933c4db8f0831104447f15b93774f4f464bd0516f0f0f2ac83b7864",
+    "meta": "a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9"
+  },
+  "holdout_seed": 20261013,
+  "holdout_per_class": 25,
+  "capacity_per_class": 20,
+  "reason": "The verified 3080 P1R1 and 4090 P1R0 pre-head trainer hashes differ; the P1 R contrast needs a same-host independently trained P1R1",
+  "counting_rule": "Additional run does not add a distinct factorial arm; require matching pre-head SHA and holdout manifest for the P1 R contrast"
+}
