@@ -66,6 +66,13 @@ def _corrected_job(root):
     identity = frozen['identity']
     identity['source_commit'] = CORRECTED_COMMIT
     identity['source_provenance'] = provenance
+    identity['task_classes'] = (
+        {str(i): [int(value) for value in group.split(',')]
+         for i, group in enumerate(config['custom_tasks'].split('|'))}
+        if config.get('custom_tasks') else
+        {str(i): list(range(i * config['classes_per_task'],
+                            (i + 1) * config['classes_per_task']))
+         for i in range(config['num_tasks'])})
     identity['protocol']['source_provenance'] = provenance
     identity['protocol_sha256'] = _canonical_sha(identity['protocol'])
     _write(frozen_path, frozen)
@@ -225,6 +232,51 @@ class Replay11V3Test(unittest.TestCase):
                 _verify_checkpoint_method_state(
                     job / 'run' / 'checkpoints' / 'formal_final.pt',
                     config, 10)
+
+    def test_frozen_task_classes_must_match_complete_config(self):
+        from replay11_evidence import _verify_frozen_task_classes
+        with tempfile.TemporaryDirectory() as directory:
+            job = _corrected_job(Path(directory))
+            run = job / 'run'
+            config = json.loads((run / 'config.json').read_text())
+            frozen = json.loads((run / 'FORMAL_STATE_FROZEN.json').read_text())
+            classes = {str(i): list(range(i * 10, (i + 1) * 10))
+                       for i in range(10)}
+            frozen['identity']['task_classes'] = classes
+            self.assertEqual(_verify_frozen_task_classes(frozen, config, 10),
+                             classes)
+            frozen['identity']['task_classes']['9'] = list(range(90, 99))
+            with self.assertRaisesRegex(ValueError, 'frozen task classes'):
+                _verify_frozen_task_classes(frozen, config, 10)
+
+    def test_frozen_state_hashes_reject_resealed_checkpoint_mutations(self):
+        from adaptive_consolidation_audit import trainer_state_sha256
+        from replay11_evidence import _verify_frozen_checkpoint_state
+        payload = {
+            'trainer_state': {'weight': torch.ones(2)},
+            'cl_state': {'data': torch.ones(2)},
+            'rng_state': {'torch': torch.ones(2, dtype=torch.uint8)},
+            'tracker_state': {'history': [1]},
+        }
+        frozen = {
+            'trainer_state_sha256': trainer_state_sha256(payload['trainer_state']),
+            'method_state_sha256': trainer_state_sha256(payload['cl_state']),
+            'rng_state_sha256': trainer_state_sha256(payload['rng_state']),
+        }
+        evaluation = dict(payload['tracker_state'])
+        _verify_frozen_checkpoint_state(payload, frozen, evaluation)
+        for field in ('trainer_state', 'cl_state', 'rng_state'):
+            changed = dict(payload)
+            changed[field] = {'changed': torch.ones(2)}
+            with self.subTest(field=field), self.assertRaisesRegex(
+                    ValueError, 'frozen checkpoint state'):
+                _verify_frozen_checkpoint_state(changed, frozen, evaluation)
+        with self.assertRaisesRegex(ValueError, 'frozen checkpoint state'):
+            _verify_frozen_checkpoint_state(payload, frozen,
+                                            {'history': [2]})
+            frozen['identity']['task_classes']['9'] = list(range(90, 99)) + [0]
+            with self.assertRaisesRegex(ValueError, 'frozen task classes'):
+                _verify_frozen_task_classes(frozen, config, 10)
 
     def test_strict_checkpoint_rejects_wrong_method_state(self):
         from replay11_evidence import (_expected_protocol,

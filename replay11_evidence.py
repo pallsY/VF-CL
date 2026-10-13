@@ -62,6 +62,33 @@ def _verify_authoritative_data(root, expected):
     return actual
 
 
+def _expected_task_classes(config, expected_tasks):
+    if config.get('custom_tasks'):
+        groups = [[int(value) for value in group.split(',')]
+                  for group in config['custom_tasks'].split('|')]
+    else:
+        per_task = config['classes_per_task']
+        groups = [list(range(index * per_task, (index + 1) * per_task))
+                  for index in range(expected_tasks)]
+    flat = [value for group in groups for value in group]
+    if (len(groups) != expected_tasks or any(not group for group in groups)
+            or len(flat) != len(set(flat))
+            or sorted(flat) != list(range(config['num_classes']))):
+        raise ValueError('frozen task classes do not cover the protocol')
+    return {str(index): group for index, group in enumerate(groups)}
+
+
+def _verify_frozen_task_classes(frozen, config, expected_tasks):
+    try:
+        expected = _expected_task_classes(config, expected_tasks)
+        actual = frozen['identity']['task_classes']
+    except (KeyError, TypeError, ValueError) as error:
+        raise ValueError('frozen task classes are invalid') from error
+    if actual != expected:
+        raise ValueError('frozen task classes differ from formal config')
+    return expected
+
+
 def _canonical_sha(value):
     content = json.dumps(
         value, indent=2, sort_keys=True, allow_nan=False,
@@ -365,14 +392,40 @@ def _verify_training_flow_strict(run, config, data_root, expected_tasks):
         except (OSError, StopIteration, KeyError, TypeError,
                 json.JSONDecodeError, ValueError) as error:
             raise ValueError('training data-flow reconstruction differs') from error
-    return {'batches': batch_count, 'batch_bytes_replayed': True}
+    return {
+        'batches': batch_count,
+        'batch_bytes_replayed': True,
+        'party_col_ranges': getattr(args, 'party_col_ranges', None),
+    }
 
 
-def _verify_checkpoint_method_state(path, config, expected_tasks):
+def _verify_frozen_checkpoint_state(payload, frozen_final, evaluation):
+    from adaptive_consolidation_audit import trainer_state_sha256
+
+    try:
+        for key, field in (
+                ('trainer_state_sha256', 'trainer_state'),
+                ('method_state_sha256', 'cl_state'),
+                ('rng_state_sha256', 'rng_state')):
+            if trainer_state_sha256(payload[field]) != frozen_final[key]:
+                raise ValueError(f'{field} differs')
+        if (trainer_state_sha256(payload['tracker_state'])
+                != trainer_state_sha256(evaluation)):
+            raise ValueError('published tracker differs from sealed evaluation')
+    except (KeyError, TypeError, ValueError) as error:
+        raise ValueError('frozen checkpoint state differs') from error
+
+
+def _verify_checkpoint_method_state(path, config, expected_tasks, *,
+                                    frozen_final=None, evaluation=None,
+                                    party_col_ranges=None):
     """Restricted decode and method-specific state contract for final weights."""
     import torch
-    from adaptive_consolidation_audit import _safe_torch_load
+    from adaptive_consolidation_audit import (_fresh_formal_state,
+                                              _safe_torch_load)
     from runner import (_decode_checkpoint_value,
+                        _capture_rng_state, _restore_rng_state,
+                        _validate_resume_checkpoint_payload,
                         _valid_method_checkpoint_state,
                         _valid_tracker_checkpoint_state)
 
@@ -395,15 +448,13 @@ def _verify_checkpoint_method_state(path, config, expected_tasks):
     method = config['cl_method']
     try:
         checkpoint = _safe_torch_load(path)
+        if frozen_final is not None:
+            _verify_frozen_checkpoint_state(
+                checkpoint, frozen_final, evaluation)
         state = _decode_checkpoint_value(checkpoint['cl_state'])
         protocol = checkpoint['protocol']
-        if config.get('custom_tasks'):
-            task_classes = [[int(value) for value in group.split(',')]
-                            for group in config['custom_tasks'].split('|')]
-        else:
-            per_task = config['classes_per_task']
-            task_classes = [list(range(i * per_task, (i + 1) * per_task))
-                            for i in range(expected_tasks)]
+        task_classes = list(_expected_task_classes(
+            config, expected_tasks).values())
         bottoms = checkpoint['trainer_state']['bottoms']
         top = checkpoint['trainer_state']['top_model']
         if (checkpoint.get('schema_version') != 4
@@ -454,10 +505,21 @@ def _verify_checkpoint_method_state(path, config, expected_tasks):
         check_tensors(bottoms)
         check_tensors(top)
         check_tensors(state)
+        if frozen_final is not None:
+            args = SimpleNamespace(**config)
+            if party_col_ranges is not None:
+                args.party_col_ranges = party_col_ranges
+            _validate_resume_checkpoint_payload(checkpoint, args)
+            live_rng = _capture_rng_state()
+            try:
+                _fresh_formal_state(checkpoint, args)
+            finally:
+                _restore_rng_state(live_rng)
     except Exception as error:
         raise ValueError('checkpoint method state is invalid') from error
     return {'method': method, 'state_keys': sorted(state),
-            'task_id': checkpoint['task_id'], 'parties': len(bottoms)}
+            'task_id': checkpoint['task_id'], 'parties': len(bottoms),
+            'strict_reloaded': frozen_final is not None}
 
 
 def _verify_transaction(run, frozen, published, provenance, result):
@@ -933,11 +995,17 @@ def verify_pinned_job(job_dir, *, producer_commit, results_root, data_root):
     if record['admission'] != 'formal' or record['code_commit'] != producer_commit:
         raise ValueError('pinned formal basic evidence is incomplete')
     config = _json(job_dir / 'run' / 'config.json')
+    frozen = _json(job_dir / 'run' / 'FORMAL_STATE_FROZEN.json')
+    _verify_frozen_task_classes(frozen, config, TASKS[job[0]])
     flow = _verify_training_flow_strict(
         job_dir / 'run', config, data_root, TASKS[job[0]])
+    complete = _json(job_dir / 'run' / 'FORMAL_EVALUATION_COMPLETE.json')
     method_state = _verify_checkpoint_method_state(
         job_dir / 'run' / 'checkpoints' / 'formal_final.pt',
-        config, TASKS[job[0]])
+        config, TASKS[job[0]],
+        frozen_final=frozen['identity']['final_checkpoint'],
+        evaluation=complete['evaluation'],
+        party_col_ranges=flow['party_col_ranges'])
     record['training_flow_replay'] = flow
     record['checkpoint_method_state'] = method_state
     return record
