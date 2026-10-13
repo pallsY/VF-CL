@@ -456,7 +456,8 @@ def audit_job(job_dir, producer_commit, producer_root, data_root):
             or not basic_audit._same_path(data_root,
                                           basic_audit.FROZEN_DATA_ROOT)):
         raise ValueError('numeric replay source or data root differs from fixed protocol')
-    basic = basic_audit.verify_v3_formal_job(job_dir)
+    basic = basic_audit.verify_v3_formal_job(
+        job_dir, producer_root=producer_root)
     if basic.get('admission') != 'formal':
         raise ValueError('numeric replay lacks formal basic admission')
     completed = subprocess.run(

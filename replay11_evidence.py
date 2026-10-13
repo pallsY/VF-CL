@@ -7,6 +7,7 @@ import math
 import os
 import re
 import subprocess
+import sys
 import tempfile
 import types
 from functools import lru_cache
@@ -22,6 +23,7 @@ CORRECTED_COMMIT = '467611a603c9604ad57861920495a3ad05612037'
 FROZEN_RESULTS_ROOT = Path(
     '/brf/users/yangxx/VFCL-results/replay11-paper-v3-20261013/full-3080')
 FROZEN_DATA_ROOT = Path('/brf/users/yangxx/VF-CL/data')
+FROZEN_PRODUCER_ROOT = Path('/tmp/vfcl-replay11-paper-v3-full')
 PRODUCER_COMMITS = {PRODUCER_COMMIT, CORRECTED_COMMIT}
 LEGACY_REUSE_METHODS = frozenset({
     'balanced_contrast', 'er', 'der_pp', 'er_ace', 'adagauss',
@@ -416,16 +418,39 @@ def _verify_frozen_checkpoint_state(payload, frozen_final, evaluation):
         raise ValueError('frozen checkpoint state differs') from error
 
 
+def _strict_producer_restore(producer_root, checkpoint_path, config_path,
+                             party_col_ranges):
+    """Run the producer's resume validator in a fresh producer-only process."""
+    command = [
+        sys.executable,
+        str(Path(__file__).resolve().parent / 'replay11_restore_worker.py'),
+        str(producer_root), str(checkpoint_path), str(config_path),
+        json.dumps(party_col_ranges),
+    ]
+    completed = subprocess.run(command, capture_output=True, text=True,
+                               check=False)
+    if completed.returncode:
+        raise ValueError('strict producer restore failed: '
+                         + completed.stderr[-3000:])
+    marker = 'REPLAY11_RESTORE_JSON='
+    lines = [line[len(marker):] for line in completed.stdout.splitlines()
+             if line.startswith(marker)]
+    if len(lines) != 1:
+        raise ValueError('strict producer restore returned no single result')
+    result = json.loads(lines[0])
+    if result.get('strict_reloaded') is not True:
+        raise ValueError('strict producer restore did not confirm reload')
+    return result
+
+
 def _verify_checkpoint_method_state(path, config, expected_tasks, *,
                                     frozen_final=None, evaluation=None,
-                                    party_col_ranges=None):
+                                    party_col_ranges=None,
+                                    producer_root=None):
     """Restricted decode and method-specific state contract for final weights."""
     import torch
-    from adaptive_consolidation_audit import (_fresh_formal_state,
-                                              _safe_torch_load)
+    from adaptive_consolidation_audit import _safe_torch_load
     from runner import (_decode_checkpoint_value,
-                        _capture_rng_state, _restore_rng_state,
-                        _validate_resume_checkpoint_payload,
                         _valid_method_checkpoint_state,
                         _valid_tracker_checkpoint_state)
 
@@ -506,15 +531,13 @@ def _verify_checkpoint_method_state(path, config, expected_tasks, *,
         check_tensors(top)
         check_tensors(state)
         if frozen_final is not None:
-            args = SimpleNamespace(**config)
-            if party_col_ranges is not None:
-                args.party_col_ranges = party_col_ranges
-            _validate_resume_checkpoint_payload(checkpoint, args)
-            live_rng = _capture_rng_state()
-            try:
-                _fresh_formal_state(checkpoint, args)
-            finally:
-                _restore_rng_state(live_rng)
+            if producer_root is None:
+                raise ValueError('producer checkout is required for strict reload')
+            restored = _strict_producer_restore(
+                producer_root, path, Path(path).parent.parent / 'config.json',
+                party_col_ranges)
+            if restored.get('parties') != 4:
+                raise ValueError('strict producer restore party count differs')
     except Exception as error:
         raise ValueError('checkpoint method state is invalid') from error
     return {'method': method, 'state_keys': sorted(state),
@@ -972,7 +995,8 @@ def _same_path(left, right):
             == os.path.normcase(os.path.abspath(right)))
 
 
-def verify_pinned_job(job_dir, *, producer_commit, results_root, data_root):
+def verify_pinned_job(job_dir, *, producer_commit, results_root, data_root,
+                      producer_root=FROZEN_PRODUCER_ROOT):
     """Verify a formal original against caller-frozen external locators."""
     if producer_commit != CORRECTED_COMMIT:
         raise ValueError('formal producer commit differs from frozen v3 commit')
@@ -994,6 +1018,11 @@ def verify_pinned_job(job_dir, *, producer_commit, results_root, data_root):
     record = verify_local_job(job_dir, data_root=data_root)
     if record['admission'] != 'formal' or record['code_commit'] != producer_commit:
         raise ValueError('pinned formal basic evidence is incomplete')
+    from replay11_numeric import _producer_sources
+    _producer_sources(producer_root, producer_commit, {
+        'source_commit': producer_commit,
+        'source_sha256': record['source_sha256'],
+    })
     config = _json(job_dir / 'run' / 'config.json')
     frozen = _json(job_dir / 'run' / 'FORMAL_STATE_FROZEN.json')
     _verify_frozen_task_classes(frozen, config, TASKS[job[0]])
@@ -1005,17 +1034,19 @@ def verify_pinned_job(job_dir, *, producer_commit, results_root, data_root):
         config, TASKS[job[0]],
         frozen_final=frozen['identity']['final_checkpoint'],
         evaluation=complete['evaluation'],
-        party_col_ranges=flow['party_col_ranges'])
+        party_col_ranges=flow['party_col_ranges'],
+        producer_root=producer_root)
     record['training_flow_replay'] = flow
     record['checkpoint_method_state'] = method_state
     return record
 
 
-def verify_v3_formal_job(job_dir):
+def verify_v3_formal_job(job_dir, *, producer_root=FROZEN_PRODUCER_ROOT):
     """Apply the frozen v3 NAS producer, original root, and data root."""
     return verify_pinned_job(
         job_dir, producer_commit=CORRECTED_COMMIT,
-        results_root=FROZEN_RESULTS_ROOT, data_root=FROZEN_DATA_ROOT)
+        results_root=FROZEN_RESULTS_ROOT, data_root=FROZEN_DATA_ROOT,
+        producer_root=producer_root)
 
 
 def merge_attestations(locations=None):

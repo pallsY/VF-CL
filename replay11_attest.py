@@ -241,7 +241,8 @@ def audit_one(job, producer_root):
             if (stage == 'numeric' and before['sha256']
                     != outputs[-1]['original_tree_after_sha256']):
                 raise ValueError('original tree changed since basic admission')
-            result = (evidence.verify_v3_formal_job(job_dir)
+            result = (evidence.verify_v3_formal_job(
+                          job_dir, producer_root=producer_root)
                       if stage == 'basic' else
                       numeric.audit_job(job_dir, evidence.CORRECTED_COMMIT,
                                         producer_root, evidence.FROZEN_DATA_ROOT))

@@ -215,7 +215,8 @@ class Replay11V3Test(unittest.TestCase):
             root = Path(directory)
             job = _corrected_job(root / 'official')
             with patch.object(evidence, '_verify_authoritative_data',
-                              return_value=matrix.expected_data('cifar100')):
+                              return_value=matrix.expected_data('cifar100')), \
+                    patch('replay11_numeric._producer_sources'):
                 with self.assertRaisesRegex(ValueError,
                                             'training data-flow reconstruction'):
                     evidence.verify_pinned_job(
@@ -324,6 +325,19 @@ class Replay11V3Test(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError,
                                             'checkpoint method state'):
                     _verify_checkpoint_method_state(path, config, 10)
+
+    def test_strict_restore_uses_explicit_producer_checkout(self):
+        import replay11_evidence as evidence
+        from types import SimpleNamespace
+        with patch.object(evidence.subprocess, 'run', return_value=SimpleNamespace(
+                returncode=0, stdout='REPLAY11_RESTORE_JSON={"strict_reloaded": true}\n',
+                stderr='')) as process:
+            result = evidence._strict_producer_restore(
+                Path('/producer'), Path('/job/final.pt'), Path('/job/config.json'),
+                [[0, 2], [2, 4]])
+        self.assertTrue(result['strict_reloaded'])
+        self.assertIn(str(Path('/producer')), process.call_args.args[0])
+        self.assertIn(str(Path('/job/final.pt')), process.call_args.args[0])
 
     def test_corrected_full_transaction_attests_real_commit(self):
         with tempfile.TemporaryDirectory() as directory:

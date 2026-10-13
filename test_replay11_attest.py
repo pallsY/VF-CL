@@ -126,7 +126,7 @@ class AuditLedgerTests(unittest.TestCase):
                 'audit_commit': 'a' * 40,
                 'producer_commit': attest.evidence.CORRECTED_COMMIT})
 
-            def fail_seed42_during_basic(_job):
+            def fail_seed42_during_basic(_job, **_kwargs):
                 attest.append_event(ledger, {
                     'job': 'isolet/mir/42', 'stage': 'basic', 'status': 'failed',
                     'audit_commit': 'a' * 40,
