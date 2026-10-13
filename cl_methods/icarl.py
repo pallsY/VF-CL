@@ -33,10 +33,14 @@ class ICaRLCL(ERCL):
     def __init__(self, trainer, args):
         super().__init__(trainer, args)
         self.name = 'iCaRL_VFL'
+        self.total_budget = 20 * int(args.num_classes)
+        if self.total_budget <= 0:
+            raise ValueError('iCaRL requires a positive final class count')
         self.new_classes = []
         self.old_classes = []
         self.teacher_bottoms = None
         self.teacher_top = None
+        self._task_current_count = None
 
     def before_task(self, task_id, new_classes, seen_classes):
         super().before_task(task_id, new_classes, seen_classes)
@@ -82,15 +86,37 @@ class ICaRLCL(ERCL):
                 old_indices = torch.tensor(self.old_classes,
                                            dtype=torch.long, device=labels.device)
                 targets[:, old_indices] = teacher_logits[:, old_indices].sigmoid()
-        return F.binary_cross_entropy_with_logits(logits, targets)
+        per_example = F.binary_cross_entropy_with_logits(
+            logits, targets, reduction='none').mean(1)
+        if not stored:
+            return per_example.mean()
+        fresh_count = len(batch_y)
+        current_total = (self._task_current_count
+                         if self._task_current_count is not None
+                         else fresh_count)
+        old_total = len(stored)
+        return ((current_total * per_example[:fresh_count].mean()
+                 + old_total * per_example[fresh_count:].mean())
+                / (current_total + old_total))
 
     def train_task(self, train_loader, task_id):
-        return self.trainer.train_task(
-            train_loader, self.args.epochs_per_task,
-            extra_loss_fn=self._icarl_loss)
+        if not hasattr(train_loader, 'dataset') or len(train_loader.dataset) < 1:
+            raise ValueError('iCaRL requires a nonempty current-task dataset')
+        self._task_current_count = len(train_loader.dataset)
+        try:
+            return self.trainer.train_task(
+                train_loader, self.args.epochs_per_task,
+                extra_loss_fn=self._icarl_loss)
+        finally:
+            self._task_current_count = None
 
     @torch.no_grad()
     def after_task(self, train_loader, task_id):
+        per_class = self.total_budget // (len(self.old_classes) + len(self.new_classes))
+        if per_class < 1:
+            raise ValueError('iCaRL budget cannot retain every seen class')
+        for class_id in self.old_classes:
+            self.buffer.data[class_id] = self.buffer.data[class_id][:per_class]
         was_training = [bottom.training for bottom in self.trainer.bottoms]
         for bottom in self.trainer.bottoms:
             bottom.eval()
@@ -109,7 +135,7 @@ class ICaRLCL(ERCL):
                 if not examples:
                     raise ValueError(f'iCaRL class {class_id} has no training examples')
                 feature_matrix = torch.stack(features_by_class[class_id])
-                selected = herding_indices(feature_matrix, self.per_class_size)
+                selected = herding_indices(feature_matrix, per_class)
                 self.buffer.data[class_id] = [examples[index] for index in selected]
                 self.buffer.seen_count[class_id] = len(examples)
         finally:
@@ -210,6 +236,7 @@ class ICaRLCL(ERCL):
     def get_state(self):
         state = super().get_state()
         state.update(
+            total_budget=self.total_budget,
             new_classes=list(self.new_classes),
             old_classes=list(self.old_classes),
             teacher_bottoms=(None if self.teacher_bottoms is None else
@@ -220,6 +247,8 @@ class ICaRLCL(ERCL):
         return state
 
     def load_state(self, state):
+        if state.get('total_budget') != self.total_budget:
+            raise ValueError('iCaRL checkpoint uses a different total exemplar budget')
         super().load_state(state)
         self.new_classes = list(state.get('new_classes', []))
         self.old_classes = list(state.get('old_classes', []))
