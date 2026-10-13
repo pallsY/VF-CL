@@ -68,15 +68,61 @@ def _job(root):
     }
     _write(run / 'config.json', config)
     _write(run / 'results.json', result)
+    frozen_identity = {
+        'source_commit': COMMIT, 'snapshots': frozen_snapshots,
+    }
     _write(run / 'FORMAL_STATE_FROZEN.json', {
         'schema_version': 1, 'status': 'frozen',
-        'identity': {
-            'source_commit': COMMIT, 'snapshots': frozen_snapshots,
-        },
+        'identity': frozen_identity,
+    })
+    freeze = {
+        'path': 'FORMAL_STATE_FROZEN.json',
+        'sha256': _sha(run / 'FORMAL_STATE_FROZEN.json'),
+    }
+    transaction = 'a' * 64
+    evaluation = 'b' * 64
+    provenance = {'source_commit': COMMIT}
+    _write(run / 'FORMAL_EVALUATION_PENDING.json', {
+        'schema_version': 1, 'status': 'pending',
+        'identity': frozen_identity, 'freeze': freeze,
+        'transaction_sha256': transaction,
+    })
+    _write(run / 'FORMAL_EVALUATION_CONSUMING.json', {
+        'schema_version': 1, 'status': 'consuming',
+        'identity': frozen_identity, 'freeze': freeze,
+        'transaction_sha256': transaction,
+    })
+    _write(run / 'FORMAL_EVALUATION_COMPLETE.json', {
+        'schema_version': 1, 'status': 'complete',
+        'identity': frozen_identity, 'freeze': freeze,
+        'transaction_sha256': transaction,
+        'evaluation_sha256': evaluation,
+    })
+    record = lambda name: {
+        'path': name + '.json', 'sha256': _sha(run / (name + '.json')),
+    }
+    _write(run / 'FORMAL_EVALUATION_SEALED.json', {
+        'schema_version': 1, 'status': 'sealed',
+        'transaction_sha256': transaction, 'freeze': freeze,
+        'pending': record('FORMAL_EVALUATION_PENDING'),
+        'consuming': record('FORMAL_EVALUATION_CONSUMING'),
+        'complete': record('FORMAL_EVALUATION_COMPLETE'),
+        'source_provenance': provenance,
+    })
+    seal = record('FORMAL_EVALUATION_SEALED')
+    _write(run / 'FORMAL_EVALUATION_PUBLISHING.json', {
+        'schema_version': 1, 'status': 'publishing',
+        'transaction_sha256': transaction,
+        'evaluation_sha256': evaluation,
+        'results_sha256': 'c' * 64, 'seal': seal,
+        'source_provenance': provenance,
     })
     _write(run / 'FORMAL_EVALUATION_PUBLISHED.json', {
         'schema_version': 1, 'status': 'published',
-        'source_provenance': {'source_commit': COMMIT},
+        'transaction_sha256': transaction,
+        'evaluation_sha256': evaluation,
+        'results_sha256': 'c' * 64, 'seal': seal,
+        'source_provenance': provenance,
         'checkpoint': {'path': 'checkpoints/formal_final.pt',
                        'sha256': _sha(checkpoint)},
         'results': {'path': 'results.json',
@@ -91,6 +137,22 @@ def _job(root):
         ('cifar100', 'mir', 42), job,
         python=Path('python'), worktree=Path('/tmp/code'),
         device='cuda:0', data_root=root / 'data')
+    for i in range(2, len(command), 2):
+        key, token = command[i][2:], command[i + 1]
+        kind = matrix.registry.OPTION_SCHEMA.get(key, 'str')
+        if key == 'unlearn_after_tasks':
+            config[key] = [int(token)]
+        elif key == 'unlearn_classes':
+            config[key] = [[int(token)]]
+        elif kind == 'bool':
+            config[key] = token == '1'
+        elif kind == 'int':
+            config[key] = int(token)
+        elif kind == 'float':
+            config[key] = float(token)
+        else:
+            config[key] = token
+    _write(run / 'config.json', config)
     plan = {
         'dataset': 'cifar100', 'method': 'mir', 'seed': 42,
         'smoke': False, 'code_commit': COMMIT, 'command': command,
@@ -191,6 +253,23 @@ class Replay11EvidenceTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 verify_local_job(job)
 
+    def test_missing_complete_transaction_marker_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            job = _job(Path(directory))
+            (job / 'run' / 'FORMAL_EVALUATION_COMPLETE.json').unlink()
+            with self.assertRaises(ValueError):
+                verify_local_job(job)
+
+    def test_broken_transaction_link_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            job = _job(Path(directory))
+            marker = job / 'run' / 'FORMAL_EVALUATION_PUBLISHED.json'
+            value = json.loads(marker.read_text())
+            value['transaction_sha256'] = 'd' * 64
+            _write(marker, value)
+            with self.assertRaises(ValueError):
+                verify_local_job(job)
+
     def test_changed_reported_metric_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             job = _job(Path(directory))
@@ -233,6 +312,27 @@ class Replay11EvidenceTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 verify_local_job(job)
 
+    def test_changed_saved_training_epochs_are_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            job = _job(Path(directory))
+            config = job / 'run' / 'config.json'
+            value = json.loads(config.read_text())
+            value['epochs_per_task'] = 1
+            _write(config, value)
+            with self.assertRaises(ValueError):
+                verify_local_job(job)
+
+    def test_unrelated_entrypoint_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            job = _job(Path(directory))
+            for filename in ('JOB_PLAN.json', 'JOB_SUCCESS.json'):
+                path = job / filename
+                value = json.loads(path.read_text())
+                value['command'][1] = '/unrelated/entry.py'
+                _write(path, value)
+            with self.assertRaises(ValueError):
+                verify_local_job(job)
+
     def test_archive_manifest_accepts_exact_copy(self):
         with tempfile.TemporaryDirectory() as directory:
             job = _job(Path(directory))
@@ -261,6 +361,34 @@ class Replay11EvidenceTest(unittest.TestCase):
             _write(manifest, value)
             with self.assertRaises(InconclusiveEvidence):
                 verify_archive_manifest(job, manifest)
+
+    def test_unrelated_parent_tree_cannot_attest_a_job(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with tempfile.TemporaryDirectory() as other:
+                root = Path(directory)
+                job = _job(root)
+                _archive_manifest(job)
+                rows = []
+                for path in sorted(root.rglob('*')):
+                    if path.is_file():
+                        rows.append([
+                            path.relative_to(root).as_posix(),
+                            path.stat().st_size, _sha(path),
+                        ])
+                digest = hashlib.sha256(json.dumps(
+                    rows, ensure_ascii=False,
+                    separators=(',', ':')).encode()).hexdigest()
+                manifest = Path(other) / 'manifest.json'
+                _write(manifest, {
+                    'job': 'cifar100/mir/42', 'code_commit': COMMIT,
+                    'source': '/original', 'destination': str(root),
+                    'files': len(rows),
+                    'bytes': sum(row[1] for row in rows),
+                    'source_tree_sha256': digest,
+                    'destination_tree_sha256': digest,
+                })
+                with self.assertRaises(ValueError):
+                    verify_archive_manifest(job, manifest)
 
 
 if __name__ == '__main__':
