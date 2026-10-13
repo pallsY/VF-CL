@@ -185,12 +185,16 @@ def run_directories(job_dir, *, smoke):
 
 def verify_success_record(job_dir, record):
     job = (record['dataset'], record['method'], record['seed'])
+    pilot_deferred = record.get('pilot_deferred', False)
+    if (type(pilot_deferred) is not bool
+            or (pilot_deferred and record['smoke'])):
+        raise ValueError('invalid deferred pilot record')
     if job not in jobs() or record['data_hashes'] != expected_data(job[0]):
         raise ValueError('success record job or data authority differs')
     run_dirs = run_directories(job_dir, smoke=record['smoke'])
     if len(run_dirs) != 1:
         raise ValueError('success record has ambiguous run directories')
-    tasks = (2 if record['smoke'] else
+    tasks = (2 if record['smoke'] or pilot_deferred else
              {'cifar100': 10, 'isolet': 13, 'upmc_food101': 10}[job[0]])
     deferred = not record['smoke']
     actual = validate_completed_run(job, run_dirs[0], tasks,
@@ -213,12 +217,14 @@ def jobs_for_shard(index, count):
 
 
 def command_for(job, results_root, *, python, worktree,
-                device, data_root=None, smoke=False):
+                device, data_root=None, smoke=False, pilot_deferred=False):
     dataset, method, seed = job
     if dataset not in DATASETS or method not in METHODS or seed not in SEEDS:
         raise ValueError('unregistered replay-11 job')
-    if type(smoke) is not bool:
-        raise TypeError('smoke must be bool')
+    if type(smoke) is not bool or type(pilot_deferred) is not bool:
+        raise TypeError('smoke and pilot_deferred must be bool')
+    if smoke and pilot_deferred:
+        raise ValueError('smoke and pilot_deferred cannot be combined')
     # Reuse the reviewed dataset-specific settings. ER supplies the shared
     # replay-class protocol; only the method-specific algorithm changes.
     base = registry.protocol_for(
@@ -243,7 +249,7 @@ def command_for(job, results_root, *, python, worktree,
     elif dataset == 'isolet':
         options['vector_npz'] = str(
             Path(options['data_path']) / 'isolet/isolet_vfl.npz')
-    if smoke:
+    if smoke or pilot_deferred:
         if 'custom_tasks' in options:
             options['custom_tasks'] = options['custom_tasks'][:2]
         options['num_tasks'] = 2
@@ -273,7 +279,8 @@ def _git_commit(worktree):
         ['git', '-C', str(worktree), 'rev-parse', 'HEAD'], text=True).strip()
 
 
-def run_one(job, results_root, *, data_root, device, smoke=False):
+def run_one(job, results_root, *, data_root, device, smoke=False,
+            pilot_deferred=False):
     dataset, method, seed = job
     worktree = Path(__file__).resolve().parent
     commit = _git_commit(worktree)
@@ -288,12 +295,14 @@ def run_one(job, results_root, *, data_root, device, smoke=False):
         raise FileExistsError(f'job root already exists: {job_dir}')
     command = command_for(
         job, job_dir, python=Path(sys.executable), worktree=worktree,
-        device=device, data_root=data_root, smoke=smoke)
+        device=device, data_root=data_root, smoke=smoke,
+        pilot_deferred=pilot_deferred)
     job_dir.mkdir(parents=True)
     plan = {
         'dataset': dataset, 'method': method, 'seed': seed,
         'code_commit': commit, 'command': command,
         'data_hashes': expected_data(dataset), 'smoke': smoke,
+        'pilot_deferred': pilot_deferred,
     }
     (job_dir / 'JOB_PLAN.json').write_text(
         json.dumps(plan, indent=2, sort_keys=True) + '\n', encoding='utf-8')
@@ -308,7 +317,7 @@ def run_one(job, results_root, *, data_root, device, smoke=False):
     run_dirs = run_directories(job_dir, smoke=smoke)
     if len(run_dirs) != 1:
         raise ValueError('job produced an ambiguous result directory')
-    tasks = 2 if smoke else {'cifar100': 10, 'isolet': 13,
+    tasks = 2 if smoke or pilot_deferred else {'cifar100': 10, 'isolet': 13,
                              'upmc_food101': 10}[dataset]
     metrics = validate_completed_run(job, run_dirs[0], tasks,
                                      deferred=not smoke)
@@ -340,8 +349,9 @@ def summarize(results_root):
                 record = json.loads(path.read_text(encoding='utf-8'))
                 if ((record['dataset'], record['method'], record['seed'])
                         != (dataset, method, seed)
-                        or record['smoke']):
-                    raise ValueError('result identity or smoke status differs')
+                        or record['smoke']
+                        or record.get('pilot_deferred', False)):
+                    raise ValueError('result identity or pilot status differs')
                 verify_success_record(path.parent, record)
                 commits.add(record['code_commit'])
                 records.append(record)
@@ -374,6 +384,7 @@ def main():
     parser.add_argument('--shard-index', type=int)
     parser.add_argument('--shard-count', type=int)
     parser.add_argument('--smoke', action='store_true')
+    parser.add_argument('--pilot-deferred', action='store_true')
     args = parser.parse_args()
     if args.action == 'plan':
         print(json.dumps(jobs()))
@@ -391,7 +402,8 @@ def main():
             parser.error('run-one requires dataset, method, seed, results-root')
         print(json.dumps(run_one(
             (args.dataset, args.method, args.seed), args.results_root,
-            data_root=args.data_root, device=args.device, smoke=args.smoke),
+            data_root=args.data_root, device=args.device, smoke=args.smoke,
+            pilot_deferred=args.pilot_deferred),
             sort_keys=True))
     else:
         if (args.shard_index is None or args.shard_count is None
@@ -400,7 +412,8 @@ def main():
         for job in jobs_for_shard(args.shard_index, args.shard_count):
             if args.dataset is None or job[0] == args.dataset:
                 run_one(job, args.results_root, data_root=args.data_root,
-                        device=args.device, smoke=args.smoke)
+                        device=args.device, smoke=args.smoke,
+                        pilot_deferred=args.pilot_deferred)
 
 
 if __name__ == '__main__':

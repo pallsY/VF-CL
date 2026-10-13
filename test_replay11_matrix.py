@@ -74,6 +74,52 @@ class Replay11MatrixTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 matrix.verify_success_record(job_dir, record)
 
+    def test_deferred_pilot_record_uses_two_task_formal_checkpoint(self):
+        from unittest import mock
+        job = ('upmc_food101', 'hpcr', 42)
+        with tempfile.TemporaryDirectory() as directory:
+            job_dir = Path(directory)
+            run = job_dir / 'run'
+            checkpoint = run / 'checkpoints' / 'formal_final.pt'
+            checkpoint.parent.mkdir(parents=True)
+            checkpoint.write_bytes(b'formal pilot checkpoint')
+            results = run / 'results.json'
+            results.write_bytes(b'formal pilot result')
+            metrics = {'aa_final_cil': 0.5, 'bwt_cil': 0.0,
+                       'task_il_final': 0.5}
+            record = {
+                'dataset': job[0], 'method': job[1], 'seed': job[2],
+                'smoke': False, 'pilot_deferred': True,
+                'data_hashes': matrix.expected_data(job[0]),
+                'metrics': metrics,
+                'results_sha256': matrix.sha256_file(results),
+                'checkpoint_sha256': matrix.sha256_file(checkpoint),
+            }
+            with mock.patch.object(matrix, 'validate_completed_run',
+                                   return_value=metrics) as validate:
+                matrix.verify_success_record(job_dir, record)
+            validate.assert_called_once_with(job, run, 2, deferred=True)
+
+    def test_pilot_record_cannot_enter_full_summary(self):
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            job_dir = root / 'cifar100' / 'hpcr' / '42'
+            job_dir.mkdir(parents=True)
+            (job_dir / 'JOB_SUCCESS.json').write_text(json.dumps({
+                'dataset': 'cifar100', 'method': 'hpcr', 'seed': 42,
+                'smoke': False, 'pilot_deferred': True,
+                'code_commit': 'historical',
+                'metrics': {'aa_final_cil': 0.5, 'bwt_cil': 0.0,
+                            'task_il_final': 0.5},
+            }))
+            with (mock.patch.object(matrix, 'DATASETS', ('cifar100',)),
+                  mock.patch.object(matrix, 'METHODS', ('hpcr',)),
+                  mock.patch.object(matrix, 'SEEDS', (42,)),
+                  mock.patch.object(matrix, 'verify_success_record')):
+                with self.assertRaisesRegex(ValueError, 'pilot'):
+                    matrix.summarize(root)
+
     def test_upmc_authority_binds_new_cache_and_clean_source(self):
         expected = matrix.expected_data('upmc_food101')
         self.assertEqual(expected[matrix.UPMC_FOUR_CACHE],
@@ -230,6 +276,27 @@ class Replay11MatrixTest(unittest.TestCase):
         self.assertEqual(command[command.index('--num_tasks') + 1], '2')
         self.assertEqual(command[command.index('--epochs_per_task') + 1], '1')
         self.assertEqual(command[command.index('--formal_deferred_evaluation') + 1], '0')
+
+    def test_upmc_pilot_uses_two_tasks_and_formal_deferred_evaluation(self):
+        import inspect
+        self.assertIn('pilot_deferred',
+                      inspect.signature(matrix.command_for).parameters)
+        job = ('upmc_food101', 'hpcr', 42)
+        command = matrix.command_for(
+            job, Path('/tmp/replay11-pilot'),
+            python=Path('/opt/python'), worktree=Path('/opt/worktree'),
+            device='cuda:0', pilot_deferred=True)
+        options = dict(zip(command[2::2], command[3::2]))
+        self.assertEqual(options['--num_tasks'], '2')
+        self.assertEqual(options['--epochs_per_task'], '1')
+        self.assertEqual(options['--formal_deferred_evaluation'], '1')
+        self.assertEqual(options['--num_parties'], '4')
+        self.assertEqual(len(options['--custom_tasks'].split('|')), 2)
+        with self.assertRaises(ValueError):
+            matrix.command_for(
+                job, Path('/tmp/replay11-pilot'),
+                python=Path('/opt/python'), worktree=Path('/opt/worktree'),
+                device='cuda:0', smoke=True, pilot_deferred=True)
 
     def test_shards_partition_jobs_without_overlap(self):
         first = set(matrix.jobs_for_shard(0, 3))
