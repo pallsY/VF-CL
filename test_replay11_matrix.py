@@ -298,6 +298,16 @@ class Replay11MatrixTest(unittest.TestCase):
                 python=Path('/opt/python'), worktree=Path('/opt/worktree'),
                 device='cuda:0', smoke=True, pilot_deferred=True)
 
+    def test_cifar_two_task_pilot_disables_ten_task_bic_gate(self):
+        command = matrix.command_for(
+            ('cifar100', 'hpcr', 42), Path('/tmp/replay11-pilot'),
+            python=Path('/opt/python'), worktree=Path('/opt/worktree'),
+            device='cuda:0', pilot_deferred=True)
+        options = dict(zip(command[2::2], command[3::2]))
+        self.assertEqual(options['--num_tasks'], '2')
+        self.assertEqual(options['--formal_deferred_evaluation'], '1')
+        self.assertEqual(options['--bic_enabled'], '0')
+
     def test_shards_partition_jobs_without_overlap(self):
         first = set(matrix.jobs_for_shard(0, 3))
         second = set(matrix.jobs_for_shard(1, 3))
