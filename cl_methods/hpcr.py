@@ -100,6 +100,7 @@ class HPCRCL:
             raise ValueError('invalid HPCR memory or loss settings')
         self.memory = {}
         self.seen_count = {}
+        self.seen_classes = set()
         self.step = 0
         self._task_step = 0
         self._steps_per_epoch = None
@@ -126,6 +127,7 @@ class HPCRCL:
     def before_task(self, task_id, new_classes, seen_classes):
         self.trainer.top_model.expand_classes(max(seen_classes) + 1,
                                               self.args.device)
+        self.seen_classes = {int(class_id) for class_id in seen_classes}
         self._use_cosine_head(self.trainer.top_model)
         self._task_step = 0
 
@@ -158,13 +160,15 @@ class HPCRCL:
         return self.temperature / tau_step
 
     def _insert(self, examples, labels, logits, features):
+        self.seen_classes.update(int(label) for label in labels)
+        active = sorted(self.seen_classes)
         for example, label, logit, feature in zip(examples, labels, logits,
                                                    features):
             class_id = int(label)
             count = self.seen_count.get(class_id, 0)
             entries = self.memory.setdefault(class_id, [])
             packed_logits = torch.full((self.args.num_classes,), float('nan'))
-            packed_logits[:len(logit)] = logit.detach().cpu()
+            packed_logits[active] = logit.detach().cpu()[active]
             entry = (example.detach().cpu().clone(), class_id,
                      packed_logits, feature.detach().cpu().clone())
             if len(entries) < self.per_class_size:
@@ -229,11 +233,83 @@ class HPCRCL:
     def after_task(self, train_loader, task_id):
         pass
 
+    @torch.no_grad()
+    def _evaluate(self, task_classes, batches_for_task):
+        seen = sorted({int(label) for classes in task_classes.values()
+                       for label in classes})
+        if not seen or set(seen) != self.seen_classes:
+            raise ValueError('HPCR evaluation classes differ from learned classes')
+        seen_indices = torch.tensor(seen, dtype=torch.long,
+                                    device=self.args.device)
+        class_task = {int(label): int(task)
+                      for task, classes in task_classes.items()
+                      for label in classes}
+        result = {name: {} for name in (
+            'class_il_pred_task', 'class_il_global', 'task_il_oracle',
+            'task_prediction', 'class_il_pred_task_counts')}
+        modules = [*self.trainer.bottoms, self.trainer.top_model]
+        modes = [module.training for module in modules]
+        try:
+            for module in modules:
+                module.eval()
+            for task, classes in task_classes.items():
+                allowed = torch.tensor(classes, dtype=torch.long,
+                                       device=self.args.device)
+                correct = global_correct = oracle_correct = task_correct = total = 0
+                for examples, labels in batches_for_task(task, classes):
+                    pieces = split_features(examples.to(self.args.device), self.args)
+                    embeddings = [bottom(piece) for bottom, piece in
+                                  zip(self.trainer.bottoms, pieces)]
+                    logits = self.trainer.top_model(
+                        self.trainer._aggregate(embeddings))
+                    target = labels.to(self.args.device)
+                    predictions = seen_indices[
+                        logits.index_select(1, seen_indices).argmax(1)]
+                    global_predictions = logits.argmax(1)
+                    oracle = allowed[logits.index_select(1, allowed).argmax(1)]
+                    correct += int((predictions == target).sum())
+                    global_correct += int((global_predictions == target).sum())
+                    oracle_correct += int((oracle == target).sum())
+                    task_correct += sum(class_task[int(value)] == int(task)
+                                        for value in predictions.tolist())
+                    total += len(target)
+                if total < 1:
+                    raise ValueError('HPCR evaluation task is empty')
+                key = f'task_{task}'
+                result['class_il_pred_task'][key] = round(correct / total, 4)
+                result['class_il_global'][key] = round(global_correct / total, 4)
+                result['task_il_oracle'][key] = round(oracle_correct / total, 4)
+                result['task_prediction'][key] = round(task_correct / total, 4)
+                result['class_il_pred_task_counts'][key] = {
+                    'correct': correct, 'total': total}
+        finally:
+            for module, mode in zip(modules, modes):
+                module.train(mode)
+        return result
+
+    def evaluate_class_il_readouts(self, dataset, seen_task_classes):
+        return self._evaluate(
+            seen_task_classes,
+            lambda _task, classes: dataset.get_task_loaders(
+                classes, shuffle_train=False)[1],
+        )
+
+    def evaluate_class_il_readouts_cached(self, cached_test_batches,
+                                          seen_task_classes):
+        from metrics import select_formal_cached_batches
+
+        return self._evaluate(
+            seen_task_classes,
+            lambda _task, classes: select_formal_cached_batches(
+                cached_test_batches, classes),
+        )
+
     def get_state(self):
         return {
             'per_class_size': self.per_class_size,
             'memory': self.memory,
             'seen_count': self.seen_count,
+            'seen_classes': sorted(self.seen_classes),
             'step': self.step,
         }
 
@@ -242,4 +318,10 @@ class HPCRCL:
             raise ValueError('HPCR checkpoint memory budget differs')
         self.memory = state['memory']
         self.seen_count = state['seen_count']
+        classes = state['seen_classes']
+        if (type(classes) is not list or classes != sorted(set(classes))
+                or any(type(value) is not int or value < 0
+                       or value >= self.args.num_classes for value in classes)):
+            raise ValueError('HPCR checkpoint seen classes differ')
+        self.seen_classes = set(classes)
         self.step = int(state['step'])

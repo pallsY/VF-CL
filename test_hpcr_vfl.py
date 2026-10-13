@@ -10,6 +10,62 @@ from models import TopModel
 
 
 class HPCRLossTest(unittest.TestCase):
+    def test_formal_readout_masks_never_seen_proxy_columns(self):
+        bottom = torch.nn.Identity()
+        top = TopModel(2, 3, cosine=True)
+        trainer = SimpleNamespace(
+            bottoms=[bottom], top_model=top,
+            _aggregate=lambda values: values[0],
+            bytes_transmitted=0, comm_rounds=0,
+        )
+        args = SimpleNamespace(
+            data='tabvfl', party_col_ranges=[(0, 2)], device='cpu',
+            num_classes=3, er_per_class=2, er_batch=2,
+            hpcr_temperature=1.0,
+        )
+        method = HPCRCL(trainer, args)
+        method.before_task(0, [0, 1], [0, 1])
+        with torch.no_grad():
+            top.classifier.weight.copy_(torch.tensor(
+                [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]))
+        cached = ((torch.tensor([[1.0, 0.0], [0.6, 0.8]]),
+                   torch.tensor([0, 1])),)
+        self.assertTrue(hasattr(method, 'evaluate_class_il_readouts_cached'))
+        readouts = method.evaluate_class_il_readouts_cached(
+            cached, {0: [0, 1]})
+        self.assertEqual(readouts['class_il_pred_task']['task_0'], 1.0)
+        self.assertEqual(readouts['class_il_global']['task_0'], 0.5)
+        self.assertEqual(readouts['class_il_pred_task_counts']['task_0'],
+                         {'correct': 2, 'total': 2})
+        from runner import _evaluate_cil_readouts_cached
+        formal = _evaluate_cil_readouts_cached(
+            method, trainer, cached, {0: [0, 1]}, 'cpu')
+        self.assertEqual(formal['primary']['task_0'], 1.0)
+        self.assertEqual(formal['companions']['class_il_global']['task_0'], 0.5)
+
+    def test_stored_logits_exclude_future_class_targets(self):
+        bottom = torch.nn.Identity()
+        top = TopModel(2, 4, cosine=True)
+        trainer = SimpleNamespace(bottoms=[bottom], top_model=top)
+        args = SimpleNamespace(device='cpu', num_classes=4,
+                               batch_size=1, er_per_class=2, er_batch=1)
+        method = HPCRCL(trainer, args)
+        method.before_task(0, [0, 1], [0, 1])
+        method._insert(
+            torch.tensor([[1.0, 0.0]]), torch.tensor([0]),
+            torch.tensor([[1.0, 2.0, 3.0, 4.0]]),
+            torch.tensor([[1.0, 0.0]]),
+        )
+        stored = method.memory[0][0][2]
+        self.assertTrue(torch.isfinite(stored[:2]).all())
+        self.assertTrue(torch.isnan(stored[2:]).all())
+        current = torch.tensor([[1.0, 2.0, 3.0, 4.0]],
+                               requires_grad=True)
+        loss = hpcr.proxy_logit_distillation_loss(
+            current, stored[None, :], torch.tensor([0, 2]))
+        loss.backward()
+        self.assertEqual(float(current.grad[0, 2]), 0.0)
+
     def test_first_unreplayed_batch_learns_from_paper_contrast(self):
         bottom = torch.nn.Linear(1, 2)
         top = TopModel(2, 2)
