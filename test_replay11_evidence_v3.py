@@ -5,7 +5,11 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
+
+import numpy as np
+import torch
 
 import replay11_matrix as matrix
 from test_replay11_evidence import (
@@ -101,7 +105,174 @@ def _corrected_job(root):
     return job
 
 
+def _vector_training_flow(root):
+    from data_utils import TaskManager, VFLDataset
+    from determinism import tensor_sha256
+
+    data_root = root / 'data'
+    isolet = data_root / 'isolet'
+    isolet.mkdir(parents=True)
+    np.savez(isolet / 'isolet_vfl.npz',
+             X=np.arange(40, dtype=np.float32).reshape(10, 4),
+             y=np.array([0] * 5 + [1] * 5),
+             train_idx=np.arange(8), test_idx=np.array([8, 9]),
+             view_names=np.array(['a', 'b', 'c', 'd']),
+             range_lo=np.array([0, 1, 2, 3]),
+             range_hi=np.array([1, 2, 3, 4]))
+    (isolet / 'isolet_vfl.metadata.json').write_text('{}')
+    config = {
+        'data': 'tabvfl', 'num_classes': 2, 'num_parties': 4,
+        'num_tasks': 2, 'custom_tasks': '0|1', 'classes_per_task': 1,
+        'seed': 42, 'batch_size': 2, 'num_workers': 0,
+        'deterministic': 1, 'data_flow_audit': 1,
+        'epochs_per_task': 2, 'replay_mode': 'class',
+        'bic_enabled': 0, 'lambda_validation_enabled': 0,
+        'data_path': str(data_root),
+        'vector_npz': str(isolet / 'isolet_vfl.npz'),
+        'output_dir': str(root / 'scratch'),
+    }
+    dataset = VFLDataset(SimpleNamespace(**config))
+    tasks = TaskManager(SimpleNamespace(**config))
+    rows = []
+    for task_id in range(2):
+        tasks.advance_task(task_id)
+        loader = dataset.get_train_loader(tasks.task_classes[task_id])
+        for epoch in range(2):
+            for batch, (batch_x, _batch_y) in enumerate(loader):
+                order = loader.audit_sampler.epoch_orders[-1]
+                start = batch * loader.batch_size
+                rows.append({
+                    'loader_key': loader.audit_key,
+                    'loader_iteration': epoch, 'batch': batch,
+                    'indices': order[start:start + len(batch_x)],
+                    'dtype': str(batch_x.dtype),
+                    'shape': list(batch_x.shape),
+                    'batch_sha256': tensor_sha256(batch_x),
+                })
+    rows.append({'split': 'test'})
+    run = root / 'run'
+    run.mkdir()
+    (run / 'data_flow_audit.jsonl').write_text(
+        ''.join(json.dumps(row) + '\n' for row in rows), encoding='utf-8')
+    return run, config, data_root, rows
+
+
 class Replay11V3Test(unittest.TestCase):
+    def test_vector_flow_rejects_truncation_and_changed_batch_sha(self):
+        from replay11_evidence import _verify_training_flow_strict
+        with tempfile.TemporaryDirectory() as directory:
+            run, config, data_root, rows = _vector_training_flow(Path(directory))
+            self.assertTrue(_verify_training_flow_strict(
+                run, config, data_root, 2)['batch_bytes_replayed'])
+            path = run / 'data_flow_audit.jsonl'
+            for changed in (rows[:3] + rows[4:],
+                            [{**rows[0], 'batch_sha256': '0' * 64}]
+                            + rows[1:]):
+                path.write_text(''.join(json.dumps(row) + '\n'
+                                        for row in changed), encoding='utf-8')
+                with self.assertRaisesRegex(ValueError,
+                                            'training data-flow reconstruction'):
+                    _verify_training_flow_strict(run, config, data_root, 2)
+
+    def test_pinned_locator_rejects_copy_with_rewritten_plan(self):
+        from replay11_evidence import verify_pinned_job
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            original = _corrected_job(root / 'official')
+            copy = root / 'copy' / 'cifar100' / 'mir' / '42'
+            shutil.copytree(original, copy)
+            for name in ('JOB_PLAN.json', 'JOB_SUCCESS.json'):
+                path = copy / name
+                value = json.loads(path.read_text())
+                command = value['command']
+                command[command.index('--results_dir') + 1] = str(copy)
+                _write(path, value)
+            with self.assertRaisesRegex(ValueError, 'pinned result locator'):
+                verify_pinned_job(
+                    copy, producer_commit=CORRECTED_COMMIT,
+                    results_root=root / 'official', data_root=root / 'data')
+
+    def test_pinned_data_root_must_match_training_command(self):
+        from replay11_evidence import verify_pinned_job
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            job = _corrected_job(root / 'official')
+            with self.assertRaisesRegex(ValueError, 'pinned data root'):
+                verify_pinned_job(
+                    job, producer_commit=CORRECTED_COMMIT,
+                    results_root=root / 'official', data_root=root / 'other')
+
+    def test_pinned_job_rejects_synthetic_one_batch_per_task(self):
+        import replay11_evidence as evidence
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            job = _corrected_job(root / 'official')
+            with patch.object(evidence, '_verify_authoritative_data',
+                              return_value=matrix.expected_data('cifar100')):
+                with self.assertRaisesRegex(ValueError,
+                                            'training data-flow reconstruction'):
+                    evidence.verify_pinned_job(
+                        job, producer_commit=CORRECTED_COMMIT,
+                        results_root=root / 'official',
+                        data_root=root / 'official' / 'data')
+
+    def test_strict_checkpoint_rejects_opaque_bytes(self):
+        from replay11_evidence import _verify_checkpoint_method_state
+        with tempfile.TemporaryDirectory() as directory:
+            job = _corrected_job(Path(directory))
+            config = json.loads((job / 'run' / 'config.json').read_text())
+            with self.assertRaisesRegex(ValueError, 'checkpoint method state'):
+                _verify_checkpoint_method_state(
+                    job / 'run' / 'checkpoints' / 'formal_final.pt',
+                    config, 10)
+
+    def test_strict_checkpoint_rejects_wrong_method_state(self):
+        from replay11_evidence import (_expected_protocol,
+                                       _verify_checkpoint_method_state)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            job = _corrected_job(root)
+            run = job / 'run'
+            config = json.loads((run / 'config.json').read_text())
+            provenance = json.loads((run / 'results.json').read_text())[
+                'source_provenance']
+            classes = ([[int(item) for item in group.split(',')]
+                        for group in config['custom_tasks'].split('|')]
+                       if config.get('custom_tasks') else
+                       [list(range(i * config['classes_per_task'],
+                                   (i + 1) * config['classes_per_task']))
+                        for i in range(10)])
+            checkpoint = {
+                'schema_version': 4, 'task_id': 9, 'event_idx': 9,
+                'step': 'event_9_CIL',
+                'seen_task_classes': dict(enumerate(classes)),
+                'protocol': _expected_protocol(config, provenance),
+                'trainer_state': {
+                    'bottoms': [{'weight': torch.ones(1)} for _ in range(4)],
+                    'top_model': {'weight': torch.ones(1)},
+                },
+                'cl_state': {
+                    'per_class_size': 20,
+                    'data': {0: torch.ones(1, 4)},
+                    'seen_count': {0: 1},
+                },
+                'tracker_state': {},
+            }
+            path = root / 'state.pt'
+            torch.save(checkpoint, path)
+            with patch('runner._valid_tracker_checkpoint_state',
+                       return_value=True), patch(
+                           'adaptive_consolidation_audit._safe_torch_load',
+                           side_effect=lambda target: torch.load(
+                               target, map_location='cpu', weights_only=True)):
+                self.assertEqual(_verify_checkpoint_method_state(
+                    path, config, 10)['method'], 'mir')
+                checkpoint['cl_state'] = {'gaussians': {}, 'adapters': []}
+                torch.save(checkpoint, path)
+                with self.assertRaisesRegex(ValueError,
+                                            'checkpoint method state'):
+                    _verify_checkpoint_method_state(path, config, 10)
+
     def test_corrected_full_transaction_attests_real_commit(self):
         with tempfile.TemporaryDirectory() as directory:
             record = verify_local_job(_corrected_job(Path(directory)))

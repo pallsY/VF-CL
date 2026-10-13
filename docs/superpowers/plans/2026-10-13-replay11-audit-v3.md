@@ -49,3 +49,11 @@
 - [ ] Trial one corrected ISOLET/MIR original and one historical D: archive read-only, then record what each trial establishes.
 
 The later 33-cell numerical stage must use the frozen `REPLAY11_AUDIT_V3_INTEGER_DERIVATION_20261013.md`: obtain authoritative task totals, uniquely invert each four-decimal stored accuracy to an integer correct count, and compare an independent replay's integers exactly. The original results do not explicitly store those integers.
+
+### Final corrected-producer admission
+
+- [ ] Enumerate all 99 cells only beneath `/brf/users/yangxx/VFCL-results/replay11-paper-v3-20261013/full-3080`, with producer `467611a603c9604ad57861920495a3ad05612037` and data root `/brf/users/yangxx/VF-CL/data` pinned outside each job record. Old jobs are historical diagnostics only.
+- [ ] Reject a copied job even when its internal results path is edited; require both command `results_dir` and `data_path` to equal externally pinned locators.
+- [ ] Independently rebuild all task/epoch train loaders from authoritative bytes and producer deterministic sampler/worker settings; compare each batch index, shape, dtype, and post-augmentation SHA. Any mismatch fails closed.
+- [ ] Restricted-load the final checkpoint, check four-party model/tracker state and exact method state keys against corrected producer definitions, then run the fixed seed-42 numerical module separately.
+- [ ] Trial the corrected ISOLET/MIR/42 original and record wall time, CPU, memory, and evidence digests before extending to the remaining 98 cells.

@@ -7,9 +7,11 @@ import math
 import os
 import re
 import subprocess
+import tempfile
 import types
 from functools import lru_cache
 from pathlib import Path
+from types import SimpleNamespace
 
 import replay11_matrix as matrix
 from adaptive_consolidation_audit import FORMAL_SOURCE_FILES
@@ -17,6 +19,9 @@ from adaptive_consolidation_audit import FORMAL_SOURCE_FILES
 
 PRODUCER_COMMIT = '99e81b28e0544e182f777a34d7e7a786a1c3b920'
 CORRECTED_COMMIT = '467611a603c9604ad57861920495a3ad05612037'
+FROZEN_RESULTS_ROOT = Path(
+    '/brf/users/yangxx/VFCL-results/replay11-paper-v3-20261013/full-3080')
+FROZEN_DATA_ROOT = Path('/brf/users/yangxx/VF-CL/data')
 PRODUCER_COMMITS = {PRODUCER_COMMIT, CORRECTED_COMMIT}
 LEGACY_REUSE_METHODS = frozenset({
     'balanced_contrast', 'er', 'der_pp', 'er_ace', 'adagauss',
@@ -293,6 +298,166 @@ def _verify_data_flow(run, expected_test, expected_tasks):
     if len(train_groups) != expected_tasks or test_count != 1:
         raise ValueError('training data-flow task or test count differs')
     return digest.hexdigest()
+
+
+def _verify_training_flow_strict(run, config, data_root, expected_tasks):
+    """Rebuild producer loaders from authoritative data and compare each epoch."""
+    from data_utils import TaskManager, VFLDataset
+    from determinism import tensor_sha256
+
+    if any(not (Path(data_root) / relative).is_file()
+           for relative in matrix.expected_data(
+               'cifar100' if config['data'] == 'cifar100' else
+               'upmc_food101' if config['num_classes'] == 101 else 'isolet')):
+        raise ValueError('training data-flow reconstruction lacks data files')
+    with tempfile.TemporaryDirectory() as scratch:
+        args = SimpleNamespace(**config)
+        args.data_path = str(data_root)
+        args.output_dir = scratch
+        if config['data'] == 'tabvfl':
+            relative = (matrix.UPMC_FOUR_CACHE
+                        if config['num_classes'] == 101
+                        else 'isolet/isolet_vfl.npz')
+            args.vector_npz = str(Path(data_root) / relative)
+        try:
+            dataset = VFLDataset(args)
+            tasks = TaskManager(args)
+            if len(tasks.task_classes) != expected_tasks:
+                raise ValueError('task count differs')
+            batch_count = 0
+            with _file(run / 'data_flow_audit.jsonl').open('r',
+                                                            encoding='utf-8') as handle:
+                records = (json.loads(line) for line in handle if line.strip())
+                for task_id in range(expected_tasks):
+                    tasks.advance_task(task_id)
+                    classes = (tasks.get_effective_classes()
+                               if args.replay_mode == 'full'
+                               else tasks.task_classes[task_id])
+                    loader = dataset.get_train_loader(classes)
+                    if loader.audit_sampler is None:
+                        raise ValueError('deterministic audit sampler is absent')
+                    for epoch in range(args.epochs_per_task):
+                        for batch, (batch_x, _batch_y) in enumerate(loader):
+                            actual = next(records)
+                            order = loader.audit_sampler.epoch_orders[-1]
+                            start = batch * loader.batch_size
+                            expected = {
+                                'loader_key': loader.audit_key,
+                                'loader_iteration': epoch,
+                                'batch': batch,
+                                'indices': order[start:start + len(batch_x)],
+                                'dtype': str(batch_x.dtype),
+                                'shape': list(batch_x.shape),
+                            }
+                            if (type(actual) is not dict
+                                    or any(actual.get(key) != value
+                                           for key, value in expected.items())
+                                    or actual.get('batch_sha256')
+                                    != tensor_sha256(batch_x)):
+                                raise ValueError('batch identity differs')
+                            batch_count += 1
+                remaining = list(records)
+                if (not remaining
+                        or any(type(record) is not dict
+                               or 'split' not in record
+                               for record in remaining)):
+                    raise ValueError('training batch count differs')
+        except (OSError, StopIteration, KeyError, TypeError,
+                json.JSONDecodeError, ValueError) as error:
+            raise ValueError('training data-flow reconstruction differs') from error
+    return {'batches': batch_count, 'batch_bytes_replayed': True}
+
+
+def _verify_checkpoint_method_state(path, config, expected_tasks):
+    """Restricted decode and method-specific state contract for final weights."""
+    import torch
+    from adaptive_consolidation_audit import _safe_torch_load
+    from runner import (_decode_checkpoint_value,
+                        _valid_method_checkpoint_state,
+                        _valid_tracker_checkpoint_state)
+
+    base = {'per_class_size', 'data', 'seen_count'}
+    schemas = {
+        'er': base, 'mir': base, 'lpr': base,
+        'balanced_contrast': base | {'task_number'},
+        'ocar': base | {'factor_schema_version', 'tau', 'steps', 'factors'},
+        'alsar': base | {'usage', 'step', 'fisher', 'top_fisher',
+                         'class_similarity', 'last_gradient_mean'},
+        'icarl': base | {'total_budget', 'new_classes', 'old_classes',
+                         'teacher_bottoms', 'teacher_top'},
+        'hpcr': {'per_class_size', 'memory', 'seen_count',
+                 'seen_classes', 'step'},
+        'der_pp': {'buffer_size', 'num_seen', 'examples',
+                   'labels', 'logits'},
+        'er_ace': {'buffer_size', 'num_seen', 'examples', 'labels'},
+        'adagauss': {'gaussians', 'adapters'},
+    }
+    method = config['cl_method']
+    try:
+        checkpoint = _safe_torch_load(path)
+        state = _decode_checkpoint_value(checkpoint['cl_state'])
+        protocol = checkpoint['protocol']
+        if config.get('custom_tasks'):
+            task_classes = [[int(value) for value in group.split(',')]
+                            for group in config['custom_tasks'].split('|')]
+        else:
+            per_task = config['classes_per_task']
+            task_classes = [list(range(i * per_task, (i + 1) * per_task))
+                            for i in range(expected_tasks)]
+        bottoms = checkpoint['trainer_state']['bottoms']
+        top = checkpoint['trainer_state']['top_model']
+        if (checkpoint.get('schema_version') != 4
+                or checkpoint.get('task_id') != expected_tasks - 1
+                or checkpoint.get('event_idx') != expected_tasks - 1
+                or checkpoint.get('step')
+                != f'event_{expected_tasks - 1}_CIL'
+                or checkpoint.get('seen_task_classes')
+                != dict(enumerate(task_classes))
+                or protocol != _expected_protocol(
+                    config, protocol.get('source_provenance'))
+                or type(bottoms) is not list or len(bottoms) != 4
+                or any(type(bottom) is not dict or not bottom
+                       for bottom in bottoms)
+                or type(top) is not dict or not top
+                or method not in schemas or type(state) is not dict
+                or set(state) != schemas[method]
+                or not _valid_method_checkpoint_state(
+                    method, state, False, 4)
+                or not _valid_tracker_checkpoint_state(
+                    checkpoint['tracker_state'], protocol)):
+            raise ValueError('checkpoint schema or method fields differ')
+        if 'per_class_size' in state:
+            memory = state.get('data', state.get('memory'))
+            if (type(state['per_class_size']) is not int
+                    or state['per_class_size'] < 1
+                    or type(memory) is not dict
+                    or not memory):
+                raise ValueError('method exemplar memory differs')
+        def check_tensors(value, path=()):
+            if isinstance(value, torch.Tensor):
+                if value.is_floating_point():
+                    hpcr_masked_logits = (method == 'hpcr'
+                                          and len(path) == 4
+                                          and path[0] == 'memory'
+                                          and path[-1] == 2)
+                    invalid = (torch.isnan(value) | torch.isposinf(value)
+                               if hpcr_masked_logits
+                               else ~torch.isfinite(value))
+                    if bool(invalid.any()):
+                        raise ValueError('checkpoint tensor is invalid')
+            elif type(value) is dict:
+                for key, item in value.items():
+                    check_tensors(item, path + (key,))
+            elif type(value) in (list, tuple):
+                for index, item in enumerate(value):
+                    check_tensors(item, path + (index,))
+        check_tensors(bottoms)
+        check_tensors(top)
+        check_tensors(state)
+    except Exception as error:
+        raise ValueError('checkpoint method state is invalid') from error
+    return {'method': method, 'state_keys': sorted(state),
+            'task_id': checkpoint['task_id'], 'parties': len(bottoms)}
 
 
 def _verify_transaction(run, frozen, published, provenance, result):
@@ -740,28 +905,59 @@ def _is_planned_original(job_dir):
             == os.path.normcase(os.path.abspath(options['results_dir'])))
 
 
-def merge_attestations(locations):
-    """Recheck local evidence before counting any of the 99 formal cells."""
+def _same_path(left, right):
+    return (os.path.normcase(os.path.abspath(left))
+            == os.path.normcase(os.path.abspath(right)))
+
+
+def verify_pinned_job(job_dir, *, producer_commit, results_root, data_root):
+    """Verify a formal original against caller-frozen external locators."""
+    if producer_commit != CORRECTED_COMMIT:
+        raise ValueError('formal producer commit differs from frozen v3 commit')
+    job_dir = Path(job_dir)
+    job = (job_dir.parent.parent.name, job_dir.parent.name, int(job_dir.name))
+    if job not in matrix.jobs():
+        raise ValueError('unregistered formal job')
+    expected = Path(results_root) / job[0] / job[1] / str(job[2])
+    if (not _same_path(job_dir, expected)
+            or any(part.is_symlink() for part in (job_dir, *job_dir.parents))):
+        raise ValueError('pinned result locator differs')
+    plan = _json(job_dir / 'JOB_PLAN.json')
+    options = _options(plan.get('command'))
+    if (plan.get('code_commit') != producer_commit
+            or not _same_path(options.get('results_dir', ''), expected)):
+        raise ValueError('pinned result locator or producer differs')
+    if not _same_path(options.get('data_path', ''), data_root):
+        raise ValueError('pinned data root differs from training command')
+    record = verify_local_job(job_dir, data_root=data_root)
+    if record['admission'] != 'formal' or record['code_commit'] != producer_commit:
+        raise ValueError('pinned formal basic evidence is incomplete')
+    config = _json(job_dir / 'run' / 'config.json')
+    flow = _verify_training_flow_strict(
+        job_dir / 'run', config, data_root, TASKS[job[0]])
+    method_state = _verify_checkpoint_method_state(
+        job_dir / 'run' / 'checkpoints' / 'formal_final.pt',
+        config, TASKS[job[0]])
+    record['training_flow_replay'] = flow
+    record['checkpoint_method_state'] = method_state
+    return record
+
+
+def verify_v3_formal_job(job_dir):
+    """Apply the frozen v3 NAS producer, original root, and data root."""
+    return verify_pinned_job(
+        job_dir, producer_commit=CORRECTED_COMMIT,
+        results_root=FROZEN_RESULTS_ROOT, data_root=FROZEN_DATA_ROOT)
+
+
+def merge_attestations(locations=None):
+    """Recheck all 99 corrected originals under one externally pinned root."""
+    if locations is not None:
+        raise ValueError('catalog requires pinned job path roots')
     records = []
-    for location in locations:
-        if (type(location) is not dict
-                or not location.get('job_dir')
-                or not location.get('data_root')
-                or location.get('source_kind') not in ('original', 'archive')):
-            raise ValueError('catalog requires a job path and data root')
-        job_dir = Path(location['job_dir'])
-        record = verify_local_job(
-            job_dir, data_root=location['data_root'],
-            archive_manifest=location.get('archive_manifest'))
-        if record['admission'] != 'formal':
-            raise ValueError('job lacks formal basic admission')
-        if location['source_kind'] == 'archive':
-            if (not location.get('archive_manifest')
-                    or record['archive_evidence'] is None):
-                raise ValueError('archived job lacks source-proven manifest')
-        elif not _is_planned_original(job_dir):
-            raise ValueError('job path is not the planned original')
-        records.append(record)
+    for dataset, method, seed in matrix.jobs():
+        records.append(verify_v3_formal_job(
+            FROZEN_RESULTS_ROOT / dataset / method / str(seed)))
     return _merge_verified_attestations(records)
 
 
