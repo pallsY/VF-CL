@@ -2,12 +2,15 @@
 
 import hashlib
 import json
+import math
 import os
+import re
 import subprocess
 from functools import lru_cache
 from pathlib import Path
 
 import replay11_matrix as matrix
+from adaptive_consolidation_audit import FORMAL_SOURCE_FILES
 
 
 PRODUCER_COMMIT = '99e81b28e0544e182f777a34d7e7a786a1c3b920'
@@ -32,7 +35,10 @@ def _file(path):
 
 
 def _json(path):
-    return json.loads(_file(path).read_text(encoding='utf-8'))
+    value = json.loads(_file(path).read_text(encoding='utf-8'))
+    if type(value) is not dict:
+        raise ValueError(f'evidence JSON is not an object: {path}')
+    return value
 
 
 def _canonical_sha(value):
@@ -43,12 +49,14 @@ def _canonical_sha(value):
 
 
 @lru_cache(maxsize=1)
-def _producer_main_sha256():
-    source = subprocess.check_output([
-        'git', '-C', str(Path(matrix.__file__).parent),
-        'show', f'{PRODUCER_COMMIT}:main.py',
-    ])
-    return hashlib.sha256(source).hexdigest()
+def _producer_source_sha256():
+    root = str(Path(matrix.__file__).parent)
+    return {
+        name: hashlib.sha256(subprocess.check_output([
+            'git', '-C', root, 'show', f'{PRODUCER_COMMIT}:{name}',
+        ])).hexdigest()
+        for name in FORMAL_SOURCE_FILES
+    }
 
 
 def _options(command):
@@ -73,6 +81,36 @@ def _verify_transaction(run, frozen, published, provenance, result):
         name: _json(run / f'FORMAL_EVALUATION_{name}.json')
         for name in names
     }
+    identity = frozen.get('identity')
+    bic = identity.get('protocol', {}).get('bic_enabled') is True
+    base = {'schema_version', 'status', 'transaction_sha256'}
+    schemas = {
+        'PENDING': base | {'identity', 'freeze'},
+        'CONSUMING': base | {'identity', 'freeze', 'cache_identity'},
+        'COMPLETE': base | {
+            'identity', 'freeze', 'cache_identity',
+            'evaluation', 'evaluation_sha256',
+        } | ({'calibration_cache_identity', 'bic', 'bic_sha256'}
+             if bic else set()),
+        'SEALED': base | {
+            'identity_sha256', 'protocol_sha256', 'freeze',
+            'cache_identity', 'source_provenance',
+            'pending', 'consuming', 'complete',
+        },
+        'PUBLISHING': base | {
+            'evaluation_sha256', 'results_sha256',
+            'seal', 'source_provenance',
+        },
+        'PUBLISHED': base | {
+            'evaluation_sha256', 'results_sha256', 'seal',
+            'source_provenance', 'checkpoint', 'results',
+        },
+    }
+    if (set(frozen) != {'schema_version', 'status', 'identity'}
+            or any(set(marker) != schemas[name]
+                   for name, marker in (
+                       *markers.items(), ('PUBLISHED', published)))):
+        raise ValueError('formal transaction schema differs')
     freeze_hash = matrix.sha256_file(
         _file(run / 'FORMAL_STATE_FROZEN.json'))
     transaction = markers['PENDING'].get('transaction_sha256')
@@ -87,9 +125,18 @@ def _verify_transaction(run, frozen, published, provenance, result):
     complete = markers['COMPLETE']
     if (not isinstance(complete.get('evaluation'), dict)
             or evaluation != _canonical_sha(complete['evaluation'])
-            or ('bic' in complete and complete.get('bic_sha256')
+            or (bic and complete.get('bic_sha256')
                 != _canonical_sha(complete['bic']))):
         raise ValueError('formal evaluation digest differs')
+    if (markers['CONSUMING']['cache_identity']
+            != complete['cache_identity']
+            or markers['SEALED']['cache_identity']
+            != complete['cache_identity']
+            or markers['SEALED']['identity_sha256']
+            != _canonical_sha(identity)
+            or markers['SEALED']['protocol_sha256']
+            != identity.get('protocol_sha256')):
+        raise ValueError('formal cache or seal identity differs')
     for name, marker in (*markers.items(), ('PUBLISHED', published)):
         if (marker.get('schema_version') != 1
                 or marker.get('status') != name.lower()
@@ -236,15 +283,35 @@ def verify_local_job(job_dir):
                 raise ValueError('frozen checkpoint bytes differ')
     provenance = result.get('source_provenance')
     _verify_transaction(run, frozen, published, provenance, result)
+    source_hashes = provenance.get('source_sha256') if type(provenance) is dict else None
+    access_record = access.get('access')
+    expected_classes = list(range(config['num_classes']))
+    if (set(access) != {'schema_version', 'status', 'access'}
+            or access.get('schema_version') != 1
+            or type(access_record) is not dict
+            or set(access_record) != {
+                'event', 'loader_key', 'split', 'phase',
+                'event_idx', 'task_id', 'timeline_step', 'classes',
+            }
+            or access_record.get('event') != 'first_iteration'
+            or access_record.get('classes') != expected_classes
+            or access_record.get('task_id') != TASKS[dataset] - 1
+            or access_record.get('timeline_step')
+            != f'event_{TASKS[dataset] - 1}_CIL'
+            or access_record.get('loader_key')
+            != repr(('test', tuple(expected_classes)))):
+        raise ValueError('formal test access identity differs')
     if (frozen.get('status') != 'frozen'
             or frozen.get('identity', {}).get('source_commit')
             != PRODUCER_COMMIT
             or published.get('status') != 'published'
             or published.get('source_provenance') != provenance
             or type(provenance) is not dict
+            or provenance.get('schema_version') != 1
             or provenance.get('source_commit') != PRODUCER_COMMIT
-            or provenance.get('source_sha256', {}).get('main.py')
-            != _producer_main_sha256()
+            or type(source_hashes) is not dict
+            or source_hashes != _producer_source_sha256()
+            or frozen['identity'].get('source_provenance') != provenance
             or published.get('checkpoint', {}).get('path')
             != 'checkpoints/formal_final.pt'
             or published['checkpoint'].get('sha256')
@@ -324,4 +391,42 @@ def verify_archive_manifest(job_dir, manifest_path):
     return {
         'job': job, 'code_commit': PRODUCER_COMMIT,
         'files': files, 'bytes': size, 'tree_sha256': digest,
+    }
+
+
+def merge_attestations(records):
+    """Require every planned cell once; preselect seed 42 for strict replay."""
+    jobs = matrix.jobs()
+    expected = {f'{dataset}/{method}/{seed}'
+                for dataset, method, seed in jobs}
+    found = set()
+    for record in records:
+        if type(record) is not dict:
+            raise ValueError('invalid attestation')
+        job = record.get('job')
+        metrics = record.get('metrics')
+        if (job not in expected or job in found
+                or record.get('code_commit') != PRODUCER_COMMIT
+                or record.get('smoke') is True
+                or type(metrics) is not dict
+                or set(metrics) != {
+                    'aa_final_cil', 'bwt_cil', 'task_il_final'}
+                or any(type(value) not in (int, float)
+                       or not math.isfinite(value)
+                       for value in metrics.values())
+                or any(type(record.get(key)) is not str
+                       or re.fullmatch(
+                           r'[0-9a-f]{64}', record[key]) is None
+                       for key in ('results_sha256', 'checkpoint_sha256'))):
+            raise ValueError('invalid or duplicate attestation')
+        found.add(job)
+    if found != expected:
+        raise ValueError('replay-11 attestation matrix is incomplete')
+    return {
+        'jobs': len(found),
+        'code_commit': PRODUCER_COMMIT,
+        'strict_replays': [
+            f'{dataset}/{method}/{seed}'
+            for dataset, method, seed in jobs if seed == 42
+        ],
     }

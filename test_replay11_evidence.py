@@ -1,17 +1,20 @@
 import hashlib
 import json
+import subprocess
 import tempfile
 import unittest
+from functools import lru_cache
 from pathlib import Path
 
+from adaptive_consolidation_audit import FORMAL_SOURCE_FILES
 import replay11_matrix as matrix
 from replay11_evidence import (
-    InconclusiveEvidence, verify_archive_manifest, verify_local_job,
+    InconclusiveEvidence, merge_attestations,
+    verify_archive_manifest, verify_local_job,
 )
 
 
 COMMIT = '99e81b28e0544e182f777a34d7e7a786a1c3b920'
-MAIN_BLOB_SHA = '115e8c0ac31054de1ff657b5b4f5024d088017c4b3bb4d0b2019ec84d8ea4e89'
 
 
 def _write(path, value):
@@ -28,6 +31,17 @@ def _canonical_sha(value):
         value, indent=2, sort_keys=True, allow_nan=False,
         separators=(',', ': ')) + '\n'
     return hashlib.sha256(content.encode()).hexdigest()
+
+
+@lru_cache(maxsize=1)
+def _source_hashes():
+    root = Path(matrix.__file__).parent
+    return {
+        name: hashlib.sha256(subprocess.check_output([
+            'git', '-C', str(root), 'show', f'{COMMIT}:{name}',
+        ])).hexdigest()
+        for name in FORMAL_SOURCE_FILES
+    }
 
 
 def _job(root, dataset='cifar100'):
@@ -72,10 +86,8 @@ def _job(root, dataset='cifar100'):
         'num_parties': 4, 'formal_deferred_evaluation': True,
     }
     provenance = {
-        'source_commit': COMMIT,
-        'source_sha256': {
-            'main.py': MAIN_BLOB_SHA,
-        },
+        'schema_version': 1, 'source_commit': COMMIT,
+        'source_sha256': _source_hashes(),
     }
     result = {
         'config': dict(config), 'task_acc_history': history,
@@ -85,6 +97,9 @@ def _job(root, dataset='cifar100'):
     _write(run / 'results.json', result)
     frozen_identity = {
         'source_commit': COMMIT, 'snapshots': frozen_snapshots,
+        'source_provenance': provenance,
+        'protocol': {'bic_enabled': False},
+        'protocol_sha256': 'e' * 64,
     }
     _write(run / 'FORMAL_STATE_FROZEN.json', {
         'schema_version': 1, 'status': 'frozen',
@@ -107,6 +122,7 @@ def _job(root, dataset='cifar100'):
         'schema_version': 1, 'status': 'consuming',
         'identity': frozen_identity, 'freeze': freeze,
         'transaction_sha256': transaction,
+        'cache_identity': {'test': 'fixture'},
     })
     _write(run / 'FORMAL_EVALUATION_COMPLETE.json', {
         'schema_version': 1, 'status': 'complete',
@@ -114,6 +130,7 @@ def _job(root, dataset='cifar100'):
         'transaction_sha256': transaction,
         'evaluation_sha256': evaluation,
         'evaluation': evaluation_payload,
+        'cache_identity': {'test': 'fixture'},
     })
     record = lambda name: {
         'path': name + '.json', 'sha256': _sha(run / (name + '.json')),
@@ -125,6 +142,9 @@ def _job(root, dataset='cifar100'):
         'consuming': record('FORMAL_EVALUATION_CONSUMING'),
         'complete': record('FORMAL_EVALUATION_COMPLETE'),
         'source_provenance': provenance,
+        'identity_sha256': _canonical_sha(frozen_identity),
+        'protocol_sha256': 'e' * 64,
+        'cache_identity': {'test': 'fixture'},
     })
     seal = record('FORMAL_EVALUATION_SEALED')
     _write(run / 'FORMAL_EVALUATION_PUBLISHING.json', {
@@ -147,8 +167,15 @@ def _job(root, dataset='cifar100'):
     })
     _write(run / 'formal_access' / 'test.consumed.json', {
         'schema_version': 1, 'status': 'consumed',
-        'access': {'split': 'test', 'event_idx': tasks - 1,
-                   'phase': 'final_test_post_install'},
+        'access': {
+            'event': 'first_iteration', 'split': 'test',
+            'event_idx': tasks - 1, 'task_id': tasks - 1,
+            'phase': 'final_test_post_install',
+            'timeline_step': f'event_{tasks - 1}_CIL',
+            'classes': list(range(100 if dataset == 'cifar100' else 26)),
+            'loader_key': repr((
+                'test', tuple(range(100 if dataset == 'cifar100' else 26)))),
+        },
     })
     command = matrix.command_for(
         (dataset, 'mir', 42), job,
@@ -279,6 +306,50 @@ class Replay11EvidenceTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             job = _job(Path(directory))
             (job / 'run' / 'FORMAL_EVALUATION_COMPLETE.json').unlink()
+            with self.assertRaises(ValueError):
+                verify_local_job(job)
+
+    def test_missing_access_identity_field_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            job = _job(Path(directory))
+            path = job / 'run' / 'formal_access' / 'test.consumed.json'
+            value = json.loads(path.read_text())
+            del value['access']['loader_key']
+            _write(path, value)
+            with self.assertRaises(ValueError):
+                verify_local_job(job)
+
+    def test_missing_method_source_hash_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            job = _job(Path(directory))
+            result = job / 'run' / 'results.json'
+            value = json.loads(result.read_text())
+            del value['source_provenance']['source_sha256']['cl_methods/mir.py']
+            _write(result, value)
+            success = job / 'JOB_SUCCESS.json'
+            record = json.loads(success.read_text())
+            record['results_sha256'] = _sha(result)
+            _write(success, record)
+            published = job / 'run' / 'FORMAL_EVALUATION_PUBLISHED.json'
+            marker = json.loads(published.read_text())
+            marker['results']['sha256'] = _sha(result)
+            marker['source_provenance'] = value['source_provenance']
+            marker['results_sha256'] = _canonical_sha(value)
+            _write(published, marker)
+            publishing = job / 'run' / 'FORMAL_EVALUATION_PUBLISHING.json'
+            marker = json.loads(publishing.read_text())
+            marker['source_provenance'] = value['source_provenance']
+            marker['results_sha256'] = _canonical_sha(value)
+            _write(publishing, marker)
+            sealed = job / 'run' / 'FORMAL_EVALUATION_SEALED.json'
+            marker = json.loads(sealed.read_text())
+            marker['source_provenance'] = value['source_provenance']
+            _write(sealed, marker)
+            for name in ('PUBLISHING', 'PUBLISHED'):
+                path = job / 'run' / f'FORMAL_EVALUATION_{name}.json'
+                marker = json.loads(path.read_text())
+                marker['seal']['sha256'] = _sha(sealed)
+                _write(path, marker)
             with self.assertRaises(ValueError):
                 verify_local_job(job)
 
@@ -452,6 +523,43 @@ class Replay11EvidenceTest(unittest.TestCase):
                 })
                 with self.assertRaises(ValueError):
                     verify_archive_manifest(job, manifest)
+
+
+def _all_attestations():
+    return [{
+        'job': f'{dataset}/{method}/{seed}',
+        'code_commit': COMMIT,
+        'metrics': {'aa_final_cil': 0.5, 'bwt_cil': -0.1,
+                    'task_il_final': 0.7},
+        'results_sha256': 'a' * 64,
+        'checkpoint_sha256': 'b' * 64,
+    } for dataset, method, seed in matrix.jobs()]
+
+
+class Replay11CatalogTest(unittest.TestCase):
+    def test_exact_matrix_selects_33_seed_42_replays(self):
+        catalog = merge_attestations(_all_attestations())
+        self.assertEqual(catalog['jobs'], 99)
+        self.assertEqual(len(catalog['strict_replays']), 33)
+        self.assertTrue(all(job.endswith('/42')
+                            for job in catalog['strict_replays']))
+
+    def test_missing_or_duplicate_job_is_rejected(self):
+        rows = _all_attestations()
+        with self.assertRaises(ValueError):
+            merge_attestations(rows[:-1])
+        with self.assertRaises(ValueError):
+            merge_attestations(rows + [rows[0]])
+
+    def test_mixed_commit_or_smoke_is_rejected(self):
+        rows = _all_attestations()
+        rows[0] = {**rows[0], 'code_commit': '0' * 40}
+        with self.assertRaises(ValueError):
+            merge_attestations(rows)
+        rows = _all_attestations()
+        rows[0] = {**rows[0], 'smoke': True}
+        with self.assertRaises(ValueError):
+            merge_attestations(rows)
 
 
 if __name__ == '__main__':
