@@ -78,15 +78,22 @@ class LPRCL(ERCL):
             rows = patches.transpose(1, 2).reshape(-1, patches.size(1))
         elif isinstance(module, nn.BatchNorm2d):
             n_eff = value.size(2) * value.size(3)
-            rows = value.permute(0, 2, 3, 1).reshape(-1, value.size(1))
+            if module.running_mean is None or module.running_var is None:
+                raise ValueError('LPR BatchNorm requires running statistics')
+            mean = module.running_mean[None, :, None, None]
+            scale = torch.sqrt(module.running_var[None, :, None, None]
+                               + module.eps)
+            normalized = (value - mean) / scale
+            rows = normalized.permute(0, 2, 3, 1).reshape(-1, value.size(1))
         else:
             return
-        if len(rows) > self.max_rows:
-            indices = torch.linspace(0, len(rows) - 1,
-                                     self.max_rows, device=rows.device).long()
+        total_rows = len(rows)
+        if total_rows > self.max_rows:
+            indices = torch.randperm(total_rows, device=rows.device)[:self.max_rows]
             rows = rows[indices]
+        row_mass = total_rows / len(rows)
         omega = self.omega0 / n_eff ** self.beta
-        self.references[module] = (rows.float().clone(), omega)
+        self.references[module] = (rows.float().clone(), omega, row_mass)
 
     @torch.no_grad()
     def _refresh(self):
@@ -130,7 +137,7 @@ class LPRCL(ERCL):
                 reference = self.references.get(module)
                 if reference is None or module.weight.grad is None:
                     continue
-                rows, omega = reference
+                rows, omega, row_mass = reference
                 if isinstance(module, (nn.Linear, nn.Conv2d)):
                     gradient = module.weight.grad
                     flat = gradient.reshape(gradient.size(0), -1)
@@ -138,15 +145,23 @@ class LPRCL(ERCL):
                             else module.bias.grad)
                     adjusted, adjusted_bias = precondition_affine_gradient(
                         rows, flat, bias, omega,
-                        normalizer=self.reference_count)
+                        normalizer=self.reference_count / row_mass)
                     gradient.copy_(adjusted.reshape_as(gradient))
                     if adjusted_bias is not None:
                         bias.copy_(adjusted_bias)
                 elif isinstance(module, nn.BatchNorm2d):
-                    coefficient = omega / self.reference_count
-                    module.weight.grad.div_(1 + coefficient * rows.square().sum(0))
+                    coefficient = omega * row_mass / self.reference_count
+                    a = 1 + coefficient * rows.square().sum(0)
+                    b = coefficient * rows.sum(0)
+                    d = 1 + coefficient * len(rows)
+                    determinant = a * d - b.square()
+                    gamma = module.weight.grad.clone()
+                    beta = (module.bias.grad.clone()
+                            if module.bias is not None and module.bias.grad is not None
+                            else torch.zeros_like(gamma))
+                    module.weight.grad.copy_((d * gamma - b * beta) / determinant)
                     if module.bias is not None and module.bias.grad is not None:
-                        module.bias.grad.div_(1 + coefficient * len(rows))
+                        module.bias.grad.copy_((-b * gamma + a * beta) / determinant)
 
     def _transform_top(self, modules):
         if not self.references or self.steps % self.interval == 0:
