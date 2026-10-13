@@ -188,6 +188,26 @@ class Replay11MatrixTest(unittest.TestCase):
                 self.assertEqual(float(options['--momentum']), 0.0)
                 self.assertEqual(float(options['--weight_decay']), 0.0)
 
+    def test_hpcr_formal_config_reconstructs_cosine_head(self):
+        for dataset in matrix.DATASETS:
+            with self.subTest(dataset=dataset):
+                command = matrix.command_for(
+                    (dataset, 'hpcr', 42), Path('/tmp/replay11-test'),
+                    python=Path('/opt/python'), worktree=Path('/opt/worktree'),
+                    device='cuda:0')
+                self.assertIn('--cosine_head', command)
+
+    def test_alsar_sample_similarity_uses_same_full_head_ce_as_training(self):
+        for dataset in matrix.DATASETS:
+            with self.subTest(dataset=dataset):
+                command = matrix.command_for(
+                    (dataset, 'alsar', 42), Path('/tmp/replay11-test'),
+                    python=Path('/opt/python'), worktree=Path('/opt/worktree'),
+                    device='cuda:0')
+                options = dict(zip(command[2::2], command[3::2]))
+                self.assertEqual(options['--task_ce_mode'], 'full')
+                self.assertEqual(float(options['--alsar_temperature']), 0.125)
+
     def test_isolet_uses_host_local_cache_path(self):
         command = matrix.command_for(
             ('isolet', 'ocar', 42), Path('/tmp/replay11-test'),

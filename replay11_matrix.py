@@ -43,13 +43,13 @@ METHOD_OPTIONS = {
     'lpr': {'lpr_omega0': 1.0, 'lpr_beta': 1.0,
             'lpr_interval': 10, 'lpr_reference_size': 8,
             'lpr_max_rows': 64},
-    'hpcr': {'hpcr_temperature': 0.09, 'hpcr_temp_max': 1.8,
-             'hpcr_temp_min': 0.5625, 'hpcr_pcd_alpha': 0.1,
-             'hpcr_scd_beta': 0.5},
+    'hpcr': {'hpcr_temperature': 0.09, 'hpcr_temp_max': 0.16,
+             'hpcr_temp_min': 0.05, 'hpcr_pcd_alpha': 0.1,
+             'hpcr_scd_beta': 0.5, 'cosine_head': True},
     'ocar': {'ocar_ema': 0.01, 'ocar_delta_tau': 1e-5,
              'ocar_max_rows': 32, 'task_ce_mode': 'full',
              'optimizer': 'sgd', 'momentum': 0.0, 'weight_decay': 0.0},
-    'alsar': {'alsar_temperature': 1.0, 'alsar_decay': 0.99,
+    'alsar': {'alsar_temperature': 0.125, 'task_ce_mode': 'full',
               'alsar_fisher_rate': 0.01,
               'alsar_gradient_rate': 0.01},
     'mir': {'mir_candidates': 128, 'task_ce_mode': 'full',
@@ -251,6 +251,10 @@ def command_for(job, results_root, *, python, worktree,
     options.update(METHOD_OPTIONS[method])
     command = [str(python), str(Path(worktree) / 'main.py')]
     for option, value in options.items():
+        if option == 'cosine_head':
+            if value:
+                command.append('--cosine_head')
+            continue
         if option in registry.OPTION_SCHEMA:
             encoded = registry._option_token(option, value)
         else:
