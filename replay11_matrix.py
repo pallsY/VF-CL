@@ -256,6 +256,7 @@ def command_for(job, results_root, *, python, worktree,
         options['epochs_per_task'] = 1
         if pilot_deferred and dataset == 'cifar100':
             options['bic_enabled'] = 0
+            options['lambda_validation_enabled'] = 0
     options.update(METHOD_OPTIONS[method])
     command = [str(python), str(Path(worktree) / 'main.py')]
     for option, value in options.items():

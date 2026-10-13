@@ -307,6 +307,7 @@ class Replay11MatrixTest(unittest.TestCase):
         self.assertEqual(options['--num_tasks'], '2')
         self.assertEqual(options['--formal_deferred_evaluation'], '1')
         self.assertEqual(options['--bic_enabled'], '0')
+        self.assertEqual(options['--lambda_validation_enabled'], '0')
 
     def test_shards_partition_jobs_without_overlap(self):
         first = set(matrix.jobs_for_shard(0, 3))
