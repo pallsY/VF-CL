@@ -1,5 +1,6 @@
 import json
 import hashlib
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -12,7 +13,8 @@ from test_replay11_evidence import (
 )
 from adaptive_consolidation_audit import FORMAL_SOURCE_FILES
 from replay11_evidence import (
-    CORRECTED_COMMIT, PRODUCER_COMMIT, equivalence_certificate,
+    CORRECTED_COMMIT, PRODUCER_COMMIT, _merge_verified_attestations,
+    equivalence_certificate,
     merge_attestations, verify_archive_manifest, verify_local_job,
 )
 
@@ -27,7 +29,7 @@ def _corrected_job(root):
     plan['command'] = matrix_command = __import__(
         'replay11_evidence')._committed_matrix(CORRECTED_COMMIT).command_for(
             ('cifar100', 'mir', 42), job,
-            python=Path('python'), worktree=Path('/tmp/vfcl-replay11-code99'),
+            python=Path('python'), worktree=Path('/tmp/vfcl-replay11-paper-v3-full'),
             device='cuda:0', data_root=root / 'data')
     _write(plan_path, plan)
     config_path = run / 'config.json'
@@ -104,7 +106,7 @@ class Replay11V3Test(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             record = verify_local_job(_corrected_job(Path(directory)))
             self.assertEqual(record['code_commit'], CORRECTED_COMMIT)
-            self.assertEqual(record['admission'], 'formal')
+            self.assertEqual(record['admission'], 'EVIDENCE_INCOMPLETE')
             self.assertEqual(record['source_sha256']['cl_methods/mir.py'],
                              __import__('replay11_evidence')._producer_source_sha256(
                                  CORRECTED_COMMIT)['cl_methods/mir.py'])
@@ -112,6 +114,137 @@ class Replay11V3Test(unittest.TestCase):
             self.assertEqual(record['data_hashes'],
                              matrix.expected_data('cifar100'))
             self.assertEqual(len(record['command_sha256']), 64)
+
+    def test_authoritative_data_is_hashed_from_files(self):
+        from replay11_evidence import _verify_authoritative_data
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'sample.bin').write_bytes(b'authoritative')
+            expected = {'sample.bin': hashlib.sha256(b'authoritative').hexdigest()}
+            self.assertEqual(_verify_authoritative_data(root, expected), expected)
+            (root / 'sample.bin').write_bytes(b'changed')
+            with self.assertRaisesRegex(ValueError, 'data hash'):
+                _verify_authoritative_data(root, expected)
+
+    def test_catalog_rejects_99_unbound_rows(self):
+        from test_replay11_evidence import _all_attestations
+        with self.assertRaisesRegex(ValueError, 'job path'):
+            merge_attestations(_all_attestations())
+
+    def test_legacy_archive_without_original_is_unproven(self):
+        with tempfile.TemporaryDirectory() as directory:
+            job = _job(Path(directory))
+            manifest = _archive_manifest(job)
+            record = verify_archive_manifest(job, manifest)
+            self.assertEqual(record['status'], 'SOURCE_EQUIVALENCE_UNPROVEN')
+
+    def test_copied_job_cannot_be_labelled_original(self):
+        from replay11_evidence import _is_planned_original
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            job = _job(root / 'source')
+            copy = root / 'copy' / 'cifar100' / 'mir' / '42'
+            shutil.copytree(job, copy)
+            self.assertTrue(_is_planned_original(job))
+            self.assertFalse(_is_planned_original(copy))
+
+    def test_archive_with_accessible_identical_original_is_proven(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            original = _job(root / 'original')
+            copy = root / 'copy' / 'cifar100' / 'mir' / '42'
+            shutil.copytree(original, copy)
+            manifest = _archive_manifest(copy)
+            value = json.loads(manifest.read_text())
+            value['source'] = str(original)
+            _write(manifest, value)
+            self.assertEqual(verify_archive_manifest(copy, manifest)['status'],
+                             'SOURCE_EQUIVALENT')
+            (original / 'training.log').write_text('changed')
+            with self.assertRaisesRegex(ValueError, 'source and destination'):
+                verify_archive_manifest(copy, manifest)
+
+    def test_archive_source_must_be_the_planned_original(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            original = _job(root / 'original')
+            copy = root / 'copy' / 'cifar100' / 'mir' / '42'
+            other = root / 'other' / 'cifar100' / 'mir' / '42'
+            shutil.copytree(original, copy)
+            shutil.copytree(original, other)
+            manifest = _archive_manifest(copy)
+            value = json.loads(manifest.read_text())
+            value['source'] = str(other)
+            _write(manifest, value)
+            with self.assertRaisesRegex(ValueError, 'archive source path'):
+                verify_archive_manifest(copy, manifest)
+
+    def test_copied_corrected_job_needs_source_chain_for_admission(self):
+        import replay11_evidence as evidence
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            original = _corrected_job(root / 'original')
+            copy = root / 'copy' / 'cifar100' / 'mir' / '42'
+            shutil.copytree(original, copy)
+            with patch.object(evidence, '_verify_authoritative_data',
+                              return_value=matrix.expected_data('cifar100')):
+                record = verify_local_job(copy, data_root=root / 'data')
+            self.assertEqual(record['admission'],
+                             'SOURCE_EQUIVALENCE_UNPROVEN')
+            manifest = _archive_manifest(copy)
+            value = json.loads(manifest.read_text())
+            value['source'] = str(original)
+            value['code_commit'] = CORRECTED_COMMIT
+            _write(manifest, value)
+            with patch.object(evidence, '_verify_authoritative_data',
+                              return_value=matrix.expected_data('cifar100')):
+                proven = verify_local_job(
+                    copy, data_root=root / 'data', archive_manifest=manifest)
+            self.assertEqual(proven['admission'], 'formal')
+            self.assertEqual(proven['archive_evidence']['status'],
+                             'SOURCE_EQUIVALENT')
+
+    def test_corrected_entrypoint_cannot_be_arbitrary_main(self):
+        with tempfile.TemporaryDirectory() as directory:
+            job = _corrected_job(Path(directory))
+            for name in ('JOB_PLAN.json', 'JOB_SUCCESS.json'):
+                path = job / name
+                value = json.loads(path.read_text())
+                value['command'][1] = '/evil/main.py'
+                _write(path, value)
+            with self.assertRaisesRegex(ValueError, 'entrypoint'):
+                verify_local_job(job)
+
+    def test_complete_history_must_equal_published_results(self):
+        with tempfile.TemporaryDirectory() as directory:
+            job = _job(Path(directory))
+            run = job / 'run'
+            complete_path = run / 'FORMAL_EVALUATION_COMPLETE.json'
+            complete = json.loads(complete_path.read_text())
+            complete['evaluation']['task_acc_history'][0]['per_task_accs']['task_0'] = .1
+            complete['evaluation_sha256'] = _canonical_sha(complete['evaluation'])
+            _write(complete_path, complete)
+            sealed_path = run / 'FORMAL_EVALUATION_SEALED.json'
+            sealed = json.loads(sealed_path.read_text())
+            sealed['complete']['sha256'] = _sha(complete_path)
+            _write(sealed_path, sealed)
+            for name in ('PUBLISHING', 'PUBLISHED'):
+                path = run / f'FORMAL_EVALUATION_{name}.json'
+                value = json.loads(path.read_text())
+                value['evaluation_sha256'] = complete['evaluation_sha256']
+                value['seal']['sha256'] = _sha(sealed_path)
+                _write(path, value)
+            with self.assertRaisesRegex(ValueError, 'evaluation history'):
+                verify_local_job(job)
+
+    def test_missing_training_data_flow_is_not_basic_verified(self):
+        with tempfile.TemporaryDirectory() as directory:
+            job = _job(Path(directory))
+            flow = job / 'run' / 'data_flow_audit.jsonl'
+            if flow.exists():
+                flow.unlink()
+            with self.assertRaisesRegex(ValueError, 'data-flow'):
+                verify_local_job(job)
 
     def test_corrected_producer_requires_matching_full_transaction(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -153,6 +286,9 @@ class Replay11V3Test(unittest.TestCase):
                                  {PRODUCER_COMMIT, CORRECTED_COMMIT})
                 self.assertIn(f'cl_methods/{method}.py',
                               certificate['source_sha256'])
+                if method == 'balanced_contrast':
+                    self.assertIn('cl_methods/er.py',
+                                  certificate['source_sha256'])
 
     def test_old_changed_method_cannot_claim_equivalence(self):
         job = ('cifar100', 'mir', 42)
@@ -233,17 +369,17 @@ class Replay11V3Test(unittest.TestCase):
         old = next(row for row in rows if row['job'] == 'cifar100/er/42')
         old['code_commit'] = PRODUCER_COMMIT
         with self.assertRaises(ValueError):
-            merge_attestations(rows)
+            _merge_verified_attestations(rows)
         command = matrix.command_for(
             ('cifar100', 'er', 42), Path('/results'),
             python=Path('/python'), worktree=Path('/source'),
             device='cuda:0', data_root=Path('/data'))
         old['reuse_certificate'] = equivalence_certificate(
             ('cifar100', 'er', 42), command)
-        self.assertEqual(merge_attestations(rows)['jobs'], 99)
+        self.assertEqual(_merge_verified_attestations(rows)['jobs'], 99)
         old['pilot_deferred'] = True
         with self.assertRaises(ValueError):
-            merge_attestations(rows)
+            _merge_verified_attestations(rows)
 
 
 if __name__ == '__main__':

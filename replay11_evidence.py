@@ -1,6 +1,7 @@
 """Read-only, portable checks for replay-11 result identities."""
 
 import hashlib
+import ast
 import json
 import math
 import os
@@ -26,6 +27,9 @@ PRODUCER_ENTRYPOINTS = {
     '/home/c3080/YangXiaoXiang/VF-CL-worktrees/replay11-clip-test/main.py',
     '/tmp/vfcl-replay11-code99/main.py',
 }
+CORRECTED_ENTRYPOINTS = {
+    '/tmp/vfcl-replay11-paper-v3-full/main.py',
+}
 
 
 def _file(path):
@@ -41,6 +45,16 @@ def _json(path):
     if type(value) is not dict:
         raise ValueError(f'evidence JSON is not an object: {path}')
     return value
+
+
+def _verify_authoritative_data(root, expected):
+    root = Path(root)
+    actual = {}
+    for relative, digest in expected.items():
+        actual[relative] = matrix.sha256_file(_file(root / relative))
+        if actual[relative] != digest:
+            raise ValueError(f'authoritative data hash differs: {relative}')
+    return actual
 
 
 def _canonical_sha(value):
@@ -104,10 +118,13 @@ def equivalence_certificate(job, command):
         normalized.append(_normalized_command(expected))
     if actual != normalized[0] or normalized[0] != normalized[1]:
         raise ValueError('formal commands are not equivalent')
+    method_sources = {f'cl_methods/{method}.py'}
+    if method == 'balanced_contrast':
+        method_sources.add('cl_methods/er.py')
     scope = [name for name in FORMAL_SOURCE_FILES
              if not name.startswith('cl_methods/')
-             or name in ('cl_methods/__init__.py',
-                         f'cl_methods/{method}.py')]
+             or name == 'cl_methods/__init__.py'
+             or name in method_sources]
     old = _producer_source_sha256(PRODUCER_COMMIT)
     new = _producer_source_sha256(CORRECTED_COMMIT)
     if any(old[name] != new[name] for name in scope):
@@ -224,6 +241,60 @@ def _validate_cache_record(record):
         raise ValueError('formal cache sample count differs')
 
 
+def _verify_data_flow(run, expected_test, expected_tasks):
+    try:
+        path = _file(run / 'data_flow_audit.jsonl')
+    except ValueError as error:
+        raise ValueError('training data-flow evidence is missing') from error
+    digest = hashlib.sha256()
+    train_groups = set()
+    test_count = 0
+    formal_started = False
+    try:
+        with path.open('rb') as handle:
+            for line in handle:
+                digest.update(line)
+                record = json.loads(line)
+                if type(record) is not dict:
+                    raise ValueError('data-flow record is not an object')
+                if 'split' in record:
+                    formal_started = True
+                    if record.get('split') == 'test':
+                        test_count += 1
+                        if record != expected_test:
+                            raise ValueError('data-flow test access differs')
+                    elif record.get('split') not in ('validation', 'calibration'):
+                        raise ValueError('data-flow split is invalid')
+                    elif test_count:
+                        raise ValueError('data-flow access follows test')
+                    continue
+                if formal_started:
+                    raise ValueError('data-flow training follows formal access')
+                key = ast.literal_eval(record.get('loader_key', ''))
+                if (type(key) is not tuple or len(key) != 2
+                        or key[0] != 'train' or type(key[1]) is not tuple
+                        or not key[1] or type(record.get('batch')) is not int
+                        or type(record.get('loader_iteration')) is not int
+                        or type(record.get('indices')) is not list
+                        or not record['indices']
+                        or any(type(index) is not int or index < 0
+                               for index in record['indices'])
+                        or record.get('dtype') != 'torch.float32'
+                        or type(record.get('shape')) is not list
+                        or not record['shape']
+                        or record['shape'][0] != len(record['indices'])
+                        or re.fullmatch(r'[0-9a-f]{64}',
+                                        record.get('batch_sha256', '')) is None):
+                    raise ValueError('training data-flow batch is invalid')
+                train_groups.add(key[1])
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError,
+            SyntaxError, TypeError) as error:
+        raise ValueError('training data-flow is unreadable') from error
+    if len(train_groups) != expected_tasks or test_count != 1:
+        raise ValueError('training data-flow task or test count differs')
+    return digest.hexdigest()
+
+
 def _verify_transaction(run, frozen, published, provenance, result):
     names = (
         'PENDING', 'CONSUMING', 'COMPLETE', 'SEALED', 'PUBLISHING')
@@ -278,6 +349,11 @@ def _verify_transaction(run, frozen, published, provenance, result):
             or (bic and complete.get('bic_sha256')
                 != _canonical_sha(complete['bic']))):
         raise ValueError('formal evaluation digest differs')
+    if (complete['evaluation'].get('task_acc_history')
+            != result.get('task_acc_history')
+            or any(result.get(key) != value
+                   for key, value in complete['evaluation'].items())):
+        raise ValueError('sealed evaluation history or payload differs from results')
     if (markers['CONSUMING']['cache_identity']
             != complete['cache_identity']
             or markers['SEALED']['cache_identity']
@@ -344,7 +420,7 @@ def _verify_transaction(run, frozen, published, provenance, result):
         raise ValueError('formal publication identity differs')
 
 
-def verify_local_job(job_dir):
+def verify_local_job(job_dir, *, data_root=None, archive_manifest=None):
     """Check one completed job without relying on inode identity."""
     job_dir = Path(job_dir)
     job = (job_dir.parent.parent.name, job_dir.parent.name,
@@ -367,11 +443,14 @@ def verify_local_job(job_dir):
             or producer_commit not in PRODUCER_COMMITS
             or plan.get('data_hashes') != matrix.expected_data(dataset)):
         raise ValueError('job plan or authority differs')
+    verified_data = (_verify_authoritative_data(data_root, plan['data_hashes'])
+                     if data_root is not None else None)
     options = _options(plan.get('command'))
     entrypoint = plan['command'][1].replace('\\', '/')
-    if (not entrypoint.endswith('/main.py')
-            or (producer_commit == PRODUCER_COMMIT
-                and entrypoint not in PRODUCER_ENTRYPOINTS)):
+    allowed_entrypoints = (PRODUCER_ENTRYPOINTS
+                           if producer_commit == PRODUCER_COMMIT
+                           else CORRECTED_ENTRYPOINTS)
+    if entrypoint not in allowed_entrypoints:
         raise ValueError('training entrypoint differs')
     if any(options.get(key) != expected for key, expected in {
             'cl_method': method, 'seed': str(seed),
@@ -468,6 +547,7 @@ def verify_local_job(job_dir):
             != _canonical_sha(expected_protocol)):
         raise ValueError('frozen scientific protocol differs')
     access_record = access.get('access')
+    data_flow_sha256 = _verify_data_flow(run, access_record, TASKS[dataset])
     expected_classes = list(range(config['num_classes']))
     if (set(access) != {'schema_version', 'status', 'access'}
             or access.get('schema_version') != 1
@@ -517,14 +597,25 @@ def verify_local_job(job_dir):
         result.get('task_acc_history'), TASKS[dataset], deferred=True)
     if metrics != success.get('metrics'):
         raise ValueError('metric formula differs')
+    original = _is_planned_original(job_dir)
+    archive_evidence = (verify_archive_manifest(job_dir, archive_manifest)
+                        if not original and archive_manifest else None)
+    source_proven = (original or archive_evidence is not None
+                     and archive_evidence['status'] == 'SOURCE_EQUIVALENT')
     attestation = {
         'job': f'{dataset}/{method}/{seed}',
         'code_commit': producer_commit,
-        'admission': ('formal' if producer_commit == CORRECTED_COMMIT
-                      or method in LEGACY_REUSE_METHODS else 'historical'),
+        'admission': (
+            'historical' if producer_commit == PRODUCER_COMMIT
+            and method not in LEGACY_REUSE_METHODS else
+            'SOURCE_EQUIVALENCE_UNPROVEN' if not source_proven else
+            'formal' if verified_data is not None else 'EVIDENCE_INCOMPLETE'),
         'source_sha256': source_hashes,
         'command_sha256': _canonical_sha(plan['command']),
         'data_hashes': plan['data_hashes'],
+        'verified_data_hashes': verified_data,
+        'archive_evidence': archive_evidence,
+        'data_flow_sha256': data_flow_sha256,
         'transaction_sha256': published['transaction_sha256'],
         'metrics': metrics,
         'results_sha256': success['results_sha256'],
@@ -562,6 +653,16 @@ def _archive_job_scope(job_dir, record, destination):
     dataset, method, seed = job.split('/')
     plan = _json(job_dir / 'JOB_PLAN.json')
     success = _json(job_dir / 'JOB_SUCCESS.json')
+    planned_source = _options(plan.get('command')).get('results_dir')
+    source = record.get('source')
+    if type(source) is not str or not source:
+        raise ValueError('archive source path differs')
+    claimed_source = (Path(source) if destination == job_dir
+                      else Path(source) / method / seed)
+    if (not planned_source
+            or os.path.normcase(os.path.abspath(claimed_source))
+            != os.path.normcase(os.path.abspath(planned_source))):
+        raise ValueError('archive source path differs')
     if (destination != job_dir
             and not (destination.name == dataset
                      and job_dir == destination / method / seed)):
@@ -569,7 +670,6 @@ def _archive_job_scope(job_dir, record, destination):
     if (record.get('code_commit') not in PRODUCER_COMMITS
             or plan.get('code_commit') != record['code_commit']
             or success.get('code_commit') != record['code_commit']
-            or not record.get('source')
             or ('job' in record and record['job'] != job)
             or ('dataset' in record and record['dataset'] != dataset)
             or ('method' in record and record['method'] != method)
@@ -609,9 +709,22 @@ def verify_archive_group(manifest_path, job_dirs):
             raise ValueError('archive bytes differ')
     elif record.get('tree_sha256') != digest:
         raise ValueError('archive bytes differ')
+    source = Path(record['source'])
+    source_verified = False
+    if source.is_dir() and source.resolve() != destination.resolve():
+        if any(part.is_symlink() for part in (source, *source.parents)):
+            raise ValueError('archive source path is a symlink')
+        source_files, source_size, source_digest = _tree_identity(source)
+        if ((source_files, source_size, source_digest)
+                != (files, size, digest)):
+            raise ValueError('archive source and destination bytes differ')
+        source_verified = True
     return [{
         'job': job, 'code_commit': record['code_commit'],
         'files': files, 'bytes': size, 'tree_sha256': digest,
+        'source_tree_sha256': digest if source_verified else None,
+        'status': ('SOURCE_EQUIVALENT' if source_verified
+                   else 'SOURCE_EQUIVALENCE_UNPROVEN'),
     } for job in jobs]
 
 
@@ -620,8 +733,40 @@ def verify_archive_manifest(job_dir, manifest_path):
     return verify_archive_group(manifest_path, [job_dir])[0]
 
 
-def merge_attestations(records):
-    """Require every planned cell once; preselect seed 42 for strict replay."""
+def _is_planned_original(job_dir):
+    plan = _json(Path(job_dir) / 'JOB_PLAN.json')
+    options = _options(plan.get('command'))
+    return (os.path.normcase(os.path.abspath(job_dir))
+            == os.path.normcase(os.path.abspath(options['results_dir'])))
+
+
+def merge_attestations(locations):
+    """Recheck local evidence before counting any of the 99 formal cells."""
+    records = []
+    for location in locations:
+        if (type(location) is not dict
+                or not location.get('job_dir')
+                or not location.get('data_root')
+                or location.get('source_kind') not in ('original', 'archive')):
+            raise ValueError('catalog requires a job path and data root')
+        job_dir = Path(location['job_dir'])
+        record = verify_local_job(
+            job_dir, data_root=location['data_root'],
+            archive_manifest=location.get('archive_manifest'))
+        if record['admission'] != 'formal':
+            raise ValueError('job lacks formal basic admission')
+        if location['source_kind'] == 'archive':
+            if (not location.get('archive_manifest')
+                    or record['archive_evidence'] is None):
+                raise ValueError('archived job lacks source-proven manifest')
+        elif not _is_planned_original(job_dir):
+            raise ValueError('job path is not the planned original')
+        records.append(record)
+    return _merge_verified_attestations(records)
+
+
+def _merge_verified_attestations(records):
+    """Check the complete matrix after all file evidence was reopened."""
     jobs = matrix.jobs()
     expected = {f'{dataset}/{method}/{seed}'
                 for dataset, method, seed in jobs}

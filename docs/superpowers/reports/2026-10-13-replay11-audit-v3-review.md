@@ -1,0 +1,15 @@
+# Replay-11 v3 audit review correction
+
+The attached `2026-10-13-replay11-legacy-reuse-inventory.csv` is a 33-row action list derived from `D:\VFCL-artifacts\REPLAY11_EVIDENCE_CENSUS_20261013.csv` for completed jobs in Balanced Contrast, ER, DER++, ER-ACE, and AdaGauss. As of this review, **zero archived jobs have a verified original-to-copy tree chain**. Four original jobs are reachable on their recorded hosts; they still need full v3 basic checks and the seed-42 replay gate. The other 29 are D: archived copies labelled `SOURCE_EQUIVALENCE_UNPROVEN`; the fixed protocol requires source proof or a rerun from initial weights on the corrected producer commit. This inventory does not admit any result by itself.
+
+## Read-only trials
+
+- Corrected ISOLET/MIR/42 original on `brf3080`, `/brf/users/yangxx/VFCL-results/replay11-paper-v3-20261013/full-3080/isolet/mir/42`: `verify_local_job(job, data_root='/brf/users/yangxx/VF-CL/data')` returned `formal`, producer `467611a603c9604ad57861920495a3ad05612037`, training flow SHA-256 `831d5a8042b61a3ef705836d82d50fd05f7fadfb9e988844534787e7400ea2f0`, transaction SHA-256 `d3390de42f24929a35d751d0173b9195dec2d80bc034e06ffab28f539b1c3704`, and measured duration 0.304 s. This is a single basic audit probe, not an independent numerical replay.
+- Historical CIFAR100/Balanced/42 D: archive: destination manifest and 39-file, 4,288,863,322-byte tree matched SHA-256 `e9a32f401715c8740ada68bc75e147dc4e9eca18d61139c017910bfd816adf32`. The original path in the manifest was unavailable on `brf3080` and `vf-cl-3080`; `verify_archive_manifest` returned `SOURCE_EQUIVALENCE_UNPROVEN`. With the final gate, local `verify_local_job` also marks this copy `SOURCE_EQUIVALENCE_UNPROVEN` before data-root admission. It cannot be counted as a reused formal result.
+- The four census originals were checked for `JOB_SUCCESS.json` on their recorded SSH hosts: CIFAR100/DER++/42 on `brf3080`, and UPMC/ER/44, UPMC/DER++/44, UPMC/ER-ACE/44 on `vf-cl-3080`. File presence is not v3 admission.
+
+## Gate semantics
+
+`verify_local_job` checks the source blobs, command, transaction, checkpoint/result hashes, sealed evaluation against the published result, and training/test access log. A copy without a proven source chain is `SOURCE_EQUIVALENCE_UNPROVEN`; an original lacking independently hashed authoritative data is `EVIDENCE_INCOMPLETE`. `merge_attestations` accepts local job locations rather than unattached JSON rows, reopens the job and data, checks the planned original path or a source-proven archive, and requires all 99 formal rows. Archive verification reports destination integrity separately from source equivalence.
+
+The 33 fixed seed-42 independent numerical replays remain separate work. The frozen integer-derivation addendum requires recovering a unique integer count from each four-decimal stored accuracy using authoritative test totals before exact comparison with new predictions; source results must not be described as having explicitly stored correct counts.

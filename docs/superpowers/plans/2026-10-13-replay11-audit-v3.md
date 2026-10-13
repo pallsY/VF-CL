@@ -38,3 +38,14 @@
 
 - [ ] Run `python -m unittest -q test_replay11_evidence test_replay11_matrix`, `git diff --check`, and inspect changed paths.
 - [ ] Commit audit-only changes locally, report limits and numerical replay handoff; do not push.
+
+### Review corrections after first audit commit
+
+- [ ] Bind COMPLETE evaluation payload to results and restrict the corrected producer entrypoint to the observed frozen executable path.
+- [ ] Include Balanced Contrast's ER parent source in its reuse certificate.
+- [ ] Read and validate training data-flow records; hash authoritative data files when `data_root` is supplied. Without that root, mark the row `EVIDENCE_INCOMPLETE`.
+- [ ] Make the public 99-cell merger reopen each job directory and actual data root; reject copied jobs presented as originals.
+- [ ] Distinguish destination archive integrity from source-to-copy equivalence. If the original tree cannot be read, return `SOURCE_EQUIVALENCE_UNPROVEN` and keep it out of the formal merger.
+- [ ] Trial one corrected ISOLET/MIR original and one historical D: archive read-only, then record what each trial establishes.
+
+The later 33-cell numerical stage must use the frozen `REPLAY11_AUDIT_V3_INTEGER_DERIVATION_20261013.md`: obtain authoritative task totals, uniquely invert each four-decimal stored accuracy to an integer correct count, and compare an independent replay's integers exactly. The original results do not explicitly store those integers.

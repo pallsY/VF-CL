@@ -10,7 +10,7 @@ from pathlib import Path
 from adaptive_consolidation_audit import FORMAL_SOURCE_FILES
 import replay11_matrix as matrix
 from replay11_evidence import (
-    merge_attestations, verify_archive_group,
+    _merge_verified_attestations, verify_archive_group,
     verify_archive_manifest, verify_local_job,
 )
 
@@ -173,7 +173,7 @@ def _job(root, dataset='cifar100', *, wrong_protocol=False, bad_cache=False):
     }
     transaction = _canonical_sha({
         'identity': frozen_identity, 'freeze': freeze})
-    evaluation_payload = {'history': history}
+    evaluation_payload = {'task_acc_history': history}
     evaluation = _canonical_sha(evaluation_payload)
     _write(run / 'FORMAL_EVALUATION_PENDING.json', {
         'schema_version': 1, 'status': 'pending',
@@ -246,6 +246,18 @@ def _job(root, dataset='cifar100', *, wrong_protocol=False, bad_cache=False):
                 'test', tuple(range(100 if dataset == 'cifar100' else 26)))),
         },
     })
+    training_flow = [{
+        'loader_key': repr(('train', tuple(range(
+            i * (10 if dataset == 'cifar100' else 2),
+            (i + 1) * (10 if dataset == 'cifar100' else 2))))),
+        'loader_iteration': 0, 'batch': 0, 'indices': [i],
+        'dtype': 'torch.float32', 'shape': [1, 4],
+        'batch_sha256': 'a' * 64,
+    } for i in range(tasks)]
+    consumed = json.loads((run / 'formal_access' / 'test.consumed.json').read_text())
+    (run / 'data_flow_audit.jsonl').write_text(
+        ''.join(json.dumps(row) + '\n' for row in
+                training_flow + [consumed['access']]), encoding='utf-8')
     plan = {
         'dataset': dataset, 'method': 'mir', 'seed': 42,
         'smoke': False, 'code_commit': COMMIT, 'command': command,
@@ -275,9 +287,11 @@ def _archive_manifest(job):
     digest = hashlib.sha256(json.dumps(
         rows, ensure_ascii=False, separators=(',', ':')).encode()).hexdigest()
     manifest = job.parent / 'ARCHIVE_MANIFEST.json'
+    plan = json.loads((job / 'JOB_PLAN.json').read_text())
+    command = plan['command']
     _write(manifest, {
         'job': 'cifar100/mir/42', 'code_commit': COMMIT,
-        'source': '/source/cifar100/mir/42',
+        'source': command[command.index('--results_dir') + 1],
         'destination': str(job),
         'files': len(rows), 'bytes': sum(row[1] for row in rows),
         'source_tree_sha256': digest,
@@ -566,7 +580,7 @@ class Replay11EvidenceTest(unittest.TestCase):
                 separators=(',', ':')).encode()).hexdigest()
             manifest = root / 'ARCHIVE_MANIFEST.json'
             _write(manifest, {
-                'source': '/source/cifar100',
+                'source': str(dataset_root),
                 'destination': str(dataset_root),
                 'code_commit': COMMIT, 'methods': ['mir'],
                 'files': len(rows), 'bytes': sum(row[1] for row in rows),
@@ -590,6 +604,8 @@ class Replay11EvidenceTest(unittest.TestCase):
             _write(er / 'JOB_PLAN.json', {
                 'dataset': 'cifar100', 'method': 'er', 'seed': 42,
                 'code_commit': COMMIT,
+                'command': ['python', '/tmp/vfcl-replay11-code99/main.py',
+                            '--results_dir', str(er)],
             })
             _write(er / 'JOB_SUCCESS.json', {
                 'dataset': 'cifar100', 'method': 'er', 'seed': 42,
@@ -610,7 +626,7 @@ class Replay11EvidenceTest(unittest.TestCase):
                 separators=(',', ':')).encode()).hexdigest()
             manifest = root / 'ARCHIVE_MANIFEST.json'
             _write(manifest, {
-                'source': '/source/cifar100',
+                'source': str(dataset_root),
                 'destination': str(dataset_root),
                 'code_commit': COMMIT, 'methods': ['mir', 'er'],
                 'files': len(rows), 'bytes': sum(row[1] for row in rows),
@@ -680,7 +696,7 @@ def _all_attestations():
 
 class Replay11CatalogTest(unittest.TestCase):
     def test_exact_matrix_selects_33_seed_42_replays(self):
-        catalog = merge_attestations(_all_attestations())
+        catalog = _merge_verified_attestations(_all_attestations())
         self.assertEqual(catalog['jobs'], 99)
         self.assertEqual(len(catalog['strict_replays']), 33)
         self.assertTrue(all(job.endswith('/42')
@@ -689,23 +705,23 @@ class Replay11CatalogTest(unittest.TestCase):
     def test_missing_or_duplicate_job_is_rejected(self):
         rows = _all_attestations()
         with self.assertRaises(ValueError):
-            merge_attestations(rows[:-1])
+            _merge_verified_attestations(rows[:-1])
         with self.assertRaises(ValueError):
-            merge_attestations(rows + [rows[0]])
+            _merge_verified_attestations(rows + [rows[0]])
 
     def test_mixed_commit_or_smoke_is_rejected(self):
         rows = _all_attestations()
         rows[0] = {**rows[0], 'code_commit': '0' * 40}
         with self.assertRaises(ValueError):
-            merge_attestations(rows)
+            _merge_verified_attestations(rows)
         rows = _all_attestations()
         rows[0] = {**rows[0], 'smoke': True}
         with self.assertRaises(ValueError):
-            merge_attestations(rows)
+            _merge_verified_attestations(rows)
         rows = _all_attestations()
         rows[0] = {**rows[0], 'smoke': 1}
         with self.assertRaises(ValueError):
-            merge_attestations(rows)
+            _merge_verified_attestations(rows)
 
 
 if __name__ == '__main__':
