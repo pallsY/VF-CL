@@ -257,7 +257,18 @@ def score_state(trainer, method, batches, task_classes):
     return answer
 
 
-def compare_trajectory(history, totals, observed):
+def post_final_task(config, protocol):
+    """Use the final state for the last adaptive task after head installation."""
+    keys = ('cl_method', 'head_consolidation_enabled',
+            'head_consolidation_mode', 'num_tasks')
+    if any(config.get(key) != protocol.get(key) for key in keys):
+        raise ValueError('frozen protocol differs from run configuration')
+    return (config['cl_method'] == 'proto_evolve'
+            and bool(config['head_consolidation_enabled'])
+            and config['head_consolidation_mode'] == 'adaptive_dual_branch')
+
+
+def compare_trajectory(history, totals, observed, *, post_final=False):
     """Compare independent integers to every saved diagonal and final readout."""
     count = len(history)
     if count < 1 or set(totals) != {f'task_{i}' for i in range(count)}:
@@ -276,7 +287,10 @@ def compare_trajectory(history, totals, observed):
                 raise ValueError('final task keys differ')
         elif set(row['per_task_accs']) != {key}:
             raise ValueError('diagonal task keys differ')
-        if unique_correct(accuracy, totals[key]) != observed['diagonal'][key]:
+        expected_count = (observed['final'][key]
+                          if post_final and i == count - 1
+                          else observed['diagonal'][key])
+        if unique_correct(accuracy, totals[key]) != expected_count:
             raise ValueError('diagonal integer differs')
     final = history[-1]
     if set(final['per_task_accs_taskil']) != set(totals):
@@ -286,7 +300,10 @@ def compare_trajectory(history, totals, observed):
             raise ValueError('final Class-IL integer differs')
         if unique_correct(final['per_task_accs_taskil'][key], total) != observed['task_il'][key]:
             raise ValueError('final Task-IL integer differs')
-    diagonal = [round(observed['diagonal'][f'task_{i}'] / totals[f'task_{i}'], 4)
+    diagonal = [round((observed['final'][f'task_{i}']
+                       if post_final and i == count - 1
+                       else observed['diagonal'][f'task_{i}'])
+                      / totals[f'task_{i}'], 4)
                 for i in range(count)]
     final_scores = [round(observed['final'][f'task_{i}'] / totals[f'task_{i}'], 4)
                     for i in range(count)]
@@ -421,7 +438,8 @@ def _numeric_worker(job_dir, producer_commit, producer_root, data_root):
         observed['final'] = final_readout['primary']
         observed['task_il'] = final_readout['task_il']
     metrics = compare_trajectory(
-        evidence['results']['task_acc_history'], totals, observed)
+        evidence['results']['task_acc_history'], totals, observed,
+        post_final=post_final_task(config, identity['protocol']))
     success = json.loads((job_dir / 'JOB_SUCCESS.json').read_text(encoding='utf-8'))
     if metrics != success.get('metrics'):
         raise ValueError('AA/BWT/Task-IL formula differs')
