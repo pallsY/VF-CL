@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "status": "training_only_implementation_smoke",
+  "source_commit": "99e1da7e05e7eeb8b57587b6d3a75c6eaa490066",
+  "host": "vf-cl-4090-1",
+  "device": "cpu",
+  "dataset": "isolet",
+  "seed": 54,
+  "variant": "sample_replay_only",
+  "config_sha256": "afa604eddbe9e3c1680eb2e457cb7013fbbe84d320f780e97a5db0cca5eddb8b",
+  "data_sha256": "d34312670de93198afcd2b126c95b79bae2b4cffeb30d480f097faf046b69514",
+  "holdout_seed": 20261013,
+  "holdout_per_class": 40,
+  "raw_replay_capacity_per_class": 20,
+  "expected_prototype_bytes": 0,
+  "epochs_per_task": 1,
+  "output_root": "/home/chase/Yangxx/VF-CL/results/adaptive20-sample-replay-only-smoke-20261014-v3-cpu",
+  "reason": "External GPU job remained active; use idle CPU for implementation smoke only",
+  "scientific_comparison_allowed": false,
+  "formal_test_access_allowed": false
+}
