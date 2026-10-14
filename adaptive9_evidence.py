@@ -14,6 +14,25 @@ from replay11_numeric import _producer_sources
 
 TASKS = {'cifar100': 10, 'isolet': 13, 'upmc_food101': 10}
 EPOCHS = {'cifar100': 50, 'isolet': 50, 'upmc_food101': 20}
+RUNTIME = {
+    'python': '3.11.15', 'torch': '2.5.1+cu124',
+    'torchvision': '0.20.1+cu124', 'numpy': '1.24.4',
+    'scikit_learn': '1.9.0', 'pillow': '11.3.0',
+    'cuda_runtime': '12.4',
+}
+HOST_PYTHON = {
+    'c3080.upcbrfed.xyz': '/home/c3080/miniconda3/envs/hy3d/bin/python',
+    'c5090.upcbrfed.xyz': '/var/tmp/vfcl-adaptive9-yangxx/venv/bin/python',
+}
+
+
+def validate_runtime(runtime, interpreter):
+    if (type(runtime) is not dict or set(runtime) != set(RUNTIME) | {'host'}
+            or runtime.get('host') not in HOST_PYTHON
+            or interpreter != HOST_PYTHON[runtime['host']]
+            or any(runtime.get(key) != value for key, value in RUNTIME.items())):
+        raise ValueError('adaptive training runtime differs')
+    return runtime
 
 
 def verify_run(run_dir, *, dataset, seed, expected_epochs,
@@ -140,7 +159,7 @@ def verify_pinned_job(job_dir, *, results_root, data_root,
     success = shared._json(job_dir / 'JOB_SUCCESS.json')
     expected_plan_keys = {
         'dataset', 'method', 'seed', 'code_commit', 'command',
-        'data_hashes', 'smoke',
+        'data_hashes', 'smoke', 'runtime',
     }
     if (set(plan) != expected_plan_keys or plan['dataset'] != dataset
             or plan['method'] != 'adaptive' or plan['seed'] != seed
@@ -155,9 +174,9 @@ def verify_pinned_job(job_dir, *, results_root, data_root,
     wrapper = ("from three_dataset_formal_runtime import "
                "execute_variant_main; execute_variant_main('adaptive')")
     if (type(command) is not list or len(command) < 5
-            or command[1:3] != ['-c', wrapper]
-            or Path(command[0]).resolve() != Path(sys.executable).resolve()):
+            or command[1:3] != ['-c', wrapper]):
         raise ValueError('adaptive training entrypoint differs')
+    validate_runtime(plan['runtime'], command[0])
     producer_root = Path(producer_root)
     head = subprocess.check_output(
         ['git', '-C', str(producer_root), 'rev-parse', 'HEAD'],
@@ -182,7 +201,7 @@ def verify_pinned_job(job_dir, *, results_root, data_root,
         'data_root=Path(sys.argv[6]),device=sys.argv[7])))'
     )
     generated = json.loads(subprocess.check_output([
-        command[0], '-c', script, dataset, str(seed), command[0],
+        sys.executable, '-c', script, dataset, str(seed), command[0],
         str(producer_root), str(job_dir), str(data_root),
         command[command.index('--device') + 1],
     ], cwd=producer_root, text=True))

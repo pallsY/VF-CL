@@ -4,7 +4,8 @@ import unittest
 import tempfile
 from pathlib import Path
 
-from adaptive9_evidence import verify_run, verify_pinned_job
+from adaptive9_evidence import (
+    verify_run, verify_pinned_job, validate_runtime)
 
 
 RUN = Path('/brf/users/yangxx/VFCL-results/'
@@ -12,6 +13,20 @@ RUN = Path('/brf/users/yangxx/VFCL-results/'
 
 
 class AdaptiveRunEvidenceTests(unittest.TestCase):
+    def test_remote_runtime_requires_pinned_host_versions_and_interpreter(self):
+        runtime = {
+            'host': 'c5090.upcbrfed.xyz', 'python': '3.11.15',
+            'torch': '2.5.1+cu124', 'torchvision': '0.20.1+cu124',
+            'numpy': '1.24.4', 'scikit_learn': '1.9.0',
+            'pillow': '11.3.0', 'cuda_runtime': '12.4',
+        }
+        interpreter = '/var/tmp/vfcl-adaptive9-yangxx/venv/bin/python'
+        self.assertEqual(validate_runtime(runtime, interpreter), runtime)
+        with self.assertRaisesRegex(ValueError, 'runtime'):
+            validate_runtime(dict(runtime, numpy='1.26.4'), interpreter)
+        with self.assertRaisesRegex(ValueError, 'runtime'):
+            validate_runtime(runtime, '/tmp/unreviewed-python')
+
     def test_formal_job_must_be_under_pinned_root(self):
         with tempfile.TemporaryDirectory() as scratch:
             original = Path(scratch) / 'other/isolet/adaptive/42'
