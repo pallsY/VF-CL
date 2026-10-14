@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "status": "training_only_development_smoke",
+  "source_commit": "99e1da7e05e7eeb8b57587b6d3a75c6eaa490066",
+  "host": "vf-cl-4090-1",
+  "gpu": 0,
+  "dataset": "isolet",
+  "seed": 54,
+  "variant": "sample_replay_only",
+  "config_sha256": "878f0f13fc61282a0d6dd3505075185c6e7224403cf1061b040d74eaf452a8e4",
+  "data_sha256": "d34312670de93198afcd2b126c95b79bae2b4cffeb30d480f097faf046b69514",
+  "holdout_seed": 20261013,
+  "holdout_per_class": 40,
+  "raw_replay_capacity_per_class": 20,
+  "expected_prototype_bytes": 0,
+  "epochs_per_task": 1,
+  "output_root": "/home/chase/Yangxx/VF-CL/results/adaptive20-sample-replay-only-smoke-20261014-v2",
+  "supersedes": "v1 waiting launcher stopped before any training/readout because its source still rejected zero prototype memory during holdout audit",
+  "scope": "implementation smoke only; no formal test or scientific comparison"
+}
