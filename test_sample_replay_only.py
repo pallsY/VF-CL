@@ -7,6 +7,7 @@ import runner
 import torch
 
 from cl_methods.proto_evolve import ProtoEvolveCL
+import run_replay_factorial_pilot as pilot
 
 
 class SampleReplayOnlyProtocolTests(unittest.TestCase):
@@ -124,6 +125,33 @@ class SampleReplayOnlyMethodTests(unittest.TestCase):
                 "global_protos": {7: {"mean": torch.ones(2)}},
                 "prev_protos": {},
             })
+
+
+class SampleReplayOnlyPilotTests(unittest.TestCase):
+    def test_readout_has_separate_variant_and_zero_prototype_memory(self):
+        self.assertTrue(hasattr(pilot, "sample_only_result_fields"))
+        args = SimpleNamespace(sample_replay_only=1)
+        measured = {
+            "prototype_bytes": 0,
+            "raw_replay_per_class": 20,
+            "raw_replay_bytes": 2000,
+        }
+        self.assertEqual(
+            pilot.sample_only_result_fields(args, measured),
+            {"variant": "sample_replay_only"},
+        )
+        self.assertEqual(
+            pilot.sample_only_result_fields(
+                SimpleNamespace(sample_replay_only=0), measured),
+            {},
+        )
+        for key, value in (("prototype_bytes", 8),
+                           ("raw_replay_per_class", 0),
+                           ("raw_replay_bytes", 0)):
+            with self.subTest(key=key):
+                bad = {**measured, key: value}
+                with self.assertRaisesRegex(ValueError, key):
+                    pilot.sample_only_result_fields(args, bad)
 
 
 if __name__ == "__main__":

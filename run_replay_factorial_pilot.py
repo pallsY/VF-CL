@@ -204,9 +204,23 @@ def evaluate_holdout(args, dataset, checkpoint):
     }
 
 
+def sample_only_result_fields(args, measured):
+    if not bool(getattr(args, 'sample_replay_only', 0)):
+        return {}
+    expected = {'prototype_bytes': 0, 'raw_replay_per_class': 20}
+    for key, value in expected.items():
+        if measured.get(key) != value:
+            raise ValueError(f'sample replay only requires {key}={value}')
+    if measured.get('raw_replay_bytes', 0) <= 0:
+        raise ValueError('sample replay only requires raw_replay_bytes > 0')
+    return {'variant': 'sample_replay_only'}
+
+
 def run_pilot(config_path):
     import runner
-    from config import validate_adaptive_head_consolidation, validate_party_kd_variant
+    from config import (validate_adaptive_head_consolidation,
+                        validate_party_kd_variant,
+                        validate_sample_replay_only)
     from data_utils import TaskManager
 
     config_path = Path(config_path)
@@ -226,6 +240,7 @@ def run_pilot(config_path):
                 args.head_consolidation_mode) not in ARMS.values()):
         raise ValueError('config differs from replay-factorial pilot')
     validate_party_kd_variant(config, config['expected_party_kd_variant'])
+    validate_sample_replay_only(args)
     validate_adaptive_head_consolidation(args)
     if any(event['type'] != 'CIL' for event in TaskManager(args).get_timeline()):
         raise ValueError('pilot must have a CL-only task stream')
@@ -266,6 +281,7 @@ def run_pilot(config_path):
             source['trainer_state']),
         **evaluate_holdout(args, dataset, final_path),
     }
+    result.update(sample_only_result_fields(args, result))
     path = run / 'HOLDOUT_READOUT.json'
     path.write_text(json.dumps(result, indent=2, sort_keys=True) + '\n',
                     encoding='utf-8')
