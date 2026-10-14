@@ -7,7 +7,7 @@
   "dataset": "isolet",
   "seed": 54,
   "variant": "sample_replay_only",
-  "config_sha256": "286e32044835e71c74eff98e7840dfe8ebfeff6f9bceb84099134b7c7eb081b3",
+  "config_sha256": "6394d219b907a2f209456e5b04ff7bc48a1ec9029fdd100c32e48e3e38465083",
   "data_sha256": "d34312670de93198afcd2b126c95b79bae2b4cffeb30d480f097faf046b69514",
   "holdout_seed": 20261013,
   "holdout_per_class": 40,

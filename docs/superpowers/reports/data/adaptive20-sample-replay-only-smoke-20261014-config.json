@@ -178,5 +178,6 @@
   "pilot_dataset": "isolet",
   "pilot_holdout_seed": 20261013,
   "pilot_holdout_per_class": 40,
-  "sample_replay_only": 1
+  "sample_replay_only": 1,
+  "party_drift_telemetry": 0
 }
