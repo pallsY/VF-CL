@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--host", required=True, choices=("vf-cl-4090-1", "vf-cl-3080"))
+parser.add_argument("--host", required=True, choices=("vf-cl-4090-1", "vf-cl-3080", "vf-cl-5090-1"))
 parser.add_argument("--remote-root", required=True)
 parser.add_argument("--run-name", required=True)
 parser.add_argument("--destination", required=True, type=Path)
