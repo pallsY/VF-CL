@@ -135,6 +135,25 @@ def validate_adaptive_head_consolidation(args):
             "adaptive dual-branch contract failed: " + '; '.join(mismatches)
         )
 
+
+def validate_sample_replay_only(args):
+    """Keep raw replay as the sole replay memory in the opt-in variant."""
+    if not bool(getattr(args, 'sample_replay_only', 0)):
+        return
+    required = {
+        'cl_method': 'proto_evolve',
+        'head_consolidation_enabled': 1,
+        'head_consolidation_mode': 'adaptive_dual_branch',
+        'head_consolidation_samples_per_class': 20,
+        'proto_replay_gradient_enabled': 0,
+        'proto_sdc': False,
+        'feat_distill_weight': 0.0,
+        'party_drift_telemetry': 0,
+    }
+    for field, value in required.items():
+        if getattr(args, field, None) != value:
+            raise ValueError(f'sample replay only requires {field}={value!r}')
+
 def get_config():
     p = argparse.ArgumentParser(description="VFL-CLU Benchmark")
     # Dataset
@@ -224,6 +243,8 @@ def get_config():
     p.add_argument('--proto_replay_gradient_enabled', default=1, type=int,
                    choices=[0, 1],
                    help='proto_evolve: include the sampled prototype loss gradient')
+    p.add_argument('--sample_replay_only', default=0, type=int, choices=[0, 1],
+                   help='Use raw exemplars as the only persistent replay memory')
     p.add_argument('--proto_replay_loss_norm',
                    default='legacy_class_normalized',
                    choices=['legacy_class_normalized', 'sample_mean'],
@@ -514,6 +535,7 @@ def get_config():
                         for value in args.unlearn_after_tasks.split(','))):
             raise ValueError('party drift telemetry requires a CL-only stream')
         validate_party_kd_variant(vars(args), args.expected_party_kd_variant)
+        validate_sample_replay_only(args)
         validate_adaptive_head_consolidation(args)
     except ValueError as exc:
         p.error(str(exc))
