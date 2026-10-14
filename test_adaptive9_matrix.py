@@ -7,7 +7,7 @@ from pathlib import Path
 import replay11_matrix as baseline
 import three_dataset_formal_registry as registry
 
-from adaptive9_matrix import command_for, jobs, run_one
+from adaptive9_matrix import command_for, jobs, run_one, runtime_identity
 
 
 def options(command):
@@ -16,6 +16,14 @@ def options(command):
 
 
 class Adaptive9CommandTests(unittest.TestCase):
+    def test_runtime_identity_records_training_host_and_libraries(self):
+        identity = runtime_identity()
+        self.assertEqual(set(identity), {
+            'host', 'python', 'torch', 'torchvision', 'numpy',
+            'scikit_learn', 'pillow', 'cuda_runtime'})
+        self.assertTrue(all(isinstance(value, str) and value
+                            for value in identity.values()))
+
     def test_existing_cell_cannot_be_relaunched(self):
         with tempfile.TemporaryDirectory() as scratch:
             (Path(scratch) / 'isolet/adaptive/42').mkdir(parents=True)

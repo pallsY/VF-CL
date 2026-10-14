@@ -3,6 +3,7 @@
 import argparse
 import json
 import os
+import platform
 import shutil
 import subprocess
 import sys
@@ -16,6 +17,22 @@ import three_dataset_formal_registry as registry
 
 def jobs():
     return tuple(product(baseline.DATASETS, ('adaptive',), baseline.SEEDS))
+
+
+def runtime_identity():
+    """Record the interpreter and packages that actually launch training."""
+    import numpy
+    import PIL
+    import sklearn
+    import torch
+    import torchvision
+
+    return {
+        'host': platform.node(), 'python': platform.python_version(),
+        'torch': torch.__version__, 'torchvision': torchvision.__version__,
+        'numpy': numpy.__version__, 'scikit_learn': sklearn.__version__,
+        'pillow': PIL.__version__, 'cuda_runtime': str(torch.version.cuda),
+    }
 
 
 def command_for(dataset, seed, *, python, worktree, results_dir,
@@ -102,6 +119,7 @@ def run_one(dataset, seed, *, results_root, data_root, device):
         'dataset': dataset, 'method': 'adaptive', 'seed': seed,
         'code_commit': commit, 'command': command,
         'data_hashes': baseline.expected_data(dataset), 'smoke': False,
+        'runtime': runtime_identity(),
     }
     with (job_dir / 'JOB_PLAN.json').open('x', encoding='utf-8') as handle:
         json.dump(plan, handle, indent=2, sort_keys=True)
