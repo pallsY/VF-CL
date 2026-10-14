@@ -166,6 +166,8 @@ class ProtoEvolveCL:
     """V-LETO faithful implementation."""
 
     def __init__(self, trainer, args):
+        from config import validate_sample_replay_only
+        validate_sample_replay_only(args)
         self.trainer = trainer
         self.args = args
         self.name = 'ProtoEvolve_VFL'
@@ -178,6 +180,7 @@ class ProtoEvolveCL:
         self.proto_replay_gradient_enabled = bool(
             getattr(args, 'proto_replay_gradient_enabled', 1)
         )
+        self.sample_replay_only = bool(getattr(args, 'sample_replay_only', 0))
         self.proto_replay_loss_norm = getattr(
             args, 'proto_replay_loss_norm', 'legacy_class_normalized'
         )
@@ -939,7 +942,10 @@ class ProtoEvolveCL:
         )
         if self.head_consolidation_mode == 'adaptive_dual_branch':
             retained_classes = tuple(sorted(
-                int(class_id) for class_id in self.global_protos
+                int(class_id) for class_id in (
+                    self.head_raw_replay if self.sample_replay_only
+                    else self.global_protos
+                )
             ))
             if not retained_classes:
                 raise ValueError('adaptive retained class set is empty')
@@ -948,7 +954,7 @@ class ProtoEvolveCL:
             prototypes = {
                 class_id: self.global_protos[class_id]
                 for class_id in retained_classes
-            }
+            } if not self.sample_replay_only else {}
             task_classes = {
                 int(task_id): kept
                 for task_id, classes in self.head_task_classes.items()
@@ -1149,18 +1155,20 @@ class ProtoEvolveCL:
             post_replay = {}
         # 3. Merge drift-compensated old state with the new classes.
         if task_id == 0:
-            self.global_protos = post.copy()
+            if not self.sample_replay_only:
+                self.global_protos = post.copy()
             self.head_raw_replay = post_replay.copy()
         else:
-            for c, p in post.items():
-                self.global_protos[c] = p
+            if not self.sample_replay_only:
+                for c, p in post.items():
+                    self.global_protos[c] = p
             for c, values in post_replay.items():
                 self.head_raw_replay[c] = values
         self._write_party_drift_record(task_id)
         # 4. Re-encode bounded replay, then apply the configured final head step.
         self.head_task_classes[int(task_id)] = list(self.current_task_classes)
         self._consolidate_head(task_id)
-        self.prev_protos = post.copy()
+        self.prev_protos = {} if self.sample_replay_only else post.copy()
         if self.dep_tracking_enabled and self.current_task_classes:
             self._freeze_dependency_snapshot(self.current_task_classes)
         # Cache the consolidated post-task model as the next frozen teacher/anchor.
@@ -1349,6 +1357,9 @@ class ProtoEvolveCL:
             'adaptive_audit_bundle': deepcopy(self.adaptive_audit_bundle),
         }
     def load_state(self, s):
+        if self.sample_replay_only and (
+                s.get('global_protos') or s.get('prev_protos')):
+            raise ValueError('sample replay only checkpoint contains prototypes')
         adaptive_history, adaptive_pending = (
             self._validate_adaptive_resume_state(s)
         )
