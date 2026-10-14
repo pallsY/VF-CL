@@ -1,5 +1,6 @@
 """Append-only audit and final gate for the nine adaptive originals."""
 
+import argparse
 import json
 import hashlib
 import math
@@ -20,6 +21,12 @@ import replay11_attest as ledger
 DATASETS = ('cifar100', 'isolet', 'upmc_food101')
 SEEDS = (42, 43, 44)
 TASKS = {'cifar100': 10, 'isolet': 13, 'upmc_food101': 10}
+FORMAL_BASE = Path(
+    '/brf/users/yangxx/VFCL-results/adaptive9-fourparty-v1-20261015')
+FORMAL_RESULTS_ROOT = FORMAL_BASE / 'full'
+FORMAL_LEDGER = FORMAL_BASE / 'audit/attestations.jsonl'
+FORMAL_DATA_ROOT = Path('/brf/users/yangxx/VF-CL/data')
+FORMAL_PRODUCER_ROOT = Path('/tmp/vfcl-adaptive9-v3')
 
 
 def _verify_numeric_evidence(numeric, basic, job, producer_commit):
@@ -311,3 +318,28 @@ def write_final_gate(*, results_root, data_root, producer_root,
         handle.flush()
         os.fsync(handle.fileno())
     return output
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('action', choices=('audit-one', 'finalize'))
+    parser.add_argument('--dataset', choices=DATASETS)
+    parser.add_argument('--seed', type=int, choices=SEEDS)
+    parser.add_argument('--audit-commit', required=True)
+    args = parser.parse_args()
+    common = dict(
+        results_root=FORMAL_RESULTS_ROOT, data_root=FORMAL_DATA_ROOT,
+        producer_root=FORMAL_PRODUCER_ROOT,
+        producer_commit=evidence.APPROVED_PRODUCER_COMMIT,
+        ledger_path=FORMAL_LEDGER, audit_commit=args.audit_commit)
+    if args.action == 'audit-one':
+        if args.dataset is None or args.seed is None:
+            parser.error('audit-one requires dataset and seed')
+        audit_one(args.dataset, args.seed, **common)
+        print('adaptive_audit_one_passed')
+    else:
+        print(json.dumps(write_final_gate(**common), sort_keys=True))
+
+
+if __name__ == '__main__':
+    main()

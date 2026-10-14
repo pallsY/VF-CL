@@ -6,7 +6,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 from adaptive9_attest import (
-    finalize_records, audit_one, numeric_visibility, next_audit_stage)
+    finalize_records, audit_one, numeric_visibility, next_audit_stage,
+    FORMAL_RESULTS_ROOT, FORMAL_LEDGER, FORMAL_DATA_ROOT)
 import replay11_attest as ledger
 
 
@@ -39,6 +40,15 @@ def passed(job, stage):
 
 
 class AdaptiveFinalGateTests(unittest.TestCase):
+    def test_formal_adaptive_roots_are_pinned_and_separate(self):
+        self.assertEqual(FORMAL_RESULTS_ROOT.as_posix(),
+                         '/brf/users/yangxx/VFCL-results/'
+                         'adaptive9-fourparty-v1-20261015/full')
+        self.assertEqual(FORMAL_LEDGER.parent.parent,
+                         FORMAL_RESULTS_ROOT.parent)
+        self.assertEqual(FORMAL_DATA_ROOT.as_posix(),
+                         '/brf/users/yangxx/VF-CL/data')
+
     def test_retry_appends_new_basic_after_failed_basic(self):
         with tempfile.TemporaryDirectory() as scratch:
             path = Path(scratch) / 'ledger.jsonl'
