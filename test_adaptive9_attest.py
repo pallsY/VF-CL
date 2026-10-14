@@ -71,8 +71,8 @@ class AdaptiveFinalGateTests(unittest.TestCase):
                 'status': 'failed'})
             snapshot = {'sha256': 'c' * 64, 'error': None,
                         'files': 1, 'bytes': 1}
-            basic = {'admission': 'formal', 'metrics': {'aa_final_cil': 0.5}}
-            numeric = {'metrics': {'aa_final_cil': 0.5}}
+            basic = passed('isolet/adaptive/42', 'basic')['result']
+            numeric = passed('isolet/adaptive/42', 'numeric')['result']
             with patch.object(ledger, '_audit_commit', return_value=AUDIT), \
                  patch('adaptive9_attest._snapshot', return_value=snapshot), \
                  patch('adaptive9_attest.evidence.verify_pinned_job',
@@ -88,6 +88,32 @@ class AdaptiveFinalGateTests(unittest.TestCase):
             self.assertEqual([(row['stage'], row['status']) for row in rows],
                              [('basic', 'passed'), ('numeric', 'failed'),
                               ('basic', 'passed'), ('numeric', 'passed')])
+
+    def test_malformed_numeric_worker_is_recorded_as_failure(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            path = Path(scratch) / 'ledger.jsonl'
+            ledger.append_event(path, {
+                'job': 'isolet/adaptive/42', 'stage': 'basic',
+                'status': 'passed', 'producer_commit': PRODUCER,
+                'audit_commit': AUDIT,
+                'original_tree_sha256': 'c' * 64})
+            snapshot = {'sha256': 'c' * 64, 'error': None,
+                        'files': 1, 'bytes': 1}
+            basic = passed('isolet/adaptive/42', 'basic')['result']
+            malformed = {'metrics': basic['metrics']}
+            with patch.object(ledger, '_audit_commit', return_value=AUDIT), \
+                 patch('adaptive9_attest._snapshot', return_value=snapshot), \
+                 patch('adaptive9_attest.evidence.verify_pinned_job',
+                       return_value=basic), \
+                 patch('adaptive9_attest._numeric_in_new_process',
+                       return_value=malformed):
+                with self.assertRaisesRegex(ValueError, 'numeric audit failed'):
+                    audit_one(
+                        'isolet', 42, results_root=Path(scratch) / 'full',
+                        data_root='/data', producer_root='/producer',
+                        producer_commit=PRODUCER, ledger_path=path,
+                        audit_commit=AUDIT)
+            self.assertEqual(ledger.read_ledger(path)[-1]['status'], 'failed')
 
     def test_consistent_but_unapproved_producer_cannot_pass(self):
         other = 'f' * 40

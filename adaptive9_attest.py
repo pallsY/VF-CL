@@ -248,6 +248,9 @@ def audit_one(dataset, seed, *, results_root, data_root, producer_root,
         if numeric['metrics'] != basic['metrics']:
             raise ValueError('adaptive numeric metrics differ from basic audit')
         numeric['basic_admission'] = 'formal'
+        _verify_numeric_evidence(
+            {'result': numeric}, {'result': basic}, job,
+            producer_commit)
         after = _snapshot(job_dir)
         if (before['error'] or after['error']
                 or before['sha256'] != after['sha256']):
