@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "status": "registered_training_only_development",
+  "source_commit": "3f9bf8afc42e58a5f8a759ee0e6c1b0747b8958f",
+  "host": "vf-cl-4090-1",
+  "gpu": 0,
+  "results_root": "/home/chase/Yangxx/VF-CL/results/adaptive20-sample-replay-only-dev-20261014-v1",
+  "data_sha256": {
+    "isolet": "d34312670de93198afcd2b126c95b79bae2b4cffeb30d480f097faf046b69514",
+    "upmc": "dea0569f0d4195eaaecc9cab3a6cce533f07b8d88472e7dbca5113152a314339",
+    "cifar": {
+      "train": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b",
+      "test": "4b67687d9933c4db8f0831104447f15b93774f4f464bd0516f0f0f2ac83b7864",
+      "meta": "a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9"
+    }
+  },
+  "expected_holdout_manifest_sha256": {
+    "isolet": "d1bab580ecab91b054a4bd7f21fde9d30612270c845da52daed899dabb7e00d7",
+    "upmc": "21ce856b3b28c80c57640d6948b7eb1c65f622e0711bded1f77837165ab006e4",
+    "cifar": "ebd998fca72f673bd933832f6a0f2b3f6fb6368170c5d0c05e12fb4896860dc7"
+  },
+  "raw_capacity_per_class": 20,
+  "expected_prototype_bytes": 0,
+  "formal_test_access_allowed": false,
+  "runs": [
+    {
+      "dataset": "isolet",
+      "seed": 54,
+      "run": "isolet_seed54_SAMPLE_ONLY",
+      "config_sha256": "3da990b13dd613705c28b1482ec3a67b77542e1c25e55e04f16261329fa8cfd5",
+      "allowed_changed_fields_from_P0R1": [
+        "data_path",
+        "exp_name",
+        "feat_distill_weight",
+        "output_dir",
+        "party_drift_telemetry",
+        "proto_sdc",
+        "results_dir",
+        "sample_replay_only",
+        "vector_npz"
+      ],
+      "output_dir": "/home/chase/Yangxx/VF-CL/results/adaptive20-sample-replay-only-dev-20261014-v1/isolet_seed54_SAMPLE_ONLY"
+    },
+    {
+      "dataset": "isolet",
+      "seed": 55,
+      "run": "isolet_seed55_SAMPLE_ONLY",
+      "config_sha256": "599b46a215f939248b042623e7864bc2f329825924a5c65966ad2549335a4291",
+      "allowed_changed_fields_from_P0R1": [
+        "data_path",
+        "exp_name",
+        "feat_distill_weight",
+        "output_dir",
+        "party_drift_telemetry",
+        "proto_sdc",
+        "results_dir",
+        "sample_replay_only",
+        "vector_npz"
+      ],
+      "output_dir": "/home/chase/Yangxx/VF-CL/results/adaptive20-sample-replay-only-dev-20261014-v1/isolet_seed55_SAMPLE_ONLY"
+    },
+    {
+      "dataset": "upmc",
+      "seed": 54,
+      "run": "upmc_seed54_SAMPLE_ONLY",
+      "config_sha256": "6184a50371f3638827f2ccfaee7c5acb6394f0b55a6e0d6b76ad9ffebdda51db",
+      "allowed_changed_fields_from_P0R1": [
+        "data_path",
+        "exp_name",
+        "feat_distill_weight",
+        "output_dir",
+        "party_drift_telemetry",
+        "proto_sdc",
+        "results_dir",
+        "sample_replay_only",
+        "vector_npz"
+      ],
+      "output_dir": "/home/chase/Yangxx/VF-CL/results/adaptive20-sample-replay-only-dev-20261014-v1/upmc_seed54_SAMPLE_ONLY"
+    },
+    {
+      "dataset": "upmc",
+      "seed": 55,
+      "run": "upmc_seed55_SAMPLE_ONLY",
+      "config_sha256": "2aeab97c2331e4b87246a00de7316a97240d4afd80f937393a3dbe5067d3ab35",
+      "allowed_changed_fields_from_P0R1": [
+        "data_path",
+        "exp_name",
+        "feat_distill_weight",
+        "output_dir",
+        "party_drift_telemetry",
+        "proto_sdc",
+        "results_dir",
+        "sample_replay_only",
+        "vector_npz"
+      ],
+      "output_dir": "/home/chase/Yangxx/VF-CL/results/adaptive20-sample-replay-only-dev-20261014-v1/upmc_seed55_SAMPLE_ONLY"
+    },
+    {
+      "dataset": "cifar",
+      "seed": 54,
+      "run": "cifar_seed54_SAMPLE_ONLY",
+      "config_sha256": "cd6e357d06867ea313f44595a6f219f2088cae8646e67748d783af98c95775f3",
+      "allowed_changed_fields_from_P0R1": [
+        "data_path",
+        "exp_name",
+        "feat_distill_weight",
+        "output_dir",
+        "party_drift_telemetry",
+        "proto_sdc",
+        "results_dir",
+        "sample_replay_only"
+      ],
+      "output_dir": "/home/chase/Yangxx/VF-CL/results/adaptive20-sample-replay-only-dev-20261014-v1/cifar_seed54_SAMPLE_ONLY"
+    },
+    {
+      "dataset": "cifar",
+      "seed": 55,
+      "run": "cifar_seed55_SAMPLE_ONLY",
+      "config_sha256": "6f3d4bcc500906e5a1f938e1c9ee311fc42a61e3c9db5b4f43741368a40c6797",
+      "allowed_changed_fields_from_P0R1": [
+        "data_path",
+        "exp_name",
+        "feat_distill_weight",
+        "output_dir",
+        "party_drift_telemetry",
+        "proto_sdc",
+        "results_dir",
+        "sample_replay_only"
+      ],
+      "output_dir": "/home/chase/Yangxx/VF-CL/results/adaptive20-sample-replay-only-dev-20261014-v1/cifar_seed55_SAMPLE_ONLY"
+    }
+  ]
+}
