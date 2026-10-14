@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "status": "training_only_development_smoke",
+  "source_commit": "3f9bf8afc42e58a5f8a759ee0e6c1b0747b8958f",
+  "host": "vf-cl-4090-1",
+  "gpu": 0,
+  "dataset": "isolet",
+  "seed": 54,
+  "variant": "sample_replay_only",
+  "config_sha256": "286e32044835e71c74eff98e7840dfe8ebfeff6f9bceb84099134b7c7eb081b3",
+  "data_sha256": "d34312670de93198afcd2b126c95b79bae2b4cffeb30d480f097faf046b69514",
+  "holdout_seed": 20261013,
+  "holdout_per_class": 40,
+  "raw_replay_capacity_per_class": 20,
+  "expected_prototype_bytes": 0,
+  "epochs_per_task": 1,
+  "output_root": "/home/chase/Yangxx/VF-CL/results/adaptive20-sample-replay-only-smoke-20261014-v1",
+  "scope": "implementation smoke only; no formal test or scientific comparison"
+}
