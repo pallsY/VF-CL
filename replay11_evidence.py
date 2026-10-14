@@ -334,6 +334,12 @@ def _verify_training_flow_strict(run, config, data_root, expected_tasks):
     from data_utils import TaskManager, VFLDataset
     from determinism import tensor_sha256
 
+    sdc = (config.get('cl_method') == 'proto_evolve'
+           and bool(config.get('proto_sdc', True)))
+    sdc_interval = config.get('sdc_interval', 1)
+    if sdc and (type(sdc_interval) is not int or sdc_interval < 1):
+        raise ValueError('adaptive SDC interval differs')
+
     if any(not (Path(data_root) / relative).is_file()
            for relative in matrix.expected_data(
                'cifar100' if config['data'] == 'cifar100' else
@@ -366,13 +372,18 @@ def _verify_training_flow_strict(run, config, data_root, expected_tasks):
                     if loader.audit_sampler is None:
                         raise ValueError('deterministic audit sampler is absent')
                     for epoch in range(args.epochs_per_task):
+                        if sdc and task_id > 0 and epoch % sdc_interval == 0:
+                            # The method's SDC pass consumes one sampler order
+                            # before the audited optimizer epoch.
+                            iter(loader.audit_sampler)
                         for batch, (batch_x, _batch_y) in enumerate(loader):
                             actual = next(records)
                             order = loader.audit_sampler.epoch_orders[-1]
                             start = batch * loader.batch_size
                             expected = {
                                 'loader_key': loader.audit_key,
-                                'loader_iteration': epoch,
+                                'loader_iteration': (
+                                    len(loader.audit_sampler.epoch_orders) - 1),
                                 'batch': batch,
                                 'indices': order[start:start + len(batch_x)],
                                 'dtype': str(batch_x.dtype),
@@ -469,6 +480,19 @@ def _verify_checkpoint_method_state(path, config, expected_tasks, *,
                    'labels', 'logits'},
         'er_ace': {'buffer_size', 'num_seen', 'examples', 'labels'},
         'adagauss': {'gaussians', 'adapters'},
+        'proto_evolve': {
+            'global_protos', 'prev_protos', 'fim_masks',
+            'dep_tracker_contrib', 'current_task_classes', 'has_old_teacher',
+            'class_party_contrib', 'class_party_weights',
+            'effective_class_party_weights', 'party_weight_manifest_hash',
+            'party_shuffle_seed', 'party_shuffle_mapping',
+            'distill_weight_schedule', 'effective_distill_weight',
+            'current_task_id', 'head_raw_replay', 'head_task_classes',
+            'head_consolidation_history', 'adaptive_method_version',
+            'adaptive_top_version', 'adaptive_class_order', 'adaptive_gate',
+            'head_validation_sha256', 'adaptive_pending_task_id',
+            'adaptive_audit_bundle',
+        },
     }
     method = config['cl_method']
     try:
@@ -498,10 +522,19 @@ def _verify_checkpoint_method_state(path, config, expected_tasks, *,
                 or method not in schemas or type(state) is not dict
                 or set(state) != schemas[method]
                 or not _valid_method_checkpoint_state(
-                    method, state, False, 4)
+                    method, state, method == 'proto_evolve', 4)
                 or not _valid_tracker_checkpoint_state(
                     checkpoint['tracker_state'], protocol)):
             raise ValueError('checkpoint schema or method fields differ')
+        if method == 'proto_evolve':
+            history = state['head_consolidation_history']
+            bundle = state['adaptive_audit_bundle']
+            if (len(history) != 1 or type(bundle) is not dict
+                    or history[0] != bundle.get('result')
+                    or state['adaptive_pending_task_id'] is not None
+                    or bundle['result'].get('task_id') != expected_tasks - 1
+                    or state['current_task_id'] != expected_tasks - 1):
+                raise ValueError('adaptive final head installation differs')
         if 'per_class_size' in state:
             memory = state.get('data', state.get('memory'))
             if (type(state['per_class_size']) is not int
