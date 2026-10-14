@@ -18,6 +18,8 @@
 
 迁移清单为 `adaptive20-sample-replay-only-dev-20261014-5090-v2-manifest.json`，SHA-256 为 `a1958b65242cfea90fb80591d117ab6fb4143c6c7f7380bd8827683f2bffeae3`。五组配置相对原 4090-1 配置仅更改数据和输出路径；训练参数、种子和留出协议保持一致。守卫脚本 `start_sample_replay_only_dev_5090.sh` 的 SHA-256 为 `d76cb54ae3b0bac7b2e3430ab35310aa6b406db1e02446f73acd622cc6989308`。
 
+ISOLET、UPMC 和 CIFAR-100 数据已复制到 `/home/c5090/VF-CL-data`；五个原始数据文件的远端 SHA-256 均与迁移清单相同。文件核验完成时，`/home` 仍约有 13 GiB 可用空间。
+
 5090-1 上的独立 CPU 实现烟测已退出 0：留出 `1040`、`raw20/class`、原型 `0` 字节、ClassIL `0.8826923077`、TaskIL `0.9798076923`。其 49 文件本机档案 `D:\VF-CL-ablation-archive-20261012\raw-only-isolet-seed54-cpu-smoke-5090-v1.tar.gz` 的 SHA-256 为 `dc1cda2c14008cdc82a68bafc2d57e6253a94c8711afbe5e7176894522216c91`，已逐文件核验。该烟测只验证环境与实现，不计入六组完整实验。
 
 `isolet_seed55_SAMPLE_ONLY` 的守卫等待器 PID `2762707` 已通过源码、配置、ISOLET 数据及前组归档检查。2026-10-14 约 15:57 CST，5090-1 的外部 GPU 进程 PID `4160238` 仍占用约 25.8 GiB，因此尚未生成运行目录；等待器将在 GPU 无计算进程时自行启动。未向外部进程发送信号。
