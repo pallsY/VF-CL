@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "registered_training_only_development",
-  "source_commit": "3f9bf8afc42e58a5f8a759ee0e6c1b0747b8958f",
+  "source_commit": "99e1da7e05e7eeb8b57587b6d3a75c6eaa490066",
   "host": "vf-cl-4090-1",
   "gpu": 0,
   "results_root": "/home/chase/Yangxx/VF-CL/results/adaptive20-sample-replay-only-dev-20261014-v1",
