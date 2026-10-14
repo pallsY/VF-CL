@@ -24,6 +24,7 @@ HOST_PYTHON = {
     'c3080.upcbrfed.xyz': '/home/c3080/miniconda3/envs/hy3d/bin/python',
     'c5090.upcbrfed.xyz': '/var/tmp/vfcl-adaptive9-yangxx/venv/bin/python',
 }
+HOST_GPU_COUNT = {'c3080.upcbrfed.xyz': 2, 'c5090.upcbrfed.xyz': 1}
 
 
 def validate_runtime(runtime, interpreter):

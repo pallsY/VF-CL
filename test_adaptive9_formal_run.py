@@ -10,9 +10,23 @@ from adaptive9_evidence import (
 
 RUN = Path('/brf/users/yangxx/VFCL-results/'
            'adaptive9-v2-fullschedule-preflight-20261015/run')
+ISOLET_5090_RUN = Path('/brf/users/yangxx/VFCL-results/'
+                       'adaptive9-isolet-5090-preflight-20261015/run')
 
 
 class AdaptiveRunEvidenceTests(unittest.TestCase):
+    def test_one_gpu_source_restores_on_two_gpu_audit_host(self):
+        if not ISOLET_5090_RUN.is_dir():
+            self.skipTest('cross-host ISOLET pilot is not mounted')
+        checked = verify_run(
+            ISOLET_5090_RUN, dataset='isolet', seed=42,
+            expected_epochs=1,
+            producer_commit='9973018295da270fd6098de07dcf36b9fe65ff61',
+            producer_root=Path('/tmp/vfcl-adaptive9-v3'),
+            data_root=Path('/brf/users/yangxx/VF-CL/data'))
+        self.assertEqual(checked['admission'], 'pilot')
+        self.assertEqual(len(checked['flow']['party_col_ranges']), 4)
+
     def test_remote_runtime_requires_pinned_host_versions_and_interpreter(self):
         runtime = {
             'host': 'c5090.upcbrfed.xyz', 'python': '3.11.15',

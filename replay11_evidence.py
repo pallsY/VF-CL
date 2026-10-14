@@ -430,7 +430,7 @@ def _verify_frozen_checkpoint_state(payload, frozen_final, evaluation):
 
 
 def _strict_producer_restore(producer_root, checkpoint_path, config_path,
-                             party_col_ranges):
+                             party_col_ranges, cuda_device_count=None):
     """Run the producer's resume validator in a fresh producer-only process."""
     command = [
         sys.executable,
@@ -438,8 +438,17 @@ def _strict_producer_restore(producer_root, checkpoint_path, config_path,
         str(producer_root), str(checkpoint_path), str(config_path),
         json.dumps(party_col_ranges),
     ]
+    env = None
+    if cuda_device_count is not None:
+        import torch
+        if (type(cuda_device_count) is not int or cuda_device_count < 0
+                or cuda_device_count > torch.cuda.device_count()):
+            raise ValueError('checkpoint GPU count exceeds audit host')
+        env = dict(os.environ)
+        env['CUDA_VISIBLE_DEVICES'] = ','.join(
+            map(str, range(cuda_device_count)))
     completed = subprocess.run(command, capture_output=True, text=True,
-                               check=False)
+                               check=False, env=env)
     if completed.returncode:
         raise ValueError('strict producer restore failed: '
                          + completed.stderr[-3000:])
@@ -568,7 +577,8 @@ def _verify_checkpoint_method_state(path, config, expected_tasks, *,
                 raise ValueError('producer checkout is required for strict reload')
             restored = _strict_producer_restore(
                 producer_root, path, Path(path).parent.parent / 'config.json',
-                party_col_ranges)
+                party_col_ranges,
+                cuda_device_count=len(checkpoint['rng_state']['cuda']))
             if restored.get('parties') != 4:
                 raise ValueError('strict producer restore party count differs')
     except Exception as error:
