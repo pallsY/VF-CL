@@ -151,6 +151,24 @@ def sha256(path):
     return digest.hexdigest()
 
 
+def validate_replay_cache(args, state):
+    raw = state['head_raw_replay']
+    if args.head_consolidation_enabled:
+        if (set(raw) != set(range(args.num_classes))
+                or any(values.size(0) != 20 for values in raw.values())):
+            raise ValueError('sample-backed head has wrong raw replay')
+    elif raw:
+        raise ValueError('no-head arm retained raw examples')
+    proto = state['global_protos']
+    if bool(getattr(args, 'sample_replay_only', 0)):
+        for field in ('global_protos', 'prev_protos'):
+            if state.get(field) != {}:
+                raise ValueError(f'sample replay only retained {field}')
+    elif set(proto) != set(range(args.num_classes)):
+        raise ValueError('prototype memory has wrong classes')
+    return raw, proto
+
+
 @torch.no_grad()
 def evaluate_holdout(args, dataset, checkpoint):
     import runner
@@ -180,17 +198,7 @@ def evaluate_holdout(args, dataset, checkpoint):
     )
     if metrics['count'] != args.num_classes * args.pilot_holdout_per_class:
         raise ValueError('pilot holdout example count differs')
-    state = payload['cl_state']
-    raw = state['head_raw_replay']
-    if args.head_consolidation_enabled:
-        if (set(raw) != set(range(args.num_classes))
-                or any(values.size(0) != 20 for values in raw.values())):
-            raise ValueError('sample-backed head has wrong raw replay')
-    elif raw:
-        raise ValueError('no-head arm retained raw examples')
-    proto = state['global_protos']
-    if set(proto) != set(range(args.num_classes)):
-        raise ValueError('prototype memory has wrong classes')
+    raw, proto = validate_replay_cache(args, payload['cl_state'])
     return {
         'metrics': metrics,
         'raw_replay_per_class': 20 if args.head_consolidation_enabled else 0,

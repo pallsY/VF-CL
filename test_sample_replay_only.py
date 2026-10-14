@@ -128,6 +128,33 @@ class SampleReplayOnlyMethodTests(unittest.TestCase):
 
 
 class SampleReplayOnlyPilotTests(unittest.TestCase):
+    def test_cache_gate_accepts_raw_only_and_rejects_any_prototype_state(self):
+        self.assertTrue(hasattr(pilot, "validate_replay_cache"))
+        args = SimpleNamespace(
+            sample_replay_only=1, head_consolidation_enabled=1,
+            num_classes=2,
+        )
+        state = {
+            "head_raw_replay": {
+                0: torch.zeros(20, 2),
+                1: torch.ones(20, 2),
+            },
+            "global_protos": {},
+            "prev_protos": {},
+        }
+        pilot.validate_replay_cache(args, state)
+        for field in ("global_protos", "prev_protos"):
+            with self.subTest(field=field):
+                bad = {**state, field: {0: {"mean": torch.ones(2)}}}
+                with self.assertRaisesRegex(ValueError, field):
+                    pilot.validate_replay_cache(args, bad)
+        old = SimpleNamespace(
+            sample_replay_only=0, head_consolidation_enabled=1,
+            num_classes=2,
+        )
+        with self.assertRaisesRegex(ValueError, "prototype memory"):
+            pilot.validate_replay_cache(old, state)
+
     def test_readout_has_separate_variant_and_zero_prototype_memory(self):
         self.assertTrue(hasattr(pilot, "sample_only_result_fields"))
         args = SimpleNamespace(sample_replay_only=1)
