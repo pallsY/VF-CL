@@ -14,6 +14,7 @@ from replay11_numeric import _producer_sources
 
 TASKS = {'cifar100': 10, 'isolet': 13, 'upmc_food101': 10}
 EPOCHS = {'cifar100': 50, 'isolet': 50, 'upmc_food101': 20}
+APPROVED_PRODUCER_COMMIT = '9973018295da270fd6098de07dcf36b9fe65ff61'
 RUNTIME = {
     'python': '3.11.15', 'torch': '2.5.1+cu124',
     'torchvision': '0.20.1+cu124', 'numpy': '1.24.4',
@@ -156,6 +157,8 @@ def verify_pinned_job(job_dir, *, results_root, data_root,
             or seed not in baseline.SEEDS or job_dir != expected
             or any(part.is_symlink() for part in (job_dir, *job_dir.parents))):
         raise ValueError('pinned adaptive job path differs')
+    if producer_commit != APPROVED_PRODUCER_COMMIT:
+        raise ValueError('adaptive approved producer commit differs')
     plan = shared._json(job_dir / 'JOB_PLAN.json')
     success = shared._json(job_dir / 'JOB_SUCCESS.json')
     expected_plan_keys = {

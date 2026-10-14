@@ -2,8 +2,10 @@
 
 import json
 import hashlib
+import math
 import os
 import platform
+import statistics
 import subprocess
 import sys
 import time
@@ -17,10 +19,61 @@ import replay11_attest as ledger
 
 DATASETS = ('cifar100', 'isolet', 'upmc_food101')
 SEEDS = (42, 43, 44)
+TASKS = {'cifar100': 10, 'isolet': 13, 'upmc_food101': 10}
+
+
+def _verify_numeric_evidence(numeric, basic, job, producer_commit):
+    result = numeric.get('result')
+    basic_result = basic.get('result') or {}
+    count = TASKS[job.split('/')[0]]
+    keys = [f'task_{index}' for index in range(count)]
+    try:
+        totals = result['task_totals']
+        correct = result['correct']
+        metrics = result['metrics']
+        if (result['job'] != job
+                or result['producer_commit'] != producer_commit
+                or type(totals) is not dict or set(totals) != set(keys)
+                or any(type(value) is not int or value < 1
+                       for value in totals.values())
+                or type(correct) is not dict
+                or set(correct) != {'diagonal', 'final', 'task_il'}
+                or any(type(correct[name]) is not dict
+                       or set(correct[name]) != set(keys)
+                       or any(type(correct[name][key]) is not int
+                              or not 0 <= correct[name][key] <= totals[key]
+                              for key in keys)
+                       for name in correct)
+                or type(metrics) is not dict
+                or set(metrics) != {
+                    'aa_final_cil', 'bwt_cil', 'task_il_final'}
+                or any(type(value) not in (int, float)
+                       or not math.isfinite(value)
+                       for value in metrics.values())):
+            raise ValueError('numeric payload shape differs')
+        diagonal = [round(correct['diagonal'][key] / totals[key], 4)
+                    for key in keys]
+        final = [round(correct['final'][key] / totals[key], 4)
+                 for key in keys]
+        task_il = [round(correct['task_il'][key] / totals[key], 4)
+                   for key in keys]
+        expected = {
+            'aa_final_cil': statistics.fmean(final),
+            'bwt_cil': (statistics.fmean(
+                final[index] - diagonal[index]
+                for index in range(count - 1)) if count > 1 else 0.0),
+            'task_il_final': statistics.fmean(task_il),
+        }
+        if metrics != expected or metrics != basic_result.get('metrics'):
+            raise ValueError('numeric metrics differ')
+    except (KeyError, TypeError, ValueError) as error:
+        raise ValueError(f'numeric evidence differs: {job}') from error
 
 
 def finalize_records(records, *, producer_commit, audit_commit, results_root):
     """Require latest basic success for nine jobs and numeric for seed 42."""
+    if producer_commit != evidence.APPROVED_PRODUCER_COMMIT:
+        raise ValueError('adaptive approved producer commit differs')
     basic_count = numeric_count = 0
     root = str(results_root).replace('\\', '/').rstrip('/')
     for dataset, seed in product(DATASETS, SEEDS):
@@ -55,6 +108,9 @@ def finalize_records(records, *, producer_commit, audit_commit, results_root):
         if len(required) == 2 and (required[0]['original_tree_sha256']
                                    != required[1]['original_tree_sha256']):
             raise ValueError(f'basic/numeric original tree differs: {job}')
+        if seed == 42:
+            _verify_numeric_evidence(required[0], required[1], job,
+                                     producer_commit)
         basic_count += 1
     return {
         'basic_passed': basic_count, 'numeric_passed': numeric_count,
@@ -71,6 +127,20 @@ def numeric_visibility(source_host):
     if source_host not in evidence.HOST_GPU_COUNT:
         raise ValueError('adaptive numeric source host differs')
     return ','.join(map(str, range(evidence.HOST_GPU_COUNT[source_host])))
+
+
+def next_audit_stage(prior, seed):
+    """A retry appends a fresh basic verdict; old failures stay in the ledger."""
+    if not prior or prior[-1].get('status') == 'failed':
+        return 'basic'
+    latest = prior[-1]
+    if latest.get('status') != 'passed':
+        raise ValueError('adaptive latest verdict status differs')
+    if latest.get('stage') == 'basic':
+        return 'numeric' if seed == 42 else 'done'
+    if latest.get('stage') == 'numeric' and seed == 42:
+        return 'done'
+    raise ValueError('adaptive audit stage order differs')
 
 
 def _event(job, stage, status, result, error, *, job_dir,
@@ -125,24 +195,22 @@ def audit_one(dataset, seed, *, results_root, data_root, producer_root,
     """Append a basic verdict and, for seed 42, a numeric verdict."""
     if dataset not in DATASETS or seed not in SEEDS:
         raise ValueError('job is outside the adaptive nine-cell matrix')
+    if producer_commit != evidence.APPROVED_PRODUCER_COMMIT:
+        raise ValueError('adaptive approved producer commit differs')
     if ledger._audit_commit() != audit_commit:
         raise ValueError('adaptive audit checkout differs from frozen commit')
     job = f'{dataset}/adaptive/{seed}'
     job_dir = Path(results_root) / dataset / 'adaptive' / str(seed)
     existing = ledger.read_ledger(ledger_path)
     prior = [row for row in existing if row.get('job') == job]
-    if prior and prior[-1].get('status') != 'passed':
-        raise ValueError('adaptive latest verdict failed; preserve evidence')
-    if prior and (prior[-1].get('stage') == 'numeric'
-                  or seed != 42):
+    stage = next_audit_stage(prior, seed)
+    if stage == 'done':
         raise ValueError('adaptive job already audited')
-    if prior and prior[-1].get('stage') != 'basic':
-        raise ValueError('adaptive audit stage order differs')
     common = dict(
         results_root=results_root, data_root=data_root,
         producer_root=producer_root, producer_commit=producer_commit)
     basic = None
-    if not prior:
+    if stage == 'basic':
         started = time.perf_counter()
         before = _snapshot(job_dir)
         try:
@@ -169,7 +237,7 @@ def audit_one(dataset, seed, *, results_root, data_root, producer_root,
     started = time.perf_counter()
     before = _snapshot(job_dir)
     try:
-        if prior:
+        if stage == 'numeric':
             if (before['sha256'] != prior[-1]['original_tree_sha256']
                     or prior[-1].get('audit_commit') != audit_commit
                     or prior[-1].get('producer_commit') != producer_commit):
