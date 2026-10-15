@@ -40,6 +40,11 @@ def validate_runtime(runtime, interpreter):
 def verify_adaptive_access_flow(run, expected_tasks, num_classes):
     """Bind the adaptive validation and test access markers to the flow log."""
     run = Path(run)
+    access_dir = run / 'formal_access'
+    if (access_dir.is_symlink() or not access_dir.is_dir()
+            or {path.name for path in access_dir.iterdir()}
+            != {'validation.consumed.json', 'test.consumed.json'}):
+        raise ValueError('adaptive access inventory differs')
     classes = list(range(num_classes))
     common = {
         'event': 'first_iteration', 'event_idx': expected_tasks - 1,

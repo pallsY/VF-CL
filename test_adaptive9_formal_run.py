@@ -47,6 +47,14 @@ class AdaptiveRunEvidenceTests(unittest.TestCase):
             self.assertEqual(
                 verify_adaptive_access_flow(run, 1, 2),
                 {'validation': validation, 'test': test})
+            extra = access_dir / 'calibration.consumed.json'
+            extra.write_text(json.dumps({
+                'schema_version': 1, 'status': 'consumed',
+                'access': dict(validation, split='calibration')}),
+                encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'access inventory'):
+                verify_adaptive_access_flow(run, 1, 2)
+            extra.unlink()
             flow.write_text(json.dumps(test) + '\n', encoding='utf-8')
             with self.assertRaisesRegex(ValueError, 'validation access'):
                 verify_adaptive_access_flow(run, 1, 2)
