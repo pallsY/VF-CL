@@ -12,9 +12,23 @@ RUN = Path('/brf/users/yangxx/VFCL-results/'
            'adaptive9-v2-fullschedule-preflight-20261015/run')
 ISOLET_5090_RUN = Path('/brf/users/yangxx/VFCL-results/'
                        'adaptive9-isolet-5090-preflight-20261015/run')
+CIFAR_5090_RUN = Path('/brf/users/yangxx/VFCL-results/'
+                      'adaptive9-cifar-fullschedule-5090-preflight-20261015/run')
 
 
 class AdaptiveRunEvidenceTests(unittest.TestCase):
+    def test_cifar_adaptive_bic_uses_preinstall_validation_cache(self):
+        if not (CIFAR_5090_RUN / 'results.json').is_file():
+            self.skipTest('full-task CIFAR pilot is not complete')
+        checked = verify_run(
+            CIFAR_5090_RUN, dataset='cifar100', seed=42,
+            expected_epochs=1,
+            producer_commit='9973018295da270fd6098de07dcf36b9fe65ff61',
+            producer_root=Path('/tmp/vfcl-adaptive9-v3'),
+            data_root=Path('/brf/users/yangxx/VF-CL/data'))
+        self.assertEqual(checked['admission'], 'pilot')
+        self.assertGreater(checked['flow']['batches'], 0)
+
     def test_one_gpu_source_restores_on_two_gpu_audit_host(self):
         if not ISOLET_5090_RUN.is_dir():
             self.skipTest('cross-host ISOLET pilot is not mounted')

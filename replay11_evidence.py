@@ -373,9 +373,12 @@ def _verify_training_flow_strict(run, config, data_root, expected_tasks):
                         raise ValueError('deterministic audit sampler is absent')
                     for epoch in range(args.epochs_per_task):
                         if sdc and task_id > 0 and epoch % sdc_interval == 0:
-                            # The method's SDC pass consumes one sampler order
-                            # before the audited optimizer epoch.
-                            iter(loader.audit_sampler)
+                            # SDC starts a DataLoader iteration before the
+                            # optimizer epoch. Recreate its sampler order and
+                            # worker base seed; both advance once per iterator.
+                            prepass = iter(loader)
+                            next(prepass)
+                            del prepass
                         for batch, (batch_x, _batch_y) in enumerate(loader):
                             actual = next(records)
                             order = loader.audit_sampler.epoch_orders[-1]
@@ -394,7 +397,15 @@ def _verify_training_flow_strict(run, config, data_root, expected_tasks):
                                            for key, value in expected.items())
                                     or actual.get('batch_sha256')
                                     != tensor_sha256(batch_x)):
-                                raise ValueError('batch identity differs')
+                                differing = [key for key, value in expected.items()
+                                             if actual.get(key) != value]
+                                if (actual.get('batch_sha256')
+                                        != tensor_sha256(batch_x)):
+                                    differing.append('batch_sha256')
+                                raise ValueError(
+                                    'batch identity differs at '
+                                    f'task={task_id}, epoch={epoch}, '
+                                    f'batch={batch}, fields={differing}')
                             batch_count += 1
                 remaining = list(records)
                 if (not remaining
@@ -404,7 +415,8 @@ def _verify_training_flow_strict(run, config, data_root, expected_tasks):
                     raise ValueError('training batch count differs')
         except (OSError, StopIteration, KeyError, TypeError,
                 json.JSONDecodeError, ValueError) as error:
-            raise ValueError('training data-flow reconstruction differs') from error
+            raise ValueError(
+                f'training data-flow reconstruction differs: {error}') from error
     return {
         'batches': batch_count,
         'batch_bytes_replayed': True,
@@ -665,11 +677,18 @@ def _verify_transaction(run, frozen, published, provenance, result):
             raise ValueError('formal BiC cache identity differs')
         _validate_cache_record(cache['test'])
         calibration = cache['calibration']
+        internal = (identity['protocol'].get('cl_method') == 'proto_evolve'
+                    and bool(identity['protocol'].get(
+                        'head_consolidation_enabled'))
+                    and identity['protocol'].get(
+                        'head_consolidation_mode') == 'adaptive_dual_branch')
+        expected_split = 'validation' if internal else 'calibration'
+        expected_phase = ('final_validation_pre_install' if internal
+                          else 'final_bic_calibration_post_freeze')
         if (type(calibration) is not dict
                 or set(calibration) != {'split', 'phase', 'cache'}
-                or calibration['split'] != 'calibration'
-                or calibration['phase']
-                != 'final_bic_calibration_post_freeze'):
+                or calibration['split'] != expected_split
+                or calibration['phase'] != expected_phase):
             raise ValueError('formal calibration cache identity differs')
         _validate_cache_record(calibration['cache'])
     else:
