@@ -37,6 +37,49 @@ def validate_runtime(runtime, interpreter):
     return runtime
 
 
+def verify_adaptive_access_flow(run, expected_tasks, num_classes):
+    """Bind the adaptive validation and test access markers to the flow log."""
+    run = Path(run)
+    classes = list(range(num_classes))
+    common = {
+        'event': 'first_iteration', 'event_idx': expected_tasks - 1,
+        'task_id': expected_tasks - 1,
+        'timeline_step': f'event_{expected_tasks - 1}_CIL',
+        'classes': classes,
+    }
+    expected = {
+        'validation': {
+            **common,
+            'loader_key': repr(('lambda_validation', tuple(classes))),
+            'split': 'validation', 'phase': 'final_validation_pre_install',
+        },
+        'test': {
+            **common, 'loader_key': repr(('test', tuple(classes))),
+            'split': 'test', 'phase': 'final_test_post_install',
+        },
+    }
+    for name, record in expected.items():
+        marker = shared._json(run / 'formal_access'
+                              / f'{name}.consumed.json')
+        if (set(marker) != {'schema_version', 'status', 'access'}
+                or marker['schema_version'] != 1
+                or marker['status'] != 'consumed'
+                or marker['access'] != record):
+            raise ValueError(f'adaptive {name} access marker differs')
+    accesses = []
+    with shared._file(run / 'data_flow_audit.jsonl').open(
+            encoding='utf-8') as handle:
+        for line in handle:
+            row = json.loads(line)
+            if type(row) is not dict:
+                raise ValueError('adaptive validation access flow is malformed')
+            if row.get('split') is not None:
+                accesses.append(row)
+    if accesses != [expected['validation'], expected['test']]:
+        raise ValueError('adaptive validation access flow differs')
+    return expected
+
+
 def verify_run(run_dir, *, dataset, seed, expected_epochs,
                producer_commit, producer_root, data_root):
     """Recompute source, data, flow, checkpoint, and result identities."""
@@ -114,6 +157,8 @@ def verify_run(run_dir, *, dataset, seed, expected_epochs,
         raise ValueError('adaptive publication bytes differ')
     flow_hash = shared._verify_data_flow(
         run, access.get('access'), TASKS[dataset])
+    verify_adaptive_access_flow(
+        run, TASKS[dataset], config['num_classes'])
     if (access.get('status') != 'consumed'
             or access.get('access', {}).get('split') != 'test'
             or access['access'].get('phase') != 'final_test_post_install'):

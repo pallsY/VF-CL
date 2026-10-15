@@ -397,11 +397,15 @@ def _verify_training_flow_strict(run, config, data_root, expected_tasks):
                                            for key, value in expected.items())
                                     or actual.get('batch_sha256')
                                     != tensor_sha256(batch_x)):
-                                differing = [key for key, value in expected.items()
-                                             if actual.get(key) != value]
-                                if (actual.get('batch_sha256')
-                                        != tensor_sha256(batch_x)):
-                                    differing.append('batch_sha256')
+                                if type(actual) is not dict:
+                                    differing = ['record_type']
+                                else:
+                                    differing = [
+                                        key for key, value in expected.items()
+                                        if actual.get(key) != value]
+                                    if (actual.get('batch_sha256')
+                                            != tensor_sha256(batch_x)):
+                                        differing.append('batch_sha256')
                                 raise ValueError(
                                     'batch identity differs at '
                                     f'task={task_id}, epoch={epoch}, '

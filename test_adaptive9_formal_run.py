@@ -2,10 +2,12 @@
 
 import unittest
 import tempfile
+import json
 from pathlib import Path
 
 from adaptive9_evidence import (
-    verify_run, verify_pinned_job, validate_runtime)
+    verify_run, verify_pinned_job, validate_runtime,
+    verify_adaptive_access_flow)
 
 
 RUN = Path('/brf/users/yangxx/VFCL-results/'
@@ -17,6 +19,42 @@ CIFAR_5090_RUN = Path('/brf/users/yangxx/VFCL-results/'
 
 
 class AdaptiveRunEvidenceTests(unittest.TestCase):
+    def test_validation_access_marker_must_match_the_flow(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            run = Path(scratch)
+            access_dir = run / 'formal_access'
+            access_dir.mkdir()
+            classes = [0, 1]
+            common = {
+                'event': 'first_iteration', 'event_idx': 0,
+                'task_id': 0, 'timeline_step': 'event_0_CIL',
+                'classes': classes,
+            }
+            validation = dict(
+                common, loader_key=repr(('lambda_validation',
+                                         tuple(classes))),
+                split='validation', phase='final_validation_pre_install')
+            test = dict(common, loader_key=repr(('test', tuple(classes))),
+                        split='test', phase='final_test_post_install')
+            for name, access in (('validation', validation), ('test', test)):
+                (access_dir / f'{name}.consumed.json').write_text(
+                    json.dumps({'schema_version': 1, 'status': 'consumed',
+                                'access': access}), encoding='utf-8')
+            flow = run / 'data_flow_audit.jsonl'
+            flow.write_text(''.join(json.dumps(row) + '\n'
+                                    for row in (validation, test)),
+                            encoding='utf-8')
+            self.assertEqual(
+                verify_adaptive_access_flow(run, 1, 2),
+                {'validation': validation, 'test': test})
+            flow.write_text(json.dumps(test) + '\n', encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'validation access'):
+                verify_adaptive_access_flow(run, 1, 2)
+            flow.write_text(''.join(json.dumps(row) + '\n' for row in (
+                dict(validation, phase='wrong'), test)), encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'validation access'):
+                verify_adaptive_access_flow(run, 1, 2)
+
     def test_cifar_adaptive_bic_uses_preinstall_validation_cache(self):
         if not (CIFAR_5090_RUN / 'results.json').is_file():
             self.skipTest('full-task CIFAR pilot is not complete')

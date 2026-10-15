@@ -174,7 +174,8 @@ class Replay11V3Test(unittest.TestCase):
             path = run / 'data_flow_audit.jsonl'
             for changed in (rows[:3] + rows[4:],
                             [{**rows[0], 'batch_sha256': '0' * 64}]
-                            + rows[1:]):
+                            + rows[1:],
+                            [['invalid-record']] + rows[1:]):
                 path.write_text(''.join(json.dumps(row) + '\n'
                                         for row in changed), encoding='utf-8')
                 with self.assertRaisesRegex(ValueError,
