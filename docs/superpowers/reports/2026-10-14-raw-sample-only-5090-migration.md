@@ -54,4 +54,12 @@ ISOLET、UPMC 和 CIFAR-100 数据已复制到 `/home/c5090/VF-CL-data`；五个
 
 新 wrapper PID `149657` 于约 20:52 CST 启动，通过预检且进入 `event_0_CIL`；此时尚无退出读数。继续监控日志及持久磁盘，成功后再做冻结/留出/零正式测试审计和本机全文件备份。
 
+## ISOLET seed55 核验完成
+
+修复后的 v2 运行于约 2026-10-16 20:55 CST 退出 `0`，冻结文件、开发留出读数及正式评估待办标记齐全。开发留出 `1040` 个样本，ClassIL `0.9173076923`、TaskIL `0.9923076923`；`variant=sample_replay_only`、原型缓存 `0` 字节、原始样本 `20/class`。留出清单 SHA-256 为 `d1bab580ecab91b054a4bd7f21fde9d30612270c845da52daed899dabb7e00d7`，与 seed54 一致。正式访问目录只有 `validation.consumed.json`，没有 `results.json` 或正式测试发布文件。
+
+完整 49 文件档案在 `D:\VF-CL-ablation-archive-20261012\raw-only-isolet-seed55-full-3080-v2.tar.gz`，SHA-256 `fdb1b224f9213338508a463c68a8321017e79dc307991f646093f679841db410`，按逐文件清单 SHA-256 `3459364f6cba48f8665e9515a8d77d8255b128a204eac1772bf5ea991926af2c` 全部核对通过。本机读数位于 `C:\Users\30783\Documents\VF-CL-sample-only-results-20261014\ISOLET_seed55_SAMPLE_ONLY_HOLDOUT_READOUT_3080.json`，SHA-256 `65116cfc0fdf91e9e011531ffc1acba398d85cff4654ae8b4664135ec7dce710` 与远端相同。远端写入 `ARCHIVED_isolet_seed55_SAMPLE_ONLY.txt` 并保留运行目录作为额外副本。至此新模式完整科学运行 **2/6**，CPU 烟测与首次 event0 环境失败均不计数。
+
+UPMC seed54/55 的迁移配置已单独登记在 `adaptive20-sample-replay-only-dev-20261016-3080-upmc-v1`，仍固定同一训练源码和原有 UPMC 留出协议。原始 UPMC 文件正复制到 `/brf/users/yangxx/VFCL-data/upmc_food101_image_clean_v1/`；在复制完成并校验 SHA-256 `dea0569f0d4195eaaecc9cab3a6cce533f07b8d88472e7dbca5113152a314339` 前不得启动。UPMC seed54 配置 SHA-256 `0d2e4735c5700323c70ac15239e6801e8cc09e283757d3dda489899e6eaffd0a`，seed55 配置 SHA-256 `c4c98118e5bde4d562d36ac8c9371a2daf47f8e50ef56b9eba6bf739f9a70efa`；清单 SHA-256 `0a388a144d5335455c06e5da1881271235671a5d34c1cf1b95f7ed553cbc1baf`。备用 GPU0/GPU1 脚本 SHA-256 分别为 `8d67dc0fad36041fbd2cf6236113693f2e9879991cbbbd046a33cfe39a9cbd35`、`df75a8ca90a3f6f1b8994c99d81f10ae5dd342ab6f24813d5fb2b17131a3f098`，脚本需前组 `ARCHIVED` 证据及目标 GPU 空闲，当前尚未启动。
+
 待全部六组完成后，最终台账须标注 seed54 与后续组分属不同 GPU，运行时间不得直接做跨机器速度比较。旧 P0R1 仅可作为机制不同的参考，不能冒充本模式的结果。
