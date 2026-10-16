@@ -24,4 +24,14 @@ ISOLET、UPMC 和 CIFAR-100 数据已复制到 `/home/c5090/VF-CL-data`；五个
 
 `isolet_seed55_SAMPLE_ONLY` 的守卫等待器 PID `2762707` 已通过源码、配置、ISOLET 数据及前组归档检查。2026-10-14 约 15:57 CST，5090-1 的外部 GPU 进程 PID `4160238` 仍占用约 25.8 GiB，因此尚未生成运行目录；等待器将在 GPU 无计算进程时自行启动。未向外部进程发送信号。
 
+## 5090-2 的后续排队
+
+2026-10-16 约 17:07 CST，确认 5090-1 的 `isolet_seed55_SAMPLE_ONLY` 仍没有运行目录、训练日志或退出读数后，安全停止其等待器 PID `2762707`，留下 `MIGRATED_BEFORE_TRAINING_isolet_seed55_SAMPLE_ONLY.txt`。本机也保存了该小证据文件。未触碰任何外部进程。
+
+用户提供的新 5090-2 地址可连接，但其 GPU 仍有多个外部计算任务，显存仅剩约 6.3 GiB，磁盘约剩 7.4 GiB。因此只在 5090-2 排队 ISOLET seed55，并继续要求 GPU 无计算进程、该盘至少 2 GiB 空闲后才启动。其余 UPMC/CIFAR 组没有在 5090-2 启动；CIFAR 尤其不能按当前磁盘余量运行。
+
+5090-2 的独立源码目录为 `/home/c518/VF-CL-worktrees/raw-sample-replay-20261016`，从相同 SHA 已核验的完整 Git bundle 检出固定训练提交 `99e1da7e05e7eeb8b57587b6d3a75c6eaa490066`。ISOLET 数据 SHA-256 `d34312670de93198afcd2b126c95b79bae2b4cffeb30d480f097faf046b69514` 核对通过，Python 环境可以导入 PyTorch、实验入口及主要模块。结果根为 `/home/c518/VF-CL-results/adaptive20-sample-replay-only-dev-20261016-v3`。配置相对 5090-1 仅更改数据和输出路径；配置 SHA-256 `255ecc6150708e8abebad77bf16387baecf406c1e805524004a236b7255353bf`、清单 SHA-256 `6d341751cb929450080d402d9758e4c304f8c9991e92ea1af525a642ebfd2083`、守卫脚本 SHA-256 `bd4dcc6c4b60e7f30ca5e0bf9ca28124da17cd86aa8292af919ee9d3a1ac598f` 均在远端核对。守卫同时要求前组归档证据和 5090-1 未训练迁移证据。
+
+5090-2 的新等待器 PID `1510676` 已通过源代码、配置、数据和前组归档检查（`PREFLIGHT_OK`）。截至 2026-10-16 17:11 CST，GPU 仍被外部任务占用，没有训练目录或读数；等待器将继续等待。5090-1 上该组等待器已停，不存在双重排队。
+
 待全部六组完成后，最终台账须标注 seed54 与后续组分属不同 GPU，运行时间不得直接做跨机器速度比较。旧 P0R1 仅可作为机制不同的参考，不能冒充本模式的结果。
