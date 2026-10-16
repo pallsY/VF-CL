@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "experiment": "adaptive9-fourparty-v1-20261015",
+  "status": "final_gate_passed",
+  "protocol_anchor_sha256": "38f5fa9acbcb6b6d447e81b3103a7ba94f718b013541cf3682cbf95f28e53db3",
+  "producer_commit": "9973018295da270fd6098de07dcf36b9fe65ff61",
+  "audit_commit": "c0442611ebce23c3428111258cb8a7b731d63863",
+  "basic_passed": 9,
+  "numeric_passed": 3,
+  "ledger_sha256": "6ae68e7d5cc560e4e31196be93748c1cf1ab460721b5d38e6cbbe99a3a4197ec",
+  "ledger_head_sha256": "319c615eaf1f1ebe453838f88e5ac87ab4d477d6aa1dbd7973138119221d6c6c",
+  "final_gate_sha256": "db3dde9553d9029cf73d09b2ce76f7af51530d642f487d033ec83d98837cd20c",
+  "final_gate_checked_at_utc": "2026-10-16T17:05:23.470741+00:00"
+}
