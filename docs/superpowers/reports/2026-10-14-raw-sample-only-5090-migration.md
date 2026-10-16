@@ -34,4 +34,12 @@ ISOLET、UPMC 和 CIFAR-100 数据已复制到 `/home/c5090/VF-CL-data`；五个
 
 5090-2 的新等待器 PID `1510676` 已通过源代码、配置、数据和前组归档检查（`PREFLIGHT_OK`）。截至 2026-10-16 17:11 CST，GPU 仍被外部任务占用，没有训练目录或读数；等待器将继续等待。5090-1 上该组等待器已停，不存在双重排队。
 
+## 同时观察 5090-2 与双卡 3080
+
+按用户要求，持续观察 5090-2 GPU0 与双卡 3080 的 GPU0/1，比较谁先空闲。2026-10-16 19:49 CST，两台都仍有外部 GPU 进程；5090-2 的 ISOLET seed55 等待器保持唯一活动队列。双卡 3080 本地盘仅约 684 MiB，不使用曾两次被全局清空的 `/dev/shm`。它另有用户可写的持久 `/brf/users/yangxx` 挂载（约 18 TiB 空闲），可以作为经过核对后的备用结果位置。
+
+备用源码在 `/brf/users/yangxx/VF-CL-worktrees/raw-sample-replay-20261016-standby`，从相同 SHA 已核验的 Git bundle 检出固定训练提交；ISOLET 数据仍使用已经 SHA 核对的 `/home/c3080/YangXiaoXiang/VF-CL/data/isolet/isolet_vfl.npz`。备用结果根 `/brf/users/yangxx/VFCL-results/adaptive20-sample-replay-only-dev-20261016-3080-standby-v1` 已放置配置、清单及未启动的守卫脚本。其配置 SHA-256 `b15c0d3477d5c5832d0f322d15d99ad7a40760c90ab577c634fbaf2c7bcce1eb`、清单 SHA-256 `98300cc5b310b072ddbe76439aba76ed56e9f22e65cf25eceb3c01ed4a7e120a`、守卫脚本 SHA-256 `063e9c4b6e5de2d834d3ef75390b8a1d231dd2c1b011265bd8f8de017029b282` 已远端核对。当前没有备用训练进程或结果目录。
+
+如果 3080 GPU0 先空闲，必须先确认 5090-2 仍无训练目录、日志和退出读数，安全停止其唯一等待器，再将带有 `training_started=false` 的迁移证据送至 3080。3080 脚本在该证据、前组归档、固定源码与数据 SHA、GPU0 无外部计算进程、`/brf` 至少 8 GiB 空闲时才能启动，并将临时文件和输出写入 `/brf`。若 5090-2 已先开跑，则 3080 备用配置只保持未启动状态。
+
 待全部六组完成后，最终台账须标注 seed54 与后续组分属不同 GPU，运行时间不得直接做跨机器速度比较。旧 P0R1 仅可作为机制不同的参考，不能冒充本模式的结果。
