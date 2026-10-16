@@ -67,3 +67,15 @@ UPMC seed54/55 的迁移配置已单独登记在 `adaptive20-sample-replay-only-
 CIFAR-100 seed54/55 也已在独立的 3080 持久根 `adaptive20-sample-replay-only-dev-20261016-3080-cifar-v1` 预备，尚无训练进程。它使用原有可读的 CIFAR train/test/meta，三文件 SHA-256 分别为 `735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b`、`4b67687d9933c4db8f0831104447f15b93774f4f464bd0516f0f0f2ac83b7864`、`a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9`，远端重新核对。seed54 配置 SHA-256 `3d85f6593f2b9d252073f676a0e6ce9be81ccb7e4f4571e2aa7460a5acaa57a3`、seed55 `dbe0fb55a393f1f203b524ebdc0eee6f3ffc4e06dbdea84f8798ff57ec6d0a7a`，清单 `a248bcfffe7cc4f369c2e8f6ab5175f9895bdf92c375a075ffb034d819efde55`；两张 GPU 的互斥守卫脚本分别为 `e91840d91241c6b55a73f31b776acd4a66b9c0991e406b0e421e838aee31bf7d` 和 `9f08d56aef4a3012017ffffb7014d6ea0ec38a5ba424e6ddcb35ade3571ef740`。启动顺序必须等待 UPMC seed55 完整归档并且目标 GPU 空闲，所有输出留在 `/brf`。
 
 待全部六组完成后，最终台账须标注 seed54 与后续组分属不同 GPU，运行时间不得直接做跨机器速度比较。旧 P0R1 仅可作为机制不同的参考，不能冒充本模式的结果。
+
+## UPMC 两组完成与 CIFAR-100 启动
+
+UPMC seed54 于 2026-10-17 约 00:20 CST 在 3080 GPU1 退出 `0`。开发留出共 `6464` 个样本，ClassIL `0.7930074257`、TaskIL `0.9214108911`，原型缓存 `0` 字节、原始样本 `20/class`。UPMC seed55 也在同一 GPU 退出 `0`，相应读数为 ClassIL `0.7936262376`、TaskIL `0.9229579208`。两组共用留出清单 SHA-256 `21ce856b3b28c80c57640d6948b7eb1c65f622e0711bded1f77837165ab006e4`，均有冻结状态与正式评估待办标记，正式访问目录只有 `validation.consumed.json`，没有 `results.json`。
+
+seed54 的本机 D 盘完整 40 文件档案为 `raw-only-upmc-seed54-full-3080-v1.tar.gz`，SHA-256 `7e7365f78c01861010cce20d6103fb1b7e18639eb86c0d20c839945796718509`；seed55 为 `raw-only-upmc-seed55-full-3080-v1.tar.gz`，SHA-256 `244842db4cb7c6f14f903576c9964061a6d27a3a6377adb3f0820d8bdafd662d`。两个档案都与远端逐文件 SHA 清单核对通过。本机 C 盘读数 SHA-256 分别为 `0e70d83d3c9e9f091107ccd58c5d988d70b0b65dff178c4c8623a09f1a3d6f38` 和 `fb01c8421ca7f4074d385265e985c120b552603ce3f83417d4897499d2497c7a`。远端只在本机完整核验后写 `ARCHIVED` 标记，运行目录移至 `/brf/users/yangxx/VFCL-results/archived-raw-only-20261016/` 保留额外副本。至此科学运行 **4/6**。
+
+UPMC seed55 的归档证据已复制到 CIFAR-100 结果根并核对 SHA-256。CIFAR-100 seed54 使用固定源码、既定配置和 GPU1 守卫脚本，于 2026-10-17 约 00:47 CST 通过 `PREFLIGHT_OK` 后开始训练；唯一启动 wrapper PID `453665`。seed55 尚未启动，须等 seed54 完整备份并逐文件核验后再运行。
+
+CIFAR-100 seed54 于约 02:38 CST 退出 `0`，开发留出 `2500` 个样本，ClassIL `0.3628`、TaskIL `0.7368`，原始样本 `20/class`、原型缓存 `0` 字节。冻结状态、留出读数及正式评估待办标记齐全，访问记录只有开发验证集，没有 `results.json`。留出清单 SHA-256 为 `ebd998fca72f673bd933832f6a0f2b3f6fb6368170c5d0c05e12fb4896860dc7`。远端 41 文件 SHA 清单与本机 C 盘读数 SHA-256 分别为 `c377559091f182ce69839abd6d83219eabb98588a6b1120a3a3b9933be162525` 和 `15c0b3f7d03b28b7ed2aed6ccd2514d149e379cabbeed60d244e47dee2952f26`。
+
+本机 D 盘完整档案 `raw-only-cifar-seed54-full-3080-v1.tar.gz` 的 SHA-256 为 `29980ae2ee48436865f755fe8a0ff8223a692a28ca941fc36a33b57aadb37c42`，全部 41 个文件逐一核验通过。此后才写远端 `ARCHIVED_cifar_seed54_SAMPLE_ONLY.txt`，将运行目录移至持久 `/brf/users/yangxx/VFCL-results/archived-raw-only-20261016/` 保留副本。科学运行进度 **5/6**。seed55 的唯一 GPU1 wrapper PID `806469` 已通过 `PREFLIGHT_OK` 并开始训练；不启动第二个等待器。
