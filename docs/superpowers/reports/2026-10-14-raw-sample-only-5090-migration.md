@@ -44,4 +44,14 @@ ISOLET、UPMC 和 CIFAR-100 数据已复制到 `/home/c5090/VF-CL-data`；五个
 
 双卡 3080 的 GPU1 也可作为同等备用：`start_dev_gpu1.sh` 仅将可见设备与空闲检查从 GPU0 改为 GPU1，SHA-256 为 `59c26218d663176457d96386860930df8262a24c33f74e3b025bbe3bbd9db673`，已复制到同一备用根并通过语法检查。两脚本只能选一份启动，且启动前均须先完成 5090-2 唯一等待器的安全撤销。
 
+## 3080 GPU1 实际启动与临时目录修复
+
+2026-10-16 20:50 CST，3080 的 GPU1 先空闲。确认 5090-2 仍没有运行目录、训练日志或退出读数后，只停止它的等待器 PID `1510676`，留存 SHA-256 为 `8236afabb36a4fd1689597db10d378b264fe36a8637177a1f28f87203ded45cf` 的 `training_started=false` 迁移证据。3080 按该证据、前组归档、源码/配置/数据 SHA、GPU1 空闲及 `/brf` 空间检查后启动唯一任务。
+
+首次 3080 备用根在 `event_0_CIL` 的数据加载阶段报告 `OSError: AF_UNIX path too long`。追查发现启动脚本把 `TMPDIR` 指向约 89 字符的持久结果路径；Python multiprocessing 再附加套接字名，超过 Unix 路径限制。该运行没有冻结文件或开发留出读数；只对自己的 pilot PID `136997` 发 `TERM`，wrapper 记录退出码 `143`。保留失败目录、日志和迁移证据，不将其计入六组。
+
+在同一 Python 环境下用短 `/tmp` 目录创建 Unix multiprocessing listener 成功，监听地址长 `36` 字符。因此另建结果根 `/brf/users/yangxx/VFCL-results/adaptive20-sample-replay-only-dev-20261016-3080-v2`，仅把临时套接字目录设为 `/tmp`，完整运行输出仍落在持久 `/brf`；脚本还核对旧运行退出码 `143` 且无读数。新配置 SHA-256 `1d4de4d438051f62174bc66b8166685f63b07bcf7675fb48194609616208e434`、清单 SHA-256 `a0ed87dd346c9054b50c7cf41740bb272e98b31e25687df76bd55587bf488c76`、GPU1 脚本 SHA-256 `2d0c4ec9163bd4d812d7053354ab1528f0b4b530955e92a7e7aa1a2a55c4c69d` 已远端核对；训练源码仍固定不变。
+
+新 wrapper PID `149657` 于约 20:52 CST 启动，通过预检且进入 `event_0_CIL`；此时尚无退出读数。继续监控日志及持久磁盘，成功后再做冻结/留出/零正式测试审计和本机全文件备份。
+
 待全部六组完成后，最终台账须标注 seed54 与后续组分属不同 GPU，运行时间不得直接做跨机器速度比较。旧 P0R1 仅可作为机制不同的参考，不能冒充本模式的结果。

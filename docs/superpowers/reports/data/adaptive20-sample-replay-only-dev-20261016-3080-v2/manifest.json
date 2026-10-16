@@ -1,0 +1,46 @@
+{
+  "data_sha256": {
+    "cifar": {
+      "meta": "a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9",
+      "test": "4b67687d9933c4db8f0831104447f15b93774f4f464bd0516f0f0f2ac83b7864",
+      "train": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b"
+    },
+    "isolet": "d34312670de93198afcd2b126c95b79bae2b4cffeb30d480f097faf046b69514",
+    "upmc": "dea0569f0d4195eaaecc9cab3a6cce533f07b8d88472e7dbca5113152a314339"
+  },
+  "expected_holdout_manifest_sha256": {
+    "cifar": "ebd998fca72f673bd933832f6a0f2b3f6fb6368170c5d0c05e12fb4896860dc7",
+    "isolet": "d1bab580ecab91b054a4bd7f21fde9d30612270c845da52daed899dabb7e00d7",
+    "upmc": "21ce856b3b28c80c57640d6948b7eb1c65f622e0711bded1f77837165ab006e4"
+  },
+  "expected_prototype_bytes": 0,
+  "formal_test_access_allowed": false,
+  "gpu": 0,
+  "host": "vf-cl-3080-nas",
+  "migration_note": "v1 reached event0 but AF_UNIX path too long from long TMPDIR; exit143 after own pilot stopped, no readout. v2 uses short /tmp for sockets, all results persist on /brf.",
+  "raw_capacity_per_class": 20,
+  "results_root": "/brf/users/yangxx/VFCL-results/adaptive20-sample-replay-only-dev-20261016-3080-v2",
+  "runs": [
+    {
+      "allowed_changed_fields_from_P0R1": [
+        "data_path",
+        "exp_name",
+        "feat_distill_weight",
+        "output_dir",
+        "party_drift_telemetry",
+        "proto_sdc",
+        "results_dir",
+        "sample_replay_only",
+        "vector_npz"
+      ],
+      "config_sha256": "1d4de4d438051f62174bc66b8166685f63b07bcf7675fb48194609616208e434",
+      "dataset": "isolet",
+      "output_dir": "/brf/users/yangxx/VFCL-results/adaptive20-sample-replay-only-dev-20261016-3080-v2/isolet_seed55_SAMPLE_ONLY",
+      "run": "isolet_seed55_SAMPLE_ONLY",
+      "seed": 55
+    }
+  ],
+  "schema_version": 1,
+  "source_commit": "99e1da7e05e7eeb8b57587b6d3a75c6eaa490066",
+  "status": "registered_training_only_development"
+}
