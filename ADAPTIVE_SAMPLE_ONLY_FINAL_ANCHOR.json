@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "experiment": "adaptive-sample-only-fourparty-v1-20261017",
+  "status": "final_gate_and_paired_tables_independently_verified",
+  "results_root": "/brf/users/yangxx/VFCL-results/adaptive-sample-only-fourparty-v1-20261017",
+  "producer_commit": "e2a559dc4945729848225cf21fdc95451762c231",
+  "audit_commit": "0474731423ca6ce9db03a413792f33e519306ed4",
+  "prelaunch_protocol_anchor_commit": "af553688aaf7ce4d204fa76e76bd01a0453d6085",
+  "prelaunch_protocol_anchor_sha256": "6f0b98e8b371bfe10cc66e3d7bf7f2acad44b8cfbbaeed749bdb0878b82b5ef2",
+  "basic_passed": 9,
+  "numeric_seed": 42,
+  "numeric_passed": 3,
+  "verified_original_trees": 9,
+  "final_gate": {
+    "relative_path": "audit/FINAL_GATE.json",
+    "sha256": "ff378d1d80abf571ec2d222fdbf5c19f1dc28e529a5ce64d44f7a3a84e05cbad"
+  },
+  "ledger": {
+    "relative_path": "audit/attestations.jsonl",
+    "sha256": "0f51cc016562bfbccfc01fc298160fe3d3248adcd3d4124f346eaceb173554c8",
+    "chain_head_sha256": "f4b1a692d65c15481a764d5a974d4f01eb7c25e999fef90ce0c45ac3d47162b2"
+  },
+  "all_methods_table": {
+    "relative_path": "summary/ALL_METHODS_METRICS.csv",
+    "rows": 39,
+    "sha256": "4c5ed939942749daa5361b28df3d18ca272f81fe3c5076d7d70567c70baa647a"
+  },
+  "paired_comparison_table": {
+    "relative_path": "summary/SAMPLE_ONLY_PAIRED_COMPARISON.csv",
+    "rows": 3,
+    "sha256": "ceff8603dbb18b8a5f443459535fbfa4fc7b983dcf9812c048b3a85680c45720"
+  },
+  "interpretation": "Secondary bundled raw-sample-memory ablation; strict equal-resource comparison is not established."
+}
