@@ -13,8 +13,8 @@ class AdaptiveFinalStateTests(unittest.TestCase):
     def test_sdc_sampler_passes_preserve_training_batch_identity(self):
         run = Path(os.environ.get(
             'ADAPTIVE9_PILOT_RUN',
-            '/brf/users/yangxx/VFCL-results/adaptive9-fullschedule-'
-            'preflight-20261015/run'))
+            '/brf/users/yangxx/VFCL-results/sampleonly-upmc_food101-'
+            'preflight-20261017/upmc_food101/adaptive/42/run'))
         if not run.is_dir():
             self.skipTest('isolated Linux pilot is not mounted')
         config = json.loads((run / 'config.json').read_text(encoding='utf-8'))
@@ -26,8 +26,8 @@ class AdaptiveFinalStateTests(unittest.TestCase):
     def test_four_party_adaptive_checkpoint_strictly_restores(self):
         run = Path(os.environ.get(
             'ADAPTIVE9_PILOT_RUN',
-            '/brf/users/yangxx/VFCL-results/adaptive9-fullschedule-'
-            'preflight-20261015/run'))
+            '/brf/users/yangxx/VFCL-results/sampleonly-upmc_food101-'
+            'preflight-20261017/upmc_food101/adaptive/42/run'))
         if not run.is_dir():
             self.skipTest('isolated Linux pilot is not mounted')
         config = json.loads((run / 'config.json').read_text(encoding='utf-8'))
@@ -41,7 +41,7 @@ class AdaptiveFinalStateTests(unittest.TestCase):
             evaluation=complete['evaluation'],
             party_col_ranges=[(0, 256), (256, 512),
                               (512, 1024), (1024, 1536)],
-            producer_root='/tmp/vfcl-adaptive9-v1')
+            producer_root='/tmp/vfcl-sampleonly-producer-preflight-v1')
         self.assertEqual(checked['method'], 'proto_evolve')
         self.assertTrue(checked['strict_reloaded'])
 

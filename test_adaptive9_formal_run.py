@@ -11,11 +11,14 @@ from adaptive9_evidence import (
 
 
 RUN = Path('/brf/users/yangxx/VFCL-results/'
-           'adaptive9-v2-fullschedule-preflight-20261015/run')
+           'sampleonly-upmc_food101-preflight-20261017/'
+           'upmc_food101/adaptive/42/run')
 ISOLET_5090_RUN = Path('/brf/users/yangxx/VFCL-results/'
-                       'adaptive9-isolet-5090-preflight-20261015/run')
+                       'sampleonly-isolet-preflight-20261017/'
+                       'isolet/adaptive/42/run')
 CIFAR_5090_RUN = Path('/brf/users/yangxx/VFCL-results/'
-                      'adaptive9-cifar-fullschedule-5090-preflight-20261015/run')
+                      'sampleonly-cifar100-preflight-20261017/'
+                      'cifar100/adaptive/42/run')
 
 
 class AdaptiveRunEvidenceTests(unittest.TestCase):
@@ -69,8 +72,8 @@ class AdaptiveRunEvidenceTests(unittest.TestCase):
         checked = verify_run(
             CIFAR_5090_RUN, dataset='cifar100', seed=42,
             expected_epochs=1,
-            producer_commit='9973018295da270fd6098de07dcf36b9fe65ff61',
-            producer_root=Path('/tmp/vfcl-adaptive9-v3'),
+            producer_commit='e2a559dc4945729848225cf21fdc95451762c231',
+            producer_root=Path('/tmp/vfcl-sampleonly-producer-preflight-v1'),
             data_root=Path('/brf/users/yangxx/VF-CL/data'))
         self.assertEqual(checked['admission'], 'pilot')
         self.assertGreater(checked['flow']['batches'], 0)
@@ -81,8 +84,8 @@ class AdaptiveRunEvidenceTests(unittest.TestCase):
         checked = verify_run(
             ISOLET_5090_RUN, dataset='isolet', seed=42,
             expected_epochs=1,
-            producer_commit='9973018295da270fd6098de07dcf36b9fe65ff61',
-            producer_root=Path('/tmp/vfcl-adaptive9-v3'),
+            producer_commit='e2a559dc4945729848225cf21fdc95451762c231',
+            producer_root=Path('/tmp/vfcl-sampleonly-producer-preflight-v1'),
             data_root=Path('/brf/users/yangxx/VF-CL/data'))
         self.assertEqual(checked['admission'], 'pilot')
         self.assertEqual(len(checked['flow']['party_col_ranges']), 4)
@@ -119,8 +122,8 @@ class AdaptiveRunEvidenceTests(unittest.TestCase):
             verify_run(
                 RUN, dataset='upmc_food101', seed=42,
                 expected_epochs=20,
-                producer_commit='bff98e74e9037e6676a0cf26da9ebc5420ebc6a9',
-                producer_root=Path('/tmp/vfcl-adaptive9-v2'),
+                producer_commit='e2a559dc4945729848225cf21fdc95451762c231',
+                producer_root=Path('/tmp/vfcl-sampleonly-producer-preflight-v1'),
                 data_root=Path('/brf/users/yangxx/VF-CL/data'))
 
     def test_four_party_pilot_replays_frozen_evidence_and_batches(self):
@@ -128,8 +131,8 @@ class AdaptiveRunEvidenceTests(unittest.TestCase):
             self.skipTest('isolated Linux pilot is not mounted')
         checked = verify_run(
             RUN, dataset='upmc_food101', seed=42, expected_epochs=1,
-            producer_commit='bff98e74e9037e6676a0cf26da9ebc5420ebc6a9',
-            producer_root=Path('/tmp/vfcl-adaptive9-v2'),
+            producer_commit='e2a559dc4945729848225cf21fdc95451762c231',
+            producer_root=Path('/tmp/vfcl-sampleonly-producer-preflight-v1'),
             data_root=Path('/brf/users/yangxx/VF-CL/data'))
         self.assertEqual(checked['admission'], 'pilot')
         self.assertEqual(checked['flow']['party_col_ranges'],

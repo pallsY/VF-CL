@@ -11,7 +11,7 @@ from adaptive9_attest import (
 import replay11_attest as ledger
 
 
-PRODUCER = '9973018295da270fd6098de07dcf36b9fe65ff61'
+PRODUCER = 'e2a559dc4945729848225cf21fdc95451762c231'
 AUDIT = 'b' * 40
 ROOT = '/results/full'
 
@@ -43,7 +43,7 @@ class AdaptiveFinalGateTests(unittest.TestCase):
     def test_formal_adaptive_roots_are_pinned_and_separate(self):
         self.assertEqual(FORMAL_RESULTS_ROOT.as_posix(),
                          '/brf/users/yangxx/VFCL-results/'
-                         'adaptive9-fourparty-v1-20261015/full')
+                         'adaptive-sample-only-fourparty-v1-20261017/full')
         self.assertEqual(FORMAL_LEDGER.parent.parent,
                          FORMAL_RESULTS_ROOT.parent)
         self.assertEqual(FORMAL_DATA_ROOT.as_posix(),

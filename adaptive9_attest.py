@@ -22,11 +22,11 @@ DATASETS = ('cifar100', 'isolet', 'upmc_food101')
 SEEDS = (42, 43, 44)
 TASKS = {'cifar100': 10, 'isolet': 13, 'upmc_food101': 10}
 FORMAL_BASE = Path(
-    '/brf/users/yangxx/VFCL-results/adaptive9-fourparty-v1-20261015')
+    '/brf/users/yangxx/VFCL-results/adaptive-sample-only-fourparty-v1-20261017')
 FORMAL_RESULTS_ROOT = FORMAL_BASE / 'full'
 FORMAL_LEDGER = FORMAL_BASE / 'audit/attestations.jsonl'
 FORMAL_DATA_ROOT = Path('/brf/users/yangxx/VF-CL/data')
-FORMAL_PRODUCER_ROOT = Path('/tmp/vfcl-adaptive9-v3')
+FORMAL_PRODUCER_ROOT = Path('/tmp/vfcl-sampleonly-producer-formal-v1')
 
 
 def _verify_numeric_evidence(numeric, basic, job, producer_commit):

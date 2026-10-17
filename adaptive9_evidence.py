@@ -14,7 +14,7 @@ from replay11_numeric import _producer_sources
 
 TASKS = {'cifar100': 10, 'isolet': 13, 'upmc_food101': 10}
 EPOCHS = {'cifar100': 50, 'isolet': 50, 'upmc_food101': 20}
-APPROVED_PRODUCER_COMMIT = '9973018295da270fd6098de07dcf36b9fe65ff61'
+APPROVED_PRODUCER_COMMIT = 'e2a559dc4945729848225cf21fdc95451762c231'
 RUNTIME = {
     'python': '3.11.15', 'torch': '2.5.1+cu124',
     'torchvision': '0.20.1+cu124', 'numpy': '1.24.4',
@@ -26,6 +26,39 @@ HOST_PYTHON = {
     'c5090.upcbrfed.xyz': '/var/tmp/vfcl-adaptive9-yangxx/venv/bin/python',
 }
 HOST_GPU_COUNT = {'c3080.upcbrfed.xyz': 2, 'c5090.upcbrfed.xyz': 1}
+
+
+def verify_sample_only_state(checkpoint, config):
+    """Require bounded raw memory and no persistent feature replay."""
+    import torch
+    from runner import _decode_checkpoint_value
+
+    required = {
+        'sample_replay_only': 1,
+        'proto_replay_gradient_enabled': 0,
+        'proto_sdc': False,
+        'feat_distill_weight': 0.0,
+        'head_consolidation_samples_per_class': 20,
+    }
+    if any(config.get(key) != value for key, value in required.items()):
+        raise ValueError('sample-only configuration differs')
+    if type(checkpoint) is not dict:
+        raise ValueError('sample-only checkpoint differs')
+    state = _decode_checkpoint_value(checkpoint.get('cl_state'))
+    tasks = checkpoint.get('seen_task_classes')
+    if type(state) is not dict or type(tasks) is not dict:
+        raise ValueError('sample-only checkpoint state differs')
+    classes = [class_id for group in tasks.values() for class_id in group]
+    raw = state.get('head_raw_replay')
+    if (state.get('global_protos') != {}
+            or state.get('prev_protos') != {}
+            or type(raw) is not dict or len(classes) != len(set(classes))
+            or set(raw) != set(classes)
+            or any(not isinstance(value, torch.Tensor)
+                   or value.ndim < 2 or value.shape[0] != 20
+                   for value in raw.values())):
+        raise ValueError('sample-only replay state differs')
+    return len(classes)
 
 
 def validate_runtime(runtime, interpreter):
@@ -103,6 +136,10 @@ def verify_run(run_dir, *, dataset, seed, expected_epochs,
         'head_consolidation_enabled': 1,
         'head_consolidation_mode': 'adaptive_dual_branch',
         'formal_deferred_evaluation': True,
+        'sample_replay_only': 1,
+        'proto_replay_gradient_enabled': 0,
+        'proto_sdc': False,
+        'feat_distill_weight': 0.0,
     }
     if any(config.get(key) != value for key, value in expected.items()):
         raise ValueError('adaptive configuration differs')
@@ -153,6 +190,10 @@ def verify_run(run_dir, *, dataset, seed, expected_epochs,
                     or baseline.sha256_file(shared._file(run / expected_path))
                     != record.get('sha256')):
                 raise ValueError('adaptive snapshot bytes differ')
+        from adaptive_consolidation_audit import _safe_torch_load
+        snapshot = _safe_torch_load(
+            shared._file(run / f'formal_snapshots/event_{task}_CIL.pt'))
+        verify_sample_only_state(snapshot, config)
     checkpoint = shared._file(run / 'checkpoints/formal_final.pt')
     result_path = shared._file(run / 'results.json')
     if (published.get('checkpoint', {}).get('sha256')
@@ -176,6 +217,7 @@ def verify_run(run_dir, *, dataset, seed, expected_epochs,
         evaluation=complete['evaluation'],
         party_col_ranges=flow['party_col_ranges'],
         producer_root=producer_root)
+    verify_sample_only_state(_safe_torch_load(checkpoint), config)
     metrics = baseline.metrics_from_history(
         result['task_acc_history'], TASKS[dataset], deferred=True)
     return {
