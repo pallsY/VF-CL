@@ -44,6 +44,8 @@ def command_for(dataset, seed, *, python, worktree, results_dir,
     options.update(
         data_path=str(data_root), results_dir=str(results_dir),
         device=str(device), exp_name='run', formal_deferred_evaluation=True,
+        sample_replay_only=1, proto_replay_gradient_enabled=0,
+        proto_sdc=False, feat_distill_weight=0.0,
     )
     if dataset == 'upmc_food101':
         options['num_parties'] = 4
@@ -71,6 +73,10 @@ def validate_completed_run(dataset, seed, run_dir):
         'cl_method': 'proto_evolve', 'head_consolidation_enabled': 1,
         'head_consolidation_mode': 'adaptive_dual_branch',
         'formal_deferred_evaluation': True,
+        'sample_replay_only': 1,
+        'proto_replay_gradient_enabled': 0,
+        'proto_sdc': False,
+        'feat_distill_weight': 0.0,
     }
     if any(config.get(key) != value for key, value in expected.items()):
         raise ValueError('adaptive run identity differs from frozen comparison')
@@ -85,6 +91,15 @@ def validate_completed_run(dataset, seed, run_dir):
     if payload.get('schema_version') != 4 or payload.get('protocol', {}).get(
             'formal_deferred_evaluation') is not True:
         raise ValueError('adaptive formal checkpoint protocol differs')
+    state = payload.get('cl_state')
+    if (type(state) is not dict or state.get('global_protos')
+            or state.get('prev_protos')):
+        raise ValueError('sample-only final checkpoint contains prototypes')
+    raw = state.get('head_raw_replay')
+    if (type(raw) is not dict or len(raw) != int(config['num_classes'])
+            or any(getattr(samples, 'shape', (0,))[0] != 20
+                   for samples in raw.values())):
+        raise ValueError('sample-only final checkpoint raw memory differs')
     snapshots = [run_dir / 'formal_snapshots' / f'event_{task}_CIL.pt'
                  for task in range(expected_tasks)]
     transaction = prepare_formal_deferred_evaluation(

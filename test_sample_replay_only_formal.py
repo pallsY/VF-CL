@@ -9,6 +9,10 @@ import torch
 
 import config
 import cl_methods.proto_evolve as proto_evolve
+import adaptive9_matrix as matrix
+import replay11_matrix as baseline
+import three_dataset_formal_registry as registry
+from pathlib import Path
 from test_proto_evolve_adaptive_head import TinyTrainer
 
 
@@ -30,6 +34,53 @@ def sample_args(output_dir):
 
 
 class SampleReplayOnlyFormalTest(unittest.TestCase):
+    def test_nine_commands_match_formal_adaptive_except_declared_switches(self):
+        switches = {
+            'sample_replay_only': '1',
+            'proto_replay_gradient_enabled': '0',
+            'proto_sdc': '0',
+            'feat_distill_weight': '0.0',
+        }
+        for dataset in baseline.DATASETS:
+            for seed in baseline.SEEDS:
+                with self.subTest(dataset=dataset, seed=seed):
+                    command = matrix.command_for(
+                        dataset, seed, python=Path('/python'),
+                        worktree=Path('/code'), results_dir=Path('/results'),
+                        data_root=Path('/data'), device='cuda:0')
+                    actual = dict(zip(
+                        (token[2:] for token in command[3::2]),
+                        command[4::2],
+                    ))
+                    expected = dict(registry.protocol_for(
+                        registry.FormalSpec(dataset, 'adaptive', seed)
+                    )['base_options'])
+                    expected.update(
+                        data_path=str(Path('/data')),
+                        results_dir=str(Path('/results')),
+                        device='cuda:0', exp_name='run',
+                        formal_deferred_evaluation=True,
+                    )
+                    if dataset == 'upmc_food101':
+                        expected['num_parties'] = 4
+                        expected['vector_npz'] = str(
+                            Path('/data') / baseline.UPMC_FOUR_CACHE)
+                    elif dataset == 'isolet':
+                        expected['vector_npz'] = str(
+                            Path('/data') / 'isolet/isolet_vfl.npz')
+                    expected = {
+                        key: registry._option_token(key, value)
+                        for key, value in expected.items()
+                    }
+                    for key in switches:
+                        expected.pop(key, None)
+                    self.assertEqual({k: v for k, v in actual.items()
+                                      if k not in switches}, expected)
+                    self.assertEqual({k: actual.get(k) for k in switches},
+                                     switches)
+                    self.assertEqual(actual['distill_weight'], '0.25')
+                    self.assertEqual(actual['num_parties'], '4')
+
     def test_validator_rejects_any_feature_replay_path(self):
         with tempfile.TemporaryDirectory() as output_dir:
             args = sample_args(output_dir)
