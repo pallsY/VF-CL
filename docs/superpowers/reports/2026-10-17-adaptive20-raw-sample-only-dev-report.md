@@ -27,12 +27,18 @@
 
 表中的缓存字节只计持久回放记忆，不代表模型、FIM、优化器或 GPU 的总占用。
 
+## 读数观察
+
+两种子平均 Class-IL / Task-IL 在 ISOLET 为 `90.82% / 99.28%`，UPMC 为 `79.33% / 92.22%`，CIFAR-100 为 `35.28% / 74.10%`。CIFAR-100 的 Task-IL 与 Class-IL 相差 `38.82` 个百分点，说明在这个开发留出协议下，跨任务统一判别比给定任务后的判别更困难。这只是本模式的描述性读数；两种子与不同机器的运行不足以支持相对其他机制的因果或速度结论。
+
 ## 归档与限制
 
-ISOLET seed54/55 的完整档案各含 49 个文件，SHA-256 分别为 `e8087cde248bf4499baabb678149f354d18a2c7cba8a316ea90fb4a3ff9b4d94`、`fdb1b224f9213338508a463c68a8321017e79dc307991f646093f679841db410`。UPMC seed54/55 的完整档案各含 40 个文件，SHA-256 分别为 `7e7365f78c01861010cce20d6103fb1b7e18639eb86c0d20c839945796718509`、`244842db4cb7c6f14f903576c9964061a6d27a3a6377adb3f0820d8bdafd662d`。四组均按逐文件清单校验通过，且仅在本机完整验证后写入远端 `ARCHIVED`。3080 的 UPMC 运行目录还保留在持久 `/brf` 的独立归档位置。
+下列完整档案位于本机 `D:\VF-CL-ablation-archive-20261012\`；本机 C 盘的逐组读数位于 `C:\Users\30783\Documents\VF-CL-sample-only-results-20261014\`。
 
-CIFAR-100 seed54 的完整 41 文件档案 `raw-only-cifar-seed54-full-3080-v1.tar.gz` 的 SHA-256 为 `29980ae2ee48436865f755fe8a0ff8223a692a28ca941fc36a33b57aadb37c42`，已逐文件核验。其开发留出清单有 2500 个样本，SHA-256 为 `ebd998fca72f673bd933832f6a0f2b3f6fb6368170c5d0c05e12fb4896860dc7`。访问记录只有开发验证集；本机核验后才写远端归档标记并保留 `/brf` 副本。
+ISOLET seed54/55 的完整档案 `raw-only-isolet-seed54-full-4090-v1.tar.gz`、`raw-only-isolet-seed55-full-3080-v2.tar.gz` 各含 49 个文件，SHA-256 分别为 `e8087cde248bf4499baabb678149f354d18a2c7cba8a316ea90fb4a3ff9b4d94`、`fdb1b224f9213338508a463c68a8321017e79dc307991f646093f679841db410`。UPMC seed54/55 的完整档案 `raw-only-upmc-seed54-full-3080-v1.tar.gz`、`raw-only-upmc-seed55-full-3080-v1.tar.gz` 各含 40 个文件，SHA-256 分别为 `7e7365f78c01861010cce20d6103fb1b7e18639eb86c0d20c839945796718509`、`244842db4cb7c6f14f903576c9964061a6d27a3a6377adb3f0820d8bdafd662d`。四组均按逐文件清单校验通过，且仅在本机完整验证后写入远端 `ARCHIVED`。3080 的 UPMC 运行目录还保留在持久 `/brf` 的独立归档位置。
+
+CIFAR-100 seed54/55 的完整档案各含 41 个文件。`raw-only-cifar-seed54-full-3080-v1.tar.gz` 的 SHA-256 为 `29980ae2ee48436865f755fe8a0ff8223a692a28ca941fc36a33b57aadb37c42`，`raw-only-cifar-seed55-full-3080-v1.tar.gz` 的 SHA-256 为 `0e80657b973a80dae81a83349a720879f8ebd200b61850ad357fbb4fd5bc8376`，均已逐文件核验。两组开发留出清单各有 2500 个样本、SHA-256 均为 `ebd998fca72f673bd933832f6a0f2b3f6fb6368170c5d0c05e12fb4896860dc7`。访问记录只有开发验证集；本机核验后才写远端归档标记并保留 `/brf` 副本。
 
 旧 [Adaptive20 回放因子实验](2026-10-12-adaptive20-replay-factorial-pilot.md) 的 P0R1 只关闭原型回放损失梯度，仍可能通过 SDC 等路径使用原型，并保留不同的损失系数；其训练源码与本实验也不同。旧 P0R1 因而只是机制不同的参考，不能视作本模式或纯 ER 的对照。新模式也保留 logit/party 蒸馏、FIM、BiC 与最终头整合。
 
-机器可读的逐组数值及哈希见 [台账](data/adaptive20-raw-sample-only-dev-ledger.csv)。CIFAR-100 seed55 已退出 `0`，其完整档案仍待本机逐文件核验；核验后补齐归档证据。
+机器可读的逐组数值及哈希见 [台账](data/adaptive20-raw-sample-only-dev-ledger.csv)。六组均退出 `0`，保留冻结状态与正式评估待办标记，本机完整档案与远端逐文件清单一致；正式测试加载器与 `results.json` 均未使用。
