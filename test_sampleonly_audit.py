@@ -15,6 +15,14 @@ class SampleOnlyAuditTests(unittest.TestCase):
             'proto_sdc': False,
             'feat_distill_weight': 0.0,
             'head_consolidation_samples_per_class': 20,
+            'head_consolidation_schedule': 'final',
+            'distill_weight': 0.25,
+            'distill_weight_schedule': 'constant',
+            'proto_lambda_a': 0.15,
+            'proto_replay_loss_norm': 'sample_mean',
+            'dep_tracking_enabled': 1,
+            'party_kd_enabled': 1,
+            'party_kd_mode': 'uniform',
         }
         self.checkpoint = {
             'seen_task_classes': {0: [0, 1]},
@@ -52,6 +60,17 @@ class SampleOnlyAuditTests(unittest.TestCase):
                 ('proto_replay_gradient_enabled', 1),
                 ('proto_sdc', True),
                 ('feat_distill_weight', 0.05)):
+            with self.subTest(key=key):
+                with self.assertRaisesRegex(ValueError, 'sample-only'):
+                    evidence.verify_sample_only_state(
+                        self.checkpoint, dict(self.config, **{key: value}))
+
+    def test_rejects_extra_training_advantages(self):
+        for key, value in (
+                ('distill_weight', 0.5),
+                ('head_consolidation_schedule', 'every'),
+                ('head_consolidation_samples_per_class', 40),
+                ('party_kd_mode', 'static')):
             with self.subTest(key=key):
                 with self.assertRaisesRegex(ValueError, 'sample-only'):
                     evidence.verify_sample_only_state(

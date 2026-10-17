@@ -10,7 +10,7 @@ from replay11_evidence import (
 
 
 class AdaptiveFinalStateTests(unittest.TestCase):
-    def test_sdc_sampler_passes_preserve_training_batch_identity(self):
+    def test_sample_only_training_batches_preserve_identity(self):
         run = Path(os.environ.get(
             'ADAPTIVE9_PILOT_RUN',
             '/brf/users/yangxx/VFCL-results/sampleonly-upmc_food101-'

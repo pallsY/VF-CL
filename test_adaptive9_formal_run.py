@@ -78,7 +78,7 @@ class AdaptiveRunEvidenceTests(unittest.TestCase):
         self.assertEqual(checked['admission'], 'pilot')
         self.assertGreater(checked['flow']['batches'], 0)
 
-    def test_one_gpu_source_restores_on_two_gpu_audit_host(self):
+    def test_isolet_sample_only_pilot_restores(self):
         if not ISOLET_5090_RUN.is_dir():
             self.skipTest('cross-host ISOLET pilot is not mounted')
         checked = verify_run(

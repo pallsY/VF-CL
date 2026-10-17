@@ -39,6 +39,14 @@ def verify_sample_only_state(checkpoint, config):
         'proto_sdc': False,
         'feat_distill_weight': 0.0,
         'head_consolidation_samples_per_class': 20,
+        'head_consolidation_schedule': 'final',
+        'distill_weight': 0.25,
+        'distill_weight_schedule': 'constant',
+        'proto_lambda_a': 0.15,
+        'proto_replay_loss_norm': 'sample_mean',
+        'dep_tracking_enabled': 1,
+        'party_kd_enabled': 1,
+        'party_kd_mode': 'uniform',
     }
     if any(config.get(key) != value for key, value in required.items()):
         raise ValueError('sample-only configuration differs')
