@@ -114,6 +114,17 @@ class ResourceLedgerTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'producer'):
             self.read()
 
+    def test_legacy_gate_requires_separately_pinned_ledger_hash(self):
+        gate_path = self.base / 'audit/FINAL_GATE.json'
+        self.gate.pop('ledger_sha256')
+        gate_path.write_text(json.dumps(self.gate))
+        self.authority['gate_sha256'] = digest(gate_path.read_bytes())
+        self.authority['ledger_sha256'] = digest(b'fixed-ledger\n')
+        self.assertEqual(self.read()['final_raw_examples'], 2)
+        self.authority['ledger_sha256'] = '0' * 64
+        with self.assertRaisesRegex(ValueError, 'ledger'):
+            self.read()
+
     def test_changed_checkpoint_and_wrong_party_count_are_rejected(self):
         (self.run / 'checkpoints/formal_final.pt').write_bytes(b'changed')
         with self.assertRaisesRegex(ValueError, 'checkpoint'):

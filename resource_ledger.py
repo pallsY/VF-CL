@@ -22,7 +22,8 @@ DATA_ROOT = '/brf/users/yangxx/VF-CL/data'
 
 
 def _authority(name, folder, jobs_folder, gate_folder, gate_sha,
-               producer, auditor, basic, numeric, methods):
+               producer, auditor, basic, numeric, methods,
+               ledger_sha=None):
     base = RESULTS / folder
     return {
         'name': name, 'base': base, 'jobs_root': base / jobs_folder,
@@ -31,6 +32,7 @@ def _authority(name, folder, jobs_folder, gate_folder, gate_sha,
         'producer_commit': producer, 'audit_commit': auditor,
         'basic_passed': basic, 'numeric_passed': numeric,
         'methods': methods, 'data_root': DATA_ROOT,
+        'ledger_sha256': ledger_sha,
     }
 
 
@@ -40,7 +42,8 @@ AUTHORITIES = (
         'fc4b555de0451181ac15fe51f6bc94a5183f8d1e633070c74bc79680f6f392ec',
         '467611a603c9604ad57861920495a3ad05612037',
         '8029edebd1b7f981ef75624a90150631c41de5ab',
-        99, 33, BASELINE_METHODS),
+        99, 33, BASELINE_METHODS,
+        '05254e79e522592cb92077c7839a64ea3e53ceb3d157e9380be6f36e30a52e20'),
     _authority(
         'original_adaptive', 'adaptive9-fourparty-v1-20261015',
         'full', 'audit',
@@ -81,8 +84,11 @@ def verify_authority(authority):
             or gate.get('numeric_passed') != authority['numeric_passed']):
         raise ValueError(f"frozen gate identity differs: {authority['name']}")
     ledger_path = gate_path.parent / 'attestations.jsonl'
-    if (not ledger_path.is_file()
-            or file_sha256(ledger_path) != gate.get('ledger_sha256')):
+    pinned_ledger = authority.get('ledger_sha256') or gate.get('ledger_sha256')
+    if (not pinned_ledger or (gate.get('ledger_sha256') is not None
+                              and gate['ledger_sha256'] != pinned_ledger)
+            or not ledger_path.is_file()
+            or file_sha256(ledger_path) != pinned_ledger):
         raise ValueError(f"frozen ledger differs: {authority['name']}")
     return gate
 
