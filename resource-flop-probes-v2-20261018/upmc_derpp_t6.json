@@ -1,0 +1,17 @@
+{
+  "coverage": "torch FlopCounterMode supported ops only; no final-head fit",
+  "device": "cpu",
+  "flop_counter_total": 830865408,
+  "input_origin": "synthetic_current_task_shape; no test data",
+  "input_shape": [
+    128,
+    1536
+  ],
+  "job": "upmc_food101/der_pp/42",
+  "probe_script_sha256": "7b90650cb8fb593dbcc3c4b3f8edbc1dfe10a15a9635e0cb2ea0f2685c3a2074",
+  "producer_commit": "467611a603c9604ad57861920495a3ad05612037",
+  "profile_task": 6,
+  "schema_version": 1,
+  "snapshot_sha256": "080a9e3dfc9740c34ceacaf2b4697d72907ff0871b59f342dafb88f7ae697a5f",
+  "torch_version": "2.5.1+cu124"
+}

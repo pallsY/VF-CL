@@ -1,0 +1,17 @@
+{
+  "coverage": "torch FlopCounterMode supported ops only; no final-head fit",
+  "device": "cpu",
+  "flop_counter_total": 460914688,
+  "input_origin": "synthetic_current_task_shape; no test data",
+  "input_shape": [
+    128,
+    617
+  ],
+  "job": "isolet/adaptive/42",
+  "probe_script_sha256": "7b90650cb8fb593dbcc3c4b3f8edbc1dfe10a15a9635e0cb2ea0f2685c3a2074",
+  "producer_commit": "e2a559dc4945729848225cf21fdc95451762c231",
+  "profile_task": 4,
+  "schema_version": 1,
+  "snapshot_sha256": "8381c4f689f41e2e79decb8272aa558910efa64ceebce5bc911d45385c179f95",
+  "torch_version": "2.5.1+cu124"
+}

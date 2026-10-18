@@ -1,0 +1,80 @@
+[
+  {
+    "calibration_examples": 0,
+    "flops_measured_complete": false,
+    "head_candidate_steps_unprofiled": 1100,
+    "job": "cifar100/adaptive/42",
+    "model_train_flop_proxy": 16883969189478400,
+    "nominal_optimizer_steps": 35500,
+    "one_batch_flops_max": 496872718336,
+    "one_batch_flops_min": 284193193984,
+    "probe_script_sha256": "7b90650cb8fb593dbcc3c4b3f8edbc1dfe10a15a9635e0cb2ea0f2685c3a2074",
+    "producer_commit": "e2a559dc4945729848225cf21fdc95451762c231",
+    "validation_examples": 2500
+  },
+  {
+    "calibration_examples": 2500,
+    "flops_measured_complete": false,
+    "head_candidate_steps_unprofiled": 0,
+    "job": "cifar100/er_ace/42",
+    "model_train_flop_proxy": 14371809381580800,
+    "nominal_optimizer_steps": 35500,
+    "one_batch_flops_max": 426147053568,
+    "one_batch_flops_min": 213073526784,
+    "probe_script_sha256": "7b90650cb8fb593dbcc3c4b3f8edbc1dfe10a15a9635e0cb2ea0f2685c3a2074",
+    "producer_commit": "467611a603c9604ad57861920495a3ad05612037",
+    "validation_examples": 0
+  },
+  {
+    "calibration_examples": 0,
+    "flops_measured_complete": false,
+    "head_candidate_steps_unprofiled": 1100,
+    "job": "isolet/adaptive/42",
+    "model_train_flop_proxy": 1147915468800,
+    "nominal_optimizer_steps": 2600,
+    "one_batch_flops_max": 460914688,
+    "one_batch_flops_min": 269156352,
+    "probe_script_sha256": "7b90650cb8fb593dbcc3c4b3f8edbc1dfe10a15a9635e0cb2ea0f2685c3a2074",
+    "producer_commit": "e2a559dc4945729848225cf21fdc95451762c231",
+    "validation_examples": 1040
+  },
+  {
+    "calibration_examples": 0,
+    "flops_measured_complete": false,
+    "head_candidate_steps_unprofiled": 0,
+    "job": "isolet/icarl/42",
+    "model_train_flop_proxy": 1208549376000,
+    "nominal_optimizer_steps": 2600,
+    "one_batch_flops_max": 481132544,
+    "one_batch_flops_min": 269156352,
+    "probe_script_sha256": "7b90650cb8fb593dbcc3c4b3f8edbc1dfe10a15a9635e0cb2ea0f2685c3a2074",
+    "producer_commit": "467611a603c9604ad57861920495a3ad05612037",
+    "validation_examples": 0
+  },
+  {
+    "calibration_examples": 0,
+    "flops_measured_complete": false,
+    "head_candidate_steps_unprofiled": 1100,
+    "job": "upmc_food101/adaptive/42",
+    "model_train_flop_proxy": 7093066137600,
+    "nominal_optimizer_steps": 8940,
+    "one_batch_flops_max": 830865408,
+    "one_batch_flops_min": 489160704,
+    "probe_script_sha256": "7b90650cb8fb593dbcc3c4b3f8edbc1dfe10a15a9635e0cb2ea0f2685c3a2074",
+    "producer_commit": "e2a559dc4945729848225cf21fdc95451762c231",
+    "validation_examples": 6464
+  },
+  {
+    "calibration_examples": 0,
+    "flops_measured_complete": false,
+    "head_candidate_steps_unprofiled": 0,
+    "job": "upmc_food101/der_pp/42",
+    "model_train_flop_proxy": 7093066137600,
+    "nominal_optimizer_steps": 8940,
+    "one_batch_flops_max": 830865408,
+    "one_batch_flops_min": 489160704,
+    "probe_script_sha256": "7b90650cb8fb593dbcc3c4b3f8edbc1dfe10a15a9635e0cb2ea0f2685c3a2074",
+    "producer_commit": "467611a603c9604ad57861920495a3ad05612037",
+    "validation_examples": 0
+  }
+]
