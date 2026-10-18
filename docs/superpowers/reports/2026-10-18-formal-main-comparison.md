@@ -2,7 +2,7 @@
 
 ## 口径与完整结果
 
-此表只使用已经冻结、通过审计的 **3 数据集 × 12 方法 × 3 种子 = 108 项正式测试**。每一项的生产提交、`results.json` 文件哈希与 `JOB_SUCCESS.json` 指标已经重新核对；42/43/44 的均值和样本标准差由独立脚本复算。完整 36 行方法汇总在 [CSV](../../../formal_main_summary.csv)与 [JSON](../../../formal_main_summary.json)，每项三个种子的原始读数和结果文件哈希在 [108 行来源 JSON](../../../formal_main_cells.json)。这是一张统一主要实验条件的性能表；[关键因素报告](2026-10-18-key-factor-fairness-audit.md)列出方法特定的验证、存储和计算差异。
+此表只使用已经冻结、通过审计的 **3 数据集 × 12 方法 × 3 种子 = 108 项正式测试**。其中 `original_adaptive` 是同时使用**原始样本回放与原型特征回放**的原方法，最终每类保留 20 个原始样本，并存储类别原型均值/方差；它不是 `sample_only` 仅样本回放版本。每一项的生产提交、`results.json` 文件哈希与 `JOB_SUCCESS.json` 指标已经重新核对；42/43/44 的均值和样本标准差由独立脚本复算。完整 36 行方法汇总在 [CSV](../../../formal_main_summary.csv)与 [JSON](../../../formal_main_summary.json)，每项三个种子的原始读数和结果文件哈希在 [108 行来源 JSON](../../../formal_main_cells.json)。这是一张统一主要实验条件的性能表；[关键因素报告](2026-10-18-key-factor-fairness-audit.md)列出方法特定的验证、存储和计算差异。
 
 | 数据集 | 原 adaptive 最终 CIL AA，均值±样本标准差 | 最强基线 | 基线均值±样本标准差 | 配对均值差（百分点） | adaptive 排名 |
 | --- | ---: | --- | ---: | ---: | ---: |
