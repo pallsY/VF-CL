@@ -151,10 +151,32 @@ def build_holdout_manifest(targets, excluded, per_class, seed, dataset):
     return manifest, indices
 
 
+def paired_vector_validation(targets, args):
+    """Reconstruct the reference split without granting validation access."""
+    manifest = build_manifest(
+        targets,
+        per_class=args.lambda_validation_per_class,
+        seed=args.lambda_validation_split_seed,
+        dataset=f'{Path(args.vector_npz).name}-train',
+    )
+    return manifest, manifest_indices(manifest)
+
+
 class PilotDataset(VFLDataset):
     def __init__(self, args):
         super().__init__(args)
-        excluded = self.calibration_indices | self.validation_indices
+        if args.data == 'tabvfl':
+            paired_manifest, paired_validation = paired_vector_validation(
+                self.trainset.targets, args)
+            if (getattr(args, 'lambda_validation_enabled', 0)
+                    and paired_validation != self.validation_indices):
+                raise ValueError('paired validation reconstruction differs')
+        else:
+            paired_manifest = self.validation_manifest
+            paired_validation = self.validation_indices
+        self.pilot_pair_excluded = (
+            self.calibration_indices | paired_validation)
+        excluded = self.pilot_pair_excluded
         self.holdout_manifest, self.holdout_indices = build_holdout_manifest(
             self.trainset.targets, excluded, args.pilot_holdout_per_class,
             args.pilot_holdout_seed, args.pilot_dataset,
@@ -169,11 +191,17 @@ class PilotDataset(VFLDataset):
         path = Path(args.output_dir) / 'pilot_holdout' / 'manifest.json'
         path.parent.mkdir(parents=True, exist_ok=True)
         write_manifest(self.holdout_manifest, path)
+        if paired_manifest is not None:
+            write_manifest(
+                paired_manifest,
+                path.parent / 'paired_validation_manifest.json',
+            )
 
     def _loader(self, dataset, indices, key, shuffle, audit=False):
         if key[0] == 'train':
             indices = [index for index in indices
-                       if index not in getattr(self, 'holdout_indices', set())]
+                       if index not in getattr(self, 'holdout_indices', set())
+                       and index not in getattr(self, 'pilot_pair_excluded', set())]
         return super()._loader(dataset, indices, key, shuffle, audit=audit)
 
     def holdout_loader(self, classes):

@@ -8,8 +8,8 @@ from unittest import mock
 from calibration_split import manifest_indices
 from data_utils import VFLDataset
 from run_resource_lite_pilot import (
-    PilotDataset, StopBeforeTest, build_holdout_manifest, derive_config,
-    expected_tasks,
+    HOLDOUT_SEED, PilotDataset, StopBeforeTest, build_holdout_manifest, derive_config,
+    expected_tasks, paired_vector_validation,
     validate_source_data_hash, validate_training_only_artifacts,
 )
 
@@ -113,6 +113,24 @@ class ResourceLitePilotTests(unittest.TestCase):
         self.assertEqual(len(indices), 20)
         self.assertFalse(indices & excluded)
 
+    def test_pair_uses_same_vector_validation_exclusion_with_gate_disabled(self):
+        labels = [0] * 100 + [1] * 100
+        args = type('Args', (), {
+            'vector_npz': '/data/isolet/isolet_vfl.npz',
+            'lambda_validation_per_class': 10,
+            'lambda_validation_split_seed': 11,
+        })()
+        manifest, indices = paired_vector_validation(labels, args)
+        self.assertEqual(indices, manifest_indices(manifest))
+        self.assertEqual(len(indices), 20)
+        first, holdout = build_holdout_manifest(
+            labels, indices, 5, HOLDOUT_SEED, 'isolet')
+        second, other = build_holdout_manifest(
+            labels, indices, 5, HOLDOUT_SEED, 'isolet')
+        self.assertEqual(first, second)
+        self.assertEqual(holdout, other)
+        self.assertFalse(holdout & indices)
+
     def test_test_loader_and_authorization_are_blocked(self):
         dataset = PilotDataset.__new__(PilotDataset)
         dataset._formal_durable_state = lambda: ([], None)
@@ -127,9 +145,12 @@ class ResourceLitePilotTests(unittest.TestCase):
     def test_train_loader_removes_holdout_indices(self):
         dataset = PilotDataset.__new__(PilotDataset)
         dataset.holdout_indices = {2, 4}
+        dataset.pilot_pair_excluded = {5}
         with mock.patch.object(VFLDataset, '_loader', return_value='loader') as base:
             self.assertEqual(dataset._loader(object(), [1, 2, 3, 4],
                                              ('train', (0,)), True), 'loader')
+            self.assertEqual(base.call_args.args[1], [1, 3])
+            dataset._loader(object(), [1, 2, 3, 4, 5], ('train', (0,)), True)
             self.assertEqual(base.call_args.args[1], [1, 3])
 
     def test_vector_hash_must_match_frozen_data(self):
