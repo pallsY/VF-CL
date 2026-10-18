@@ -1,0 +1,15 @@
+{
+  "bias_steps": 600,
+  "classes": 100,
+  "coverage": "torch FlopCounterMode supported ops for synthetic Full/Bias fitting; validation encoding and gate solver excluded",
+  "embedding_dimension": 512,
+  "full_steps": 500,
+  "head_fit_flop_proxy": 205414400000,
+  "input_origin": "synthetic embeddings; no validation or test data",
+  "job": "cifar100/adaptive/42",
+  "per_class": 20,
+  "probe_script_sha256": "f97852ece6d0fb047ac1d3e8c2be8f6fcce7a5f3d9dc485c72f09a86ed6ccb1a",
+  "producer_commit": "e2a559dc4945729848225cf21fdc95451762c231",
+  "schema_version": 1,
+  "torch_version": "2.5.1+cu124"
+}
