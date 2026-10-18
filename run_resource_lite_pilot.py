@@ -135,7 +135,7 @@ def derive_config(source, root, dataset, seed, variant, *, smoke=False):
             raise ValueError('smoke requires at least two locked tasks')
         result.update(
             num_tasks=2, custom_tasks='|'.join(tasks[:2]),
-            epochs_per_task=1,
+            epochs_per_task=1, device='cpu',
         )
     return result
 
@@ -307,8 +307,8 @@ def run_pilot(config_path):
             or bool(args.resource_lite) != (args.pilot_variant == 'lite18')):
         raise ValueError('config differs from resource-lite pilot')
     if bool(getattr(args, 'pilot_smoke', False)):
-        if args.epochs_per_task != 1:
-            raise ValueError('smoke must use one epoch per task')
+        if args.epochs_per_task != 1 or args.device != 'cpu':
+            raise ValueError('smoke must use one epoch per task on CPU')
     elif args.epochs_per_task != (20 if args.pilot_dataset == 'upmc_food101' else 50):
         raise ValueError('full development budget drifted')
     if args.pilot_variant == 'reference20' and (

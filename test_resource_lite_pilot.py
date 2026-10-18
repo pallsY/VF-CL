@@ -101,6 +101,7 @@ class ResourceLitePilotTests(unittest.TestCase):
         self.assertEqual(config['num_tasks'], 2)
         self.assertEqual(config['custom_tasks'], '0,1|2,3')
         self.assertEqual(config['epochs_per_task'], 1)
+        self.assertEqual(config['device'], 'cpu')
         self.assertTrue(config['output_dir'].endswith('_smoke'))
 
     def test_holdout_excludes_calibration_and_validation(self):
