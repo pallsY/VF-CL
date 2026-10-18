@@ -78,7 +78,8 @@ class ResourceLedgerTests(unittest.TestCase):
         task = 12 if name == 'formal_final.pt' else int(
             name.split('_')[1])
         return {
-            'schema_version': 4, 'task_id': task,
+            'schema_version': 4 if name == 'formal_final.pt' else 1,
+            'task_id': task,
             'trainer_state': {'bottoms': [torch.zeros(2) for _ in range(4)],
                               'top_model': torch.zeros(3)},
             'cl_state': {'data': {0: torch.zeros(2, 3)}},

@@ -93,10 +93,10 @@ def verify_authority(authority):
     return gate
 
 
-def _account_checkpoint(path, method, expected_task):
+def _account_checkpoint(path, method, expected_task, expected_schema):
     payload = _safe_torch_load(path)
     trainer = payload.get('trainer_state')
-    if (payload.get('schema_version') != 4
+    if (payload.get('schema_version') != expected_schema
             or payload.get('task_id') != expected_task
             or type(trainer) is not dict
             or type(trainer.get('bottoms')) is not list
@@ -147,7 +147,8 @@ def read_cell(dataset, method, seed, authority):
     if (final_path.is_symlink() or not final_path.is_file()
             or file_sha256(final_path) != final_hash):
         raise ValueError(f'final checkpoint hash differs: {job}')
-    final = _account_checkpoint(final_path, expected_method, task_count - 1)
+    final = _account_checkpoint(final_path, expected_method,
+                                task_count - 1, 4)
     maxima = {
         'learning_bytes': final['learning_bytes'],
         'raw_examples': final['raw_examples'],
@@ -165,7 +166,7 @@ def read_cell(dataset, method, seed, authority):
                 or not path.is_file()
                 or file_sha256(path) != record.get('sha256')):
             raise ValueError(f'frozen snapshot hash differs: {job}/{task}')
-        measured = _account_checkpoint(path, expected_method, task)
+        measured = _account_checkpoint(path, expected_method, task, 1)
         for key in maxima:
             maxima[key] = max(maxima[key], measured[key])
         ever_teacher |= measured['unserialized_teacher']
