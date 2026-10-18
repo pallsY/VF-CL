@@ -71,6 +71,16 @@ class SelectedBaselineDevPilotTests(unittest.TestCase):
                         derive_config({**source, **change},
                                       folder, 'isolet', 54)
 
+    def test_smoke_preserves_two_task_prefix_and_uses_cpu(self):
+        with tempfile.TemporaryDirectory() as folder:
+            config = derive_config(self.source('isolet'), folder,
+                                   'isolet', 54, smoke=True)
+        self.assertEqual(config['custom_tasks'], '0,1|2,3')
+        self.assertEqual(config['num_tasks'], 2)
+        self.assertEqual(config['epochs_per_task'], 1)
+        self.assertEqual(config['device'], 'cpu')
+        self.assertTrue(config['pilot_smoke'])
+
 
 if __name__ == '__main__':
     unittest.main()

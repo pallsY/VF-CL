@@ -7,7 +7,8 @@ from types import SimpleNamespace
 
 from run_resource_lite_pilot import (
     DATASET_IDENTITY, HOLDOUT_PER_CLASS, HOLDOUT_SEED,
-    PilotDataset, StopBeforeTest, _identity, score_holdout_checkpoint,
+    PilotDataset, StopBeforeTest, _identity, expected_tasks,
+    score_holdout_checkpoint,
     sha256, validate_source_data_hash, validate_training_only_artifacts,
 )
 
@@ -20,8 +21,8 @@ SELECTED = {
 PROTOCOL = 'selected-baseline-train-holdout-v1'
 
 
-def _validate_source(source, dataset):
-    _identity(source, dataset)
+def _validate_source(source, dataset, *, smoke=False):
+    _identity(source, dataset, smoke=smoke)
     method, per_class, split_seed, epochs = SELECTED[dataset]
     if source.get('cl_method') != method:
         raise ValueError('selected baseline method differs')
@@ -32,7 +33,7 @@ def _validate_source(source, dataset):
         'lambda_validation_enabled': 1,
         'lambda_validation_per_class': per_class,
         'lambda_validation_split_seed': split_seed,
-        'epochs_per_task': epochs,
+        'epochs_per_task': 1 if smoke else epochs,
     }
     if any(source.get(key) != value for key, value in required.items()):
         raise ValueError('selected baseline source config drifted')
@@ -40,7 +41,7 @@ def _validate_source(source, dataset):
         raise ValueError('selected baseline calibration drifted')
 
 
-def derive_config(source, root, dataset, seed):
+def derive_config(source, root, dataset, seed, *, smoke=False):
     if dataset not in DATASET_IDENTITY:
         raise ValueError('unknown selected baseline dataset')
     _validate_source(source, dataset)
@@ -49,19 +50,28 @@ def derive_config(source, root, dataset, seed):
     root = (PurePosixPath(root) if str(root).startswith('/')
             else Path(root).resolve())
     method = SELECTED[dataset][0]
-    name = f'{dataset}_seed{seed}_{method}'
-    return {
+    name = f'{dataset}_seed{seed}_{method}' + ('_smoke' if smoke else '')
+    result = {
         **source,
         'seed': seed,
         'pilot_protocol': PROTOCOL,
         'pilot_dataset': dataset,
         'pilot_variant': method,
+        'pilot_smoke': bool(smoke),
         'pilot_holdout_seed': HOLDOUT_SEED,
         'pilot_holdout_per_class': HOLDOUT_PER_CLASS[dataset],
         'results_dir': str(root),
         'output_dir': str(root / name),
         'exp_name': f'selected_baseline_dev_{name}',
     }
+    if smoke:
+        result.update(
+            num_tasks=2,
+            custom_tasks='|'.join(expected_tasks(dataset).split('|')[:2]),
+            epochs_per_task=1,
+            device='cpu',
+        )
+    return result
 
 
 def run_pilot(config_path):
@@ -71,7 +81,8 @@ def run_pilot(config_path):
     config_path = Path(config_path)
     config = json.loads(config_path.read_text(encoding='utf-8'))
     dataset_name = config['pilot_dataset']
-    _validate_source({**config, 'seed': 42}, dataset_name)
+    smoke = bool(config.get('pilot_smoke', False))
+    _validate_source({**config, 'seed': 42}, dataset_name, smoke=smoke)
     method = SELECTED[dataset_name][0]
     if (config.get('pilot_protocol') != PROTOCOL
             or config.get('pilot_variant') != method
@@ -101,6 +112,24 @@ def run_pilot(config_path):
         raise RuntimeError('baseline pilot did not stop before formal test')
     validate_training_only_artifacts(run)
     final_path = run / 'checkpoints' / 'formal_final.pt'
+    if smoke:
+        if args.device != 'cpu':
+            raise ValueError('baseline smoke must run on CPU')
+        gate = {
+            'status': 'two_task_training_only_smoke',
+            'method': method,
+            'seed': args.seed,
+            'dataset': dataset_name,
+            'config_sha256': sha256(run / 'config.json'),
+            'checkpoint_sha256': sha256(final_path),
+            'holdout_manifest_sha256': sha256(
+                run / 'pilot_holdout' / 'manifest.json'),
+        }
+        (run / 'SMOKE_GATE.json').write_text(
+            json.dumps(gate, indent=2, sort_keys=True) + '\n',
+            encoding='utf-8')
+        print(json.dumps(gate, sort_keys=True))
+        return
     result = {
         'status': 'independent_training_holdout_readout',
         'method': method,
@@ -127,6 +156,7 @@ def main():
     prepare.add_argument('--root', required=True)
     prepare.add_argument('--dataset', choices=SELECTED, required=True)
     prepare.add_argument('--seed', type=int, required=True)
+    prepare.add_argument('--smoke', action='store_true')
     run = sub.add_parser('run')
     run.add_argument('--config', type=Path, required=True)
     args = parser.parse_args()
@@ -134,10 +164,12 @@ def main():
         run_pilot(args.config)
         return
     source = json.loads(args.source_config.read_text(encoding='utf-8'))
-    config = derive_config(source, args.root, args.dataset, args.seed)
+    config = derive_config(source, args.root, args.dataset, args.seed,
+                           smoke=args.smoke)
     method = SELECTED[args.dataset][0]
     target = Path(args.root) / (
-        f'{args.dataset}_seed{args.seed}_{method}.config.json')
+        f'{args.dataset}_seed{args.seed}_{method}'
+        f'{"_smoke" if args.smoke else ""}.config.json')
     target.parent.mkdir(parents=True, exist_ok=True)
     with target.open('x', encoding='utf-8') as stream:
         json.dump(config, stream, sort_keys=True, indent=2)
