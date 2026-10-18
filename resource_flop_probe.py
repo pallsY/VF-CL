@@ -46,7 +46,7 @@ def verify_profile_inputs(job, source, task):
     job, source = Path(job), Path(source)
     config = json.loads((job / 'run/config.json').read_text(encoding='utf-8'))
     tasks = parse_task_classes(config)
-    if (not isinstance(task, int) or not 0 < task < len(tasks)
+    if (not isinstance(task, int) or not 0 <= task < len(tasks)
             or config.get('num_parties') != 4):
         raise ValueError('profile task or party count differs')
     plan = json.loads((job / 'JOB_PLAN.json').read_text(encoding='utf-8'))
@@ -57,6 +57,8 @@ def verify_profile_inputs(job, source, task):
         ['git', '-C', str(source), 'status', '--porcelain'], text=True).strip()
     if commit != head or dirty:
         raise ValueError('profile producer source differs')
+    if task == 0:
+        return config, None, commit
     frozen = json.loads((job / 'run/FORMAL_STATE_FROZEN.json').read_text(
         encoding='utf-8'))['identity']
     relative = f'formal_snapshots/event_{task - 1}_CIL.pt'
@@ -87,11 +89,15 @@ def profile_one(job, source, task):
     sys.path.insert(0, str(Path(source).resolve()))
     from adaptive_consolidation_audit import (_fresh_formal_state,
                                                _safe_torch_load)
+    from cl_methods import get_cl_method
+    from models import build_models
+    from vfl_trainer import VFLTrainer
 
     torch.set_num_threads(1)
     torch.manual_seed(0)
     random.seed(0)
-    payload = _safe_torch_load(snapshot_path)
+    payload = (_safe_torch_load(snapshot_path)
+               if snapshot_path is not None else None)
     classes = parse_task_classes(config)
     with tempfile.TemporaryDirectory(prefix='vfcl_resource_flops_') as scratch:
         options = SimpleNamespace(**config)
@@ -105,7 +111,12 @@ def profile_one(job, source, task):
                 if config['num_classes'] == 101 else
                 [(0, 155), (155, 309), (309, 463), (463, 617)]
             )
-        trainer, method, _ = _fresh_formal_state(payload, options)
+        if payload is None:
+            bottoms, top = build_models(options)
+            trainer = VFLTrainer(bottoms, top, options)
+            method = get_cl_method(config['cl_method'], trainer, options)
+        else:
+            trainer, method, _ = _fresh_formal_state(payload, options)
         seen = [label for group in classes[:task + 1] for label in group]
         method.before_task(task, classes[task], seen)
         for holder in (options, method.args, trainer.args):
@@ -123,7 +134,8 @@ def profile_one(job, source, task):
         'schema_version': 1,
         'job': '/'.join(Path(job).parts[-3:]),
         'producer_commit': commit,
-        'snapshot_sha256': _sha(snapshot_path),
+        'snapshot_sha256': (_sha(snapshot_path)
+                            if snapshot_path is not None else None),
         'profile_task': task,
         'input_shape': list(shape),
         'flop_counter_total': counter.get_total_flops(),

@@ -50,6 +50,11 @@ class FlopProbeTests(unittest.TestCase):
         self.assertEqual(actual, config)
         self.assertEqual(path, snapshot)
         self.assertEqual(commit, 'a' * 40)
+        with mock.patch('resource_flop_probe.subprocess.check_output',
+                        side_effect=['a' * 40 + '\n', '']):
+            first, first_path, _ = verify_profile_inputs(job, source, 0)
+        self.assertEqual(first, config)
+        self.assertIsNone(first_path)
         snapshot.write_bytes(b'changed')
         with mock.patch('resource_flop_probe.subprocess.check_output',
                         side_effect=['a' * 40 + '\n', '']):
