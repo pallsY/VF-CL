@@ -33,6 +33,11 @@ SELECTED = (
 RESULTS = Path('/brf/users/yangxx/VFCL-results')
 
 
+def profile_name(dataset, method, task):
+    prefix = 'cifar' if dataset == 'cifar100' else dataset
+    return f'{prefix}_{method}_t{task}.json'
+
+
 def nominal_steps_per_task(flow_path, config):
     tasks = parse_task_classes(config)
     by_classes = {tuple(group): index for index, group in enumerate(tasks)}
@@ -93,7 +98,7 @@ def summarize(profiles_root, access_csv, output_root):
         config = json.loads((job / 'run/config.json').read_text(encoding='utf-8'))
         steps = nominal_steps_per_task(
             job / 'run/data_flow_audit.jsonl', config)
-        profiles = [json.loads((profiles_root / f'{dataset}_{method}_t{task}.json')
+        profiles = [json.loads((profiles_root / profile_name(dataset, method, task))
                                .read_text(encoding='utf-8'))
                     for task in range(tasks)]
         if any(row.get('job') != job_name

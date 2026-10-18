@@ -5,10 +5,17 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from resource_flop_summary import nominal_steps_per_task, weighted_profile
+from resource_flop_summary import (nominal_steps_per_task, weighted_profile,
+                                   profile_name)
 
 
 class FlopSummaryTests(unittest.TestCase):
+    def test_cifar_profile_file_uses_frozen_short_name(self):
+        self.assertEqual(profile_name('cifar100', 'sample', 0),
+                         'cifar_sample_t0.json')
+        self.assertEqual(profile_name('upmc', 'derpp', 9),
+                         'upmc_derpp_t9.json')
+
     def test_weights_each_profile_by_real_task_batch_count(self):
         profiles = [
             {'profile_task': 0, 'flop_counter_total': 10,
