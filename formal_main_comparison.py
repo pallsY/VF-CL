@@ -13,7 +13,7 @@ from resource_ledger import (
 )
 
 
-FACTOR_JSON_SHA256 = 'b84fc16151f1639c8884408cd10eb8770eecc77ccefb13787e7b93ce60acd8a'
+FACTOR_JSON_SHA256 = 'b84fc16151f1639c8884408cd10eb8770eecc77ccefb13787e7b93ce60eacd8a'
 METRICS = ('aa_final_cil', 'bwt_cil', 'task_il_final')
 
 

@@ -1,9 +1,14 @@
 import unittest
 
-from formal_main_comparison import summarize
+from formal_main_comparison import FACTOR_JSON_SHA256, summarize
+from resource_ledger import file_sha256
 
 
 class FormalMainComparisonTests(unittest.TestCase):
+    def test_local_factor_export_matches_pinned_hash(self):
+        self.assertEqual(file_sha256('major_factor_cells.json'),
+                         FACTOR_JSON_SHA256)
+
     def test_three_paired_seeds_and_sample_sd(self):
         rows = []
         for seed, accuracy in ((42, 0.5), (43, 0.6), (44, 0.7)):
