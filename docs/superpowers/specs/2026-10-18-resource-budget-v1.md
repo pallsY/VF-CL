@@ -18,9 +18,9 @@ The first development candidate will use at most **18 original examples per seen
 
 ## Development and selection
 
-Develop only on four-party training/validation data with class-order seeds 54 and 55. The old two-party UPMC development outputs are not reusable. Candidate selection uses validation AA/BWT and resource gates, with ISOLET and UPMC improvement as the main objective and CIFAR non-regression as a guard. Record every attempt, including failures, and never select a change from the already observed 42/43/44 formal test scores. Keep the number of candidate families small: teacher-free training and a predeclared training-only head gate first; head compression only if needed by the byte cap.
+Develop only on four-party training/validation data with random seeds 54 and 55. The class/task sequence is fixed by the shared protocol. The old two-party UPMC development outputs are not reusable. Candidate selection uses validation AA/BWT and resource gates, with ISOLET and UPMC improvement as the main objective and CIFAR non-regression as a guard. Record every attempt, including failures, and never select a change from the already observed 42/43/44 formal test scores. Keep the number of candidate families small: teacher-free training and a predeclared training-only head gate first; head compression only if needed by the byte cap.
 
-If a candidate survives development, freeze source, effective training budget, head rule, data hashes, resource limits, and audit checks before a new formal experiment. Prefer predeclared class-order seeds 45/46/47 and rerun the three selected baselines alongside the candidate. Preserve all results even if a baseline wins. Because earlier work has used the benchmark test images, describe this as a new class-order confirmation rather than a fully untouched external test set.
+If a candidate survives development, freeze source, effective training budget, head rule, data hashes, resource limits, and audit checks before a new formal experiment. Prefer predeclared random seeds 45/46/47 and rerun the three selected baselines alongside the candidate on the same fixed class/task sequence. Preserve all results even if a baseline wins. Because earlier work has used the benchmark test images, describe this as a new-seed confirmation rather than a fully untouched external test set.
 
 ## Current evidence and limits
 
