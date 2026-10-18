@@ -5,16 +5,38 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+import torch
+import torch.nn.functional as F
+
 from calibration_split import manifest_indices
 from data_utils import VFLDataset
 from run_resource_lite_pilot import (
     HOLDOUT_SEED, PilotDataset, StopBeforeTest, build_holdout_manifest, derive_config,
     expected_tasks, paired_vector_validation,
+    score_branch,
     validate_source_data_hash, validate_training_only_artifacts,
 )
 
 
 class ResourceLitePilotTests(unittest.TestCase):
+    def test_holdout_scorer_reports_class_and_task_accuracy(self):
+        logits = torch.tensor([
+            [4., 0., 0., 0.],
+            [0., 4., 0., 0.],
+            [0., 0., 0., 4.],
+            [0., 0., 4., 0.],
+        ])
+        labels = torch.tensor([0, 1, 2, 3])
+        result = score_branch(
+            F.log_softmax(logits, dim=1), labels,
+            {0: [0, 1], 1: [2, 3]},
+        )
+        self.assertEqual(result['count'], 4)
+        self.assertEqual(result['cil'], 0.5)
+        self.assertEqual(result['task_id'], 1.0)
+        self.assertEqual(result['task_il'], 0.5)
+        self.assertEqual(result['per_task_cil'], [1.0, 0.0])
+
     def source(self, dataset='isolet'):
         paths = {
             'isolet': ('isolet/isolet_vfl.npz', 26, 13, 0),

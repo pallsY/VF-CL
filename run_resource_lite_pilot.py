@@ -264,26 +264,87 @@ def validate_source_data_hash(config):
             raise ValueError('pilot vector data hash differs from frozen protocol')
 
 
+def score_branch(log_probs, labels, task_classes):
+    """Aggregate held-out training counts and accuracies without row exports."""
+    if (log_probs.ndim != 2 or labels.ndim != 1
+            or log_probs.shape[0] != labels.numel() or not labels.numel()
+            or not torch.isfinite(log_probs).all()):
+        raise ValueError('invalid holdout scores or labels')
+    n, class_count = log_probs.shape
+    tasks = sorted(task_classes)
+    if tasks != list(range(len(tasks))) or len(tasks) < 2:
+        raise ValueError('invalid task IDs')
+    class_task = torch.full((class_count,), -1, dtype=torch.long)
+    for task_id in tasks:
+        for class_id in task_classes[task_id]:
+            if not 0 <= class_id < class_count or class_task[class_id] >= 0:
+                raise ValueError('invalid task class map')
+            class_task[class_id] = task_id
+    if (bool((class_task < 0).any()) or labels.dtype != torch.long
+            or bool(((labels < 0) | (labels >= class_count)).any())):
+        raise ValueError('incomplete task map or invalid labels')
+    predicted = log_probs.argmax(dim=1)
+    true_task, predicted_task = class_task[labels], class_task[predicted]
+    correct = predicted == labels
+    task_correct = true_task == predicted_task
+    taskil = torch.zeros(n, dtype=torch.bool)
+    per_task_cil, per_task_taskil = [], []
+    for task_id in tasks:
+        mask = true_task == task_id
+        members = torch.tensor(task_classes[task_id], dtype=torch.long)
+        if not bool(mask.any()):
+            raise ValueError('empty task in holdout cohort')
+        local = members[log_probs[mask][:, members].argmax(dim=1)]
+        taskil[mask] = local == labels[mask]
+        per_task_cil.append(float(correct[mask].double().mean()))
+        per_task_taskil.append(float(taskil[mask].double().mean()))
+    old, newest = true_task != tasks[-1], true_task == tasks[-1]
+    confusion = torch.bincount(
+        true_task * len(tasks) + predicted_task,
+        minlength=len(tasks) ** 2,
+    ).reshape(len(tasks), len(tasks)).tolist()
+    return {
+        'count': n,
+        'cil': float(correct.double().mean()),
+        'task_id': float(task_correct.double().mean()),
+        'task_il': float(taskil.double().mean()),
+        'old_cil': float(correct[old].double().mean()),
+        'new_cil': float(correct[newest].double().mean()),
+        'old_to_new_rate': float((old & (predicted_task == tasks[-1])).sum()
+                                 / old.sum()),
+        'new_to_old_rate': float((newest & (predicted_task != tasks[-1])).sum()
+                                 / newest.sum()),
+        'cross_task_error_fraction': float((~task_correct).sum()
+                                           / (~correct).sum())
+        if bool((~correct).any()) else 0.0,
+        'nll': float(-log_probs.gather(1, labels[:, None]).mean()),
+        'per_task_cil': per_task_cil,
+        'per_task_taskil': per_task_taskil,
+        'task_confusion': confusion,
+    }
+
+
 @torch.no_grad()
 def score_holdout_checkpoint(args, dataset, checkpoint):
     import runner
-    from analyze_isolet_head_branches import score_branch
     from data_utils import split_features
     from models import build_models
     from vfl_trainer import VFLTrainer
 
+    score_args = SimpleNamespace(**vars(args))
+    score_args.device = 'cpu'
     payload = runner._decode_checkpoint_value(torch.load(
         checkpoint, map_location='cpu', weights_only=True,
     ))
-    bottoms, top = build_models(args)
-    trainer = VFLTrainer(bottoms, top, args)
+    bottoms, top = build_models(score_args)
+    trainer = VFLTrainer(bottoms, top, score_args)
     trainer.load_state(payload['trainer_state'])
     for model in (*trainer.bottoms, trainer.top_model):
         model.eval()
     logits, labels = [], []
     for batch_x, batch_y in dataset.holdout_loader(
             list(range(args.num_classes))):
-        parts = split_features(batch_x.to(args.device), args)
+        parts = split_features(batch_x.to('cpu'), score_args)
         embedded = [bottom(part) for bottom, part in zip(trainer.bottoms, parts)]
         logits.append(trainer.top_model(trainer._aggregate(embedded)).cpu())
         labels.append(batch_y.cpu())
