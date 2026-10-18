@@ -12,7 +12,7 @@
 
 - Do not edit source commits `467611a6`, `9973018`, `e2a559d`, or any frozen result root.
 - Budget anchor `codex/resource-budget-anchors` at `38fa927eeb9efddd0ccdf99b8254e892b3460a4b` precedes optimization. The initial candidate has at most 18 raw examples per class, no prototypes, no full frozen teacher, and no extra formal vector validation access.
-- Development class-order seeds are 54/55. Official test access is prohibited during development; 42/43/44 results cannot select candidates. Confirmation seeds 45/46/47 and paired baseline reruns require a new frozen protocol.
+- Development random seeds are 54/55 on the fixed class/task order. Official test access is prohibited during development; 42/43/44 results cannot select candidates. Confirmation random seeds 45/46/47 and paired baseline reruns require a new frozen protocol.
 - All dev outputs use new named roots. Preserve failed trials and never count low-budget smoke runs as formal results.
 
 ---
