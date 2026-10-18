@@ -614,9 +614,10 @@ class VFLDataset:
         splits = [item['split'] for item in history]
         if record['split'] in splits:
             raise ValueError('duplicate or stale formal access phase')
-        validation_required = bool(getattr(
-            self.args, 'head_consolidation_enabled', False
-        ))
+        validation_required = (
+            bool(getattr(self.args, 'head_consolidation_enabled', False))
+            and not bool(getattr(self.args, 'resource_lite', 0))
+        )
         calibration_required = (
             bool(getattr(self.args, 'bic_enabled', False))
             and not validation_required

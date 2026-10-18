@@ -8,6 +8,7 @@ import torch
 
 from config import validate_sample_replay_only
 from cl_methods.proto_evolve import ProtoEvolveCL
+from data_utils import VFLDataset
 from test_proto_evolve_adaptive_head import TinyTrainer
 from test_sample_replay_only_formal import sample_args
 
@@ -25,6 +26,31 @@ def lite_args(output_dir):
 
 
 class AdaptiveResourceLiteTests(unittest.TestCase):
+    def test_formal_test_phase_allows_no_vector_validation_only_in_lite_mode(self):
+        dataset = VFLDataset.__new__(VFLDataset)
+        with tempfile.TemporaryDirectory() as output_dir:
+            dataset.args = lite_args(output_dir)
+            dataset.args.bic_enabled = 0
+            dataset._validate_formal_phase_transition({'split': 'test'}, [])
+            with self.assertRaisesRegex(ValueError, 'validation'):
+                dataset._validate_formal_phase_transition(
+                    {'split': 'validation'}, [])
+            dataset.args.resource_lite = 0
+            with self.assertRaisesRegex(ValueError, 'ordered'):
+                dataset._validate_formal_phase_transition({'split': 'test'}, [])
+
+    def test_formal_cifar_lite_requires_calibration_before_test(self):
+        dataset = VFLDataset.__new__(VFLDataset)
+        with tempfile.TemporaryDirectory() as output_dir:
+            dataset.args = lite_args(output_dir)
+            dataset.args.bic_enabled = 1
+            with self.assertRaisesRegex(ValueError, 'ordered'):
+                dataset._validate_formal_phase_transition({'split': 'test'}, [])
+            dataset._validate_formal_phase_transition(
+                {'split': 'calibration'}, [])
+            dataset._validate_formal_phase_transition(
+                {'split': 'test'}, [{'split': 'calibration'}])
+
     def test_only_declared_teacher_free_train_only_head_is_accepted(self):
         with tempfile.TemporaryDirectory() as output_dir:
             args = lite_args(output_dir)
