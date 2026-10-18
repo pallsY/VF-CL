@@ -4,7 +4,7 @@
 
 Determine which comparisons can support a claim that the adaptive method has no resource advantage, then optimize ISOLET and four-party UPMC within a frozen budget. Preserve the completed Replay11, original adaptive, and sample-only experiments and their audit chains. Existing 42/43/44 test results are context, not a tuning signal.
 
-The resource study has three labels: same task/data/evaluation protocol; same original-exemplar budget; and resource-matched. The last label requires evidence for storage, training-time model copies, and compute. No single universal memory equivalence is asserted across methods such as AdaGauss, iCaRL, and ER.
+The resource study has three labels: same task/data/deferred-test schedule; same original-exemplar budget; and resource-matched. The last label requires evidence for storage, training-time model copies, compute, and actual validation access. No single universal memory equivalence is asserted across methods such as AdaGauss, iCaRL, and ER. In the frozen records, adaptive consumes a validation set on ISOLET and UPMC while ER-ACE and DER++ respectively record only final test access; CIFAR baseline calibration and adaptive validation occur at different phases. These are explicit comparison conditions, not presumed equal from matching config flags.
 
 ## Phase A: read-only resource ledger
 
