@@ -2,10 +2,28 @@ import tempfile
 import unittest
 
 from run_resource_lite_pilot import expected_tasks
-from run_selected_baseline_dev_pilot import derive_config
+from run_selected_baseline_dev_pilot import (
+    derive_config, summarize_icarl_readouts,
+)
 
 
 class SelectedBaselineDevPilotTests(unittest.TestCase):
+    def test_icarl_uses_exemplar_mean_counts_not_global_head(self):
+        readouts = {
+            'class_il_pred_task_counts': {
+                'task_0': {'correct': 7, 'total': 10},
+                'task_1': {'correct': 9, 'total': 10},
+            },
+            'class_il_global': {'task_0': 0.1, 'task_1': 0.2},
+            'task_il_oracle': {'task_0': 0.9, 'task_1': 1.0},
+            'task_prediction': {'task_0': 0.8, 'task_1': 0.9},
+        }
+        metrics = summarize_icarl_readouts(readouts, expected_count=20)
+        self.assertEqual(metrics['cil'], 0.8)
+        self.assertEqual(metrics['per_task_cil'], [0.7, 0.9])
+        self.assertEqual(metrics['readout_rule'], 'icarl_nearest_exemplar_mean')
+        self.assertEqual(metrics['global_head_per_task'], [0.1, 0.2])
+
     def source(self, dataset):
         specs = {
             'isolet': ('icarl', 26, 13, 'isolet/isolet_vfl.npz', 40, 20260809),

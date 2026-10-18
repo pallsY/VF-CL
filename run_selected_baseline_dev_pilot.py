@@ -5,6 +5,8 @@ import json
 from pathlib import Path, PurePosixPath
 from types import SimpleNamespace
 
+import torch
+
 from run_resource_lite_pilot import (
     DATASET_IDENTITY, HOLDOUT_PER_CLASS, HOLDOUT_SEED,
     PilotDataset, StopBeforeTest, _identity, expected_tasks,
@@ -19,6 +21,70 @@ SELECTED = {
     'cifar100': ('er_ace', 25, 20260729, 50),
 }
 PROTOCOL = 'selected-baseline-train-holdout-v1'
+
+
+def summarize_icarl_readouts(readouts, expected_count):
+    counts = readouts['class_il_pred_task_counts']
+    tasks = sorted(counts, key=lambda key: int(key.split('_')[1]))
+    if tasks != [f'task_{index}' for index in range(len(tasks))]:
+        raise ValueError('iCaRL task readout order is invalid')
+    total = sum(counts[key]['total'] for key in tasks)
+    correct = sum(counts[key]['correct'] for key in tasks)
+    if (total != expected_count or not tasks
+            or any(counts[key]['total'] <= 0
+                   or not 0 <= counts[key]['correct'] <= counts[key]['total']
+                   for key in tasks)):
+        raise ValueError('iCaRL held-out counts differ')
+    return {
+        'count': total,
+        'cil': correct / total,
+        'per_task_cil': [
+            counts[key]['correct'] / counts[key]['total'] for key in tasks
+        ],
+        'task_il': sum(
+            readouts['task_il_oracle'][key] * counts[key]['total']
+            for key in tasks) / total,
+        'global_head_per_task': [
+            readouts['class_il_global'][key] for key in tasks
+        ],
+        'task_prediction_per_task': [
+            readouts['task_prediction'][key] for key in tasks
+        ],
+        'readout_rule': 'icarl_nearest_exemplar_mean',
+    }
+
+
+@torch.no_grad()
+def score_icarl_checkpoint(args, dataset, checkpoint):
+    import runner
+    from cl_methods.icarl import ICaRLCL
+    from models import build_models
+    from vfl_trainer import VFLTrainer
+
+    score_args = SimpleNamespace(**vars(args))
+    score_args.device = 'cpu'
+    payload = runner._decode_checkpoint_value(torch.load(
+        checkpoint, map_location='cpu', weights_only=True,
+    ))
+    bottoms, top = build_models(score_args)
+    trainer = VFLTrainer(bottoms, top, score_args)
+    trainer.load_state(payload['trainer_state'])
+    method = ICaRLCL(trainer, score_args)
+    method.load_state(payload['cl_state'])
+    readouts = method._evaluate(
+        payload['seen_task_classes'],
+        lambda _task, classes: dataset.holdout_loader(classes),
+    )
+    return summarize_icarl_readouts(
+        readouts, args.num_classes * args.pilot_holdout_per_class)
+
+
+def score_selected_baseline_checkpoint(args, dataset, checkpoint):
+    if args.cl_method == 'icarl':
+        return score_icarl_checkpoint(args, dataset, checkpoint)
+    if args.cl_method == 'er_ace' and bool(args.bic_enabled):
+        raise RuntimeError('CIFAR BiC holdout readout is not implemented')
+    return score_holdout_checkpoint(args, dataset, checkpoint)
 
 
 def _validate_source(source, dataset, *, smoke=False):
@@ -140,7 +206,8 @@ def run_pilot(config_path):
         'freeze_sha256': sha256(run / 'FORMAL_STATE_FROZEN.json'),
         'holdout_manifest_sha256': sha256(
             run / 'pilot_holdout' / 'manifest.json'),
-        'metrics': score_holdout_checkpoint(args, dataset, final_path),
+        'metrics': score_selected_baseline_checkpoint(
+            args, dataset, final_path),
     }
     (run / 'HOLDOUT_READOUT.json').write_text(
         json.dumps(result, indent=2, sort_keys=True) + '\n',
