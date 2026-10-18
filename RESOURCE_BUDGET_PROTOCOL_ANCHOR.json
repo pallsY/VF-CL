@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "experiment": "vfcl-resource-constrained-adaptive-v1",
+  "status": "pre_optimization_resource_budget_frozen",
+  "budget_spec_commit": "5ee0eb29887a01a87720c1bce2445647313f04b3",
+  "budget_spec_path": "docs/superpowers/specs/2026-10-18-resource-budget-v1.md",
+  "budget_spec_sha256": "0ef09b92eb24c5320b9b2105c8b749175b088c6a5e65b9ceababe0a27398266b",
+  "frozen_baseline_producer_commit": "467611a603c9604ad57861920495a3ad05612037",
+  "frozen_sample_only_producer_commit": "e2a559dc4945729848225cf21fdc95451762c231",
+  "primary_pairwise_comparators": {
+    "cifar100": {
+      "method": "er_ace",
+      "max_learning_tensor_bytes": 203654374,
+      "model_training_flop_proxy_ceiling": 14371809381580800,
+      "max_extra_data_examples": 2500
+    },
+    "isolet": {
+      "method": "icarl",
+      "max_learning_tensor_bytes": 3715420,
+      "model_training_flop_proxy_ceiling": 1208549376000,
+      "max_extra_data_examples": 0
+    },
+    "upmc_food101": {
+      "method": "der_pp",
+      "max_learning_tensor_bytes": 15555306,
+      "model_training_flop_proxy_ceiling": 7093066137600,
+      "max_extra_data_examples": 0
+    }
+  },
+  "candidate_raw_examples_per_seen_class_max": 18,
+  "candidate_full_frozen_teacher_copies_max": 0,
+  "candidate_external_validation_accesses_max": 0,
+  "candidate_task_epochs_max": {
+    "cifar100": 50,
+    "isolet": 50,
+    "upmc_food101": 20
+  },
+  "development_class_order_seeds": [54, 55],
+  "preferred_confirmation_class_order_seeds": [45, 46, 47],
+  "resource_memory_csv_sha256": "0cb12d6a6c66db18a2a56b6f75811aebf81daed4fdf42bd3686b9e1ac420dbdb",
+  "resource_access_csv_sha256": "28dddbd01377b9e50643c0757da14250d7a8ef4c8de9584256d2c9cb27825b06",
+  "model_flop_proxy_csv_sha256": "622f7834ce0713c2c32a37c7a4434d73a905777a4060cd69828a5fd1e568be99",
+  "model_flop_probe_script_sha256": "7b90650cb8fb593dbcc3c4b3f8edbc1dfe10a15a9635e0cb2ea0f2685c3a2074",
+  "head_flop_probe_script_sha256": "f97852ece6d0fb047ac1d3e8c2be8f6fcce7a5f3d9dc485c72f09a86ed6ccb1a",
+  "resource_claim_limit": "The FLOP counter covers supported operators only. Final-head fitting, validation encoding, transient copies, optimizer/CUDA allocations and uncounted operators must be checked before a strict full-resource claim."
+}
