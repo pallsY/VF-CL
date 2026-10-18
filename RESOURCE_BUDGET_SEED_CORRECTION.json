@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "status": "seed_semantics_corrected_before_development_trials",
+  "corrects_anchor_commit": "38fa927eeb9efddd0ccdf99b8254e892b3460a4b",
+  "corrects_anchor_file_sha256": "be5cfda7930fee3658d5c28eaf9740b3e64cb92f25d08a16872d9accc9a1a160",
+  "corrected_budget_spec_commit": "313e23b6d1921da3a54fb3211a32431102c6e477",
+  "corrected_budget_spec_sha256": "1059365a740172325f7af7bc988b9d47776ab67af6a0cbb8a25f3d06f28e190b",
+  "development_random_seeds": [54, 55],
+  "preferred_confirmation_random_seeds": [45, 46, 47],
+  "class_task_sequence_changes_with_seed": false,
+  "benchmark_test_images_used_in_prior_work": true,
+  "interpretation": "These seeds vary initialization and stochastic training on the fixed class/task order. They do not provide new class orders or an untouched external test set.",
+  "numeric_resource_ceilings_changed": false
+}
