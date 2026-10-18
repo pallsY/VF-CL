@@ -265,7 +265,7 @@ def validate_source_data_hash(config):
 
 
 @torch.no_grad()
-def evaluate_holdout(args, dataset, checkpoint):
+def score_holdout_checkpoint(args, dataset, checkpoint):
     import runner
     from analyze_isolet_head_branches import score_branch
     from data_utils import split_features
@@ -293,6 +293,17 @@ def evaluate_holdout(args, dataset, checkpoint):
     )
     if metrics['count'] != args.num_classes * args.pilot_holdout_per_class:
         raise ValueError('pilot holdout example count differs')
+    return metrics
+
+
+@torch.no_grad()
+def evaluate_holdout(args, dataset, checkpoint):
+    import runner
+
+    metrics = score_holdout_checkpoint(args, dataset, checkpoint)
+    payload = runner._decode_checkpoint_value(torch.load(
+        checkpoint, map_location='cpu', weights_only=True,
+    ))
     state = payload['cl_state']
     raw = state['head_raw_replay']
     expected = 18 if args.pilot_variant == 'lite18' else 20
