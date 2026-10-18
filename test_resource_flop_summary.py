@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from resource_flop_summary import (nominal_steps_per_task, weighted_profile,
-                                   profile_name)
+                                   profile_name, access_job_name)
 
 
 class FlopSummaryTests(unittest.TestCase):
@@ -15,6 +15,10 @@ class FlopSummaryTests(unittest.TestCase):
                          'cifar_sample_t0.json')
         self.assertEqual(profile_name('upmc', 'derpp', 9),
                          'upmc_derpp_t9.json')
+        self.assertEqual(access_job_name('cifar100/adaptive/42'),
+                         'cifar100/sample_only/42')
+        self.assertEqual(access_job_name('cifar100/er_ace/42'),
+                         'cifar100/er_ace/42')
 
     def test_weights_each_profile_by_real_task_batch_count(self):
         profiles = [

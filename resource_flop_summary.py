@@ -38,6 +38,15 @@ def profile_name(dataset, method, task):
     return f'{prefix}_{method}_t{task}.json'
 
 
+def access_job_name(profile_job):
+    parts = profile_job.split('/')
+    if len(parts) != 3:
+        raise ValueError('profile job identity differs')
+    if parts[1] == 'adaptive':
+        parts[1] = 'sample_only'
+    return '/'.join(parts)
+
+
 def nominal_steps_per_task(flow_path, config):
     tasks = parse_task_classes(config)
     by_classes = {tuple(group): index for index, group in enumerate(tasks)}
@@ -110,7 +119,7 @@ def summarize(profiles_root, access_csv, output_root):
                for row in profiles):
             raise ValueError(f'profile authority differs: {job_name}')
         counted = weighted_profile(profiles, steps)
-        access_row = access[job_name]
+        access_row = access[access_job_name(job_name)]
         if counted['nominal_optimizer_steps'] != int(
                 access_row['nominal_optimizer_steps']):
             raise ValueError(f'profile optimizer steps differ: {job_name}')
