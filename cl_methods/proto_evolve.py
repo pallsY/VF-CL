@@ -179,6 +179,7 @@ class ProtoEvolveCL:
             getattr(args, 'proto_replay_gradient_enabled', 1)
         )
         self.sample_replay_only = bool(getattr(args, 'sample_replay_only', 0))
+        self.resource_lite = bool(getattr(args, 'resource_lite', 0))
         self.proto_replay_loss_norm = getattr(
             args, 'proto_replay_loss_norm', 'legacy_class_normalized'
         )
@@ -1111,11 +1112,15 @@ class ProtoEvolveCL:
         if self.dep_tracking_enabled and self.current_task_classes:
             self._freeze_dependency_snapshot(self.current_task_classes)
         # Cache the consolidated post-task model as the next frozen teacher/anchor.
-        self._old_bottoms = [deepcopy(b).eval() for b in self.trainer.bottoms]
-        self._old_top = deepcopy(self.trainer.top_model).eval()
-        for ob in self._old_bottoms:
-            for p in ob.parameters(): p.requires_grad = False
-        for p in self._old_top.parameters(): p.requires_grad = False
+        if self.resource_lite:
+            self._old_bottoms = None
+            self._old_top = None
+        else:
+            self._old_bottoms = [deepcopy(b).eval() for b in self.trainer.bottoms]
+            self._old_top = deepcopy(self.trainer.top_model).eval()
+            for ob in self._old_bottoms:
+                for p in ob.parameters(): p.requires_grad = False
+            for p in self._old_top.parameters(): p.requires_grad = False
 
     # The legacy _evolve() scalar mean-scaling drift heuristic and its
     # before_train_compute_pre_protos() pre-pass were removed: under the cosine
@@ -1296,6 +1301,10 @@ class ProtoEvolveCL:
             'adaptive_audit_bundle': deepcopy(self.adaptive_audit_bundle),
         }
     def load_state(self, s):
+        if self.resource_lite and s.get('has_old_teacher'):
+            raise ValueError('resource-lite checkpoint contains a teacher')
+        if self.resource_lite and s.get('adaptive_audit_bundle') is not None:
+            raise ValueError('resource-lite checkpoint contains adaptive validation evidence')
         if self.sample_replay_only and (
                 s.get('global_protos') or s.get('prev_protos')):
             raise ValueError('sample replay only checkpoint contains prototypes')

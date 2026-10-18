@@ -136,18 +136,33 @@ def validate_adaptive_head_consolidation(args):
 
 def validate_sample_replay_only(args):
     """Reject feature replay in the opt-in raw-memory ablation."""
+    if (bool(getattr(args, 'resource_lite', 0))
+            and not bool(getattr(args, 'sample_replay_only', 0))):
+        raise ValueError('resource lite requires sample_replay_only=1')
     if not bool(getattr(args, 'sample_replay_only', 0)):
         return
     required = {
         'cl_method': 'proto_evolve',
         'head_consolidation_enabled': 1,
-        'head_consolidation_mode': 'adaptive_dual_branch',
         'head_consolidation_schedule': 'final',
-        'head_consolidation_samples_per_class': 20,
         'proto_replay_gradient_enabled': 0,
         'proto_sdc': False,
         'feat_distill_weight': 0.0,
     }
+    if bool(getattr(args, 'resource_lite', 0)):
+        required.update(
+            head_consolidation_mode='full_classifier',
+            head_consolidation_samples_per_class=18,
+            distill_weight=0.0,
+            party_kd_enabled=0,
+            dep_tracking_enabled=0,
+            expected_party_kd_variant='base',
+        )
+    else:
+        required.update(
+            head_consolidation_mode='adaptive_dual_branch',
+            head_consolidation_samples_per_class=20,
+        )
     for field, value in required.items():
         if getattr(args, field, None) != value:
             raise ValueError(f'sample replay only requires {field}={value!r}')
@@ -243,6 +258,8 @@ def get_config():
     p.add_argument('--sample_replay_only', default=0, type=int,
                    choices=[0, 1],
                    help='Retain only raw examples as persistent replay memory')
+    p.add_argument('--resource_lite', default=0, type=int, choices=[0, 1],
+                   help='Opt-in teacher-free, train-only 18-example head variant')
     p.add_argument('--proto_replay_loss_norm',
                    default='legacy_class_normalized',
                    choices=['legacy_class_normalized', 'sample_mean'],
