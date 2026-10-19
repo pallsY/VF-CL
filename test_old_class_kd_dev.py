@@ -19,7 +19,7 @@ class OldClassKDDevConfigTests(unittest.TestCase):
             'num_tasks': tasks, 'custom_tasks': custom,
             'classes_per_task': 10, 'vector_npz': vector,
             'num_parties': 4, 'cl_method': 'proto_evolve',
-            'sample_replay_only': 1, 'resource_lite': 0,
+            'sample_replay_only': 1,
             'formal_deferred_evaluation': True,
             'head_consolidation_enabled': 1,
             'head_consolidation_schedule': 'final',

@@ -47,7 +47,7 @@ def build_config(source, source_sha, dataset, seed, variant, root, *,
         raise ValueError('invalid code commit')
     required = {
         'seed': 42, 'cl_method': 'proto_evolve',
-        'sample_replay_only': 1, 'resource_lite': 0,
+        'sample_replay_only': 1,
         'formal_deferred_evaluation': True,
         'head_consolidation_enabled': 1,
         'head_consolidation_schedule': 'final',
@@ -62,7 +62,8 @@ def build_config(source, source_sha, dataset, seed, variant, root, *,
         'lambda_validation_enabled': 1, 'distill_weight': 0.25,
         'bic_enabled': int(dataset == 'cifar100'),
     }
-    if any(source.get(key) != value for key, value in required.items()):
+    if (any(source.get(key) != value for key, value in required.items())
+            or bool(source.get('resource_lite', 0))):
         raise ValueError('source config differs from approved sample-only protocol')
     budget = 20 if dataset == 'upmc_food101' else 50
     if source.get('epochs_per_task') != budget:
@@ -72,6 +73,7 @@ def build_config(source, source_sha, dataset, seed, variant, root, *,
     name = f'{dataset}_seed{seed}_{variant}' + ('_smoke' if smoke else '')
     result = {
         **source,
+        'resource_lite': 0,
         'seed': seed,
         'pilot_protocol': PROTOCOL,
         'pilot_dataset': dataset,
