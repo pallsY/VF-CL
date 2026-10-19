@@ -56,6 +56,30 @@ class ConfigDerivationTests(unittest.TestCase):
         self.assertEqual(smoke['epochs_per_task'], 1)
         self.assertEqual(smoke['device'], 'cpu')
 
+    def test_fim_off_keeps_uniform_party_kd(self):
+        source = {
+            'pilot_dataset': 'isolet', 'seed': 54,
+            'num_parties': 4, 'sample_replay_only': 1,
+            'resource_lite': 0, 'head_consolidation_samples_per_class': 20,
+            'head_consolidation_mode': 'adaptive_dual_branch',
+            'party_kd_enabled': 1, 'dep_tracking_enabled': 1,
+            'party_kd_mode': 'uniform',
+            'expected_party_kd_variant': 'uniform',
+            'fim_freeze_frac': 0.25,
+            'output_dir': '/old', 'results_dir': '/old',
+            'exp_name': 'reference', 'epochs_per_task': 50,
+        }
+        derived = derive_config(source, APPROVED_HASHES['isolet', 54],
+                                '/new', mode='fim_off')
+        self.assertEqual(derived['fim_freeze_frac'], 0.0)
+        self.assertEqual(derived['party_kd_enabled'], 1)
+        self.assertEqual(derived['expected_party_kd_variant'], 'uniform')
+        self.assertEqual({key for key in source
+                          if source[key] != derived[key]}, {
+                              'fim_freeze_frac', 'output_dir', 'results_dir',
+                              'exp_name',
+                          })
+
 
 if __name__ == '__main__':
     unittest.main()

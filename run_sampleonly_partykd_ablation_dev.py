@@ -1,4 +1,4 @@
-"""Training-only PartyKD variants from four approved reference20 jobs."""
+"""Training-only component ablations from four approved reference20 jobs."""
 
 import argparse
 import json
@@ -28,21 +28,28 @@ def derive_config(source, source_hash, root, smoke=False, mode='base'):
     }
     if any(source.get(key) != value for key, value in required.items()):
         raise ValueError('reference20 source protocol differs')
-    if mode not in ('base', 'task_marginal'):
-        raise ValueError('unknown PartyKD development mode')
-    variant = 'no_partykd20' if mode == 'base' else 'task_marginal20'
+    if mode not in ('base', 'task_marginal', 'fim_off'):
+        raise ValueError('unknown component development mode')
+    if mode == 'fim_off' and source.get('fim_freeze_frac') != 0.25:
+        raise ValueError('reference20 FIM freeze fraction differs')
+    variant = {'base': 'no_partykd20',
+               'task_marginal': 'task_marginal20',
+               'fim_off': 'fim_off20'}[mode]
     name = f'{dataset}_seed{seed}_{variant}' + ('_smoke' if smoke else '')
     result = {
         **source,
         'party_kd_enabled': 0 if mode == 'base' else 1,
         'dep_tracking_enabled': 0 if mode == 'base' else 1,
         'party_kd_mode': 'uniform' if mode == 'base' else 'task_marginal',
-        'expected_party_kd_variant': mode,
+        'expected_party_kd_variant': 'uniform' if mode == 'fim_off' else mode,
         'pilot_variant': variant,
         'results_dir': str(root),
         'output_dir': str(Path(root) / name),
         'exp_name': name,
     }
+    if mode == 'fim_off':
+        result['party_kd_mode'] = 'uniform'
+        result['fim_freeze_frac'] = 0.0
     if smoke:
         result.update(
             epochs_per_task=1, device='cpu', pilot_smoke=True,
@@ -63,7 +70,8 @@ def run_ablation(source_path, root, smoke=False, mode='base'):
     source_path = Path(source_path)
     source = json.loads(source_path.read_text(encoding='utf-8'))
     config = derive_config(source, sha256(source_path), root, smoke, mode)
-    validate_party_kd_variant(config, mode)
+    validate_party_kd_variant(config,
+                              'uniform' if mode == 'fim_off' else mode)
     args = SimpleNamespace(**config)
     validate_sample_replay_only(args)
     validate_adaptive_head_consolidation(args)
@@ -122,7 +130,7 @@ def main():
     parser.add_argument('--source-config', type=Path, required=True)
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--smoke', action='store_true')
-    parser.add_argument('--mode', choices=('base', 'task_marginal'),
+    parser.add_argument('--mode', choices=('base', 'task_marginal', 'fim_off'),
                         default='base')
     args = parser.parse_args()
     run_ablation(args.source_config, args.root, args.smoke, args.mode)

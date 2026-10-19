@@ -1130,6 +1130,9 @@ class ProtoEvolveCL:
     # behind a hasattr() guard, so its removal is a safe no-op there.
 
     def _compute_fim(self, loader, task_id):
+        frac = float(getattr(self.args, 'fim_freeze_frac', 0.25))
+        if not 0.0 <= frac <= 1.0:
+            raise ValueError('fim_freeze_frac must be in [0, 1]')
         for b in self.trainer.bottoms: b.train()
         self.trainer.top_model.train()
         fim = [{n: torch.zeros_like(p) for n, p in self.trainer.bottoms[k].named_parameters()}
@@ -1149,7 +1152,16 @@ class ProtoEvolveCL:
                         fim[k][n] += p.grad.data**2
             nb += 1
 
-        frac = getattr(self.args, 'fim_freeze_frac', 0.25)
+        if frac == 0.0:
+            if any(any(mask.values()) for mask in self.fim_masks):
+                raise ValueError('zero FIM freeze cannot reuse a frozen mask')
+            for k in range(self.args.num_parties):
+                print(f"    Party {k}: 0/{len(fim[k])} frozen (+0 new this task)")
+            for b in self.trainer.bottoms:
+                b.zero_grad()
+                for parameter in b.parameters():
+                    parameter.requires_grad = True
+            return
         for k in range(self.args.num_parties):
             for n in fim[k]: fim[k][n] /= max(nb,1)
             # Per-tensor importance = mean FIM of that parameter tensor.
