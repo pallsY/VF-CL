@@ -30,7 +30,7 @@ def derive_config(source, source_hash, root, smoke=False, mode='base'):
         raise ValueError('reference20 source protocol differs')
     if mode not in ('base', 'task_marginal', 'fim_off'):
         raise ValueError('unknown component development mode')
-    if mode == 'fim_off' and source.get('fim_freeze_frac') != 0.25:
+    if mode == 'fim_off' and source.get('fim_freeze_frac') != 0.0:
         raise ValueError('reference20 FIM freeze fraction differs')
     variant = {'base': 'no_partykd20',
                'task_marginal': 'task_marginal20',

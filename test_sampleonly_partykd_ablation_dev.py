@@ -65,7 +65,7 @@ class ConfigDerivationTests(unittest.TestCase):
             'party_kd_enabled': 1, 'dep_tracking_enabled': 1,
             'party_kd_mode': 'uniform',
             'expected_party_kd_variant': 'uniform',
-            'fim_freeze_frac': 0.25,
+            'fim_freeze_frac': 0.0,
             'output_dir': '/old', 'results_dir': '/old',
             'exp_name': 'reference', 'epochs_per_task': 50,
         }
@@ -76,8 +76,7 @@ class ConfigDerivationTests(unittest.TestCase):
         self.assertEqual(derived['expected_party_kd_variant'], 'uniform')
         self.assertEqual({key for key in source
                           if source[key] != derived[key]}, {
-                              'fim_freeze_frac', 'output_dir', 'results_dir',
-                              'exp_name',
+                              'output_dir', 'results_dir', 'exp_name',
                           })
 
 

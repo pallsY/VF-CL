@@ -12,7 +12,7 @@
 
 - 原 Replay11、原 adaptive、仅样本版 42/43/44 正式源码与结果完全冻结。
 - 源配置 SHA-256 沿用 `2026-10-19-sampleonly-component-ablation.md` 的四份固定值。
-- 除 `fim_freeze_frac=0` 和输出身份外，不能改变模型、记忆、PartyKD、epoch、验证或任务顺序。
+- 四份旧配置的 `fim_freeze_frac` 已是 0，但旧代码仍冻结每方一个参数张量；新作业只能改变零值语义的源码提交和输出身份，不能改变模型、记忆、PartyKD、epoch、验证或任务顺序。
 - GPU 由其他用户占用时等待；失败原件保留，不重复启动。
 
 ---
@@ -30,7 +30,7 @@
 
 **Files:** Modify `run_sampleonly_partykd_ablation_dev.py`, `test_sampleonly_partykd_ablation_dev.py`。
 
-- [ ] 写失败测试，要求 `fim_off` 仅改变冻结比例和新作业身份；`party_kd_mode` 与 `expected_party_kd_variant` 保持 `uniform`。
+- [ ] 写失败测试，要求 `fim_off` 保持冻结比例仍为 0，只改变新作业身份；`party_kd_mode` 与 `expected_party_kd_variant` 保持 `uniform`。
 - [ ] 实现并运行测试；在 brf3080 用新干净 checkout 做 ISOLET/UPMC 完整任务一轮 CPU 预检。
 - [ ] 预检逐任务确认冻结掩码全空、无测试加载器、同一留出清单；不合格即停止。
 
