@@ -478,7 +478,8 @@ def _valid_method_checkpoint_state(method, state, adaptive, num_parties):
     if adaptive:
         required = {
             'global_protos', 'prev_protos', 'fim_masks',
-            'dep_tracker_contrib', 'current_task_classes', 'has_old_teacher',
+            'dep_tracker_contrib', 'current_task_classes', 'kd_old_classes',
+            'has_old_teacher',
             'class_party_contrib', 'class_party_weights',
             'effective_class_party_weights', 'party_weight_manifest_hash',
             'party_shuffle_seed', 'party_shuffle_mapping',
@@ -503,6 +504,11 @@ def _valid_method_checkpoint_state(method, state, adaptive, num_parties):
                 and type(state['current_task_classes']) is list
                 and all(type(value) is int
                         for value in state['current_task_classes'])
+                and type(state['kd_old_classes']) is list
+                and all(type(value) is int and value >= 0
+                        for value in state['kd_old_classes'])
+                and len(set(state['kd_old_classes']))
+                == len(state['kd_old_classes'])
                 and type(state['has_old_teacher']) is bool
                 and type(state['party_weight_manifest_hash']) is str
                 and type(state['party_shuffle_seed']) is int

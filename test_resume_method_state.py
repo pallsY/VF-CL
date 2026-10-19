@@ -790,7 +790,11 @@ class ResumeMethodStateTests(unittest.TestCase):
                 self.assertFalse(teacher_param.requires_grad)
 
     def test_adaptive_proto_evolve_round_trip_restores_exact_method_evidence(self):
+        from runner import _valid_method_checkpoint_state
+
         source, state = self._adaptive_source_and_state()
+        self.assertTrue(_valid_method_checkpoint_state(
+            'proto_evolve', state, True, 2))
         restored = ProtoEvolveCL(AdaptiveTinyTrainer(), self._adaptive_args())
         restored.trainer.top_model.load_state_dict(
             source.trainer.top_model.state_dict()
