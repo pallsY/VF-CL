@@ -47,6 +47,14 @@ class ConfigDerivationTests(unittest.TestCase):
         self.assertEqual(derived['party_kd_mode'], 'task_marginal')
         self.assertEqual(derived['expected_party_kd_variant'],
                          'task_marginal')
+        source.update(custom_tasks='0,1|2,3|4,5', num_tasks=3,
+                      device='cuda:0')
+        smoke = derive_config(source, APPROVED_HASHES['isolet', 54],
+                              '/new', smoke=True, mode='task_marginal')
+        self.assertEqual(smoke['num_tasks'], 3)
+        self.assertEqual(smoke['custom_tasks'], source['custom_tasks'])
+        self.assertEqual(smoke['epochs_per_task'], 1)
+        self.assertEqual(smoke['device'], 'cpu')
 
 
 if __name__ == '__main__':

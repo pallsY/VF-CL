@@ -44,9 +44,7 @@ def derive_config(source, source_hash, root, smoke=False, mode='base'):
         'exp_name': name,
     }
     if smoke:
-        tasks = source['custom_tasks'].split('|')
         result.update(
-            num_tasks=2, custom_tasks='|'.join(tasks[:2]),
             epochs_per_task=1, device='cpu', pilot_smoke=True,
         )
     return result
@@ -99,7 +97,7 @@ def run_ablation(source_path, root, smoke=False, mode='base'):
     validate_training_only_artifacts(run)
     final = run / 'checkpoints' / 'formal_final.pt'
     record = {
-        'status': 'two_task_training_only_smoke' if smoke
+        'status': 'full_schedule_one_epoch_smoke' if smoke
         else 'independent_training_holdout_readout',
         'variant': args.pilot_variant, 'dataset': args.pilot_dataset,
         'seed': args.seed, 'source_config_sha256': sha256(source_path),
