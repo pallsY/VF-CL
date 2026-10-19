@@ -76,7 +76,7 @@
 | 四方 UPMC | 54 | 80.80% | 76.21% | 4.59 个百分点 |
 | 四方 UPMC | 55 | 80.58% | 77.07% | 3.51 个百分点 |
 
-四份作业均保持相同训练集留出清单哈希，只有训练完成标记与 `HOLDOUT_READOUT.json`，没有正式测试访问或 `results.json`。关闭 PartyKD 后四份开发 CIL 全部降低，因此**PartyKD 对当前方法有可重复的开发集贡献**。这仍不是“自适应权重”有贡献的证据：正式均匀配置的四方权重都是 0.25。接着按预先定义的任务汇总权重规则进行成对检查，结果见下节。
+四份作业均保持相同训练集留出清单哈希，只有训练完成标记与 `HOLDOUT_READOUT.json`，没有正式测试访问或 `results.json`。关闭 PartyKD 后四份开发 CIL 全部降低，因此**当前实现的 PartyKD 整项损失对开发集准确率有可重复贡献**。后续代码复核发现这项损失还覆盖未学过类别的 logits，不能据此把全部增益解释为“旧知识保持”；修正类别范围后必须重做消融。这也不是“自适应权重”有贡献的证据：正式均匀配置的四方权重都是 0.25。接着按预先定义的任务汇总权重规则进行成对检查，结果见下节。
 
 关闭 PartyKD 的四份开发读数在 `/brf/users/yangxx/VFCL-results/sampleonly-partykd-ablation-dev-v1-20261019/`；SHA-256 分别为 ISOLET54 `51c57bb02909386fdc4ef019f0fd3c0a925c90ce2f29234c3113e38a096642eb`、ISOLET55 `dbe734d4d41ea32458083b20f0f1f5a7a25e47dec5e9cdf18ce3c077843c1638`、UPMC54 `c5932f3b382611833f28d41f97a668c56fc8630726acd4adac8df457b680265c`、UPMC55 `01b3c1e230b5f9a642500514c33c1eaacb444bbfd73b685db6b6005f5b89955f`。
 
