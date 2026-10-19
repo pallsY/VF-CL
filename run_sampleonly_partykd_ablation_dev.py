@@ -1,4 +1,4 @@
-"""Training-only PartyKD-off ablation from four approved reference20 jobs."""
+"""Training-only PartyKD variants from four approved reference20 jobs."""
 
 import argparse
 import json
@@ -14,7 +14,7 @@ APPROVED_HASHES = {
 }
 
 
-def derive_config(source, source_hash, root, smoke=False):
+def derive_config(source, source_hash, root, smoke=False, mode='base'):
     dataset, seed = source.get('pilot_dataset'), source.get('seed')
     if source_hash != APPROVED_HASHES.get((dataset, seed)):
         raise ValueError('source config hash is not approved')
@@ -28,13 +28,17 @@ def derive_config(source, source_hash, root, smoke=False):
     }
     if any(source.get(key) != value for key, value in required.items()):
         raise ValueError('reference20 source protocol differs')
-    name = f'{dataset}_seed{seed}_no_partykd20' + ('_smoke' if smoke else '')
+    if mode not in ('base', 'task_marginal'):
+        raise ValueError('unknown PartyKD development mode')
+    variant = 'no_partykd20' if mode == 'base' else 'task_marginal20'
+    name = f'{dataset}_seed{seed}_{variant}' + ('_smoke' if smoke else '')
     result = {
         **source,
-        'party_kd_enabled': 0,
-        'dep_tracking_enabled': 0,
-        'expected_party_kd_variant': 'base',
-        'pilot_variant': 'no_partykd20',
+        'party_kd_enabled': 0 if mode == 'base' else 1,
+        'dep_tracking_enabled': 0 if mode == 'base' else 1,
+        'party_kd_mode': 'uniform' if mode == 'base' else 'task_marginal',
+        'expected_party_kd_variant': mode,
+        'pilot_variant': variant,
         'results_dir': str(root),
         'output_dir': str(Path(root) / name),
         'exp_name': name,
@@ -48,7 +52,7 @@ def derive_config(source, source_hash, root, smoke=False):
     return result
 
 
-def run_ablation(source_path, root, smoke=False):
+def run_ablation(source_path, root, smoke=False, mode='base'):
     import runner
     from config import (validate_adaptive_head_consolidation,
                         validate_party_kd_variant,
@@ -60,8 +64,8 @@ def run_ablation(source_path, root, smoke=False):
 
     source_path = Path(source_path)
     source = json.loads(source_path.read_text(encoding='utf-8'))
-    config = derive_config(source, sha256(source_path), root, smoke)
-    validate_party_kd_variant(config, 'base')
+    config = derive_config(source, sha256(source_path), root, smoke, mode)
+    validate_party_kd_variant(config, mode)
     args = SimpleNamespace(**config)
     validate_sample_replay_only(args)
     validate_adaptive_head_consolidation(args)
@@ -120,8 +124,10 @@ def main():
     parser.add_argument('--source-config', type=Path, required=True)
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--smoke', action='store_true')
+    parser.add_argument('--mode', choices=('base', 'task_marginal'),
+                        default='base')
     args = parser.parse_args()
-    run_ablation(args.source_config, args.root, args.smoke)
+    run_ablation(args.source_config, args.root, args.smoke, args.mode)
 
 
 if __name__ == '__main__':
