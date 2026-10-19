@@ -744,6 +744,7 @@ class ResumeMethodStateTests(unittest.TestCase):
         ]
         source.dep_tracker.contrib.copy_(torch.arange(8).reshape(4, 2))
         source.current_task_classes = [0, 1]
+        source.kd_old_classes = [2, 3]
         source.class_party_contrib = {0: [0.2, 0.8]}
         source.class_party_weights = {0: [0.2, 0.8]}
         source.head_raw_replay = {
@@ -762,6 +763,12 @@ class ResumeMethodStateTests(unittest.TestCase):
 
         self.assertEqual(restored.fim_masks, source.fim_masks)
         self.assertEqual(restored.current_task_classes, [0, 1])
+        self.assertEqual(restored.kd_old_classes, [2, 3])
+        missing_scope = source.get_state()
+        del missing_scope['kd_old_classes']
+        with self.assertRaisesRegex(ValueError, 'old KD class scope'):
+            restored.load_state(missing_scope)
+        self.assertEqual(restored.kd_old_classes, [2, 3])
         self.assertEqual(restored.prev_protos.keys(), source.prev_protos.keys())
         torch.testing.assert_close(
             restored.dep_tracker.contrib, source.dep_tracker.contrib

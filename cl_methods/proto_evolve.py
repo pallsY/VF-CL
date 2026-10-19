@@ -222,6 +222,7 @@ class ProtoEvolveCL:
         if self.current_supcon_temperature <= 0:
             raise ValueError('current_supcon_temperature must be positive')
         self.current_task_id = 0
+        self.kd_old_classes = []
         self._old_bottoms = None
         self._old_top = None
         # --- Semantic Drift Compensation (Yu et al. CVPR 2020) ---
@@ -328,6 +329,11 @@ class ProtoEvolveCL:
     def before_task(self, task_id, new_classes, seen_classes):
         self.current_task_id = int(task_id)
         self._reset_method_rng(task_id)
+        new_ids = {int(c) for c in new_classes}
+        seen_ids = {int(c) for c in seen_classes}
+        if not new_ids.issubset(seen_ids):
+            raise ValueError('new task classes must be included in seen classes')
+        self.kd_old_classes = sorted(seen_ids - new_ids)
         req = max(seen_classes)+1 if seen_classes else 0
         self.trainer.top_model.expand_classes(req, self.args.device)
         if self.dep_tracking_enabled and self.current_task_classes:
@@ -608,19 +614,23 @@ class ProtoEvolveCL:
             curr_embs = [bottoms[i](parts[i]) for i in range(self.args.num_parties)]  # grad flows to bottoms
             party_logits_curr, curr_logits = self._compute_party_logits(curr_embs, top_model)
             self._track_dependencies(party_logits_curr, batch_y)
-            # (2a) logit-KD over the classes both heads share. A model-rebuilding UL
-            # (retrain) can leave the teacher and current head with mismatched
-            # widths; min() keeps them aligned and avoids a shape crash.
-            n = min(old_logits.size(1), curr_logits.size(1))
-            if n > 0:
+            # (2a) Distill only classes retained from earlier tasks. Full-width
+            # heads also contain new and future rows, which are not old knowledge.
+            old_classes = self.kd_old_classes
+            if old_classes:
+                if min(old_classes) < 0 or max(old_classes) >= min(
+                        old_logits.size(1), curr_logits.size(1)):
+                    raise ValueError('old KD class is missing from a classifier head')
+                idx = torch.tensor(old_classes, dtype=torch.long, device=device)
                 T = self.temperature
-                old_p = F.softmax(old_logits[:, :n] / T, dim=1)
-                curr_lp = F.log_softmax(curr_logits[:, :n] / T, dim=1)
+                old_p = F.softmax(old_logits.index_select(1, idx) / T, dim=1)
+                curr_lp = F.log_softmax(
+                    curr_logits.index_select(1, idx) / T, dim=1)
                 loss_kd = F.kl_div(curr_lp, old_p, reduction='batchmean') * (T * T)
-                dbg_kd = float(self.effective_distill_weight * loss_kd)
+                dbg_kd = float((self.effective_distill_weight * loss_kd).detach())
                 total = total + self.effective_distill_weight * loss_kd
                 loss_party_kd = self._party_kd_loss(
-                    party_logits_curr, party_logits_old, list(range(n)), device
+                    party_logits_curr, party_logits_old, old_classes, device
                 )
                 total = total + self.party_kd_lambda * loss_party_kd
             # (2b) feature-KD: squared-L2 anchor SUMMED over feature dims (PRL form,
@@ -1287,6 +1297,7 @@ class ProtoEvolveCL:
             'fim_masks': deepcopy(self.fim_masks),
             'dep_tracker_contrib': self.dep_tracker.contrib.clone(),
             'current_task_classes': list(self.current_task_classes),
+            'kd_old_classes': list(self.kd_old_classes),
             'has_old_teacher': self._old_top is not None,
             'class_party_contrib': deepcopy(self.class_party_contrib),
             'class_party_weights': deepcopy(self.class_party_weights),
@@ -1313,6 +1324,16 @@ class ProtoEvolveCL:
             'adaptive_audit_bundle': deepcopy(self.adaptive_audit_bundle),
         }
     def load_state(self, s):
+        kd_old_classes = s.get('kd_old_classes')
+        if kd_old_classes is None:
+            if s.get('has_old_teacher'):
+                raise ValueError('checkpoint lacks old KD class scope')
+            kd_old_classes = []
+        if (type(kd_old_classes) is not list
+                or any(type(c) is not int or c < 0 for c in kd_old_classes)
+                or len(set(kd_old_classes)) != len(kd_old_classes)
+                or set(kd_old_classes) & set(s.get('current_task_classes', []))):
+            raise ValueError('checkpoint old KD class scope is invalid')
         if self.resource_lite and s.get('has_old_teacher'):
             raise ValueError('resource-lite checkpoint contains a teacher')
         if self.resource_lite and s.get('adaptive_audit_bundle') is not None:
@@ -1332,6 +1353,7 @@ class ProtoEvolveCL:
         if contrib is not None:
             self.dep_tracker.contrib.copy_(torch.as_tensor(contrib))
         self.current_task_classes = list(s.get('current_task_classes', []))
+        self.kd_old_classes = list(kd_old_classes)
         self.class_party_contrib = deepcopy(s.get('class_party_contrib', {}))
         self.class_party_weights = deepcopy(s.get('class_party_weights', {}))
         self.party_shuffle_mapping = deepcopy(
