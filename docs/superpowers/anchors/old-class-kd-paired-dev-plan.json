@@ -1,0 +1,96 @@
+{
+  "cells": [
+    {
+      "code_commit": "ad01e8dc180f5cab62a61ec8f78dd8aba5b096b8",
+      "config_file": "isolet_seed56_oldonly20.config.json",
+      "config_sha256": "a7e73039bce9da04eafa5174c907558eadf34fba575d27ec3c0bb8cf127b1df7",
+      "dataset": "isolet",
+      "device": "cuda:0",
+      "seed": 56,
+      "variant": "oldonly20"
+    },
+    {
+      "code_commit": "40dc7c3588677adea80649d31926910d11bb5fe6",
+      "config_file": "isolet_seed56_fullwidth20.config.json",
+      "config_sha256": "f785c9aa66980dabfcc842e416c63a2a1e2db14c23e242f53425ad10c0e54249",
+      "dataset": "isolet",
+      "device": "cuda:1",
+      "seed": 56,
+      "variant": "fullwidth20"
+    },
+    {
+      "code_commit": "ad01e8dc180f5cab62a61ec8f78dd8aba5b096b8",
+      "config_file": "isolet_seed57_oldonly20.config.json",
+      "config_sha256": "8f142e15b9780e67d92fa19be86399499872d239ead131168503259a2f15efb5",
+      "dataset": "isolet",
+      "device": "cuda:1",
+      "seed": 57,
+      "variant": "oldonly20"
+    },
+    {
+      "code_commit": "40dc7c3588677adea80649d31926910d11bb5fe6",
+      "config_file": "isolet_seed57_fullwidth20.config.json",
+      "config_sha256": "136f392fcc3c4bae233873495dd7b8ed59e7b9dfaa0ef160235a2013cf9f6a5d",
+      "dataset": "isolet",
+      "device": "cuda:0",
+      "seed": 57,
+      "variant": "fullwidth20"
+    },
+    {
+      "code_commit": "ad01e8dc180f5cab62a61ec8f78dd8aba5b096b8",
+      "config_file": "upmc_food101_seed56_oldonly20.config.json",
+      "config_sha256": "c67baa09f6b7506c7f4efb758d2d63d207eebff48d50ba1f16508fbcc524eefb",
+      "dataset": "upmc_food101",
+      "device": "cuda:0",
+      "seed": 56,
+      "variant": "oldonly20"
+    },
+    {
+      "code_commit": "40dc7c3588677adea80649d31926910d11bb5fe6",
+      "config_file": "upmc_food101_seed56_fullwidth20.config.json",
+      "config_sha256": "5d6f0cec343dc22441d61a8028c6380f8812e5e8cc6c582f4ccb1fe014f3384e",
+      "dataset": "upmc_food101",
+      "device": "cuda:1",
+      "seed": 56,
+      "variant": "fullwidth20"
+    },
+    {
+      "code_commit": "ad01e8dc180f5cab62a61ec8f78dd8aba5b096b8",
+      "config_file": "upmc_food101_seed57_oldonly20.config.json",
+      "config_sha256": "2441c3ff8b36b1cb6cb8ba8a747fdcf2204e1041e9c1134c2fbbd4122292bd87",
+      "dataset": "upmc_food101",
+      "device": "cuda:1",
+      "seed": 57,
+      "variant": "oldonly20"
+    },
+    {
+      "code_commit": "40dc7c3588677adea80649d31926910d11bb5fe6",
+      "config_file": "upmc_food101_seed57_fullwidth20.config.json",
+      "config_sha256": "f2fb6c795dca6fc9ff65b59f3431f00199d7ef71be1216078036aa4c3def00ef",
+      "dataset": "upmc_food101",
+      "device": "cuda:0",
+      "seed": 57,
+      "variant": "fullwidth20"
+    }
+  ],
+  "datasets": [
+    "isolet",
+    "upmc_food101"
+  ],
+  "holdout_seed": 20261019,
+  "pair_differences": [
+    "device",
+    "exp_name",
+    "output_dir",
+    "pilot_code_commit",
+    "pilot_variant"
+  ],
+  "protocol": "old-class-kd-training-holdout-v1",
+  "purpose": "compare full-width teacher logits with previously retained classes only",
+  "seeds": [
+    56,
+    57
+  ],
+  "status": "prepared_not_run",
+  "test_access": "forbidden_during_development"
+}
