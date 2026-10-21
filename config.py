@@ -136,6 +136,10 @@ def validate_adaptive_head_consolidation(args):
 
 def validate_sample_replay_only(args):
     """Reject feature replay in the opt-in raw-memory ablation."""
+    if getattr(args, 'train_replay_enabled', 0) not in (0, 1):
+        raise ValueError('train_replay_enabled must be 0 or 1')
+    if getattr(args, 'train_replay_enabled', 0) and not getattr(args, 'sample_replay_only', 0):
+        raise ValueError('train_replay_enabled requires sample_replay_only=1')
     if not bool(getattr(args, 'sample_replay_only', 0)):
         return
     required = {
@@ -243,6 +247,9 @@ def get_config():
     p.add_argument('--sample_replay_only', default=0, type=int,
                    choices=[0, 1],
                    help='Retain only raw examples as persistent replay memory')
+    p.add_argument('--train_replay_enabled', default=0, type=int,
+                   choices=[0, 1],
+                   help='Development-only old raw-sample CE replay; 0 preserves frozen method')
     p.add_argument('--proto_replay_loss_norm',
                    default='legacy_class_normalized',
                    choices=['legacy_class_normalized', 'sample_mean'],

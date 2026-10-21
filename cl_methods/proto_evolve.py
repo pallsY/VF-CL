@@ -312,6 +312,11 @@ class ProtoEvolveCL:
             int(getattr(args, 'num_tasks', 1)),
         )
         self.head_raw_replay = {}
+        self.train_replay_enabled = bool(getattr(args, 'train_replay_enabled', 0))
+        if self.train_replay_enabled:
+            self.train_replay_audit = {'steps': 0, 'samples': 0, 'duplicates': 0,
+                                       'upload_bytes': 0, 'return_bytes': 0}
+            self.train_replay_history = {}
         self.head_task_classes = {}
         self.head_validation_sha256 = ''
         self.adaptive_audit_bundle = None
@@ -332,6 +337,19 @@ class ProtoEvolveCL:
         if self.dep_tracking_enabled and self.current_task_classes:
             self._freeze_dependency_snapshot(self.current_task_classes)
         self.current_task_classes = list(new_classes)
+        if self.train_replay_enabled and task_id > 0:
+            if self.global_protos:
+                raise ValueError('raw train replay cannot retain prototypes')
+            from sampleonly_train_replay import BalancedOldReplay
+            old_classes = sorted(set(self.head_raw_replay) - set(new_classes))
+            if not old_classes or any(len(self.head_raw_replay[c]) != 20
+                                      for c in old_classes):
+                raise ValueError('old raw memory must contain 20 samples per class')
+            self._train_replay_sampler = BalancedOldReplay(
+                {c: self.head_raw_replay[c] for c in old_classes},
+                derive_seed(self.args.seed, 'train_replay', int(task_id)))
+            self.train_replay_audit = {'steps': 0, 'samples': 0, 'duplicates': 0,
+                                       'upload_bytes': 0, 'return_bytes': 0}
         # Apply FIM freeze (computed in after_task of previous task)
         if task_id > 0:
             total_f, total_p = 0, 0
@@ -648,6 +666,18 @@ class ProtoEvolveCL:
                 )
                 dbg_supcon = float(supcon_weight * loss_supcon)
                 total = total + supcon_weight * loss_supcon
+        if self.train_replay_enabled and self.current_task_id > 0:
+            replay_x, replay_y, duplicates = self._train_replay_sampler.sample()
+            replay_parts = split_features(replay_x.to(device), self.args)
+            replay_embs = [bottom(part) for bottom, part in zip(bottoms, replay_parts)]
+            replay_logits = top_model(self.trainer._aggregate(replay_embs))
+            total = total + F.cross_entropy(replay_logits, replay_y.to(device))
+            uploaded = sum(emb.numel() * emb.element_size() for emb in replay_embs)
+            self.train_replay_audit['steps'] += 1
+            self.train_replay_audit['samples'] += len(replay_y)
+            self.train_replay_audit['duplicates'] += duplicates
+            self.train_replay_audit['upload_bytes'] += uploaded
+            self.train_replay_audit['return_bytes'] += uploaded
         if os.environ.get('DUMP_PROTO_LOSS'):
             self._dbg = getattr(self, '_dbg', 0) + 1
             if self._dbg % 100 == 1:
@@ -1080,6 +1110,8 @@ class ProtoEvolveCL:
         current-task prototypes and re-cache this model as the frozen reference
         (KD teacher + SDC anchor) for the next task.
         """
+        if self.train_replay_enabled:
+            self.train_replay_history[int(task_id)] = dict(self.train_replay_audit)
         # 1. FIM (global_protos still holds only the OLD classes at this point, so
         #    the radapt subclass can identify this task's new classes by difference)
         self._compute_fim(train_loader, task_id)
@@ -1264,7 +1296,7 @@ class ProtoEvolveCL:
             weights = self._party_kd_weights(classes, 'cpu')
             effective_weights = {c: weights[i].tolist() for i, c in enumerate(classes)}
         top_version, adaptive_classes, adaptive_gate = self._adaptive_top_metadata()
-        return {
+        state = {
             'global_protos': deepcopy(self.global_protos),
             'prev_protos': deepcopy(self.prev_protos),
             'fim_masks': deepcopy(self.fim_masks),
@@ -1295,7 +1327,15 @@ class ProtoEvolveCL:
             'adaptive_pending_task_id': self._adaptive_pending_task_id,
             'adaptive_audit_bundle': deepcopy(self.adaptive_audit_bundle),
         }
+        if self.train_replay_enabled:
+            state['train_replay_audit'] = dict(self.train_replay_audit)
+            state['train_replay_history'] = deepcopy(self.train_replay_history)
+        return state
     def load_state(self, s):
+        if self.train_replay_enabled:
+            self.train_replay_audit = dict(s.get('train_replay_audit',
+                                               self.train_replay_audit))
+            self.train_replay_history = deepcopy(s.get('train_replay_history', {}))
         if self.sample_replay_only and (
                 s.get('global_protos') or s.get('prev_protos')):
             raise ValueError('sample replay only checkpoint contains prototypes')
