@@ -24,12 +24,18 @@ class NmeReadonlyDriverTests(unittest.TestCase):
         (run_dir / 'pilot_holdout' / 'manifest.json').write_bytes(b'manifest')
         config = {
             'output_dir': str(run_dir), 'pilot_dataset': 'isolet',
-            'seed': 54, 'head_consolidation_samples_per_class': samples_per_class,
+            'seed': 54, 'pilot_variant': 'reference20',
+            'head_consolidation_samples_per_class': samples_per_class,
         }
         (run_dir / 'config.json').write_text(json.dumps(config))
         from run_resource_lite_pilot import sha256
         (run_dir / 'HOLDOUT_READOUT.json').write_text(json.dumps({
             'status': status,
+            'dataset': 'isolet', 'seed': 54, 'variant': 'reference20',
+            'config_sha256': sha256(run_dir / 'config.json'),
+            'checkpoint_sha256': sha256(
+                run_dir / 'checkpoints' / 'formal_final.pt'),
+            'freeze_sha256': sha256(run_dir / 'FORMAL_STATE_FROZEN.json'),
             'holdout_manifest_sha256': sha256(
                 run_dir / 'pilot_holdout' / 'manifest.json'),
             'metrics': {'cil': 0.9},
@@ -38,6 +44,16 @@ class NmeReadonlyDriverTests(unittest.TestCase):
 
     def _diag_root(self, tmp):
         return Path(tmp) / 'diagnostic'
+
+    def _assert_preflight_rejects(self, run_dir, diagnostic_root, pattern):
+        try:
+            run(run_dir, diagnostic_root)
+        except ValueError as error:
+            self.assertRegex(str(error), pattern)
+        except Exception as error:
+            self.fail(f'preflight reached data loading: {error}')
+        else:
+            self.fail('preflight accepted a drifted source')
 
     def test_rejects_run_still_open_for_formal_test(self):
         import tempfile
@@ -70,8 +86,46 @@ class NmeReadonlyDriverTests(unittest.TestCase):
         import tempfile
         with tempfile.TemporaryDirectory() as tmp:
             run_dir = self._frozen_run(tmp, samples_per_class=18)
-            with self.assertRaisesRegex(ValueError, 'reference20'):
-                run(run_dir, self._diag_root(tmp))
+            self._assert_preflight_rejects(
+                run_dir, self._diag_root(tmp), 'reference20')
+
+    def test_rejects_wrong_variant_even_with_twenty_samples(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = self._frozen_run(tmp)
+            config_path = run_dir / 'config.json'
+            config = json.loads(config_path.read_text())
+            config['pilot_variant'] = 'lite18'
+            config_path.write_text(json.dumps(config))
+            self._assert_preflight_rejects(
+                run_dir, self._diag_root(tmp), 'reference20')
+
+    def test_rejects_checkpoint_that_drifted_before_scoring(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = self._frozen_run(tmp)
+            (run_dir / 'checkpoints' / 'formal_final.pt').write_bytes(b'drifted')
+            self._assert_preflight_rejects(
+                run_dir, self._diag_root(tmp), 'checkpoint.*frozen readout')
+
+    def test_rejects_config_that_drifted_before_scoring(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = self._frozen_run(tmp)
+            config_path = run_dir / 'config.json'
+            config = json.loads(config_path.read_text())
+            config['extra'] = 'drifted'
+            config_path.write_text(json.dumps(config))
+            self._assert_preflight_rejects(
+                run_dir, self._diag_root(tmp), 'config.*frozen readout')
+
+    def test_rejects_freeze_record_that_drifted_before_scoring(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = self._frozen_run(tmp)
+            (run_dir / 'FORMAL_STATE_FROZEN.json').write_text('{"drift": true}')
+            self._assert_preflight_rejects(
+                run_dir, self._diag_root(tmp), 'freeze.*frozen readout')
 
     def test_rejects_non_frozen_readout_status(self):
         import tempfile

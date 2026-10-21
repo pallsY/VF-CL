@@ -102,20 +102,36 @@ def run(run_dir, diagnostic_root):
     config = json.loads(config_path.read_text(encoding='utf-8'))
     if Path(config['output_dir']).resolve() != run_dir.resolve():
         raise ValueError('run directory does not match its own config')
-    if config.get('head_consolidation_samples_per_class') != 20:
+    if (config.get('pilot_dataset') != 'isolet'
+            or config.get('seed') not in (54, 55)
+            or config.get('pilot_variant') != 'reference20'
+            or config.get('head_consolidation_samples_per_class') != 20):
         raise ValueError('source run is not a reference20 (20 samples/class) job')
     readout_path = run_dir / 'HOLDOUT_READOUT.json'
+    readout_sha_before = sha256(readout_path)
     original = json.loads(readout_path.read_text(encoding='utf-8'))
     if original.get('status') not in (
             'independent_training_holdout_readout',
             'paired_training_holdout_readout'):
         raise ValueError('source run is not a frozen training-holdout readout')
+    if any(original.get(key) != expected for key, expected in (
+            ('dataset', 'isolet'), ('seed', config['seed']),
+            ('variant', 'reference20'))):
+        raise ValueError('source identity differs from its frozen readout')
+    if config_sha_before != original.get('config_sha256'):
+        raise ValueError('config differs from its frozen readout')
+    freeze_path = run_dir / 'FORMAL_STATE_FROZEN.json'
+    freeze_sha_before = sha256(freeze_path)
+    if freeze_sha_before != original.get('freeze_sha256'):
+        raise ValueError('freeze record differs from its frozen readout')
     manifest_path = run_dir / 'pilot_holdout' / 'manifest.json'
     manifest_sha_before = sha256(manifest_path)
     if manifest_sha_before != original.get('holdout_manifest_sha256'):
         raise ValueError('source holdout manifest no longer matches its frozen readout')
     checkpoint = run_dir / 'checkpoints' / 'formal_final.pt'
     checkpoint_sha_before = sha256(checkpoint)
+    if checkpoint_sha_before != original.get('checkpoint_sha256'):
+        raise ValueError('checkpoint differs from its frozen readout')
 
     diagnostic_root.mkdir(parents=True, exist_ok=False)
     args = SimpleNamespace(**config)
@@ -132,13 +148,17 @@ def run(run_dir, diagnostic_root):
 
     if (sha256(config_path) != config_sha_before
             or sha256(manifest_path) != manifest_sha_before
-            or sha256(checkpoint) != checkpoint_sha_before):
+            or sha256(checkpoint) != checkpoint_sha_before
+            or sha256(freeze_path) != freeze_sha_before
+            or sha256(readout_path) != readout_sha_before):
         raise RuntimeError('source run directory was modified during scoring')
 
     result.update({
         'status': 'read_only_nme_diagnostic',
         'source_run': str(run_dir),
         'source_config_sha256': config_sha_before,
+        'source_freeze_sha256': freeze_sha_before,
+        'source_readout_sha256': readout_sha_before,
         'source_holdout_manifest_sha256': manifest_sha_before,
         'source_checkpoint_sha256': checkpoint_sha_before,
         'original_cil': original.get('metrics', {}).get('cil'),
