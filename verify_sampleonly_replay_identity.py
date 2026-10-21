@@ -33,7 +33,15 @@ def _snapshot(trainer, method):
             'fim_masks': method.fim_masks}
 
 
-def probe(checkout, source_config, output):
+def first_two_tasks(schedule):
+    tasks = [[int(value) for value in task.split(',')]
+             for task in schedule.split('|')]
+    if len(tasks) < 2 or not tasks[0] or not tasks[1]:
+        raise ValueError('identity probe requires two complete tasks')
+    return tasks[0], tasks[1]
+
+
+def probe(checkout, source_config, output, replay_enabled=0):
     checkout = Path(checkout).resolve()
     sys.path = [str(checkout)] + [path for path in sys.path
                  if Path(path or os.getcwd()).resolve() != Path(__file__).parent.resolve()]
@@ -52,7 +60,7 @@ def probe(checkout, source_config, output):
         args = SimpleNamespace(**config)
         args.device, args.num_workers = 'cpu', 0
         args.epochs_per_task, args.output_dir = 1, tmp
-        args.train_replay_enabled = 0
+        args.train_replay_enabled = int(replay_enabled)
         torch.manual_seed(37021)
         np.random.seed(37021)
         random.seed(37021)
@@ -71,13 +79,14 @@ def probe(checkout, source_config, output):
         bottoms, top = build_models(args)
         trainer = VFLTrainer(bottoms, top, args)
         method = ProtoEvolveCL(trainer, args)
-        first = loader([0, 1])
-        method.before_task(0, [0, 1], [0, 1])
+        first_classes, second_classes = first_two_tasks(args.custom_tasks)
+        first = loader(first_classes)
+        method.before_task(0, first_classes, first_classes)
         method.train_task(first, 0)
         method.after_task(first, 0)
         task0 = _snapshot(trainer, method)
-        second = loader([2, 3])
-        method.before_task(1, [2, 3], [0, 1, 2, 3])
+        second = loader(second_classes)
+        method.before_task(1, second_classes, first_classes + second_classes)
         batch_x, batch_y = next(iter(second))
         from data_utils import split_features
         import torch.nn.functional as F
@@ -122,5 +131,7 @@ if __name__ == '__main__':
     parser.add_argument('--checkout', type=Path, required=True)
     parser.add_argument('--source-config', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--replay-enabled', type=int, choices=(0, 1), default=0)
     options = parser.parse_args()
-    probe(options.checkout, options.source_config, options.output)
+    probe(options.checkout, options.source_config, options.output,
+          options.replay_enabled)
