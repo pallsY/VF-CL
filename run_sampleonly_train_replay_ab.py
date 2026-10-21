@@ -94,9 +94,6 @@ def run_config(config_path):
     runner.VFLDataset = lambda _args: dataset
     stopped = False
     started = time.monotonic()
-    if str(args.device).startswith('cuda'):
-        import torch
-        torch.cuda.reset_peak_memory_stats(args.device)
     try:
         runner.run_experiment(args)
     except StopBeforeTest:
@@ -139,12 +136,15 @@ def run_config(config_path):
         peak_rss_kib = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     except ImportError:
         peak_rss_kib = None
+    if str(args.device).startswith('cuda'):
+        import torch
+        peak_cuda_bytes = int(torch.cuda.max_memory_allocated(args.device))
+    else:
+        peak_cuda_bytes = None
     result['resource_metrics'] = {
         'wall_seconds': elapsed_seconds,
         'peak_rss_kib': peak_rss_kib,
-        'peak_cuda_bytes': (
-            int(torch.cuda.max_memory_allocated(args.device))
-            if str(args.device).startswith('cuda') else None),
+        'peak_cuda_bytes': peak_cuda_bytes,
     }
     audit_dir = run / 'train_replay_audit'
     if arm == 'B':
