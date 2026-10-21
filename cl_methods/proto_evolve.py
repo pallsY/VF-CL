@@ -315,7 +315,9 @@ class ProtoEvolveCL:
         self.train_replay_enabled = bool(getattr(args, 'train_replay_enabled', 0))
         if self.train_replay_enabled:
             self.train_replay_audit = {'steps': 0, 'samples': 0, 'duplicates': 0,
-                                       'upload_bytes': 0, 'return_bytes': 0}
+                                       'upload_bytes': 0, 'return_bytes': 0,
+                                       'upload_bytes_by_party': [0] * args.num_parties,
+                                       'return_bytes_by_party': [0] * args.num_parties}
             self.train_replay_history = {}
         self.head_task_classes = {}
         self.head_validation_sha256 = ''
@@ -349,7 +351,9 @@ class ProtoEvolveCL:
                 {c: self.head_raw_replay[c] for c in old_classes},
                 derive_seed(self.args.seed, 'train_replay', int(task_id)))
             self.train_replay_audit = {'steps': 0, 'samples': 0, 'duplicates': 0,
-                                       'upload_bytes': 0, 'return_bytes': 0}
+                                       'upload_bytes': 0, 'return_bytes': 0,
+                                       'upload_bytes_by_party': [0] * self.args.num_parties,
+                                       'return_bytes_by_party': [0] * self.args.num_parties}
         # Apply FIM freeze (computed in after_task of previous task)
         if task_id > 0:
             total_f, total_p = 0, 0
@@ -678,6 +682,10 @@ class ProtoEvolveCL:
             self.train_replay_audit['duplicates'] += duplicates
             self.train_replay_audit['upload_bytes'] += uploaded
             self.train_replay_audit['return_bytes'] += uploaded
+            for party, embedding in enumerate(replay_embs):
+                amount = embedding.numel() * embedding.element_size()
+                self.train_replay_audit['upload_bytes_by_party'][party] += amount
+                self.train_replay_audit['return_bytes_by_party'][party] += amount
         if os.environ.get('DUMP_PROTO_LOSS'):
             self._dbg = getattr(self, '_dbg', 0) + 1
             if self._dbg % 100 == 1:

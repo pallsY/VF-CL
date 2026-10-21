@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import time
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -92,16 +93,38 @@ def run_config(config_path):
     original = runner.VFLDataset
     runner.VFLDataset = lambda _args: dataset
     stopped = False
+    started = time.monotonic()
+    if str(args.device).startswith('cuda'):
+        import torch
+        torch.cuda.reset_peak_memory_stats(args.device)
     try:
         runner.run_experiment(args)
     except StopBeforeTest:
         stopped = True
     finally:
         runner.VFLDataset = original
+    elapsed_seconds = time.monotonic() - started
     if not stopped:
         raise RuntimeError('development run did not stop before official test')
     validate_training_only_artifacts(run)
     checkpoint = run / 'checkpoints' / 'formal_final.pt'
+    audit_rows = [json.loads(line) for line in
+                  (run / 'data_flow_audit.jsonl').read_text().splitlines()]
+    holdout = set(json.loads((run / 'pilot_holdout' / 'manifest.json').read_text())
+                  ['ordered_indices'])
+    used = {index for row in audit_rows for index in row.get('indices', [])}
+    if holdout & used:
+        raise ValueError('training data flow overlaps held-out indices')
+    import runner as frozen_runner
+    import torch
+    checkpoint_state = frozen_runner._decode_checkpoint_value(torch.load(
+        checkpoint, map_location='cpu', weights_only=True))['cl_state']
+    raw = checkpoint_state['head_raw_replay']
+    if (set(map(int, raw)) != set(range(args.num_classes))
+            or any(len(value) != 20 for value in raw.values())
+            or checkpoint_state.get('global_protos')
+            or checkpoint_state.get('prev_protos')):
+        raise ValueError('persistent sample-only memory differs')
     result = {
         'status': 'training_only_replay_ab_readout',
         'dataset': dataset_name, 'seed': seed, 'arm': arm,
@@ -110,6 +133,18 @@ def run_config(config_path):
         'checkpoint_sha256': sha256(checkpoint),
         'freeze_sha256': sha256(run / 'FORMAL_STATE_FROZEN.json'),
         'holdout_manifest_sha256': sha256(run / 'pilot_holdout' / 'manifest.json'),
+    }
+    try:
+        import resource
+        peak_rss_kib = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+    except ImportError:
+        peak_rss_kib = None
+    result['resource_metrics'] = {
+        'wall_seconds': elapsed_seconds,
+        'peak_rss_kib': peak_rss_kib,
+        'peak_cuda_bytes': (
+            int(torch.cuda.max_memory_allocated(args.device))
+            if str(args.device).startswith('cuda') else None),
     }
     audit_dir = run / 'train_replay_audit'
     if arm == 'B':
@@ -124,7 +159,37 @@ def run_config(config_path):
             'totals': {key: sum(event[key] for event in events)
                        for key in ('steps', 'samples', 'duplicates',
                                    'upload_bytes', 'return_bytes')},
+            'upload_bytes_by_party': [
+                sum(event['upload_bytes_by_party'][party] for event in events)
+                for party in range(args.num_parties)],
+            'return_bytes_by_party': [
+                sum(event['return_bytes_by_party'][party] for event in events)
+                for party in range(args.num_parties)],
         }
+        result['train_replay_audit']['extra_forward_graphs'] = (
+            result['train_replay_audit']['totals']['steps'])
+        result['train_replay_audit']['extra_backward_contributions'] = (
+            result['train_replay_audit']['totals']['steps'])
+        from ast import literal_eval
+        first_task = tuple(int(value) for value in args.custom_tasks.split('|')[0].split(','))
+        expected_steps = sum(
+            1 for row in audit_rows
+            if (key := literal_eval(row['loader_key']))[0] == 'train'
+            and tuple(key[1]) != first_task)
+        expected_party_bytes = (
+            result['train_replay_audit']['totals']['samples']
+            * args.embed_dim * 4)
+        if (sum(result['train_replay_audit']['upload_bytes_by_party'])
+                != result['train_replay_audit']['totals']['upload_bytes']
+                or sum(result['train_replay_audit']['return_bytes_by_party'])
+                != result['train_replay_audit']['totals']['return_bytes']
+                or result['train_replay_audit']['totals']['steps'] != expected_steps
+                or any(value != expected_party_bytes for value in
+                       result['train_replay_audit']['upload_bytes_by_party'])
+                or any(value != expected_party_bytes for value in
+                       result['train_replay_audit']['return_bytes_by_party'])):
+            raise ValueError('replay steps or per-party communication differ')
+        result['train_replay_audit']['formula_bytes_per_party'] = expected_party_bytes
     elif audit_dir.exists():
         raise ValueError('A arm unexpectedly wrote replay audit files')
     if not args.pilot_smoke:
