@@ -64,6 +64,7 @@ def probe(checkout, source_config, output, replay_enabled=0):
         torch.manual_seed(37021)
         np.random.seed(37021)
         random.seed(37021)
+        torch.set_num_threads(1)
         torch.use_deterministic_algorithms(True)
         dataset = VFLDataset(args)
         def loader(classes):
