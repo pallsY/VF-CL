@@ -42,7 +42,6 @@ def probe(checkout, source_config, output):
     from data_utils import VFLDataset
     from models import build_models
     from vfl_trainer import VFLTrainer
-    from torch.utils.data import DataLoader, Subset
 
     for module in (sys.modules['cl_methods.proto_evolve'],
                    sys.modules['data_utils'], sys.modules['models']):
@@ -66,8 +65,9 @@ def probe(checkout, source_config, output):
                 if len(selected) < 20:
                     raise ValueError('identity probe lacks class examples')
                 indices.extend(selected)
-            return DataLoader(Subset(dataset.trainset, indices),
-                              batch_size=args.batch_size, shuffle=False, num_workers=0)
+            return dataset._loader(
+                dataset.trainset, indices,
+                ('identity_train', tuple(classes)), False, audit=True)
         bottoms, top = build_models(args)
         trainer = VFLTrainer(bottoms, top, args)
         method = ProtoEvolveCL(trainer, args)
