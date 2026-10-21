@@ -95,6 +95,25 @@ def probe(checkout, source_config, output, replay_enabled=0):
         ce = F.cross_entropy(trainer.top_model(trainer._aggregate(embeddings)), batch_y)
         loss = method._proto_loss(trainer.bottoms, trainer.top_model,
                                   batch_x, batch_y, ce)
+        with torch.no_grad():
+            old_embs = [bottom(piece) for bottom, piece in zip(
+                method._old_bottoms, pieces)]
+            old_party, old_logits = method._compute_party_logits(
+                old_embs, method._old_top)
+            new_embs = [bottom(piece) for bottom, piece in zip(
+                trainer.bottoms, pieces)]
+            new_party, new_logits = method._compute_party_logits(
+                new_embs, trainer.top_model)
+            width = min(old_logits.size(1), new_logits.size(1))
+            temperature = method.temperature
+            kd = method.effective_distill_weight * F.kl_div(
+                F.log_softmax(new_logits[:, :width] / temperature, dim=1),
+                F.softmax(old_logits[:, :width] / temperature, dim=1),
+                reduction='batchmean') * temperature * temperature
+            party_kd = method.party_kd_lambda * method._party_kd_loss(
+                new_party, old_party, list(range(width)), args.device)
+            components = {'CE': float(ce).hex(), 'KD': float(kd).hex(),
+                          'PartyKD': float(party_kd).hex()}
         loss.backward()
         gradients = {}
         for party, bottom in enumerate(trainer.bottoms):
@@ -116,6 +135,7 @@ def probe(checkout, source_config, output, replay_enabled=0):
                            ('cl_methods.proto_evolve', 'data_utils', 'models')},
         'task0': task0, 'task1': task1,
         'task1_probe_loss_hex': float(loss).hex(),
+        'task1_probe_components': components,
         'task1_probe_gradients': gradients,
     }
     output = Path(output)
