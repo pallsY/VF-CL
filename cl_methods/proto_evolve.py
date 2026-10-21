@@ -1148,6 +1148,14 @@ class ProtoEvolveCL:
         for ob in self._old_bottoms:
             for p in ob.parameters(): p.requires_grad = False
         for p in self._old_top.parameters(): p.requires_grad = False
+        if self.train_replay_enabled:
+            audit_dir = os.path.join(self.args.output_dir, 'train_replay_audit')
+            os.makedirs(audit_dir, exist_ok=True)
+            audit_path = os.path.join(audit_dir, f'event_{int(task_id)}.json')
+            with open(audit_path, 'x', encoding='utf-8') as stream:
+                json.dump({'task_id': int(task_id), **self.train_replay_audit},
+                          stream, indent=2, sort_keys=True)
+                stream.write('\n')
 
     # The legacy _evolve() scalar mean-scaling drift heuristic and its
     # before_train_compute_pre_protos() pre-pass were removed: under the cosine
@@ -1327,15 +1335,8 @@ class ProtoEvolveCL:
             'adaptive_pending_task_id': self._adaptive_pending_task_id,
             'adaptive_audit_bundle': deepcopy(self.adaptive_audit_bundle),
         }
-        if self.train_replay_enabled:
-            state['train_replay_audit'] = dict(self.train_replay_audit)
-            state['train_replay_history'] = deepcopy(self.train_replay_history)
         return state
     def load_state(self, s):
-        if self.train_replay_enabled:
-            self.train_replay_audit = dict(s.get('train_replay_audit',
-                                               self.train_replay_audit))
-            self.train_replay_history = deepcopy(s.get('train_replay_history', {}))
         if self.sample_replay_only and (
                 s.get('global_protos') or s.get('prev_protos')):
             raise ValueError('sample replay only checkpoint contains prototypes')

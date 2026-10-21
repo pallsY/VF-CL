@@ -111,6 +111,22 @@ def run_config(config_path):
         'freeze_sha256': sha256(run / 'FORMAL_STATE_FROZEN.json'),
         'holdout_manifest_sha256': sha256(run / 'pilot_holdout' / 'manifest.json'),
     }
+    audit_dir = run / 'train_replay_audit'
+    if arm == 'B':
+        events = [json.loads((audit_dir / f'event_{task_id}.json').read_text())
+                  for task_id in range(args.num_tasks)]
+        if (events[0]['steps'] != 0
+                or any(event['steps'] < 1 for event in events[1:])
+                or any(event['samples'] != 64 * event['steps'] for event in events)):
+            raise ValueError('replay audit counts differ from the fixed protocol')
+        result['train_replay_audit'] = {
+            'events': events,
+            'totals': {key: sum(event[key] for event in events)
+                       for key in ('steps', 'samples', 'duplicates',
+                                   'upload_bytes', 'return_bytes')},
+        }
+    elif audit_dir.exists():
+        raise ValueError('A arm unexpectedly wrote replay audit files')
     if not args.pilot_smoke:
         result.update(evaluate_holdout(args, dataset, checkpoint))
     path = run / ('PILOT_GATE.json' if args.pilot_smoke else 'HOLDOUT_READOUT.json')

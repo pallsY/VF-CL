@@ -79,6 +79,8 @@ class TrainReplayMethodTests(unittest.TestCase):
             self.assertEqual(method.train_replay_audit['samples'], 64)
             self.assertEqual(method.train_replay_audit['upload_bytes'], 64 * 2 * 2 * 4)
             self.assertEqual(method.train_replay_audit['return_bytes'], 64 * 2 * 2 * 4)
+            self.assertNotIn('train_replay_audit', method.get_state())
+            self.assertNotIn('train_replay_history', method.get_state())
 
 
 if __name__ == '__main__':
