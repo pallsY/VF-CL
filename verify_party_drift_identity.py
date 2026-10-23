@@ -52,6 +52,9 @@ def probe(checkout, source_config, output):
     with tempfile.TemporaryDirectory(prefix='vfcl-replay-identity-') as tmp:
         args = SimpleNamespace(**config)
         args.device, args.num_workers = 'cpu', 0
+        # This fixed-input gate is not a data-flow audit. The hand-built loader
+        # has no recording sampler; disable only its unrelated audit hook.
+        args.data_flow_audit = 0
         args.epochs_per_task, args.output_dir = 1, tmp
         args.party_drift_enabled = 0
         torch.manual_seed(37021)
