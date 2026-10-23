@@ -147,8 +147,23 @@ def verify_audit_record(record, selected_parties):
         embedding_dims=record.get('embedding_dims'),
         replay_batch=record.get('replay_batch'),
     )
-    if record != expected:
+    extras = set(record) - set(expected)
+    if (extras - {'logical_replay_ids', 'duplicate_samples', 'forward_calls'} or
+            any(record.get(key) != value for key, value in expected.items())):
         raise ValueError('selection audit does not replay exactly')
+    if ('logical_replay_ids' in extras) != ('duplicate_samples' in extras):
+        raise ValueError('selection audit replay identities are incomplete')
+    if 'logical_replay_ids' in extras and (
+            not isinstance(record['logical_replay_ids'], list) or
+            type(record['duplicate_samples']) is not int or
+            record['duplicate_samples'] < 0):
+        raise ValueError('selection audit replay identities are invalid')
+    if 'forward_calls' in extras:
+        calls = record['forward_calls']
+        if (len(calls) != len(record['weights']) or
+                any((count <= 0 if k in record['selected'] else count != 0)
+                    for k, count in enumerate(calls))):
+            raise ValueError('selection audit forward calls disagree')
 
 
 def rows_from_audit(path, step_results):
@@ -250,7 +265,8 @@ def message_ledger(rows, *, epochs, current_batch, replay_batch,
     }
 
 
-def verify_replay_invariants(replay_fn, party_modules, selected):
+def verify_replay_invariants(replay_fn, party_modules, selected,
+                             *, retain_graph=False):
     """Check only the replay call, after any normal current-task update."""
     selected = set(selected)
     counts = [0] * len(party_modules)
@@ -267,7 +283,8 @@ def verify_replay_invariants(replay_fn, party_modules, selected):
         loss = replay_fn()
         params = [p for module in party_modules for p in module.parameters()
                   if p.requires_grad]
-        gradients = torch.autograd.grad(loss, params, allow_unused=True)
+        gradients = torch.autograd.grad(
+            loss, params, allow_unused=True, retain_graph=retain_graph)
         grad_by_param = dict(zip(params, gradients))
         for k, module in enumerate(party_modules):
             if k in selected:
@@ -288,7 +305,10 @@ def verify_replay_invariants(replay_fn, party_modules, selected):
         if cuda_state and any(not torch.equal(a, b) for a, b in zip(
                 cuda_state, torch.cuda.get_rng_state_all())):
             raise AssertionError('replay changed global CUDA RNG state')
-        return {'forward_calls': counts}
+        result = {'forward_calls': counts}
+        if retain_graph:
+            result['loss'] = loss
+        return result
     finally:
         for hook in hooks:
             hook.remove()

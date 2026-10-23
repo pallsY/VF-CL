@@ -1,6 +1,7 @@
 """V-LETO (AAAI 2025): sum aggregation, single linear top, FIM freeze, prototype evolution."""
 import json, os, torch, torch.nn as nn, torch.nn.functional as F, numpy as np
 from copy import deepcopy
+from pathlib import Path
 from data_utils import split_features
 from determinism import derive_seed
 from adaptive_head_consolidation import (
@@ -312,6 +313,13 @@ class ProtoEvolveCL:
             int(getattr(args, 'num_tasks', 1)),
         )
         self.head_raw_replay = {}
+        self.party_drift_enabled = bool(getattr(args, 'party_drift_enabled', 0))
+        if self.party_drift_enabled:
+            self.party_drift_step = 0
+            self.party_drift_epoch = 0
+            self.party_drift_step_records = []
+            self._party_drift_weights = [1.0 / args.num_parties] * args.num_parties
+            self._party_drift_attenuation = [0.0] * args.num_parties
         self.head_task_classes = {}
         self.head_validation_sha256 = ''
         self.adaptive_audit_bundle = None
@@ -332,6 +340,21 @@ class ProtoEvolveCL:
         if self.dep_tracking_enabled and self.current_task_classes:
             self._freeze_dependency_snapshot(self.current_task_classes)
         self.current_task_classes = list(new_classes)
+        if self.party_drift_enabled and task_id > 0:
+            if self.global_protos:
+                raise ValueError('party-drift raw replay cannot retain prototypes')
+            from party_drift_replay import BalancedOldReplay
+            old_classes = sorted(set(self.head_raw_replay) - set(new_classes))
+            if not old_classes or any(len(self.head_raw_replay[c]) != 20
+                                      for c in old_classes):
+                raise ValueError('party-drift old memory must have 20 raw samples per class')
+            self._party_drift_sampler = BalancedOldReplay(
+                {c: self.head_raw_replay[c] for c in old_classes},
+                derive_seed(self.args.seed, 'party_drift_sampler', int(task_id)))
+            self.party_drift_step = 0
+            self.party_drift_step_records = []
+            self._party_drift_weights = [1.0 / self.args.num_parties] * self.args.num_parties
+            self._party_drift_attenuation = [0.0] * self.args.num_parties
         # Apply FIM freeze (computed in after_task of previous task)
         if task_id > 0:
             total_f, total_p = 0, 0
@@ -657,7 +680,86 @@ class ProtoEvolveCL:
                       f"supcon={dbg_supcon:.4f}  "
                       f"(#protos={len(self.global_protos)}, "
                       f"old_teacher={'yes' if self._old_top is not None else 'no'})")
+        if self.party_drift_enabled and self.current_task_id > 0:
+            from party_drift_local import replay_step_audit
+            from party_drift_replay import masked_replay_loss
+            replay_x, replay_y, identities, duplicates = self._party_drift_sampler.sample()
+            replay_x = replay_x.to(device)
+            replay_y = replay_y.to(device)
+            audit = replay_step_audit(
+                self._party_drift_weights, (self.args.num_parties + 1) // 2,
+                int(self.args.seed), self.current_task_id,
+                self.party_drift_epoch, self.party_drift_step, 4,
+                attenuation=self._party_drift_attenuation,
+                embedding_dims=[int(self.args.embed_dim)] * self.args.num_parties,
+                replay_batch=len(replay_y),
+            )
+            parts = split_features(replay_x, self.args)
+            def replay_forward():
+                replay_loss, _ = masked_replay_loss(
+                    bottoms, top_model, self._old_bottoms, self._old_top,
+                    parts, replay_y, audit['selected'],
+                    self._party_drift_sampler.classes, 1.0,
+                    derive_seed(self.args.seed, 'party_drift_forward',
+                                self.current_task_id, self.party_drift_step),
+                    temperature=self.temperature,
+                    kd_weight=self.effective_distill_weight,
+                )
+                return replay_loss
+            if bool(getattr(self.args, 'party_drift_preflight', 0)):
+                from party_drift_local import verify_replay_invariants
+                checked = verify_replay_invariants(
+                    replay_forward, bottoms, audit['selected'],
+                    retain_graph=True)
+                replay_loss = checked['loss']
+                audit['forward_calls'] = checked['forward_calls']
+            else:
+                replay_loss = replay_forward()
+            total = total + replay_loss
+            audit.update({'logical_replay_ids': identities,
+                          'duplicate_samples': duplicates})
+            self.party_drift_step_records.append(audit)
+            self._write_party_drift_audit(audit)
+            self.party_drift_step += 1
         return total
+
+    def _write_party_drift_audit(self, record):
+        target = Path(self.args.output_dir) / 'party_drift_audit' / 'selection.jsonl'
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with target.open('a', encoding='utf-8') as handle:
+            handle.write(json.dumps(record, sort_keys=True) + '\n')
+
+    def _update_party_drift_probe(self, epoch):
+        from party_drift_local import attenuation_weights
+        from party_drift_replay import contribution_attenuation
+        old_classes = self._party_drift_sampler.classes
+        rng = np.random.default_rng(np.random.SeedSequence([
+            int(self.args.seed), self.current_task_id, epoch, 90210]))
+        samples, labels, identities = [], [], []
+        for class_id in old_classes:
+            raw = self.head_raw_replay[class_id]
+            if len(raw) < 2:
+                raise ValueError('probe needs two retained samples per old class')
+            for row in rng.choice(len(raw), 2, replace=False):
+                samples.append(raw[int(row)])
+                labels.append(class_id)
+                identities.append((class_id, int(row)))
+        batch = torch.stack(samples).to(self.args.device)
+        labels = torch.tensor(labels, dtype=torch.long, device=self.args.device)
+        self._party_drift_attenuation = contribution_attenuation(
+            self.trainer.bottoms, self.trainer.top_model,
+            self._old_bottoms, self._old_top,
+            split_features(batch, self.args), labels, old_classes)
+        self._party_drift_weights = attenuation_weights(
+            self._party_drift_attenuation)
+        self._write_party_drift_audit({
+            'kind': 'probe', 'task': self.current_task_id, 'epoch': epoch,
+            'seed_sequence': [int(self.args.seed), self.current_task_id,
+                              epoch, 90210],
+            'logical_probe_ids': identities,
+            'attenuation': self._party_drift_attenuation,
+            'weights': self._party_drift_weights,
+        })
 
     def train_task(self, train_loader, task_id):
         self.current_task_id = int(task_id)
@@ -698,6 +800,10 @@ class ProtoEvolveCL:
         start = time.time()
         history = []
         for ep in range(self.args.epochs_per_task):
+            if self.party_drift_enabled:
+                self.party_drift_epoch = ep
+                if ep % 2 == 0:
+                    self._update_party_drift_probe(ep)
             if self.use_sdc and ep % self.sdc_interval == 0:
                 self._sdc_update(train_loader)
             loss, acc = self.trainer.train_epoch(train_loader, optimizers, self._proto_loss)

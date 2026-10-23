@@ -95,6 +95,10 @@ class PartyDriftLocalTests(unittest.TestCase):
         counted['message_bytes'] += 1
         with self.assertRaises(ValueError):
             verify_audit_record(counted, 2)
+        extended = {**a, 'logical_replay_ids': [[0, 1]],
+                    'duplicate_samples': 0,
+                    'forward_calls': [int(i in a['selected']) for i in range(3)]}
+        verify_audit_record(extended, 2)
         verify_audit_record(a, 2)
         changed = {**a, 'selected': [2]}
         with self.assertRaises(ValueError):
@@ -165,6 +169,10 @@ class PartyDriftLocalTests(unittest.TestCase):
         with self.assertRaisesRegex(AssertionError, 'BN state'):
             verify_replay_invariants(mutate_bn_without_graph,
                                      [selected, unselected], [0])
+        checked = verify_replay_invariants(
+            replay, [selected, unselected], [0], retain_graph=True)
+        checked['loss'].backward()
+        self.assertIsNotNone(selected.weight.grad)
 
 
 if __name__ == '__main__':

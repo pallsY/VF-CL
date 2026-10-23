@@ -136,6 +136,10 @@ def validate_adaptive_head_consolidation(args):
 
 def validate_sample_replay_only(args):
     """Reject feature replay in the opt-in raw-memory ablation."""
+    if getattr(args, 'party_drift_enabled', 0) not in (0, 1):
+        raise ValueError('party_drift_enabled must be 0 or 1')
+    if getattr(args, 'party_drift_enabled', 0) and not getattr(args, 'sample_replay_only', 0):
+        raise ValueError('party drift requires raw-sample-only memory')
     if not bool(getattr(args, 'sample_replay_only', 0)):
         return
     required = {
@@ -243,6 +247,10 @@ def get_config():
     p.add_argument('--sample_replay_only', default=0, type=int,
                    choices=[0, 1],
                    help='Retain only raw examples as persistent replay memory')
+    p.add_argument('--party_drift_enabled', default=0, type=int, choices=[0, 1],
+                   help='Development-only party-drift scheduled old-sample replay')
+    p.add_argument('--party_drift_preflight', default=0, type=int, choices=[0, 1],
+                   help='Check replay-only gradients, BN state, and RNG each step')
     p.add_argument('--proto_replay_loss_norm',
                    default='legacy_class_normalized',
                    choices=['legacy_class_normalized', 'sample_mean'],
