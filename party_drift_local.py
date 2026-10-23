@@ -171,7 +171,7 @@ def verify_audit_record(record, selected_parties):
     extras = set(record) - set(expected)
     if (extras - {'logical_replay_ids', 'duplicate_samples', 'forward_calls',
                   'replay_arm', 'replay_alpha', 'cmcdr_examples',
-                  'cmcdr_subsets', 'cmcdr_profile_loss'} or
+                  'cmcdr_subsets', 'cmcdr_profile_loss', 'cmcdr_rows'} or
             any(record.get(key) != value for key, value in expected.items())):
         raise ValueError('selection audit does not replay exactly')
     if 'replay_arm' in extras and record['replay_arm'] not in {
@@ -181,13 +181,19 @@ def verify_audit_record(record, selected_parties):
             not math.isfinite(float(record['replay_alpha'])) or
             float(record['replay_alpha']) <= 0):
         raise ValueError('selection audit has invalid replay alpha')
-    cmcdr_fields = {'cmcdr_examples', 'cmcdr_subsets', 'cmcdr_profile_loss'}
+    cmcdr_fields = {'cmcdr_examples', 'cmcdr_subsets', 'cmcdr_profile_loss',
+                    'cmcdr_rows'}
     if extras & cmcdr_fields:
         if (not cmcdr_fields <= extras or
                 record.get('replay_arm') not in {'cmcdr', 'cmcdr_budget'} or
                 type(record['cmcdr_examples']) is not int or
                 not 0 <= record['cmcdr_examples'] <= record.get('replay_batch', -1) or
                 record['cmcdr_subsets'] != 1 << len(record['weights']) or
+                type(record['cmcdr_rows']) is not list or
+                len(record['cmcdr_rows']) != record['cmcdr_examples'] or
+                len(set(record['cmcdr_rows'])) != len(record['cmcdr_rows']) or
+                any(type(index) is not int or not 0 <= index < record['replay_batch']
+                    for index in record['cmcdr_rows']) or
                 not math.isfinite(float(record['cmcdr_profile_loss'])) or
                 float(record['cmcdr_profile_loss']) < 0 or
                 (record['replay_arm'] == 'cmcdr' and

@@ -762,6 +762,7 @@ class ProtoEvolveCL:
                     'cmcdr_examples': replay_components['cmcdr_examples'],
                     'cmcdr_subsets': 1 << self.args.num_parties,
                     'cmcdr_profile_loss': float(replay_components['cmcdr']),
+                    'cmcdr_rows': cmcdr_indices,
                 })
             self.party_drift_step_records.append(audit)
             self._write_party_drift_audit(audit)

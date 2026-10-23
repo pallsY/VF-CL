@@ -117,9 +117,13 @@ class PartyDriftLocalTests(unittest.TestCase):
                                 embedding_dims=[2, 2], replay_batch=64)
         row.update({'replay_arm': 'cmcdr_budget', 'replay_alpha': 0.5,
                     'cmcdr_examples': 2, 'cmcdr_subsets': 4,
-                    'cmcdr_profile_loss': 0.1})
+                    'cmcdr_profile_loss': 0.1, 'cmcdr_rows': [0, 3]})
         verify_audit_record(row, 2)
         row['cmcdr_examples'] = 65
+        with self.assertRaises(ValueError):
+            verify_audit_record(row, 2)
+        row['cmcdr_examples'] = 2
+        row['cmcdr_rows'] = [0, 64]
         with self.assertRaises(ValueError):
             verify_audit_record(row, 2)
 
