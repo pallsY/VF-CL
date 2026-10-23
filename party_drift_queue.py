@@ -9,6 +9,7 @@ import sys
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -280,9 +281,41 @@ def recover_interrupted_attempts(root, manifest_sha256, reason,
     return {'outcomes': outcomes, 'retry_attempts': retries}
 
 
+@contextmanager
+def queue_run_lock(result_root):
+    """Hold one OS-released lock across the entire queue or recovery run."""
+    if os.name != 'posix' or not Path('/proc').is_dir():
+        raise RuntimeError('development queue requires the verified Linux host')
+    import fcntl
+
+    root = Path(result_root).resolve()
+    if not root.parent.is_dir():
+        raise ValueError('queue result parent does not exist')
+    path = root.parent / f'.{root.name}.queue.lock'
+    with path.open('a+', encoding='utf-8') as stream:
+        try:
+            fcntl.flock(stream.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError as error:
+            raise RuntimeError('development queue or recovery is already running') from error
+        try:
+            yield
+        finally:
+            fcntl.flock(stream.fileno(), fcntl.LOCK_UN)
+
+
 def run_queue(manifest, manifest_sha256, result_root, *,
               retry_infra_key=None, retry_reason=None,
               recover_interruption_reason=None):
+    with queue_run_lock(result_root):
+        return _run_queue_locked(
+            manifest, manifest_sha256, result_root,
+            retry_infra_key=retry_infra_key, retry_reason=retry_reason,
+            recover_interruption_reason=recover_interruption_reason)
+
+
+def _run_queue_locked(manifest, manifest_sha256, result_root, *,
+                      retry_infra_key=None, retry_reason=None,
+                      recover_interruption_reason=None):
     if retry_infra_key is not None and recover_interruption_reason is not None:
         raise ValueError('choose one explicit queue recovery mode')
     checkout = Path(__file__).resolve().parent

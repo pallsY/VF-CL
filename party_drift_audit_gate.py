@@ -5,6 +5,7 @@ import json
 import math
 from pathlib import Path
 
+import numpy as np
 import torch
 
 from determinism import derive_seed
@@ -14,16 +15,42 @@ from party_drift_local import (
 from party_drift_replay import BalancedOldReplay, cmcdr_positions
 
 
+def validate_cmcdr_fields(row, arm):
+    fields = {'cmcdr_examples', 'cmcdr_subsets', 'cmcdr_profile_loss',
+              'cmcdr_rows'}
+    if (arm in ('cmcdr', 'cmcdr_budget')) != (fields <= set(row)) or (
+            arm not in ('cmcdr', 'cmcdr_budget') and fields & set(row)):
+        raise ValueError('CMCDR intervention fields differ from replay arm')
+
+
+def validate_probe_ids(record, seed, task, epoch, old_classes):
+    rng = np.random.default_rng(np.random.SeedSequence(
+        [seed, task, epoch, 90210]))
+    expected = [[int(class_id), int(row)] for class_id in old_classes
+                for row in rng.choice(20, 2, replace=False)]
+    if (record.get('seed_sequence') != [seed, task, epoch, 90210] or
+            record.get('logical_probe_ids') != expected):
+        raise ValueError('probe sample IDs differ from preregistered RNG')
+
+
 def verify_sealed_job(run, job_key, manifest_sha256, *, replay):
     run = Path(run)
     gate = json.loads((run / 'JOB_SUCCESS.json').read_text(encoding='utf-8'))
     readout = run / 'HOLDOUT_READOUT.json'
     audit = run / 'party_drift_audit' / 'selection.jsonl'
+    checkpoint = run / 'checkpoints' / 'formal_final.pt'
+    data_flow = run / 'data_flow_audit.jsonl'
+    readout_payload = json.loads(readout.read_text(encoding='utf-8'))
+    checkpoint_sha = hashlib.sha256(checkpoint.read_bytes()).hexdigest()
     if (gate.get('status') != 'success' or gate.get('job_key') != job_key or
             gate.get('manifest_sha256') != manifest_sha256 or
             gate.get('test_accessed') is not False or
             gate.get('readout_sha256') != hashlib.sha256(
-                readout.read_bytes()).hexdigest()):
+                readout.read_bytes()).hexdigest() or
+            gate.get('checkpoint_sha256') != checkpoint_sha or
+            readout_payload.get('checkpoint_sha256') != checkpoint_sha or
+            gate.get('data_flow_sha256') != hashlib.sha256(
+                data_flow.read_bytes()).hexdigest()):
         raise ValueError('sealed development job identity or readout differs')
     expected_audit = (hashlib.sha256(audit.read_bytes()).hexdigest()
                       if audit.is_file() else None)
@@ -117,12 +144,10 @@ def verify_selection_audit(path, args, dataset, seen_task_classes,
                 refresh = refresh_by_epoch[epoch]
                 if arm == 'drift':
                     if (refresh.get('kind') != 'probe' or
-                            len(refresh.get('logical_probe_ids', [])) !=
-                            2 * len(old) or refresh.get('seed_sequence') !=
-                            [args.seed, task, epoch, 90210] or
                             refresh.get('weights') != attenuation_weights(
                                 refresh['attenuation'])):
                         raise ValueError('contribution attenuation probe differs')
+                    validate_probe_ids(refresh, args.seed, task, epoch, old)
                 elif (refresh.get('kind') != 'weight_refresh' or
                       refresh.get('arm') != arm):
                     raise ValueError('control weight refresh differs')
@@ -137,6 +162,7 @@ def verify_selection_audit(path, args, dataset, seen_task_classes,
             for local_step in range(per_epoch):
                 step = epoch * per_epoch + local_step
                 row = task_steps[step]
+                validate_cmcdr_fields(row, arm)
                 verify_audit_record(row, selected_count)
                 _, _, identities, duplicates = sampler.sample()
                 selected = (parties if step % 4 == 3 else selected_count)

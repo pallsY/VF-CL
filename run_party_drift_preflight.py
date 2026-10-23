@@ -54,6 +54,7 @@ def derive_config(source_path, root, dataset):
         'pilot_smoke': True, 'pilot_holdout_seed': 20261023,
         'pilot_holdout_per_class': 30,
         'party_drift_enabled': 1, 'party_drift_preflight': 1,
+        'party_replay_arm': 'drift', 'party_replay_alpha': 1.0,
         'num_tasks': 10 if full_cifar else 2,
         'custom_tasks': '' if full_cifar else '|'.join(
             expected_tasks(dataset).split('|')[:2]),

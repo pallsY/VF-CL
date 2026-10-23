@@ -49,8 +49,15 @@ class AdjudicationTests(unittest.TestCase):
                 correct = count * score // 100
                 run = Path(config['output_dir']) / 'attempt-01'
                 run.mkdir(parents=True)
+                checkpoint = run / 'checkpoints' / 'formal_final.pt'
+                checkpoint.parent.mkdir()
+                checkpoint.write_bytes(b'checkpoint')
+                checkpoint_sha = hashlib.sha256(checkpoint.read_bytes()).hexdigest()
+                flow = run / 'data_flow_audit.jsonl'
+                flow.write_text('{"split":"train"}\n')
                 readout = {
                     'job_key': row['job_key'], 'test_accessed': False,
+                    'checkpoint_sha256': checkpoint_sha,
                     'readout_rule': ('final_bic_joint_alpha_beta' if ds == 'cifar100'
                                      else 'icarl_nme' if method == 'icarl'
                                      else 'model_head'),
@@ -75,6 +82,8 @@ class AdjudicationTests(unittest.TestCase):
                     'status': 'success', 'job_key': row['job_key'],
                     'manifest_sha256': digest,
                     'readout_sha256': hashlib.sha256(raw).hexdigest(),
+                    'checkpoint_sha256': checkpoint_sha,
+                    'data_flow_sha256': hashlib.sha256(flow.read_bytes()).hexdigest(),
                     'selection_audit_sha256': (
                         hashlib.sha256(audit.read_bytes()).hexdigest()
                         if replay else None),

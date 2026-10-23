@@ -1,12 +1,24 @@
 import tempfile
 import unittest
 import json
+import os
 from pathlib import Path
 
 import party_drift_queue as queue
 
 
 class QueuePolicyTests(unittest.TestCase):
+    def test_queue_run_lock_excludes_concurrent_recovery(self):
+        self.assertTrue(hasattr(queue, 'queue_run_lock'))
+        if os.name != 'posix':
+            return
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / 'results'
+            with queue.queue_run_lock(root):
+                with self.assertRaises(RuntimeError):
+                    with queue.queue_run_lock(root):
+                        pass
+
     def test_recovery_accounts_for_plan_written_before_start_event(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

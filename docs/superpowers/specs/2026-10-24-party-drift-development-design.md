@@ -90,7 +90,10 @@ identity also have separate evidence.
 Failures preserve files and logs. No failed pilot is converted into an
 accuracy job.
 
-The development queue starts with UPMC, then ISOLET, then CIFAR-100. It may
+The development queue runs only on the qualified Linux host and holds an OS
+exclusive lock for its entire lifetime, including recovery; the lock is
+released by the kernel if the process dies. It starts with UPMC, then ISOLET,
+then CIFAR-100. It may
 schedule independent listed jobs across idle qualified GPUs but never compete
 with another user's process. It records health, runtime, checkpoint, and audit
 status while withholding accuracy summaries until all listed jobs finish or a

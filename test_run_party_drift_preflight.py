@@ -36,6 +36,8 @@ class PartyDriftPreflightConfigTest(unittest.TestCase):
             self.assertEqual(config['pilot_holdout_seed'], 20261023)
             self.assertEqual(config['party_drift_enabled'], 1)
             self.assertEqual(config['party_drift_preflight'], 1)
+            self.assertEqual(config['party_replay_arm'], 'drift')
+            self.assertEqual(config['party_replay_alpha'], 1.0)
 
     def test_cifar_correctness_pilot_uses_idle_gpu_one(self):
         from run_resource_lite_pilot import expected_tasks
