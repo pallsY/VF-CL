@@ -208,8 +208,8 @@ def generate_manifest(*, sample_root, baseline_root, evidence_root,
         dataset, method, alpha_text, seed_text = job_key.split('/')
         alpha = None if alpha_text == 'none' else float(alpha_text)
         seed = int(seed_text)
-        source_path = source_config_path(sample_root, baseline_root,
-                                         dataset, method)
+        source_path = Path(source_config_path(sample_root, baseline_root,
+                                              dataset, method))
         if source_path not in source_cache:
             source_cache[source_path] = (
                 json.loads(source_path.read_text(encoding='utf-8')),
