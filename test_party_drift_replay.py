@@ -74,6 +74,8 @@ class PartyDriftReplayTests(unittest.TestCase):
         data = {0: torch.arange(20).float().unsqueeze(1),
                 1: torch.arange(20, 40).float().unsqueeze(1)}
         before = torch.get_rng_state().clone()
+        cuda_before = (torch.cuda.get_rng_state_all()
+                       if torch.cuda.is_available() else [])
         first = BalancedOldReplay(data, seed=73, batch_size=64)
         second = BalancedOldReplay(data, seed=73, batch_size=64)
         x, y, ids, duplicates = first.sample()
@@ -85,6 +87,9 @@ class PartyDriftReplayTests(unittest.TestCase):
         self.assertEqual(torch.bincount(y).tolist(), [32, 32])
         self.assertGreater(duplicates, 0)
         self.assertTrue(torch.equal(before, torch.get_rng_state()))
+        if cuda_before:
+            self.assertTrue(all(torch.equal(a, b) for a, b in zip(
+                cuda_before, torch.cuda.get_rng_state_all())))
 
     def test_masked_loss_skips_unselected_bottoms_and_preserves_rng(self):
         torch.manual_seed(9)
@@ -101,6 +106,8 @@ class PartyDriftReplayTests(unittest.TestCase):
             lambda _m, _i, _o, k=k: calls.__setitem__(k, calls[k] + 1)
         ) for k, bottom in enumerate(bottoms)]
         before = torch.get_rng_state().clone()
+        cuda_before = (torch.cuda.get_rng_state_all()
+                       if torch.cuda.is_available() else [])
         try:
             loss, components = masked_replay_loss(
                 bottoms, top, old_bottoms, old_top, parts, labels,
@@ -116,6 +123,9 @@ class PartyDriftReplayTests(unittest.TestCase):
         self.assertIsNotNone(bottoms[0].weight.grad)
         self.assertIsNotNone(bottoms[2].weight.grad)
         self.assertTrue(torch.equal(before, torch.get_rng_state()))
+        if cuda_before:
+            self.assertTrue(all(torch.equal(a, b) for a, b in zip(
+                cuda_before, torch.cuda.get_rng_state_all())))
         self.assertEqual(set(components), {'ce', 'logit_kd'})
 
     def test_probe_detects_positive_party_contribution_decay(self):

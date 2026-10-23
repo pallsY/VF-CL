@@ -118,9 +118,10 @@ def masked_replay_loss(bottoms, top, old_bottoms, old_top, parts,
         raise ValueError('invalid masked replay specification')
     devices = [parts[0].device.index] if parts[0].is_cuda else []
     with torch.random.fork_rng(devices=devices):
-        torch.manual_seed(int(seed))
+        torch.random.default_generator.manual_seed(int(seed))
         if devices:
-            torch.cuda.manual_seed_all(int(seed))
+            with torch.cuda.device(devices[0]):
+                torch.cuda.manual_seed(int(seed))
         student_selected = {k: bottoms[k](parts[k]) for k in selected}
         student_template = next(iter(student_selected.values()))
         student_embs = [student_selected.get(k, torch.zeros_like(student_template))
