@@ -55,9 +55,11 @@ for old class `c` and party `k`. Use `s_k = mean_c a(k,c)`, then the same
 `gamma = 0.2` smoothing and sampler as candidate A. This aggregation is fixed
 before accuracy results; no class or party is selected from development scores.
 
-These are **conditional** counts. The ISOLET 30-per-class tuning holdout has
-been generated from a local NPZ whose SHA-256 matches the frozen formal data
-anchor. Its selected-index digest is
+These are **pre-run simulated message counts**, now reconciled with all three
+exact-source 30-per-class tuning holdout manifests in
+`message_ledger_verified.json`. They are not measured network bytes or
+accuracy results. The ISOLET holdout was generated from a local NPZ whose
+SHA-256 matches the frozen formal data anchor. Its selected-index digest is
 `668cf1ce874c55a587647940d58181d7a42dc0ae0aa75c1dd4625004ef923089`.
 The local UPMC NPZ is the earlier **two-party** clean cache (SHA-256
 `dea0569f0d4195eaaecc9cab3a6cce533f07b8d88472e7dbca5113152a314339`,
@@ -70,15 +72,21 @@ The frozen `prepare_upmc_four_party.py` splits those columns into 0:256,
 256:512, 512:1024, and 1024:1536 while preserving rows, labels, source IDs,
 and train/test indices. The SHA mismatch is therefore an expected **different
 data artifact**, not evidence that the local file is the formal four-party
-cache. The tool correctly refused to make its holdout. When the formal source
-is reachable, verify its file and metadata hashes, then reconstruct the old
-validation manifest exactly before making the new tuning manifest. The CIFAR
-training source is not local. UPMC and CIFAR development ledger rows remain
-projections until both exact-source holdout manifests exist. No training or
-accuracy evaluation has started.
+cache. The tool correctly refused to make its holdout. After brf3080 became
+reachable, the formal UPMC file and metadata hashes were checked against the
+anchor, as was the CIFAR-100 train-file hash. The original validation and BiC
+manifests were reconstructed from those exact sources before creating new
+tuning manifests. Independently, all new manifests were checked for 30 unique
+indices per class and zero overlap with existing validation and BiC indices.
+UPMC selected-index digest:
+`d19918d00acf93cd65f3095ea3a61914da54144e192ee0fd411d76bfaf3e595f`;
+CIFAR selected-index digest:
+`55b8130fee6f828d0e6be8fbc39e8db70f05aebb55130073da47873c77a9e5ea`.
+All three are mirrored in the new NAS evidence root
+`/brf/users/yangxx/VFCL-results/party-drift-scheduler-protocol-v1-20261023/holdout`.
+No training or accuracy evaluation has started.
 
-Before the two-task correctness preflight: generate and verify the UPMC and
-CIFAR holdouts, independently rerun both message ledgers from their actual
-manifests, and check every dataset against both gates. If either gate still
-fails with the two-epoch probe schedule, stop this candidate under the locked
-protocol.
+Both message gates now pass in the development and final configurations for
+all three datasets. The next gate is the two-task **correctness-only**
+preflight. If any later exact message count fails either threshold with the
+two-epoch probe schedule, stop this candidate under the locked protocol.

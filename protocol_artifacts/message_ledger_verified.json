@@ -1,0 +1,206 @@
+{
+  "comparison": "all-party replay",
+  "datasets": {
+    "cifar100": {
+      "config_sha256": "673ca34abe87179a75abff9d10d7e7a7392f786587df8c4d668340b57418a8c2",
+      "data_flow_sha256": "65216beeed437c4e8845ffea09eb5daf544c2f6b6ca07e25796349d84b404f52",
+      "development": {
+        "ledger": {
+          "bic_bytes": 112640000,
+          "common_bytes": 1206272000,
+          "control_bytes": 1202400,
+          "current_bytes": 49889280000,
+          "fim_bytes": 688128000,
+          "full_replay_bytes": 46714060800,
+          "head_bytes": 16384000,
+          "herding_bytes": 344064000,
+          "net_replay_saving": 0.3662536312835385,
+          "net_saved_bytes": 17109194400,
+          "net_total_saving": 0.1749234447434598,
+          "probe_bytes": 368640000,
+          "probe_id_bytes": 720000,
+          "replay_id_bytes": 38016000,
+          "replay_steps": 29700,
+          "selected_party_visits": 74250,
+          "selected_replay_bytes": 29196288000,
+          "total_reference_bytes": 97809612800,
+          "training_samples_once": 42000,
+          "tuning_bytes": 24576000,
+          "validation_bytes": 20480000
+        },
+        "replay_gate_passed": true,
+        "total_gate_passed": true
+      },
+      "final": {
+        "ledger": {
+          "bic_bytes": 112640000,
+          "common_bytes": 1255424000,
+          "control_bytes": 1292256,
+          "current_bytes": 53452800000,
+          "fim_bytes": 737280000,
+          "full_replay_bytes": 50253004800,
+          "head_bytes": 16384000,
+          "herding_bytes": 368640000,
+          "net_replay_saving": 0.36688098889561327,
+          "net_saved_bytes": 18436872096,
+          "net_total_saving": 0.1756541182566643,
+          "probe_bytes": 368640000,
+          "probe_id_bytes": 720000,
+          "replay_id_bytes": 40891392,
+          "replay_steps": 31950,
+          "selected_party_visits": 79866,
+          "selected_replay_bytes": 31404589056,
+          "total_reference_bytes": 104961228800,
+          "training_samples_once": 45000,
+          "tuning_bytes": 0,
+          "validation_bytes": 20480000
+        },
+        "replay_gate_passed": true,
+        "total_gate_passed": true
+      },
+      "holdout": {
+        "count": 3000,
+        "file_sha256": "60306e2e9308ba9af77cc7d96c04ff64bcad399231c0935f2d09a16bcc872548",
+        "selected_indices_sha256": "55b8130fee6f828d0e6be8fbc39e8db70f05aebb55130073da47873c77a9e5ea",
+        "source_sha256": "735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b"
+      },
+      "results_sha256": "77be00d20cdfeb902158341bd1138de81f5cd243eef498cd64b1fb68628a34bf"
+    },
+    "isolet": {
+      "config_sha256": "9a524718f29e3dbae0a0157a875ce2b4eccb27aa51db7f757dd00858240bc8db",
+      "data_flow_sha256": "238ddc08ed9d0c4d9d4093a4df1cd415a10ea39031e37b17314a9aca18bf2bc3",
+      "development": {
+        "ledger": {
+          "bic_bytes": 0,
+          "common_bytes": 31936512,
+          "control_bytes": 91008,
+          "current_bytes": 1322393600,
+          "fim_bytes": 18096128,
+          "full_replay_bytes": 707788800,
+          "head_bytes": 1064960,
+          "herding_bytes": 9048064,
+          "net_replay_saving": 0.3278000217013889,
+          "net_saved_bytes": 232013184,
+          "net_total_saving": 0.11251202956815712,
+          "probe_bytes": 31948800,
+          "probe_id_bytes": 249600,
+          "replay_id_bytes": 2297856,
+          "replay_steps": 1800,
+          "selected_party_visits": 4488,
+          "selected_replay_bytes": 441188352,
+          "total_reference_bytes": 2062118912,
+          "training_samples_once": 4418,
+          "tuning_bytes": 1597440,
+          "validation_bytes": 2129920
+        },
+        "replay_gate_passed": true,
+        "total_gate_passed": true
+      },
+      "final": {
+        "ledger": {
+          "bic_bytes": 0,
+          "common_bytes": 35131392,
+          "control_bytes": 115200,
+          "current_bytes": 1555865600,
+          "fim_bytes": 21291008,
+          "full_replay_bytes": 943718400,
+          "head_bytes": 1064960,
+          "herding_bytes": 10645504,
+          "net_replay_saving": 0.3375040690104167,
+          "net_saved_bytes": 318508800,
+          "net_total_saving": 0.12565860490896485,
+          "probe_bytes": 31948800,
+          "probe_id_bytes": 249600,
+          "replay_id_bytes": 3072000,
+          "replay_steps": 2400,
+          "selected_party_visits": 6000,
+          "selected_replay_bytes": 589824000,
+          "total_reference_bytes": 2534715392,
+          "training_samples_once": 5198,
+          "tuning_bytes": 0,
+          "validation_bytes": 2129920
+        },
+        "replay_gate_passed": true,
+        "total_gate_passed": true
+      },
+      "holdout": {
+        "count": 780,
+        "file_sha256": "e701abb5fd3be6e449f843856181eef478c3e0a3499714b311de7e48d5e51f89",
+        "selected_indices_sha256": "668cf1ce874c55a587647940d58181d7a42dc0ae0aa75c1dd4625004ef923089",
+        "source_sha256": "d34312670de93198afcd2b126c95b79bae2b4cffeb30d480f097faf046b69514"
+      },
+      "results_sha256": "8dd11ccd1bb57043e2218731e04655660cd765d046ecbe262154a11777fde37b"
+    },
+    "upmc_food101": {
+      "config_sha256": "4e8c76695ad2c8cd4d2ddd895e134b386597281a756d80c2c3555ffb5a9042e1",
+      "data_flow_sha256": "ed4d05f276bd772ff1532378a7cd46ef6e74a100f5ec8c507c904cbdc4e46ac5",
+      "development": {
+        "ledger": {
+          "bic_bytes": 0,
+          "common_bytes": 352124928,
+          "control_bytes": 304960,
+          "current_bytes": 6327992320,
+          "fim_bytes": 219029504,
+          "full_replay_bytes": 2941255680,
+          "head_bytes": 4136960,
+          "herding_bytes": 109514752,
+          "net_replay_saving": 0.35875714143967247,
+          "net_saved_bytes": 1055196480,
+          "net_total_saving": 0.10967213181490765,
+          "probe_bytes": 37601280,
+          "probe_id_bytes": 293760,
+          "replay_id_bytes": 9574400,
+          "replay_steps": 7480,
+          "selected_party_visits": 18700,
+          "selected_replay_bytes": 1838284800,
+          "total_reference_bytes": 9621372928,
+          "training_samples_once": 53474,
+          "tuning_bytes": 6205440,
+          "validation_bytes": 13238272
+        },
+        "replay_gate_passed": true,
+        "total_gate_passed": true
+      },
+      "final": {
+        "ledger": {
+          "bic_bytes": 0,
+          "common_bytes": 364535808,
+          "control_bytes": 324160,
+          "current_bytes": 6686801920,
+          "fim_bytes": 231440384,
+          "full_replay_bytes": 3129999360,
+          "head_bytes": 4136960,
+          "herding_bytes": 115720192,
+          "net_replay_saving": 0.3595341821411746,
+          "net_saved_bytes": 1125341760,
+          "net_total_saving": 0.11052985971030842,
+          "probe_bytes": 37601280,
+          "probe_id_bytes": 293760,
+          "replay_id_bytes": 10188800,
+          "replay_steps": 7960,
+          "selected_party_visits": 19900,
+          "selected_replay_bytes": 1956249600,
+          "total_reference_bytes": 10181337088,
+          "training_samples_once": 56504,
+          "tuning_bytes": 0,
+          "validation_bytes": 13238272
+        },
+        "replay_gate_passed": true,
+        "total_gate_passed": true
+      },
+      "holdout": {
+        "count": 3030,
+        "file_sha256": "aff589e9421d41f68e9573a598ee68ab702f749f30a1ce060916b3366c71ca3d",
+        "selected_indices_sha256": "d19918d00acf93cd65f3095ea3a61914da54144e192ee0fd411d76bfaf3e595f",
+        "source_sha256": "dbdd3a2979203ba0ee804de7d3b128426f869b0a127e4b87ebbe023e5750023b"
+      },
+      "results_sha256": "7921f54f94e7dfd6c25deec8ed72a1c37e55fc4e5be11fb4737028239b55b013"
+    }
+  },
+  "fallback_reason": "corrected old-plus-current probe upload; ISOLET development every-epoch total saving below 10%",
+  "id_bytes": 8,
+  "notification_bytes": 16,
+  "probe_every": 2,
+  "schema_version": 1,
+  "scope": "training through head and calibration; test inference excluded"
+}
