@@ -1,5 +1,5 @@
 ﻿"""Experiment configuration."""
-import argparse, os, json
+import argparse, os, json, math
 from datetime import datetime
 
 from adaptive_head_consolidation import (
@@ -140,6 +140,17 @@ def validate_sample_replay_only(args):
         raise ValueError('party_drift_enabled must be 0 or 1')
     if getattr(args, 'party_drift_enabled', 0) and not getattr(args, 'sample_replay_only', 0):
         raise ValueError('party drift requires raw-sample-only memory')
+    arm = getattr(args, 'party_replay_arm', 'auto')
+    allowed_arms = {'auto', 'off', 'all_party', 'uniform', 'static',
+                    'drift', 'cmcdr', 'cmcdr_budget'}
+    if arm not in allowed_arms:
+        raise ValueError('unknown party replay arm')
+    if (arm == 'off' and getattr(args, 'party_drift_enabled', 0)) or (
+            arm not in {'auto', 'off'} and not getattr(args, 'party_drift_enabled', 0)):
+        raise ValueError('party replay arm disagrees with enabled switch')
+    alpha = float(getattr(args, 'party_replay_alpha', 1.0))
+    if not math.isfinite(alpha) or alpha <= 0:
+        raise ValueError('party replay alpha must be finite and positive')
     if not bool(getattr(args, 'sample_replay_only', 0)):
         return
     required = {
@@ -251,6 +262,10 @@ def get_config():
                    help='Development-only party-drift scheduled old-sample replay')
     p.add_argument('--party_drift_preflight', default=0, type=int, choices=[0, 1],
                    help='Check replay-only gradients, BN state, and RNG each step')
+    p.add_argument('--party_replay_arm', default='auto',
+                   choices=['auto', 'off', 'all_party', 'uniform', 'static',
+                            'drift', 'cmcdr', 'cmcdr_budget'])
+    p.add_argument('--party_replay_alpha', default=1.0, type=float)
     p.add_argument('--proto_replay_loss_norm',
                    default='legacy_class_normalized',
                    choices=['legacy_class_normalized', 'sample_mean'],

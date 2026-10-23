@@ -104,6 +104,14 @@ class PartyDriftLocalTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             verify_audit_record(changed, 2)
 
+    def test_control_audit_keeps_arm_and_alpha_without_changing_selection(self):
+        row = replay_step_audit([0.5, 0.5], 1, 70, 1, 0, 0, 4)
+        row.update({'replay_arm': 'uniform', 'replay_alpha': 0.5})
+        verify_audit_record(row, 1)
+        row['replay_alpha'] = float('nan')
+        with self.assertRaises(ValueError):
+            verify_audit_record(row, 1)
+
     def test_attenuation_weight_fallback_and_smoothing(self):
         self.assertEqual(attenuation_weights([0, 0, 0, 0]),
                          [0.25] * 4)

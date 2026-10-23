@@ -57,6 +57,27 @@ def attenuation_weights(contribution_attenuation, gamma=0.2, epsilon=1e-8):
     return ((1 - gamma) * values / values.sum() + gamma / len(values)).tolist()
 
 
+def static_importance_weights(class_party_weights, old_classes, gamma=0.2):
+    """Aggregate the already-frozen per-class party weights, without probing."""
+    rows = []
+    for class_id in old_classes:
+        row = class_party_weights.get(class_id,
+                                      class_party_weights.get(str(class_id)))
+        if row is None:
+            raise ValueError(f'missing frozen static weights for class {class_id}')
+        values = np.asarray(row, dtype=np.float64)
+        if (values.ndim != 1 or not len(values) or
+                not np.all(np.isfinite(values)) or np.any(values < 0) or
+                not np.isclose(values.sum(), 1.0, atol=1e-5)):
+            raise ValueError('invalid frozen static party weights')
+        if rows and len(values) != len(rows[0]):
+            raise ValueError('frozen static party width differs across classes')
+        rows.append(values)
+    if not rows:
+        raise ValueError('static selection needs old classes')
+    return attenuation_weights(np.mean(rows, axis=0), gamma)
+
+
 def build_tuning_holdout(labels, source, expected_sha256, validation, bic,
                          output, *, seed, per_class=30):
     """Write only selected training indices; reject source or split mismatch."""
@@ -148,9 +169,17 @@ def verify_audit_record(record, selected_parties):
         replay_batch=record.get('replay_batch'),
     )
     extras = set(record) - set(expected)
-    if (extras - {'logical_replay_ids', 'duplicate_samples', 'forward_calls'} or
+    if (extras - {'logical_replay_ids', 'duplicate_samples', 'forward_calls',
+                  'replay_arm', 'replay_alpha'} or
             any(record.get(key) != value for key, value in expected.items())):
         raise ValueError('selection audit does not replay exactly')
+    if 'replay_arm' in extras and record['replay_arm'] not in {
+            'all_party', 'uniform', 'static', 'drift', 'cmcdr', 'cmcdr_budget'}:
+        raise ValueError('selection audit has unknown replay arm')
+    if 'replay_alpha' in extras and (
+            not math.isfinite(float(record['replay_alpha'])) or
+            float(record['replay_alpha']) <= 0):
+        raise ValueError('selection audit has invalid replay alpha')
     if ('logical_replay_ids' in extras) != ('duplicate_samples' in extras):
         raise ValueError('selection audit replay identities are incomplete')
     if 'logical_replay_ids' in extras and (

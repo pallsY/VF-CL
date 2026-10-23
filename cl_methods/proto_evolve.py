@@ -1,5 +1,5 @@
 """V-LETO (AAAI 2025): sum aggregation, single linear top, FIM freeze, prototype evolution."""
-import json, os, torch, torch.nn as nn, torch.nn.functional as F, numpy as np
+import json, os, math, torch, torch.nn as nn, torch.nn.functional as F, numpy as np
 from copy import deepcopy
 from pathlib import Path
 from data_utils import split_features
@@ -314,6 +314,21 @@ class ProtoEvolveCL:
         )
         self.head_raw_replay = {}
         self.party_drift_enabled = bool(getattr(args, 'party_drift_enabled', 0))
+        arm = getattr(args, 'party_replay_arm', 'auto')
+        self.party_replay_arm = (
+            ('drift' if self.party_drift_enabled else 'off')
+            if arm == 'auto' else arm
+        )
+        self.party_replay_alpha = float(getattr(args, 'party_replay_alpha', 1.0))
+        if (self.party_replay_arm not in
+                {'off', 'all_party', 'uniform', 'static', 'drift',
+                 'cmcdr', 'cmcdr_budget'} or
+                (self.party_replay_arm == 'off') == self.party_drift_enabled or
+                not math.isfinite(self.party_replay_alpha) or
+                self.party_replay_alpha <= 0):
+            raise ValueError('invalid party replay arm or alpha')
+        if self.party_replay_arm in {'cmcdr', 'cmcdr_budget'}:
+            raise NotImplementedError('CMCDR profile loss is not wired yet')
         if self.party_drift_enabled:
             self.party_drift_step = 0
             self.party_drift_epoch = 0
@@ -686,11 +701,17 @@ class ProtoEvolveCL:
             replay_x, replay_y, identities, duplicates = self._party_drift_sampler.sample()
             replay_x = replay_x.to(device)
             replay_y = replay_y.to(device)
+            selected_count = (
+                self.args.num_parties if self.party_replay_arm in
+                {'all_party', 'cmcdr', 'cmcdr_budget'} else
+                (self.args.num_parties + 1) // 2
+            )
             audit = replay_step_audit(
-                self._party_drift_weights, (self.args.num_parties + 1) // 2,
+                self._party_drift_weights, selected_count,
                 int(self.args.seed), self.current_task_id,
                 self.party_drift_epoch, self.party_drift_step, 4,
-                attenuation=self._party_drift_attenuation,
+                attenuation=(self._party_drift_attenuation
+                             if self.party_replay_arm == 'drift' else None),
                 embedding_dims=[int(self.args.embed_dim)] * self.args.num_parties,
                 replay_batch=len(replay_y),
             )
@@ -699,7 +720,7 @@ class ProtoEvolveCL:
                 replay_loss, _ = masked_replay_loss(
                     bottoms, top_model, self._old_bottoms, self._old_top,
                     parts, replay_y, audit['selected'],
-                    self._party_drift_sampler.classes, 1.0,
+                    self._party_drift_sampler.classes, self.party_replay_alpha,
                     derive_seed(self.args.seed, 'party_drift_forward',
                                 self.current_task_id, self.party_drift_step),
                     temperature=self.temperature,
@@ -718,7 +739,9 @@ class ProtoEvolveCL:
                 replay_loss = replay_forward()
             total = total + replay_loss
             audit.update({'logical_replay_ids': identities,
-                          'duplicate_samples': duplicates})
+                          'duplicate_samples': duplicates,
+                          'replay_arm': self.party_replay_arm,
+                          'replay_alpha': self.party_replay_alpha})
             self.party_drift_step_records.append(audit)
             self._write_party_drift_audit(audit)
             self.party_drift_step += 1
@@ -760,6 +783,23 @@ class ProtoEvolveCL:
                               epoch, 90210],
             'logical_probe_ids': identities,
             'attenuation': self._party_drift_attenuation,
+            'weights': self._party_drift_weights,
+        })
+
+    def _update_party_replay_weights(self, epoch):
+        if self.party_replay_arm == 'drift':
+            self._update_party_drift_probe(epoch)
+            return
+        if self.party_replay_arm == 'static':
+            from party_drift_local import static_importance_weights
+            self._party_drift_weights = static_importance_weights(
+                self.class_party_weights, self._party_drift_sampler.classes)
+        else:
+            self._party_drift_weights = (
+                [1.0 / self.args.num_parties] * self.args.num_parties)
+        self._write_party_drift_audit({
+            'kind': 'weight_refresh', 'task': self.current_task_id,
+            'epoch': epoch, 'arm': self.party_replay_arm,
             'weights': self._party_drift_weights,
         })
 
@@ -805,7 +845,7 @@ class ProtoEvolveCL:
             if self.party_drift_enabled:
                 self.party_drift_epoch = ep
                 if ep % 2 == 0:
-                    self._update_party_drift_probe(ep)
+                    self._update_party_replay_weights(ep)
             if self.use_sdc and ep % self.sdc_interval == 0:
                 self._sdc_update(train_loader)
             loss, acc = self.trainer.train_epoch(train_loader, optimizers, self._proto_loss)
