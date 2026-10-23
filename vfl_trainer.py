@@ -176,6 +176,10 @@ class VFLTrainer:
             if after_batch is not None:
                 after_batch()
 
+        if (getattr(self.args, 'development_nonfinite_guard', 0) and
+                (not math.isfinite(total_loss) or
+                 abs(total_loss / max(total, 1)) > 1e6)):
+            raise FloatingPointError('non-finite or divergent development training epoch loss')
         return total_loss/max(total,1), correct/max(total,1)
 
     def _record_data_flow(self, loader, batch_idx, batch_x):

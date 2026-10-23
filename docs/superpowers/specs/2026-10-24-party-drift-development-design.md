@@ -94,7 +94,8 @@ terminal failure requires a decision. If a host outage, interruption, or GPU
 memory failure occurs, the exact same config and seed may be retried once the
 resource condition is corrected; each attempt, cause, and output path remains
 in an append-only record. A NaN, nonfinite/divergent loss, or other
-training-origin anomaly is the configuration's recorded outcome: no retry,
+training-origin anomaly (nonfinite epoch loss or absolute mean epoch loss
+above `1e6`) is the configuration's recorded outcome: no retry,
 changed alpha, batch, or replacement seed. Failed or incomplete jobs cannot
 be silently excluded from the result matrix.
 

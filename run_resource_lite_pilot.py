@@ -162,10 +162,30 @@ def paired_vector_validation(targets, args):
     return manifest, manifest_indices(manifest)
 
 
+def validated_paired_manifest(targets, path, calibration_indices):
+    """Rebuild a frozen validation split before excluding it for every arm."""
+    manifest = json.loads(Path(path).read_text(encoding='utf-8'))
+    expected = build_manifest(
+        targets, per_class=manifest['per_class'], seed=manifest['seed'],
+        dataset=manifest['dataset'],
+        excluded_indices=calibration_indices,
+    )
+    if manifest != expected:
+        raise ValueError('paired validation manifest differs from exact source')
+    return manifest, manifest_indices(manifest)
+
+
 class PilotDataset(VFLDataset):
     def __init__(self, args):
         super().__init__(args)
-        if args.data == 'tabvfl':
+        paired_path = getattr(args, 'pilot_paired_validation_manifest', '')
+        if paired_path:
+            paired_manifest, paired_validation = validated_paired_manifest(
+                self.trainset.targets, paired_path, self.calibration_indices)
+            if (getattr(args, 'lambda_validation_enabled', 0) and
+                    paired_validation != self.validation_indices):
+                raise ValueError('own validation differs from paired source')
+        elif args.data == 'tabvfl':
             paired_manifest, paired_validation = paired_vector_validation(
                 self.trainset.targets, args)
             if (getattr(args, 'lambda_validation_enabled', 0)
@@ -305,6 +325,7 @@ def score_branch(log_probs, labels, task_classes):
     ).reshape(len(tasks), len(tasks)).tolist()
     return {
         'count': n,
+        'cil_correct': int(correct.sum()),
         'cil': float(correct.double().mean()),
         'task_id': float(task_correct.double().mean()),
         'task_il': float(taskil.double().mean()),
