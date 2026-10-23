@@ -11,6 +11,7 @@ from party_drift_manifest import (
     ALPHAS, BASELINES, DATASETS, REPLAY_ARMS, SEEDS,
     expected_job_keys, load_approved_job,
 )
+from party_drift_audit_gate import verify_sealed_job
 
 
 def validate_queue_complete(root, manifest_sha256):
@@ -105,14 +106,13 @@ def adjudicate(manifest_path, manifest_sha256, result_root, output):
         if status != 'success':
             raise ValueError('unresolved infrastructure or unknown job failure')
         run = Path(config['output_dir']) / f"attempt-{result['attempt']:02d}"
-        gate = json.loads((run / 'JOB_SUCCESS.json').read_text(encoding='utf-8'))
+        gate = verify_sealed_job(
+            run, key, manifest_sha256, replay=row['method'] in REPLAY_ARMS)
+        if result.get('job_success_sha256') != hashlib.sha256(
+                (run / 'JOB_SUCCESS.json').read_bytes()).hexdigest():
+            raise ValueError('job success gate differs from append-only queue event')
         readout_path = run / 'HOLDOUT_READOUT.json'
         raw = readout_path.read_bytes()
-        if (gate.get('status') != 'success' or gate.get('job_key') != key or
-                gate.get('manifest_sha256') != manifest_sha256 or
-                gate.get('readout_sha256') != hashlib.sha256(raw).hexdigest() or
-                gate.get('test_accessed') is not False):
-            raise ValueError('job readout evidence differs from queue record')
         readout = json.loads(raw)
         metrics = readout['metrics']
         correct, count = metrics['cil_correct'], metrics['count']
@@ -127,9 +127,24 @@ def adjudicate(manifest_path, manifest_sha256, result_root, output):
             'status': 'success', 'cil_correct': correct, 'count': count,
             'cil': metrics['cil'], 'readout_rule': readout['readout_rule'],
         }
-        if (row['method'] == 'icarl') != (
-                readout['readout_rule'] == 'icarl_nme'):
-            raise ValueError('iCaRL readout was not method-aware')
+        expected_rule = ('final_bic_joint_alpha_beta' if row['dataset'] ==
+                         'cifar100' else 'icarl_nme' if row['method'] ==
+                         'icarl' else 'model_head')
+        if readout['readout_rule'] != expected_rule:
+            raise ValueError('development readout differs from frozen method rule')
+        if row['dataset'] == 'cifar100':
+            details = readout.get('readout_details', {})
+            raw_metrics = details.get('raw_metrics', {})
+            expected_source = ('calibration' if row['method'] == 'er_ace'
+                               else 'validation')
+            if (details.get('bic_fit_source') != expected_source or
+                    details.get('bic_fit_count') != 2500 or
+                    raw_metrics.get('count') != count or
+                    type(raw_metrics.get('cil_correct')) is not int or
+                    not 0 <= raw_metrics['cil_correct'] <= count):
+                raise ValueError('CIFAR raw/BiC paired development readout differs')
+            readouts[key]['raw_cil_correct'] = raw_metrics['cil_correct']
+            readouts[key]['raw_cil'] = raw_metrics['cil']
 
     selected = {}
     comparisons = {}
@@ -179,6 +194,7 @@ def adjudicate(manifest_path, manifest_sha256, result_root, output):
         writer = csv.DictWriter(stream, fieldnames=[
             'dataset', 'method', 'alpha', 'seed', 'status',
             'cil_correct', 'count', 'cil', 'readout_rule',
+            'raw_cil_correct', 'raw_cil',
         ])
         writer.writeheader()
         for row in sorted(rows, key=lambda item: item['job_key']):

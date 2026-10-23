@@ -69,7 +69,11 @@ manifest's SHA-256 is committed and copied to the independent NAS audit root
 before any accuracy job. A launcher receives a job key and the manifest path,
 verifies the manifest digest, config bytes/hash, commit, data identity,
 training-only holdout, and unique output path, and refuses all unlisted work.
-It writes a plan record before training. No implicit scan for extra configs,
+The queue writes an exclusive plan and append-only start event before spawning
+the worker. The worker verifies its parent queue PID, active queue lock, plan,
+and start event before training; an independent CLI invocation cannot bypass
+the retry policy. The approved config bytes remain intact beside a runtime
+config containing the actual attempt output path. No implicit scan for extra configs,
 overwrite, or duplicate launch is allowed.
 
 For each new replay control, run one correctness-only seed-74 pilot before the
@@ -93,11 +97,23 @@ status while withholding accuracy summaries until all listed jobs finish or a
 terminal failure requires a decision. If a host outage, interruption, or GPU
 memory failure occurs, the exact same config and seed may be retried once the
 resource condition is corrected; each attempt, cause, and output path remains
-in an append-only record. A NaN, nonfinite/divergent loss, or other
+in an append-only record. If the queue dies before writing a failure gate,
+recovery requires an explicit reason and checks the original queue and workers
+are no longer running. It reconstructs unfinished start events from preserved
+logs and success gates, marks training anomalies without retry, and authorizes
+only infrastructure attempts with a per-job append-only resume record.
+A NaN, nonfinite/divergent loss, or other
 training-origin anomaly (nonfinite epoch loss or absolute mean epoch loss
 above `1e6`) is the configuration's recorded outcome: no retry,
 changed alpha, batch, or replacement seed. Failed or incomplete jobs cannot
 be silently excluded from the result matrix.
+
+Before a job is sealed, the selection ledger must replay exactly: refresh and
+probe epochs, per-task step counts, party subsets, sampled old exemplar IDs,
+CMCDR interventions, and simulated message bytes. Its SHA-256 and the readout
+SHA-256 are recorded in `JOB_SUCCESS.json`; the success gate's SHA-256 is
+recorded in the append-only queue event and checked again before adjudication.
+No-replay arms are required to have no selection ledger.
 
 ## Frozen reading and decision rules
 
@@ -108,6 +124,11 @@ seed result. Candidate-vs-uniform and candidate-vs-static differences at each
 identical alpha isolate selection; independently tuned best-of-grid scores
 compare equal search opportunities. Paired strongest-baseline comparisons use
 the listed methods and seeds, with iCaRL NME.
+For CIFAR, both adaptive and ER-ACE use the frozen final joint-alpha/beta BiC
+fit rule: adaptive fits on its reserved validation cohort and ER-ACE on its
+reserved calibration cohort, then both are scored on the separate development
+tuning holdout. Raw and calibrated Class-IL are both archived; calibrated is
+the predeclared comparison metric. The official test split is never opened.
 
 The candidate progresses to a new, separately frozen 42/43/44 confirmation
 only if its selected-alpha three-seed mean beats every listed strongest

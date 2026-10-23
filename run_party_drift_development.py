@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import subprocess
 from pathlib import Path, PurePosixPath
 from types import SimpleNamespace
@@ -50,6 +51,55 @@ def attempt_args(config, attempt):
     })
 
 
+def authorize_queue_attempt(job_root, job_key, attempt, manifest_sha256,
+                            production_commit, config_sha256, *, queue_pid=None):
+    from party_drift_queue import active_queue_lock
+
+    job_root = Path(job_root).resolve()
+    root = job_root.parents[3]
+    queue_pid = os.getppid() if queue_pid is None else queue_pid
+    lock = active_queue_lock(root)
+    plan = json.loads((job_root / f'attempt-{attempt:02d}.plan.json').read_text(
+        encoding='utf-8')) if (job_root / f'attempt-{attempt:02d}.plan.json').is_file() else None
+    if (lock.get('pid') != queue_pid or
+            lock.get('manifest_sha256') != manifest_sha256 or
+            lock.get('production_commit') != production_commit or
+            plan != {'attempt': attempt, 'job_key': job_key}):
+        raise ValueError('worker is not the approved queued attempt')
+    history = [json.loads(line) for line in (root / 'ATTEMPTS.jsonl').read_text(
+        encoding='utf-8').splitlines() if line]
+    history = [row for row in history if row.get('job_key') == job_key]
+    if (not history or history[-1].get('kind') != 'start' or
+            history[-1].get('attempt') != attempt or
+            history[-1].get('config_sha256') != config_sha256 or
+            sum(row.get('kind') == 'start' and row.get('attempt') == attempt
+                for row in history) != 1):
+        raise ValueError('worker start event is absent or duplicated')
+    if attempt == 1:
+        if len(history) != 1:
+            raise ValueError('first attempt has earlier job history')
+    else:
+        prior = history[-2] if len(history) >= 2 else {}
+        resume_path = job_root / f'attempt-{attempt:02d}.resume.json'
+        resume = json.loads(resume_path.read_text(encoding='utf-8')) if resume_path.is_file() else {}
+        if (prior.get('kind') != 'finish' or
+                prior.get('attempt') != attempt - 1 or
+                prior.get('classification') != 'infrastructure' or
+                resume.get('job_key') != job_key or
+                resume.get('attempt') != attempt or
+                resume.get('manifest_sha256') != manifest_sha256 or
+                not resume.get('reason')):
+            raise ValueError('only a recorded infrastructure failure may retry')
+
+
+def write_attempt_configs(root, approved_path, args):
+    root = Path(root)
+    (root / 'APPROVED_CONFIG.json').write_bytes(Path(approved_path).read_bytes())
+    (root / 'config.json').write_text(
+        json.dumps(vars(args), indent=2, sort_keys=True) + '\n',
+        encoding='utf-8')
+
+
 @torch.no_grad()
 def score_icarl_holdout(method, dataset, task_classes, num_classes):
     """Use iCaRL's own normalized exemplar means for Class-IL readout."""
@@ -71,11 +121,49 @@ def score_icarl_holdout(method, dataset, task_classes, num_classes):
                         torch.cat(labels), task_classes)
 
 
+def score_bic_logits(calibration_logits, calibration_labels,
+                     holdout_logits, holdout_labels, task_classes, *, lr, steps):
+    from bic_calibration import fit_final_calibrator
+
+    calibrator, fit = fit_final_calibrator(
+        calibration_logits, calibration_labels, task_classes,
+        'joint_alpha_beta', lr, steps)
+    return {
+        'raw': score_branch(F.log_softmax(holdout_logits, dim=1),
+                            holdout_labels.long(), task_classes),
+        'calibrated': score_branch(F.log_softmax(calibrator.apply(
+            holdout_logits), dim=1), holdout_labels.long(), task_classes),
+        'fit': fit,
+    }
+
+
+def bic_fit_loader(args, dataset):
+    if args.bic_enabled != 1:
+        raise ValueError('CIFAR development BiC is not enabled')
+    internal = args.cl_method == 'proto_evolve'
+    if internal and args.lambda_validation_enabled != 1:
+        raise ValueError('adaptive BiC requires its frozen validation split')
+    source = 'validation' if internal else 'calibration'
+    view = dataset.validationset if internal else dataset.calibrationset
+    selected = (dataset.validation_indices if internal else
+                dataset.calibration_indices)
+    per_class = (args.lambda_validation_per_class if internal else
+                 args.bic_per_class)
+    if selected & dataset.holdout_indices:
+        raise ValueError('BiC fit split overlaps tuning holdout')
+    indices = [index for index in dataset.get_class_indices(
+        view, list(range(args.num_classes))) if index in selected]
+    if len(indices) != args.num_classes * per_class or set(indices) != selected:
+        raise ValueError('development BiC fit split is incomplete')
+    return dataset._loader(view, indices, ('development_bic_fit', source),
+                           False, audit=True), source
+
+
 def score_development_checkpoint(args, dataset, checkpoint):
     from run_resource_lite_pilot import score_holdout_checkpoint
 
-    if args.cl_method != 'icarl':
-        return score_holdout_checkpoint(args, dataset, checkpoint), 'model_head'
+    if args.pilot_dataset != 'cifar100' and args.cl_method != 'icarl':
+        return score_holdout_checkpoint(args, dataset, checkpoint), 'model_head', {}
     import runner
     from cl_methods import get_cl_method
     from models import build_models
@@ -88,12 +176,25 @@ def score_development_checkpoint(args, dataset, checkpoint):
     bottoms, top = build_models(cpu_args)
     trainer = VFLTrainer(bottoms, top, cpu_args)
     trainer.load_state(payload['trainer_state'])
-    method = get_cl_method('icarl', trainer, cpu_args)
-    method.load_state(payload['cl_state'])
     for model in (*trainer.bottoms, trainer.top_model):
         model.eval()
+    if args.pilot_dataset == 'cifar100':
+        loader, source = bic_fit_loader(args, dataset)
+        calibration_logits, calibration_labels = trainer.collect_logits(loader)
+        holdout_logits, holdout_labels = trainer.collect_logits(
+            dataset.holdout_loader(list(range(args.num_classes))))
+        paired = score_bic_logits(
+            calibration_logits, calibration_labels,
+            holdout_logits, holdout_labels, payload['seen_task_classes'],
+            lr=args.bic_lr, steps=args.bic_steps)
+        return paired['calibrated'], 'final_bic_joint_alpha_beta', {
+            'bic_fit_source': source, 'bic_fit_count': len(calibration_labels),
+            'bic_fit': paired['fit'], 'raw_metrics': paired['raw'],
+        }
+    method = get_cl_method('icarl', trainer, cpu_args)
+    method.load_state(payload['cl_state'])
     return score_icarl_holdout(
-        method, dataset, payload['seen_task_classes'], args.num_classes), 'icarl_nme'
+        method, dataset, payload['seen_task_classes'], args.num_classes), 'icarl_nme', {}
 
 
 def run_listed_job(job_key, manifest_path, manifest_sha256, attempt):
@@ -114,13 +215,15 @@ def run_listed_job(job_key, manifest_path, manifest_sha256, attempt):
     config = json.loads(config_path.read_text(encoding='utf-8'))
     validate_job_sources(config, row)
     args = attempt_args(config, attempt)
+    authorize_queue_attempt(config['output_dir'], job_key, attempt,
+                            manifest_sha256, commit, row['config_sha256'])
     if args.formal_deferred_evaluation is not True:
         raise ValueError('development run must defer formal evaluation')
     validate_sample_replay_only(args)
 
     root = Path(args.output_dir)
     root.mkdir(parents=True, exist_ok=False)
-    (root / 'config.json').write_bytes(config_path.read_bytes())
+    write_attempt_configs(root, config_path, args)
     (root / 'JOB_RUNTIME.json').write_text(json.dumps({
         'job_key': job_key, 'attempt': attempt, 'manifest_sha256': manifest_sha256,
         'config_sha256': _sha256(config_path), 'production_commit': commit,
@@ -147,14 +250,22 @@ def run_listed_job(job_key, manifest_path, manifest_sha256, attempt):
         raise RuntimeError('development job did not stop before official test')
     validate_training_only_artifacts(root)
     checkpoint = root / 'checkpoints' / 'formal_final.pt'
-    metrics, rule = score_development_checkpoint(args, dataset, checkpoint)
+    metrics, rule, details = score_development_checkpoint(args, dataset, checkpoint)
     if (metrics['count'] != args.num_classes * 30 or
             not math.isfinite(metrics['cil']) or
             not 0 <= metrics['cil'] <= 1):
         raise ValueError('development holdout readout is incomplete or nonfinite')
+    from party_drift_audit_gate import verify_selection_audit
+    payload = runner._decode_checkpoint_value(torch.load(
+        checkpoint, map_location='cpu', weights_only=True))
+    selection = verify_selection_audit(
+        root / 'party_drift_audit' / 'selection.jsonl', args, dataset,
+        payload['seen_task_classes'], root / 'formal_snapshots')
+    validate_training_only_artifacts(root)
     readout = {
         'status': 'training_holdout_readout', 'job_key': job_key,
         'attempt': attempt, 'readout_rule': rule, 'metrics': metrics,
+        'readout_details': details,
         'config_sha256': _sha256(config_path),
         'checkpoint_sha256': _sha256(checkpoint),
         'holdout_selected_sha256': dataset.holdout_manifest['sha256'],
@@ -168,6 +279,7 @@ def run_listed_job(job_key, manifest_path, manifest_sha256, attempt):
         'manifest_sha256': manifest_sha256,
         'readout_sha256': _sha256(root / 'HOLDOUT_READOUT.json'),
         'data_flow_sha256': _sha256(root / 'data_flow_audit.jsonl'),
+        **selection,
         'checkpoint_sha256': _sha256(checkpoint),
         'test_accessed': False,
     }

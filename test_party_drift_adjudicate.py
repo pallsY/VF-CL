@@ -51,20 +51,40 @@ class AdjudicationTests(unittest.TestCase):
                 run.mkdir(parents=True)
                 readout = {
                     'job_key': row['job_key'], 'test_accessed': False,
-                    'readout_rule': 'icarl_nme' if method == 'icarl' else 'model_head',
+                    'readout_rule': ('final_bic_joint_alpha_beta' if ds == 'cifar100'
+                                     else 'icarl_nme' if method == 'icarl'
+                                     else 'model_head'),
                     'metrics': {'cil_correct': correct, 'count': count,
                                 'cil': correct / count},
+                    'readout_details': ({'raw_metrics': {
+                        'cil_correct': max(0, correct - 1), 'count': count,
+                        'cil': max(0, correct - 1) / count},
+                        'bic_fit_source': ('calibration' if method == 'er_ace'
+                                           else 'validation'),
+                        'bic_fit_count': 2500}
+                        if ds == 'cifar100' else {}),
                 }
                 raw = json.dumps(readout).encode()
                 (run / 'HOLDOUT_READOUT.json').write_bytes(raw)
+                replay = method in manifest.REPLAY_ARMS
+                if replay:
+                    audit = run / 'party_drift_audit' / 'selection.jsonl'
+                    audit.parent.mkdir()
+                    audit.write_text('{"selected":[0,1]}\n')
                 (run / 'JOB_SUCCESS.json').write_text(json.dumps({
                     'status': 'success', 'job_key': row['job_key'],
                     'manifest_sha256': digest,
                     'readout_sha256': hashlib.sha256(raw).hexdigest(),
+                    'selection_audit_sha256': (
+                        hashlib.sha256(audit.read_bytes()).hexdigest()
+                        if replay else None),
+                    'replay_steps': 1 if replay else 0,
                     'test_accessed': False,
                 }), encoding='utf-8')
                 events.append({'kind': 'finish', 'job_key': row['job_key'],
-                               'attempt': 1, 'classification': 'success'})
+                               'attempt': 1, 'classification': 'success',
+                               'job_success_sha256': hashlib.sha256(
+                                   (run / 'JOB_SUCCESS.json').read_bytes()).hexdigest()})
             event_bytes = ''.join(json.dumps(item) + '\n' for item in events).encode()
             (runs / 'ATTEMPTS.jsonl').write_bytes(event_bytes)
             (runs / 'QUEUE_COMPLETE.json').write_text(json.dumps({
@@ -78,6 +98,12 @@ class AdjudicationTests(unittest.TestCase):
             self.assertEqual(result['selected_alpha']['isolet']['drift'], 0.25)
             self.assertEqual(len((output / 'all_183_cells.csv').read_text().splitlines()),
                              184)
+            self.assertIn('raw_cil', (output / 'all_183_cells.csv').read_text().splitlines()[0])
+            first = Path(entries[0][1]['output_dir']) / 'attempt-01' / 'JOB_SUCCESS.json'
+            first.write_text(first.read_text() + ' ')
+            with self.assertRaises(ValueError):
+                decision.adjudicate(listing / 'manifest.jsonl', digest,
+                                    runs, base / 'second-decision')
 
     def test_refuses_to_open_results_before_complete_queue_gate(self):
         self.assertTrue(hasattr(decision, 'validate_queue_complete'))
