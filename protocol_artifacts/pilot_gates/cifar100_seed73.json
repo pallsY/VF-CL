@@ -1,0 +1,13 @@
+{
+  "checkpoint_sha256": "4c5786f3446f313096c1b0afe907bc7e9864c84700922522721483fd2facb5fa",
+  "dataset": "cifar100",
+  "epochs_per_task": 1,
+  "holdout_manifest_sha256": "cb10836723d52da5cd47b8fed8f5c652bd92c4e4354948cac8245cc6824e5627",
+  "probe_events": 9,
+  "replay_steps": 594,
+  "seed": 73,
+  "selection_audit_sha256": "c632acc4616591f5443cbb8d43d9556078bd4fb04b22c9b700c35da9aa09ef9d",
+  "status": "correctness_only_pass",
+  "tasks": 10,
+  "test_accessed": false
+}

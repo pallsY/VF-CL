@@ -97,6 +97,35 @@ All three are mirrored in the new NAS evidence root
 No training or accuracy evaluation has started.
 
 Both message gates now pass in the development and final configurations for
-all three datasets. The next gate is the two-task **correctness-only**
-preflight. If any later exact message count fails either threshold with the
+all three datasets. The correctness-only preflight is recorded below. If any
+later exact message count fails either threshold with the
 two-epoch probe schedule, stop this candidate under the locked protocol.
+
+## Correctness-only preflight record
+
+The disabled-switch identity probe compared independent clean checkouts of
+frozen `e2a559d` and the new branch on fixed ISOLET and four-party UPMC input.
+Task-0/task-1 model tensors, bounded raw memory, FIM masks, task-1 loss, and
+gradients matched bit-for-bit. The first probe driver failed before training
+because its manually constructed loader lacked a recording data-flow sampler;
+the driver alone was corrected, and both identity probes then passed.
+
+Earlier pilot failures remain intact on NAS: v1 required two deterministic
+DataLoader workers; v2 used a NAS `TMPDIR` too long for an AF_UNIX socket; v3
+exposed the mistaken sum-only aggregation assumption; CIFAR v5 exposed the
+frozen BiC requirement for all ten tasks. These failures led to correctness
+fixes, **not** accuracy selection. No official test metric was read.
+
+| Pilot | Locked scope | Probe events / replay steps | Independent selection and message audit | Gate file SHA-256 |
+| --- | --- | ---: | --- | --- |
+| ISOLET v4 | 2 tasks, 1 epoch each, CPU | 1 / 3 | Passed; test access blocked | `b99ce1b7a3c30c8fc68b5f316bdb55c0f0e9d08556751dc01d7143ec55e09eee` |
+| Four-party UPMC v4 | 2 tasks, 1 epoch each, CPU | 1 / 41 | Passed; 10 all-party steps; test access blocked | `2c4495f4f14dfa9f6b9381def9ddba977033984acd18848e8edad16835ea3858` |
+| CIFAR-100 v6 | Full 10-task BiC path, 1 epoch each, GPU1 | 9 / 594 | Passed; 144 all-party steps; test access blocked | `5bd1a8a56d52344c1cc7a7c2050b2b6ab41921c08ee23ce74f52ebd88ee58b91` |
+
+The exact gate JSON files are in `pilot_gates/`; full logs, audit rows, and
+training-only checkpoints remain under the corresponding independent NAS pilot
+roots. The vector pilots ran at code commit `f6500e6`; CIFAR ran at `f2291ee`.
+Between those commits only the pilot driver and its test changed; the replay
+method files did not. This closes the **correctness preflight** gate only.
+Candidate A remains unproven on novelty and accuracy; no 70/71/72 development
+run or 42/43/44 formal run has been started.

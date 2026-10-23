@@ -1,0 +1,13 @@
+{
+  "checkpoint_sha256": "b1bd8cf28c8d964370220b130a4c925a21397af2a7e4fcb28e01cdf862655445",
+  "dataset": "isolet",
+  "epochs_per_task": 1,
+  "holdout_manifest_sha256": "088b393dafc38e5e11811f4683aabfd95c10f784b9344b7cf7ef8ef999f95a68",
+  "probe_events": 1,
+  "replay_steps": 3,
+  "seed": 73,
+  "selection_audit_sha256": "9c9ccb934d8808f137755db0d9e43a743379546afa7822ac48ae9e00277d0fc3",
+  "status": "correctness_only_pass",
+  "tasks": 2,
+  "test_accessed": false
+}

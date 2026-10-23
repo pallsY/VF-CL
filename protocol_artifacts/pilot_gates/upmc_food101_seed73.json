@@ -1,0 +1,13 @@
+{
+  "checkpoint_sha256": "aa7ad1dcd0469b498b7cf5058ee6dd3da0d5a936c535c66e6f9d853613db239d",
+  "dataset": "upmc_food101",
+  "epochs_per_task": 1,
+  "holdout_manifest_sha256": "290d526743bb04dd29539024c3d3e5d0baa59d835ba96d5e5dfead676a9cef7d",
+  "probe_events": 1,
+  "replay_steps": 41,
+  "seed": 73,
+  "selection_audit_sha256": "24e6d1e8d9edff552586bdeee23598c1059729df20a8ddc7896743862c2c240e",
+  "status": "correctness_only_pass",
+  "tasks": 2,
+  "test_accessed": false
+}
