@@ -53,7 +53,7 @@ def derive_config(source_path, root, dataset):
         'pilot_holdout_per_class': 30,
         'party_drift_enabled': 1, 'party_drift_preflight': 1,
         'num_tasks': 2, 'custom_tasks': '|'.join(expected_tasks(dataset).split('|')[:2]),
-        'epochs_per_task': 1, 'device': 'cpu', 'num_workers': 0,
+        'epochs_per_task': 1, 'device': 'cpu', 'num_workers': 2,
         'results_dir': str(root), 'output_dir': str(root / name),
         'exp_name': name,
     }
@@ -71,7 +71,7 @@ def run_config(config_path):
     dataset_name = args.pilot_dataset
     if (args.pilot_protocol != PROTOCOL or dataset_name not in SOURCE_CONFIG_SHA256
             or args.seed != 73 or args.num_tasks != 2 or args.epochs_per_task != 1
-            or args.device != 'cpu' or args.num_workers != 0
+            or args.device != 'cpu' or args.num_workers != 2
             or args.party_drift_enabled != 1 or args.party_drift_preflight != 1
             or args.pilot_holdout_seed != 20261023
             or args.pilot_holdout_per_class != 30

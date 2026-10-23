@@ -31,6 +31,7 @@ class PartyDriftPreflightConfigTest(unittest.TestCase):
             self.assertEqual(config['custom_tasks'], '0,1|2,3')
             self.assertEqual(config['epochs_per_task'], 1)
             self.assertEqual(config['device'], 'cpu')
+            self.assertEqual(config['num_workers'], 2)
             self.assertEqual(config['pilot_holdout_per_class'], 30)
             self.assertEqual(config['pilot_holdout_seed'], 20261023)
             self.assertEqual(config['party_drift_enabled'], 1)
