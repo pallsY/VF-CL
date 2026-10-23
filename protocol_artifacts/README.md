@@ -110,6 +110,23 @@ gradients matched bit-for-bit. The first probe driver failed before training
 because its manually constructed loader lacked a recording data-flow sampler;
 the driver alone was corrected, and both identity probes then passed.
 
+The same disabled-switch probe was subsequently run on fixed CIFAR-100 input
+with the frozen and candidate checkouts in separate interpreters. Its task-0
+and task-1 model state dictionaries (including BatchNorm running buffers),
+raw memory, FIM masks, task-1 loss, and gradients also matched bit-for-bit.
+The two raw records are in `identity/cifar_frozen.json` and
+`identity/cifar_pilot_off.json`; only checkout/provenance fields differ.
+`bic_calibration.py`, `runner.py`, and `models.py` have identical SHA-256 values
+in the two checkouts. A separate fixed-logit BiC fit used the formal
+`joint_alpha_beta`, learning rate `0.05`, and `1000` steps on a deterministic
+ten-task, 100-class calibration input. The frozen and candidate checkouts
+produced identical calibrator state, fit record, and calibrated-logit bytes;
+its records are in `identity/cifar_bic_*.json`. These checks do **not** claim
+that two complete ten-task CIFAR trainings or post-freeze BiC fits on actual
+formal calibration inputs were compared bit-for-bit. The existing ten-task
+enabled-mechanism pilot exercised BiC calibration preparation while blocking
+official test access.
+
 Earlier pilot failures remain intact on NAS: v1 required two deterministic
 DataLoader workers; v2 used a NAS `TMPDIR` too long for an AF_UNIX socket; v3
 exposed the mistaken sum-only aggregation assumption; CIFAR v5 exposed the
