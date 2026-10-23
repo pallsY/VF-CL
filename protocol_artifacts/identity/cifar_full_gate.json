@@ -1,0 +1,24 @@
+{
+  "batchnorm_running_tensor_keys": 160,
+  "bic_calibrated_logits_sha256": "7a0c39cfa0c9227e7bcac71fa4767bade2f0d1d92424a1580ab609edcea4776b",
+  "candidate_code_commit": "f2291eece6854a2a6993f53dbf8cb4cc3b9dc26f",
+  "environment": "Python 3.12.3, Torch 2.7.1+cu128, same interpreter for both",
+  "final_memory_classes": 100,
+  "frozen_commit": "e2a559dc4945729848225cf21fdc95451762c231",
+  "matched_fields": [
+    "source_config_sha256",
+    "validation_manifest_sha256",
+    "snapshots",
+    "final",
+    "bic"
+  ],
+  "model_tensors_per_task": 493,
+  "record_sha256": {
+    "frozen": "b3ffb4a792b3697c03909b81dc6bec57973e00b3dddc64e21d7a963c62a86e03",
+    "pilot_off": "b28dc86f41737f48ba4d9a756bcb6628ee8033cb824f7885ff4c577888ab56b4"
+  },
+  "scope": "CIFAR100 seed73 full ten-task one-epoch disabled-switch identity, official test blocked",
+  "status": "pass",
+  "task_count": 10,
+  "test_loader_accessed": false
+}

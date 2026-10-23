@@ -121,11 +121,22 @@ in the two checkouts. A separate fixed-logit BiC fit used the formal
 `joint_alpha_beta`, learning rate `0.05`, and `1000` steps on a deterministic
 ten-task, 100-class calibration input. The frozen and candidate checkouts
 produced identical calibrator state, fit record, and calibrated-logit bytes;
-its records are in `identity/cifar_bic_*.json`. These checks do **not** claim
-that two complete ten-task CIFAR trainings or post-freeze BiC fits on actual
-formal calibration inputs were compared bit-for-bit. The existing ten-task
-enabled-mechanism pilot exercised BiC calibration preparation while blocking
-official test access.
+its records are in `identity/cifar_bic_*.json`.
+
+A subsequent full ten-task, one-epoch CIFAR **disabled-switch** comparison
+used frozen and candidate code in independent processes with the same Python
+3.12.3/Torch 2.7.1+cu128 environment, seed 73, exact-source CIFAR data, and
+GPU1. All 10 task snapshots, each with 493 model tensors including 160
+BatchNorm running-state keys, matched bit-for-bit; so did raw sample memory,
+FIM masks, and the final installed model. On the authoritative 25-per-class
+validation split, final-head logits, labels, fitted BiC parameters, and
+calibrated logits also matched bit-for-bit. Both runs stopped before official
+test access and produced no test result. The complete hash records and summary
+gate are in `identity/cifar_full_*.json`. This is a **one-epoch correctness
+identity**, not a repetition of the 50-epoch formal training or an accuracy
+experiment. The first attempted frozen launch omitted deterministic environment
+variables and stopped before training; its original failed directory and log
+remain separate from the successful v2 comparison.
 
 Earlier pilot failures remain intact on NAS: v1 required two deterministic
 DataLoader workers; v2 used a NAS `TMPDIR` too long for an AF_UNIX socket; v3
