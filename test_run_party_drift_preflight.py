@@ -37,6 +37,27 @@ class PartyDriftPreflightConfigTest(unittest.TestCase):
             self.assertEqual(config['party_drift_enabled'], 1)
             self.assertEqual(config['party_drift_preflight'], 1)
 
+    def test_cifar_correctness_pilot_uses_idle_gpu_one(self):
+        from run_resource_lite_pilot import expected_tasks
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / 'cifar.json'
+            source.write_text(json.dumps({
+                'data': 'cifar100', 'num_classes': 100, 'num_tasks': 10,
+                'custom_tasks': '', 'classes_per_task': 10,
+                'num_parties': 4, 'seed': 42, 'vector_npz': '',
+                'sample_replay_only': 1,
+                'head_consolidation_samples_per_class': 20,
+                'formal_deferred_evaluation': True,
+            }), encoding='utf-8')
+            digest = hashlib.sha256(source.read_bytes()).hexdigest()
+            with patch('run_party_drift_preflight.SOURCE_CONFIG_SHA256',
+                       {'cifar100': digest}):
+                config = derive_config(source, Path(tmp) / 'new', 'cifar100')
+            self.assertEqual(config['device'], 'cuda:1')
+            self.assertEqual(config['num_tasks'], 2)
+            self.assertEqual(config['custom_tasks'], '|'.join(
+                expected_tasks('cifar100').split('|')[:2]))
+
 
 if __name__ == '__main__':
     unittest.main()

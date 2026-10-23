@@ -53,7 +53,9 @@ def derive_config(source_path, root, dataset):
         'pilot_holdout_per_class': 30,
         'party_drift_enabled': 1, 'party_drift_preflight': 1,
         'num_tasks': 2, 'custom_tasks': '|'.join(expected_tasks(dataset).split('|')[:2]),
-        'epochs_per_task': 1, 'device': 'cpu', 'num_workers': 2,
+        'epochs_per_task': 1,
+        'device': 'cuda:1' if dataset == 'cifar100' else 'cpu',
+        'num_workers': 2,
         'results_dir': str(root), 'output_dir': str(root / name),
         'exp_name': name,
     }
@@ -71,7 +73,8 @@ def run_config(config_path):
     dataset_name = args.pilot_dataset
     if (args.pilot_protocol != PROTOCOL or dataset_name not in SOURCE_CONFIG_SHA256
             or args.seed != 73 or args.num_tasks != 2 or args.epochs_per_task != 1
-            or args.device != 'cpu' or args.num_workers != 2
+            or args.device != ('cuda:1' if dataset_name == 'cifar100' else 'cpu')
+            or args.num_workers != 2
             or args.party_drift_enabled != 1 or args.party_drift_preflight != 1
             or args.pilot_holdout_seed != 20261023
             or args.pilot_holdout_per_class != 30
@@ -82,6 +85,11 @@ def run_config(config_path):
     validate_sample_replay_only(args)
     validate_adaptive_head_consolidation(args)
     validate_source_data_hash(config)
+    if dataset_name == 'cifar100':
+        if (not torch.cuda.is_available() or torch.cuda.device_count() < 2
+                or sha256(Path(args.data_path) / 'cifar-100-python' / 'train')
+                != '735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b'):
+            raise ValueError('CIFAR GPU or frozen training-file identity differs')
     if any(event['type'] != 'CIL' for event in TaskManager(args).get_timeline()):
         raise ValueError('preflight is not a two-task CIL stream')
     run = Path(args.output_dir)
