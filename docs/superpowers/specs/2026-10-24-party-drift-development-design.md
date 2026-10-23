@@ -131,7 +131,11 @@ For CIFAR, both adaptive and ER-ACE use the frozen final joint-alpha/beta BiC
 fit rule: adaptive fits on its reserved validation cohort and ER-ACE on its
 reserved calibration cohort, then both are scored on the separate development
 tuning holdout. Raw and calibrated Class-IL are both archived; calibrated is
-the predeclared comparison metric. The official test split is never opened.
+the predeclared comparison metric. The frozen dataset constructor materializes
+the source file's test partition in memory; development never iterates its
+test loader, runs test inference, records test metrics, or uses test outcomes
+for selection. The test-loader prohibition and saved data-flow audit verify
+this operational boundary.
 
 The candidate progresses to a new, separately frozen 42/43/44 confirmation
 only if its selected-alpha three-seed mean beats every listed strongest

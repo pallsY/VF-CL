@@ -157,3 +157,27 @@ Between those commits only the pilot driver and its test changed; the replay
 method files did not. This closes the **correctness preflight** gate only.
 Candidate A remains unproven on novelty and accuracy; no 70/71/72 development
 run or 42/43/44 formal run has been started.
+
+## 2026-10-24 development-manifest gate
+
+The later seed-74 correctness pilots for all-party replay, uniform/random
+selection, static selection, direct 16-subset CMCDR, and intervention-budget
+CMCDR passed on ISOLET, four-party UPMC, and full ten-task CIFAR. The failed
+early control pilots remain in separate NAS directories. A new seed-73 ISOLET
+candidate pilot under `party-drift-final-gate-pilot-v1-20261024` passed the
+same training-only gate after explicit drift-arm configuration. Its independent
+ledger replay matched all three replay steps and the original selection-log
+SHA-256 `d967e8c55e393d0a8e33ebc6d64f651c84db3cbbe3cd054d9206f3f6856f73d9`.
+The independent ledger checker also matched completed CIFAR static, direct
+CMCDR, and budget CMCDR pilots, each with 639 replay steps. These are
+correctness checks only; no development accuracy was used.
+
+Before sealing the 183-job manifest, review found and fixed four gate gaps:
+CIFAR development readout now uses the frozen final BiC fit on the method's
+reserved validation/calibration cohort; the worker requires an exclusive
+queued attempt; explicit crash recovery is serialized by a Linux OS lock; and
+the selection, checkpoint, data-flow, readout, and success-gate hashes close
+through the append-only queue ledger. The dataset constructor materializes
+the test partition from the source file, but development blocks test-loader
+iteration, inference, and metrics. This narrower boundary is the one claimed
+in the locked design document.
