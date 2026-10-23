@@ -327,14 +327,13 @@ class ProtoEvolveCL:
                 not math.isfinite(self.party_replay_alpha) or
                 self.party_replay_alpha <= 0):
             raise ValueError('invalid party replay arm or alpha')
-        if self.party_replay_arm in {'cmcdr', 'cmcdr_budget'}:
-            raise NotImplementedError('CMCDR profile loss is not wired yet')
         if self.party_drift_enabled:
             self.party_drift_step = 0
             self.party_drift_epoch = 0
             self.party_drift_step_records = []
             self._party_drift_weights = [1.0 / args.num_parties] * args.num_parties
             self._party_drift_attenuation = [0.0] * args.num_parties
+            self._cmcdr_budget_positions = None
         self.head_task_classes = {}
         self.head_validation_sha256 = ''
         self.adaptive_audit_bundle = None
@@ -370,6 +369,7 @@ class ProtoEvolveCL:
             self.party_drift_step_records = []
             self._party_drift_weights = [1.0 / self.args.num_parties] * self.args.num_parties
             self._party_drift_attenuation = [0.0] * self.args.num_parties
+            self._cmcdr_budget_positions = None
         # Apply FIM freeze (computed in after_task of previous task)
         if task_id > 0:
             total_f, total_p = 0, 0
@@ -716,8 +716,18 @@ class ProtoEvolveCL:
                 replay_batch=len(replay_y),
             )
             parts = split_features(replay_x, self.args)
+            cmcdr_indices = None
+            if self.party_replay_arm == 'cmcdr':
+                cmcdr_indices = list(range(len(replay_y)))
+            elif self.party_replay_arm == 'cmcdr_budget':
+                if self._cmcdr_budget_positions is None:
+                    raise RuntimeError('CMCDR intervention budget was not prepared')
+                cmcdr_indices = [row for row in range(len(replay_y))
+                                 if (self.party_drift_step, row)
+                                 in self._cmcdr_budget_positions]
+            replay_components = {}
             def replay_forward():
-                replay_loss, _ = masked_replay_loss(
+                replay_loss, components = masked_replay_loss(
                     bottoms, top_model, self._old_bottoms, self._old_top,
                     parts, replay_y, audit['selected'],
                     self._party_drift_sampler.classes, self.party_replay_alpha,
@@ -726,7 +736,12 @@ class ProtoEvolveCL:
                     temperature=self.temperature,
                     kd_weight=self.effective_distill_weight,
                     aggregation=self.args.aggregation,
+                    cmcdr_indices=cmcdr_indices,
+                    cmcdr_weight=(1.0 if self.party_replay_arm in
+                                  {'cmcdr', 'cmcdr_budget'} else 0.0),
                 )
+                replay_components.clear()
+                replay_components.update(components)
                 return replay_loss
             if bool(getattr(self.args, 'party_drift_preflight', 0)):
                 from party_drift_local import verify_replay_invariants
@@ -742,6 +757,12 @@ class ProtoEvolveCL:
                           'duplicate_samples': duplicates,
                           'replay_arm': self.party_replay_arm,
                           'replay_alpha': self.party_replay_alpha})
+            if self.party_replay_arm in {'cmcdr', 'cmcdr_budget'}:
+                audit.update({
+                    'cmcdr_examples': replay_components['cmcdr_examples'],
+                    'cmcdr_subsets': 1 << self.args.num_parties,
+                    'cmcdr_profile_loss': float(replay_components['cmcdr']),
+                })
             self.party_drift_step_records.append(audit)
             self._write_party_drift_audit(audit)
             self.party_drift_step += 1
@@ -839,6 +860,22 @@ class ProtoEvolveCL:
         import time
         optimizers = self.trainer._create_optimizers()
         self._proto_anchor = deepcopy(self.global_protos)
+        if self.party_replay_arm == 'cmcdr_budget':
+            from party_drift_replay import cmcdr_positions
+            self._cmcdr_budget_positions = cmcdr_positions(
+                seed=int(self.args.seed), task=self.current_task_id,
+                replay_steps=len(train_loader) * int(self.args.epochs_per_task),
+                batch_size=self._party_drift_sampler.batch_size,
+                old_classes=len(self._party_drift_sampler.classes),
+                probe_events=math.ceil(self.args.epochs_per_task / 2),
+                parties=self.args.num_parties, probe_per_class=2,
+            )
+            self._write_party_drift_audit({
+                'kind': 'cmcdr_budget', 'task': self.current_task_id,
+                'examples': len(self._cmcdr_budget_positions),
+                'subsets': 1 << self.args.num_parties,
+                'replay_steps': len(train_loader) * int(self.args.epochs_per_task),
+            })
         start = time.time()
         history = []
         for ep in range(self.args.epochs_per_task):

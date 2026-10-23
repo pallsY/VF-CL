@@ -112,6 +112,17 @@ class PartyDriftLocalTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             verify_audit_record(row, 1)
 
+    def test_cmcdr_audit_validates_intervention_count(self):
+        row = replay_step_audit([0.5, 0.5], 2, 70, 1, 0, 0, 4,
+                                embedding_dims=[2, 2], replay_batch=64)
+        row.update({'replay_arm': 'cmcdr_budget', 'replay_alpha': 0.5,
+                    'cmcdr_examples': 2, 'cmcdr_subsets': 4,
+                    'cmcdr_profile_loss': 0.1})
+        verify_audit_record(row, 2)
+        row['cmcdr_examples'] = 65
+        with self.assertRaises(ValueError):
+            verify_audit_record(row, 2)
+
     def test_attenuation_weight_fallback_and_smoothing(self):
         self.assertEqual(attenuation_weights([0, 0, 0, 0]),
                          [0.25] * 4)

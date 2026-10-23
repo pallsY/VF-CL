@@ -104,11 +104,24 @@ class PartyDriftControlsTests(unittest.TestCase):
             self.assertEqual(method.party_drift_step_records[-1]['selected'], [0, 1])
             self.assertEqual(method.party_drift_step_records[-1]['replay_alpha'], 0.5)
 
-    def test_cmcdr_arm_cannot_run_before_profile_loss_is_wired(self):
+    def test_cmcdr_arm_writes_full_and_budgeted_intervention_counts(self):
         with tempfile.TemporaryDirectory() as directory:
-            for arm in ('cmcdr', 'cmcdr_budget'):
-                with self.assertRaises(NotImplementedError):
-                    self.prepared_method(directory, arm)
+            direct = self.prepared_method(directory, 'cmcdr')
+            direct._proto_loss(
+                direct.trainer.bottoms, direct.trainer.top_model,
+                torch.ones(2, 4), torch.tensor([2, 3]),
+                torch.tensor(0.25, requires_grad=True),
+            )
+            self.assertEqual(direct.party_drift_step_records[-1]['cmcdr_examples'], 64)
+            self.assertEqual(direct.party_drift_step_records[-1]['cmcdr_subsets'], 4)
+            budget = self.prepared_method(directory, 'cmcdr_budget')
+            budget._cmcdr_budget_positions = {(0, 0), (0, 3)}
+            budget._proto_loss(
+                budget.trainer.bottoms, budget.trainer.top_model,
+                torch.ones(2, 4), torch.tensor([2, 3]),
+                torch.tensor(0.25, requires_grad=True),
+            )
+            self.assertEqual(budget.party_drift_step_records[-1]['cmcdr_examples'], 2)
 
 
 if __name__ == '__main__':

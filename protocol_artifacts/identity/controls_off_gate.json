@@ -1,0 +1,38 @@
+{
+  "controls_commit": "99d01cfdbe3902643bc10a6ac2d46dac0ff07ab7",
+  "datasets": {
+    "cifar100": {
+      "controls_off_record_sha256": "9180fc41c9321e49185340f0b23fd4472201f1b181459d67f0dc6fc2e2e8b26f",
+      "frozen_record_sha256": "6b31b376faae8ba64fef133a0393101006c19cd2cc45473878b7454273bd4ac0",
+      "matched": {
+        "task0": true,
+        "task1": true,
+        "task1_probe_gradients": true,
+        "task1_probe_loss_hex": true
+      }
+    },
+    "isolet": {
+      "controls_off_record_sha256": "986c832aa25b5e05d32184dcdac7cfe98b2d844b89085b260bbf3bc815fbf037",
+      "frozen_record_sha256": "8976beb8926dde93e2030fb853ef7dd2f683845e8197065c31c679fcff3bb5da",
+      "matched": {
+        "task0": true,
+        "task1": true,
+        "task1_probe_gradients": true,
+        "task1_probe_loss_hex": true
+      }
+    },
+    "upmc_food101": {
+      "controls_off_record_sha256": "1f9a369576c5bbe7f9f3b875c8ec71d48608b5a6802aed9d8996c5775253d454",
+      "frozen_record_sha256": "636d91c674d5be8732d324cef54807305c6f74ffbf60ff86766db15b39d07d01",
+      "matched": {
+        "task0": true,
+        "task1": true,
+        "task1_probe_gradients": true,
+        "task1_probe_loss_hex": true
+      }
+    }
+  },
+  "frozen_commit": "e2a559dc4945729848225cf21fdc95451762c231",
+  "scope": "two-task fixed-input disabled-switch model/memory/FIM/loss/gradient identity; no official test",
+  "status": "pass"
+}
