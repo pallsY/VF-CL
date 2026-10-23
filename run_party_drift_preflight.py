@@ -44,7 +44,9 @@ def derive_config(source_path, root, dataset):
             or source.get('head_consolidation_samples_per_class') != 20
             or source.get('formal_deferred_evaluation') is not True):
         raise ValueError('source config is not frozen reference20')
-    name = f'{dataset}_seed73_two_task_correctness'
+    full_cifar = dataset == 'cifar100'
+    name = f'{dataset}_seed73_' + (
+        'ten_task_correctness' if full_cifar else 'two_task_correctness')
     return {
         **source,
         'seed': 73, 'pilot_dataset': dataset,
@@ -52,7 +54,9 @@ def derive_config(source_path, root, dataset):
         'pilot_smoke': True, 'pilot_holdout_seed': 20261023,
         'pilot_holdout_per_class': 30,
         'party_drift_enabled': 1, 'party_drift_preflight': 1,
-        'num_tasks': 2, 'custom_tasks': '|'.join(expected_tasks(dataset).split('|')[:2]),
+        'num_tasks': 10 if full_cifar else 2,
+        'custom_tasks': '' if full_cifar else '|'.join(
+            expected_tasks(dataset).split('|')[:2]),
         'epochs_per_task': 1,
         'device': 'cuda:1' if dataset == 'cifar100' else 'cpu',
         'num_workers': 2,
@@ -71,17 +75,22 @@ def run_config(config_path):
     config = json.loads(config_path.read_text(encoding='utf-8'))
     args = SimpleNamespace(**config)
     dataset_name = args.pilot_dataset
+    full_cifar = dataset_name == 'cifar100'
+    expected_tasks_count = 10 if full_cifar else 2
+    expected_custom = '' if full_cifar else '|'.join(
+        expected_tasks(dataset_name).split('|')[:2])
     if (args.pilot_protocol != PROTOCOL or dataset_name not in SOURCE_CONFIG_SHA256
-            or args.seed != 73 or args.num_tasks != 2 or args.epochs_per_task != 1
+            or args.seed != 73 or args.num_tasks != expected_tasks_count
+            or args.epochs_per_task != 1
             or args.device != ('cuda:1' if dataset_name == 'cifar100' else 'cpu')
             or args.num_workers != 2
             or args.party_drift_enabled != 1 or args.party_drift_preflight != 1
             or args.pilot_holdout_seed != 20261023
             or args.pilot_holdout_per_class != 30
-            or args.custom_tasks != '|'.join(expected_tasks(dataset_name).split('|')[:2])
+            or args.custom_tasks != expected_custom
             or args.formal_deferred_evaluation is not True):
         raise ValueError('correctness-only preflight contract differs')
-    _identity(config, dataset_name, smoke=True)
+    _identity(config, dataset_name, smoke=not full_cifar)
     validate_sample_replay_only(args)
     validate_adaptive_head_consolidation(args)
     validate_source_data_hash(config)
@@ -116,25 +125,32 @@ def run_config(config_path):
     records = [json.loads(line) for line in audit.read_text(encoding='utf-8').splitlines()]
     probes = [row for row in records if row.get('kind') == 'probe']
     steps = [row for row in records if 'selected' in row]
-    if len(probes) != 1 or probes[0]['task'] != 1 or probes[0]['epoch'] != 0:
-        raise ValueError('two-task probe schedule differs')
-    for index, row in enumerate(steps):
+    if ([row['task'] for row in probes] != list(range(1, args.num_tasks))
+            or any(row['epoch'] != 0 for row in probes)):
+        raise ValueError('preflight probe schedule differs')
+    step_by_task = {task: 0 for task in range(1, args.num_tasks)}
+    for row in steps:
         verify_audit_record(row, (args.num_parties + 1) // 2)
-        if row['step'] != index or row['task'] != 1 or row['epoch'] != 0:
+        task = row['task']
+        if (task not in step_by_task or row['step'] != step_by_task[task]
+                or row['epoch'] != 0):
             raise ValueError('replay step order differs')
+        step_by_task[task] += 1
+    if any(count == 0 for count in step_by_task.values()):
+        raise ValueError('a task has no replay steps')
     checkpoint = run / 'checkpoints' / 'formal_final.pt'
     payload = runner._decode_checkpoint_value(torch.load(
         checkpoint, map_location='cpu', weights_only=True))
     state = payload['cl_state']
+    expected_classes = (args.num_classes if full_cifar else sum(
+        len(task.split(',')) for task in args.custom_tasks.split('|')))
     if (state.get('global_protos') != {} or state.get('prev_protos') != {}
-            or set(state['head_raw_replay']) != set(
-                range(len(config['custom_tasks'].split('|')[0].split(',')) +
-                      len(config['custom_tasks'].split('|')[1].split(','))))
+            or set(state['head_raw_replay']) != set(range(expected_classes))
             or any(len(raw) != 20 for raw in state['head_raw_replay'].values())):
         raise ValueError('preflight retained non-raw replay state')
     gate = {
         'status': 'correctness_only_pass', 'dataset': dataset_name,
-        'seed': 73, 'tasks': 2, 'epochs_per_task': 1,
+        'seed': 73, 'tasks': args.num_tasks, 'epochs_per_task': 1,
         'probe_events': len(probes), 'replay_steps': len(steps),
         'selection_audit_sha256': sha256(audit),
         'checkpoint_sha256': sha256(checkpoint),

@@ -54,9 +54,8 @@ class PartyDriftPreflightConfigTest(unittest.TestCase):
                        {'cifar100': digest}):
                 config = derive_config(source, Path(tmp) / 'new', 'cifar100')
             self.assertEqual(config['device'], 'cuda:1')
-            self.assertEqual(config['num_tasks'], 2)
-            self.assertEqual(config['custom_tasks'], '|'.join(
-                expected_tasks('cifar100').split('|')[:2]))
+            self.assertEqual(config['num_tasks'], 10)
+            self.assertEqual(config['custom_tasks'], '')
 
 
 if __name__ == '__main__':
