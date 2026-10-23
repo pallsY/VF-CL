@@ -46,7 +46,7 @@
 
 - [ ] Write failing tests for rejection of an unlisted config, test-loader access, mismatched holdout hash, wrong method/seed, and incorrect iCaRL linear-head scoring. Run the new test module and observe failures.
 - [ ] Reuse `PilotDataset` and `validate_training_only_artifacts`; use iCaRL's own NME scorer and the method-aware baseline config. Report final holdout CIL and task breakdown in a result file **read only after queue completion**.
-- [ ] Run synthetic two-task development-driver tests, then one seed-74 correctness pilot per new replay arm. Audit static source table, 16 CMCDR subsets, masks, counts, raw memory and test blocking. Preserve failed pilots.
+- [ ] Run synthetic driver tests, then one seed-74 correctness pilot per new replay arm: two tasks for ISOLET/UPMC and ten one-epoch tasks for CIFAR because its validation split requires BiC. Audit static source table, 16 CMCDR subsets, masks, counts, raw memory and test blocking. Preserve failed pilots.
 
 ### Task 4: Immutable manifest and whitelist launcher
 

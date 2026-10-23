@@ -72,13 +72,17 @@ training-only holdout, and unique output path, and refuses all unlisted work.
 It writes a plan record before training. No implicit scan for extra configs,
 overwrite, or duplicate launch is allowed.
 
-For each new replay control, run one correctness-only two-task seed-74 pilot
-before the 183-job queue. Verify exact selection/weight source, 16-subset CMCDR
+For each new replay control, run one correctness-only seed-74 pilot before the
+183-job queue: two tasks for ISOLET and four-party UPMC, and the full ten-task
+CIFAR stream at one epoch per task. The frozen CIFAR data loader requires the
+BiC calibration split to coexist with validation, and its formal BiC cache
+requires all ten tasks. The abandoned two-task/BiC-off CIFAR driver stopped
+before training; its log and config remain in the failed v2 pilot root.
+Verify exact selection/weight source, 16-subset CMCDR
 interventions where applicable, teacher/student masking, replay and probe
 counts, full-head CE and old-class KD, raw sample budget, RNG isolation, and
-test blocking. CIFAR mechanism checks can use two tasks with final BiC
-publication disabled only in the correctness pilot; the candidate's full
-ten-task BiC path and disabled-switch identity have separate evidence.
+test blocking. The candidate's full ten-task BiC path and disabled-switch
+identity also have separate evidence.
 Failures preserve files and logs. No failed pilot is converted into an
 accuracy job.
 

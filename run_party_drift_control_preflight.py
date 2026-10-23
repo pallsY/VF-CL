@@ -20,14 +20,16 @@ def prepare_control_config(base, dataset, arm, root):
     root = (PurePosixPath(root) if str(root).startswith('/')
             else Path(root).resolve())
     name = f'{dataset}_{arm}_seed74'
+    full_cifar = dataset == 'cifar100'
     return {
         **base,
-        'seed': 74, 'num_tasks': 2,
-        'custom_tasks': '|'.join(expected_tasks(dataset).split('|')[:2]),
+        'seed': 74, 'num_tasks': 10 if full_cifar else 2,
+        'custom_tasks': '' if full_cifar else '|'.join(
+            expected_tasks(dataset).split('|')[:2]),
         'epochs_per_task': 1,
         'device': 'cuda:1' if dataset == 'cifar100' else 'cpu',
         'num_workers': 2,
-        'bic_enabled': 0 if dataset == 'cifar100' else base.get('bic_enabled', 0),
+        'bic_enabled': base.get('bic_enabled', 0),
         'party_drift_enabled': 1, 'party_drift_preflight': 1,
         'party_replay_arm': arm, 'party_replay_alpha': 1.0,
         'pilot_dataset': dataset, 'pilot_variant': 'reference20',
@@ -39,14 +41,14 @@ def prepare_control_config(base, dataset, arm, root):
     }
 
 
-def verify_control_steps(steps, arm, num_parties):
+def verify_control_steps(steps, arm, num_parties, task=1):
     selected_count = (num_parties if arm in
                       ('all_party', 'cmcdr', 'cmcdr_budget') else
                       (num_parties + 1) // 2)
     for index, row in enumerate(steps):
         verify_audit_record(row, selected_count)
         expected = (num_parties if index % 4 == 3 else selected_count)
-        if (row['step'] != index or row['task'] != 1 or row['epoch'] != 0 or
+        if (row['step'] != index or row['task'] != task or row['epoch'] != 0 or
                 row['replay_arm'] != arm or row['replay_alpha'] != 1.0 or
                 len(row['selected']) != expected):
             raise ValueError('control replay step differs')
@@ -64,16 +66,18 @@ def run_config(config_path):
     dataset_name = config.get('pilot_dataset')
     arm = config.get('party_replay_arm')
     args = SimpleNamespace(**config)
+    full_cifar = dataset_name == 'cifar100'
     if (config.get('pilot_protocol') != PROTOCOL or arm not in CONTROL_ARMS or
             config.get('pilot_source_config_sha256') !=
             SOURCE_CONFIG_SHA256.get(dataset_name) or
-            args.seed != 74 or args.num_tasks != 2 or
+            args.seed != 74 or args.num_tasks != (10 if full_cifar else 2) or
             args.epochs_per_task != 1 or args.num_workers != 2 or
             args.device != ('cuda:1' if dataset_name == 'cifar100' else 'cpu') or
-            args.custom_tasks != '|'.join(expected_tasks(dataset_name).split('|')[:2]) or
+            args.custom_tasks != ('' if full_cifar else '|'.join(
+                expected_tasks(dataset_name).split('|')[:2])) or
             args.party_drift_enabled != 1 or args.party_drift_preflight != 1 or
             args.party_replay_alpha != 1.0 or
-            (dataset_name == 'cifar100' and args.bic_enabled != 0)):
+            (full_cifar and args.bic_enabled != 1)):
         raise ValueError('control preflight config differs from locked contract')
     validate_sample_replay_only(args)
     validate_adaptive_head_consolidation(args)
@@ -124,30 +128,38 @@ def run_config(config_path):
                audit_path.read_text(encoding='utf-8').splitlines()]
     steps = [row for row in records if 'selected' in row]
     refreshes = [row for row in records if row.get('kind') == 'weight_refresh']
-    if (not steps or len(refreshes) != 1 or refreshes[0]['epoch'] != 0 or
-            refreshes[0]['arm'] != arm or
+    if (not steps or len(refreshes) != args.num_tasks - 1 or
+            [row['task'] for row in refreshes] != list(range(1, args.num_tasks)) or
+            any(row['epoch'] != 0 or row['arm'] != arm for row in refreshes) or
             any(row.get('kind') == 'probe' for row in records)):
         raise ValueError('control weight refresh or replay schedule differs')
-    verify_control_steps(steps, arm, args.num_parties)
-    if arm in ('all_party', 'uniform', 'cmcdr', 'cmcdr_budget') and (
-            refreshes[0]['weights'] != [1 / args.num_parties] * args.num_parties):
+    by_task = {task: [row for row in steps if row['task'] == task]
+               for task in range(1, args.num_tasks)}
+    if any(not batch for batch in by_task.values()):
+        raise ValueError('control task has no replay steps')
+    for task, batch in by_task.items():
+        verify_control_steps(batch, arm, args.num_parties, task)
+    if arm in ('all_party', 'uniform', 'cmcdr', 'cmcdr_budget') and any(
+            row['weights'] != [1 / args.num_parties] * args.num_parties
+            for row in refreshes):
         raise ValueError('control expected uniform seed weights')
     if arm == 'static':
-        event0 = runner._decode_checkpoint_value(torch.load(
-            output / 'formal_snapshots' / 'event_0_CIL.pt',
-            map_location='cpu', weights_only=True))
-        first_classes = list(range(len(expected_tasks(dataset_name).split('|')[0].split(','))))
-        contribution = event0['cl_state']['dep_tracker_contrib']
         frozen = {}
-        for class_id in first_classes:
-            row = contribution[class_id].abs().float()
-            frozen[class_id] = (
-                row / row.sum() if float(row.sum()) > 0 else
-                torch.full_like(row, 1.0 / len(row))
-            ).tolist()
-        expected = static_importance_weights(frozen, first_classes)
-        if refreshes[0]['weights'] != expected:
-            raise ValueError('static selection differs from frozen task table')
+        task_specs = expected_tasks(dataset_name).split('|')
+        for task in range(1, args.num_tasks):
+            previous = runner._decode_checkpoint_value(torch.load(
+                output / 'formal_snapshots' / f'event_{task - 1}_CIL.pt',
+                map_location='cpu', weights_only=True))
+            contribution = previous['cl_state']['dep_tracker_contrib']
+            for class_id in (int(value) for value in task_specs[task - 1].split(',')):
+                row = contribution[class_id].abs().float()
+                frozen[class_id] = (
+                    row / row.sum() if float(row.sum()) > 0 else
+                    torch.full_like(row, 1.0 / len(row))
+                ).tolist()
+            if refreshes[task - 1]['weights'] != static_importance_weights(
+                    frozen, sorted(frozen)):
+                raise ValueError('static selection differs from frozen task table')
     if arm in ('cmcdr', 'cmcdr_budget'):
         if any(row['cmcdr_subsets'] != 16 for row in steps):
             raise ValueError('CMCDR did not evaluate all four-party subsets')
@@ -156,20 +168,24 @@ def run_config(config_path):
             raise ValueError('direct CMCDR intervention count differs')
         if arm == 'cmcdr_budget':
             from party_drift_replay import cmcdr_positions
-            old_classes = len(expected_tasks(dataset_name).split('|')[0].split(','))
-            planned = cmcdr_positions(
-                seed=74, task=1, replay_steps=len(steps), batch_size=64,
-                old_classes=old_classes, probe_events=1, parties=4)
-            actual = {(row['step'], index)
-                      for row in steps for index in row['cmcdr_rows']}
-            if observed != len(planned) or actual != planned:
-                raise ValueError('budget CMCDR intervention count differs')
+            tasks = expected_tasks(dataset_name).split('|')
+            for task, batch in by_task.items():
+                old_classes = sum(len(x.split(',')) for x in tasks[:task])
+                planned = cmcdr_positions(
+                    seed=74, task=task, replay_steps=len(batch), batch_size=64,
+                    old_classes=old_classes, probe_events=1, parties=4)
+                actual = {(row['step'], index)
+                          for row in batch for index in row['cmcdr_rows']}
+                if (sum(row['cmcdr_examples'] for row in batch) != len(planned)
+                        or actual != planned):
+                    raise ValueError('budget CMCDR intervention count differs')
 
     final = runner._decode_checkpoint_value(torch.load(
         output / 'checkpoints' / 'formal_final.pt',
         map_location='cpu', weights_only=True))
     method_state = final['cl_state']
-    classes = sum(len(task.split(',')) for task in args.custom_tasks.split('|'))
+    classes = args.num_classes if full_cifar else sum(
+        len(task.split(',')) for task in args.custom_tasks.split('|'))
     if (method_state.get('global_protos') != {} or
             method_state.get('prev_protos') != {} or
             set(method_state['head_raw_replay']) != set(range(classes)) or
@@ -177,7 +193,7 @@ def run_config(config_path):
         raise ValueError('control retained state differs from raw-only budget')
     gate = {
         'status': 'correctness_only_pass', 'dataset': dataset_name,
-        'arm': arm, 'seed': 74, 'tasks': 2, 'epochs_per_task': 1,
+        'arm': arm, 'seed': 74, 'tasks': args.num_tasks, 'epochs_per_task': 1,
         'replay_steps': len(steps), 'selection_audit_sha256': sha256(audit_path),
         'checkpoint_sha256': sha256(output / 'checkpoints' / 'formal_final.pt'),
         'test_accessed': False,

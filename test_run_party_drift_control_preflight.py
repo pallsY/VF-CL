@@ -6,7 +6,7 @@ from party_drift_local import replay_step_audit
 
 
 class ControlPreflightTests(unittest.TestCase):
-    def test_prepare_locks_two_tasks_seed_and_cifar_bic_boundary(self):
+    def test_prepare_locks_full_cifar_bic_schedule_and_seed(self):
         self.assertTrue(hasattr(pilot, 'prepare_control_config'))
         base = {
             'data': 'cifar100', 'num_tasks': 10, 'custom_tasks': '',
@@ -17,17 +17,15 @@ class ControlPreflightTests(unittest.TestCase):
         config = pilot.prepare_control_config(
             base, 'cifar100', 'cmcdr_budget', '/results')
         self.assertEqual(config['seed'], 74)
-        self.assertEqual(config['num_tasks'], 2)
-        self.assertEqual(config['bic_enabled'], 0)
+        self.assertEqual(config['num_tasks'], 10)
+        self.assertEqual(config['bic_enabled'], 1)
         self.assertEqual(config['device'], 'cuda:1')
         self.assertEqual(config['party_replay_arm'], 'cmcdr_budget')
         self.assertEqual(config['party_replay_alpha'], 1.0)
         self.assertEqual(config['party_drift_preflight'], 1)
         self.assertEqual(config['output_dir'],
                          '/results/cifar100_cmcdr_budget_seed74')
-        self.assertIn('0,1,2,3,4,5,6,7,8,9', config['custom_tasks'])
-        self.assertNotIn('20,21,22,23,24,25,26,27,28,29',
-                         config['custom_tasks'])
+        self.assertEqual(config['custom_tasks'], '')
 
     def test_prepare_refuses_unlisted_or_candidate_arm(self):
         self.assertTrue(hasattr(pilot, 'prepare_control_config'))
