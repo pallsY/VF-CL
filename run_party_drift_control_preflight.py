@@ -39,6 +39,19 @@ def prepare_control_config(base, dataset, arm, root):
     }
 
 
+def verify_control_steps(steps, arm, num_parties):
+    selected_count = (num_parties if arm in
+                      ('all_party', 'cmcdr', 'cmcdr_budget') else
+                      (num_parties + 1) // 2)
+    for index, row in enumerate(steps):
+        verify_audit_record(row, selected_count)
+        expected = (num_parties if index % 4 == 3 else selected_count)
+        if (row['step'] != index or row['task'] != 1 or row['epoch'] != 0 or
+                row['replay_arm'] != arm or row['replay_alpha'] != 1.0 or
+                len(row['selected']) != expected):
+            raise ValueError('control replay step differs')
+
+
 def run_config(config_path):
     import torch
     import runner
@@ -115,13 +128,7 @@ def run_config(config_path):
             refreshes[0]['arm'] != arm or
             any(row.get('kind') == 'probe' for row in records)):
         raise ValueError('control weight refresh or replay schedule differs')
-    m = args.num_parties if arm in ('all_party', 'cmcdr', 'cmcdr_budget') else 2
-    for index, row in enumerate(steps):
-        verify_audit_record(row, m)
-        if (row['step'] != index or row['epoch'] != 0 or
-                row['replay_arm'] != arm or row['replay_alpha'] != 1.0 or
-                len(row['selected']) != m):
-            raise ValueError('control replay step differs')
+    verify_control_steps(steps, arm, args.num_parties)
     if arm in ('all_party', 'uniform', 'cmcdr', 'cmcdr_budget') and (
             refreshes[0]['weights'] != [1 / args.num_parties] * args.num_parties):
         raise ValueError('control expected uniform seed weights')

@@ -2,6 +2,7 @@ import unittest
 from pathlib import Path
 
 import run_party_drift_control_preflight as pilot
+from party_drift_local import replay_step_audit
 
 
 class ControlPreflightTests(unittest.TestCase):
@@ -34,6 +35,20 @@ class ControlPreflightTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 pilot.prepare_control_config({}, 'isolet', arm,
                                              Path('/results'))
+
+    def test_fourth_replay_step_is_full_party_in_partial_control(self):
+        self.assertTrue(hasattr(pilot, 'verify_control_steps'))
+        records = []
+        for step in range(4):
+            row = replay_step_audit([0.25] * 4, 2, 74, 1, 0, step, 4)
+            row.update({'replay_arm': 'uniform', 'replay_alpha': 1.0})
+            records.append(row)
+        self.assertEqual([len(row['selected']) for row in records],
+                         [2, 2, 2, 4])
+        pilot.verify_control_steps(records, 'uniform', 4)
+        records[3]['selected'] = [0, 1]
+        with self.assertRaises(ValueError):
+            pilot.verify_control_steps(records, 'uniform', 4)
 
 
 if __name__ == '__main__':
