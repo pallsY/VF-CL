@@ -704,6 +704,7 @@ class ProtoEvolveCL:
                                 self.current_task_id, self.party_drift_step),
                     temperature=self.temperature,
                     kd_weight=self.effective_distill_weight,
+                    aggregation=self.args.aggregation,
                 )
                 return replay_loss
             if bool(getattr(self.args, 'party_drift_preflight', 0)):
@@ -749,7 +750,8 @@ class ProtoEvolveCL:
         self._party_drift_attenuation = contribution_attenuation(
             self.trainer.bottoms, self.trainer.top_model,
             self._old_bottoms, self._old_top,
-            split_features(batch, self.args), labels, old_classes)
+            split_features(batch, self.args), labels, old_classes,
+            aggregation=self.args.aggregation)
         self._party_drift_weights = attenuation_weights(
             self._party_drift_attenuation)
         self._write_party_drift_audit({

@@ -59,8 +59,16 @@ def _old_class_log_odds(logits, labels, old_classes):
     return true - other
 
 
+def _aggregate(embeddings, aggregation):
+    if aggregation == 'sum':
+        return sum(embeddings)
+    if aggregation == 'concat':
+        return torch.cat(embeddings, dim=1)
+    raise ValueError('unsupported replay aggregation')
+
+
 def contribution_attenuation(bottoms, top, old_bottoms, old_top,
-                             parts, labels, old_classes):
+                             parts, labels, old_classes, *, aggregation='sum'):
     """A1: mean positive loss of per-party old-class log-odds contribution."""
     if len(bottoms) != len(old_bottoms) or len(bottoms) != len(parts):
         raise ValueError('probe party layout differs')
@@ -71,15 +79,19 @@ def contribution_attenuation(bottoms, top, old_bottoms, old_top,
         with torch.no_grad():
             current = [module(part) for module, part in zip(bottoms, parts)]
             teacher = [module(part) for module, part in zip(old_bottoms, parts)]
-            full_current = _old_class_log_odds(top(sum(current)), labels, old_classes)
-            full_teacher = _old_class_log_odds(old_top(sum(teacher)), labels, old_classes)
+            full_current = _old_class_log_odds(
+                top(_aggregate(current, aggregation)), labels, old_classes)
+            full_teacher = _old_class_log_odds(
+                old_top(_aggregate(teacher, aggregation)), labels, old_classes)
             decay = []
             for k in range(len(bottoms)):
                 without_current = _old_class_log_odds(
-                    top(sum(emb for j, emb in enumerate(current) if j != k)),
+                    top(_aggregate([emb if j != k else torch.zeros_like(emb)
+                                    for j, emb in enumerate(current)], aggregation)),
                     labels, old_classes)
                 without_teacher = _old_class_log_odds(
-                    old_top(sum(emb for j, emb in enumerate(teacher) if j != k)),
+                    old_top(_aggregate([emb if j != k else torch.zeros_like(emb)
+                                        for j, emb in enumerate(teacher)], aggregation)),
                     labels, old_classes)
                 attenuation = (full_teacher - without_teacher) - (
                     full_current - without_current)
@@ -96,7 +108,8 @@ def contribution_attenuation(bottoms, top, old_bottoms, old_top,
 
 def masked_replay_loss(bottoms, top, old_bottoms, old_top, parts,
                        labels, selected, old_classes, alpha, seed,
-                       *, temperature=2.0, kd_weight=0.25):
+                       *, temperature=2.0, kd_weight=0.25,
+                       aggregation='sum'):
     """Same party mask on student and frozen teacher; full-head CE, old-only KL."""
     if (not selected or len(set(selected)) != len(selected) or
             any(k < 0 or k >= len(bottoms) for k in selected) or
@@ -108,11 +121,17 @@ def masked_replay_loss(bottoms, top, old_bottoms, old_top, parts,
         torch.manual_seed(int(seed))
         if devices:
             torch.cuda.manual_seed_all(int(seed))
-        student_embs = [bottoms[k](parts[k]) for k in selected]
-        student_logits = top(sum(student_embs))
+        student_selected = {k: bottoms[k](parts[k]) for k in selected}
+        student_template = next(iter(student_selected.values()))
+        student_embs = [student_selected.get(k, torch.zeros_like(student_template))
+                        for k in range(len(bottoms))]
+        student_logits = top(_aggregate(student_embs, aggregation))
         with torch.no_grad():
-            teacher_embs = [old_bottoms[k](parts[k]) for k in selected]
-            teacher_logits = old_top(sum(teacher_embs))
+            teacher_selected = {k: old_bottoms[k](parts[k]) for k in selected}
+            teacher_template = next(iter(teacher_selected.values()))
+            teacher_embs = [teacher_selected.get(k, torch.zeros_like(teacher_template))
+                            for k in range(len(bottoms))]
+            teacher_logits = old_top(_aggregate(teacher_embs, aggregation))
         ce = F.cross_entropy(student_logits, labels)
         old = torch.as_tensor(old_classes, dtype=torch.long,
                               device=student_logits.device)

@@ -55,6 +55,16 @@ for old class `c` and party `k`. Use `s_k = mean_c a(k,c)`, then the same
 `gamma = 0.2` smoothing and sampler as candidate A. This aggregation is fixed
 before accuracy results; no class or party is selected from development scores.
 
+The frozen configurations do **not** share one aggregation rule: ISOLET and
+four-party UPMC use `concat` (four 128-dimensional party slots); CIFAR-100 uses
+`sum` (four 512-dimensional embeddings). The earlier design discussion that
+assumed `sum` for every dataset was incorrect. For a missing party the replay
+implementation zeroes that party's own slot before `concat`, or adds zero in
+`sum`. The same mask is applied to current and frozen-old embeddings. This
+correction followed the first correctness pilot's shape failure, before any
+accuracy readout. The message-byte ledger is unchanged because it counted
+per-party embedding widths and selections, independent of aggregation.
+
 These are **pre-run simulated message counts**, now reconciled with all three
 exact-source 30-per-class tuning holdout manifests in
 `message_ledger_verified.json`. They are not measured network bytes or

@@ -150,6 +150,41 @@ class PartyDriftReplayTests(unittest.TestCase):
         self.assertTrue(torch.count_nonzero(top.weight.grad[2:]) == 0)
         self.assertTrue(torch.count_nonzero(top.bias.grad[2:]) == 0)
 
+    def test_concat_aggregation_keeps_zero_slots_for_unselected_parties(self):
+        bottoms = [torch.nn.Linear(2, 3) for _ in range(4)]
+        old_bottoms = copy.deepcopy(bottoms)
+        top = torch.nn.Linear(12, 4)
+        old_top = copy.deepcopy(top)
+        parts = [torch.ones(5, 2) for _ in range(4)]
+        loss, _ = masked_replay_loss(
+            bottoms, top, old_bottoms, old_top, parts,
+            torch.tensor([0, 1, 0, 1, 0]), selected=[0, 2],
+            old_classes=[0, 1], alpha=1.0, seed=12,
+            aggregation='concat',
+        )
+        loss.backward()
+        self.assertIsNone(bottoms[1].weight.grad)
+        self.assertIsNone(bottoms[3].weight.grad)
+        self.assertIsNotNone(bottoms[0].weight.grad)
+
+    def test_concat_probe_measures_same_party_contribution_decay(self):
+        old_bottoms = [torch.nn.Linear(1, 1, bias=False) for _ in range(2)]
+        for bottom in old_bottoms:
+            bottom.weight.data.fill_(1)
+        bottoms = copy.deepcopy(old_bottoms)
+        bottoms[1].weight.data.zero_()
+        old_top = torch.nn.Linear(2, 2, bias=False)
+        old_top.weight.data[:] = torch.tensor([[1.0, 1.0], [-1.0, -1.0]])
+        top = copy.deepcopy(old_top)
+        parts = [torch.tensor([[1.0], [-1.0]]) for _ in range(2)]
+        labels = torch.tensor([0, 1])
+        decay = contribution_attenuation(
+            bottoms, top, old_bottoms, old_top,
+            parts, labels, old_classes=[0, 1], aggregation='concat',
+        )
+        np.testing.assert_allclose(decay[0], 0.0, atol=1e-6)
+        self.assertGreater(decay[1], 0.0)
+
 
 if __name__ == '__main__':
     unittest.main()
