@@ -1,0 +1,17 @@
+{
+  "anchor_kind": "party_drift_balanced_shared_handoff_v2",
+  "protocol_anchor_sha256": "167de971ce187d915629b188de2d73b6a256904187b5a9d656d2fe18f5f35985",
+  "producer_commit": "b2b9546f82765c25e18394874ad0f79e786ffb82",
+  "scheduler_commit": "80883dc7d1094b6bd6983f91cbda415db618aed6",
+  "manifest_sha256": "532f551f74e8db2e3f6af088d0bbf3995d9426bec822b357dd7726d4d0734c20",
+  "source_ledger_sha256": "c0369c15558645b80e50812fad9d3cf6987b646684a8766ccfa042eef0149926",
+  "gpu_uuids": [
+    "GPU-6c7fee92-a6fe-5525-c554-bddb8e14943f",
+    "GPU-6569e526-43ea-74e1-264e-4b66417181e1"
+  ],
+  "original_queue_pid": 917882,
+  "admission_proof_path": "/brf/users/yangxx/VFCL-results/party-drift-balanced-amendment-v1-20261027/audit/GPU1_ADMISSION_PROOF.json",
+  "admission_proof_sha256": "0ea9bfa61988bcc5f90945ea8b1f362215ce122ebf84dca14bff36ee42a15516",
+  "pending_count": 23,
+  "development_accuracy_read_for_handoff": false
+}
