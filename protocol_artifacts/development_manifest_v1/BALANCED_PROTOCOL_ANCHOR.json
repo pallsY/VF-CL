@@ -1,0 +1,22 @@
+{
+  "anchor_kind": "party_drift_balanced_resume_protocol_v1",
+  "activation_status": "prepared_only_no_handoff",
+  "approved_manifest_sha256": "532f551f74e8db2e3f6af088d0bbf3995d9426bec822b357dd7726d4d0734c20",
+  "original_manifest_anchor_commit": "7c2684abd1a50e687ad067eb987f61a64e2c62aa",
+  "frozen_producer_commit": "b2b9546f82765c25e18394874ad0f79e786ffb82",
+  "balanced_scheduler_commit": "946992296906924df0c664af0f066e5446c8f189",
+  "qualified_host": "brf3080",
+  "physical_gpu_uuid_by_index": [
+    "GPU-6c7fee92-a6fe-5525-c554-bddb8e14943f",
+    "GPU-6569e526-43ea-74e1-264e-4b66417181e1"
+  ],
+  "activation_requires": [
+    "original coordinator stopped while current training child completes successfully",
+    "no active producer worker",
+    "GPU 1 no compute process for 600 continuous seconds",
+    "separate idle proof SHA-256 anchored before cutover",
+    "GPU 1 still idle immediately before resume",
+    "original 183-job manifest and frozen producer unchanged"
+  ],
+  "development_accuracy_read_for_amendment": false
+}
