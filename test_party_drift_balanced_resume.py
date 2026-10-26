@@ -37,7 +37,9 @@ class BalancedAdmissionTests(unittest.TestCase):
     def test_preparation_gpu_wait_has_bounded_timeout(self):
         now = [0]
         busy = {'name': 'NVIDIA GeForce RTX 3080', 'uuid': 'GPU-one',
-                'memory_mib': 500, 'utilization': 50,
+                'memory_mib': 7000, 'total_mib': 10240,
+                'free_mib': 3240,
+                'utilization': 50,
                 'compute_pids': [123]}
         self.assertFalse(balanced.wait_ready(
             1, ['pending'], threading.Event(), snapshot_fn=lambda _gpu: busy,
@@ -47,11 +49,12 @@ class BalancedAdmissionTests(unittest.TestCase):
         self.assertLessEqual(now[0], 120)
 
     def test_prepared_proof_binds_stable_ledger_and_gpu_uuid(self):
-        proof = balanced.make_idle_proof(
+        proof = balanced.make_admission_proof(
             manifest='m', ledger='l', producer='p', scheduler='s',
             gpu_uuid='GPU-one', original_pid=123,
             pending_count=24, reconstructable=['job-a'])
-        self.assertEqual(proof['idle_duration_seconds'], 600)
+        self.assertEqual(proof['admission_duration_seconds'], 120)
+        self.assertEqual(proof['min_free_mib'], 5120)
         self.assertEqual(proof['source_ledger_sha256'], 'l')
         self.assertEqual(proof['gpu1_uuid'], 'GPU-one')
         self.assertEqual(proof['original_queue_pid'], 123)
@@ -72,37 +75,40 @@ class BalancedAdmissionTests(unittest.TestCase):
             balanced.assert_stopped_coordinator(root,
                 proc_root=Path(tmp) / 'proc')
 
-    def test_anchor_binds_idle_proof_bytes(self):
+    def test_anchor_binds_admission_proof_bytes(self):
         with tempfile.TemporaryDirectory() as tmp:
-            proof = Path(tmp) / 'GPU1_IDLE_PROOF.json'
-            proof.write_text('{"idle_duration_seconds":600}')
-            anchor = {'idle_proof_path': str(proof),
-                      'idle_proof_sha256': hashlib.sha256(
+            proof = Path(tmp) / 'GPU1_ADMISSION_PROOF.json'
+            proof.write_text('{"admission_duration_seconds":120}')
+            anchor = {'admission_proof_path': str(proof),
+                      'admission_proof_sha256': hashlib.sha256(
                           proof.read_bytes()).hexdigest()}
-            self.assertEqual(balanced.load_anchored_idle_proof(
-                anchor)['idle_duration_seconds'], 600)
-            proof.write_text('{"idle_duration_seconds":0}')
+            self.assertEqual(balanced.load_anchored_admission_proof(
+                anchor)['admission_duration_seconds'], 120)
+            proof.write_text('{"admission_duration_seconds":0}')
             with self.assertRaises(ValueError):
-                balanced.load_anchored_idle_proof(anchor)
+                balanced.load_anchored_admission_proof(anchor)
 
-    def test_idle_proof_rejects_outside_process_or_stale_observation(self):
+    def test_admission_proof_accepts_outside_process_but_rejects_low_headroom(self):
         now = datetime(2026, 10, 27, 1, 0, tzinfo=timezone.utc)
         proof = {'manifest_sha256': 'm', 'source_ledger_sha256': 'l',
                  'producer_commit': 'p', 'scheduler_commit': 's',
-                 'gpu1_uuid': 'GPU-one', 'idle_duration_seconds': 600,
+                 'gpu1_uuid': 'GPU-one', 'admission_duration_seconds': 120,
+                 'min_free_mib': 5120,
                  'completed_utc': now.isoformat()}
         snapshot = {'name': 'NVIDIA GeForce RTX 3080',
-                    'uuid': 'GPU-one', 'memory_mib': 1,
-                    'utilization': 0, 'compute_pids': []}
-        balanced.validate_idle_proof(proof, manifest='m', ledger='l',
-                                     producer='p', scheduler='s',
-                                     snapshot=snapshot, now=now)
+                    'uuid': 'GPU-one', 'memory_mib': 4000,
+                    'total_mib': 10240, 'free_mib': 6240,
+                    'utilization': 100,
+                    'compute_pids': [123]}
+        balanced.validate_admission_proof(proof, manifest='m', ledger='l',
+                                          producer='p', scheduler='s',
+                                          snapshot=snapshot, now=now)
         with self.assertRaises(ValueError):
-            balanced.validate_idle_proof(
+            balanced.validate_admission_proof(
                 proof, manifest='m', ledger='l', producer='p', scheduler='s',
-                snapshot={**snapshot, 'compute_pids': [123]}, now=now)
+                snapshot={**snapshot, 'free_mib': 4240}, now=now)
         with self.assertRaises(ValueError):
-            balanced.validate_idle_proof(
+            balanced.validate_admission_proof(
                 proof, manifest='m', ledger='l', producer='p', scheduler='s',
                 snapshot=snapshot, now=now + timedelta(minutes=31))
 
@@ -185,7 +191,13 @@ class BalancedAdmissionTests(unittest.TestCase):
                 rows, configs, Path(tmp) / 'manifest.jsonl', root,
                 producer, 'm', 's', 'p', ['GPU-zero', 'GPU-one'],
                 ready=lambda _gpu, _pending, _stop: True,
-                run_process=fake_run)
+                run_process=fake_run,
+                snapshot_fn=lambda gpu: {
+                    'name': 'NVIDIA GeForce RTX 3080',
+                    'uuid': ['GPU-zero', 'GPU-one'][gpu],
+                    'memory_mib': 0, 'total_mib': 10240,
+                    'free_mib': 10240,
+                    'utilization': 0, 'compute_pids': []})
             self.assertEqual(set(launched), set(keys[1:]))
             self.assertEqual(gate['accounted_for'], 3)
             self.assertTrue((root / 'QUEUE_COMPLETE.json').is_file())
@@ -272,7 +284,12 @@ class BalancedAdmissionTests(unittest.TestCase):
                 row, config, producer, root / 'manifest.jsonl', root, events,
                 'm', 'scheduler-sha',
                 'producer-sha', 1, 'GPU-one', threading.Lock(),
-                run_process=fake_run)
+                run_process=fake_run,
+                snapshot_fn=lambda _gpu: {
+                    'name': 'NVIDIA GeForce RTX 3080', 'uuid': 'GPU-one',
+                    'memory_mib': 4000, 'total_mib': 10240,
+                    'free_mib': 6000,
+                    'utilization': 100, 'compute_pids': [123]})
             self.assertEqual(outcome, 'success')
             self.assertEqual(commands[0][1], 'GPU-one')
             self.assertEqual(commands[0][0][2], str(
@@ -281,27 +298,62 @@ class BalancedAdmissionTests(unittest.TestCase):
             self.assertEqual([event['kind'] for event in history],
                              ['start', 'finish'])
             self.assertEqual(history[0]['physical_gpu_uuid'], 'GPU-one')
+            self.assertEqual(history[0]['free_memory_mib'], 6000)
+            self.assertEqual(history[0]['co_tenant_pids'], [123])
+
+    def test_gpu_one_losing_headroom_does_not_reserve_or_start_job(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            key = 'cifar100/sample_only_off/none/70'
+            events = root / 'ATTEMPTS.jsonl'
+            events.write_text('')
+            with self.assertRaisesRegex(RuntimeError, 'launch conditions'):
+                balanced.execute_one_job(
+                    {'job_key': key, 'config_sha256': 'a' * 64,
+                     'method': 'sample_only_off'},
+                    {'output_dir': str(root / key), 'seed': 70,
+                     'device': 'cuda:0'}, root, root / 'manifest.jsonl',
+                    root, events, 'm', 's', 'p', 1, 'GPU-one',
+                    threading.Lock(),
+                    snapshot_fn=lambda _gpu: {
+                        'name': 'NVIDIA GeForce RTX 3080',
+                        'uuid': 'GPU-one', 'memory_mib': 6000,
+                        'total_mib': 10240, 'free_mib': 4240,
+                        'utilization': 50,
+                        'compute_pids': [123]})
+            self.assertEqual(events.read_text(), '')
+            self.assertFalse((root / key).exists())
 
     def test_gpu_snapshot_uses_uuid_to_reject_only_its_own_compute_process(self):
         value = balanced.parse_gpu_snapshot(
-            '1, NVIDIA GeForce RTX 3080, GPU-one, 226, 0',
+            '1, NVIDIA GeForce RTX 3080, GPU-one, 226, 10240, 9900, 0',
             'GPU-zero, 44, 2418\nGPU-one, 55, 216\n')
         self.assertEqual(value['uuid'], 'GPU-one')
         self.assertEqual(value['compute_pids'], [55])
         self.assertFalse(balanced.idle_snapshot(value))
 
-    def test_gpu_one_requires_ten_continuous_minutes_without_compute_process(self):
+    def test_gpu_one_uses_reported_free_memory_not_total_minus_used(self):
+        snapshot = {'name': 'NVIDIA GeForce RTX 3080', 'uuid': 'GPU-one',
+                    'memory_mib': 4000, 'total_mib': 10240,
+                    'free_mib': 5000, 'utilization': 0,
+                    'compute_pids': [123]}
+        self.assertFalse(balanced.shared_headroom_snapshot(snapshot))
+
+    def test_gpu_one_requires_two_continuous_minutes_of_headroom(self):
         now = [0]
         def snapshot(_gpu):
             return {'name': 'NVIDIA GeForce RTX 3080', 'uuid': 'GPU-1',
-                    'memory_mib': 216 if now[0] < 60 else 1,
-                    'utilization': 0,
-                    'compute_pids': [123] if now[0] < 60 else []}
+                    'memory_mib': 7000 if now[0] < 60 else 4000,
+                    'total_mib': 10240,
+                    'free_mib': 3240 if now[0] < 60 else 6240,
+                    'utilization': 100,
+                    'compute_pids': [123]}
         self.assertTrue(balanced.wait_ready(
             1, ['pending'], threading.Event(), snapshot_fn=snapshot,
             clock_fn=lambda: now[0],
             sleep_fn=lambda seconds: now.__setitem__(0, now[0] + seconds)))
-        self.assertGreaterEqual(now[0], 660)
+        self.assertGreaterEqual(now[0], 180)
+        self.assertLess(now[0], 240)
 
     def test_dispatch_keeps_gpu_zero_moving_when_gpu_one_is_busy(self):
         calls = []

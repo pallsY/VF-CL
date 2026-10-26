@@ -24,11 +24,15 @@ def idle_snapshot(snapshot):
             not snapshot['compute_pids'])
 
 
+def shared_headroom_snapshot(snapshot):
+    return snapshot['free_mib'] >= 5120
+
+
 def parse_gpu_snapshot(gpu_line, app_lines):
     fields = [field.strip() for field in gpu_line.split(',')]
-    if len(fields) != 5:
+    if len(fields) != 7:
         raise ValueError('unexpected GPU inventory format')
-    index, name, uuid, memory, utilization = fields
+    index, name, uuid, memory, total, free, utilization = fields
     pids = []
     for line in app_lines.splitlines():
         parts = [part.strip() for part in line.split(',')]
@@ -37,14 +41,16 @@ def parse_gpu_snapshot(gpu_line, app_lines):
         if parts[0] == uuid:
             pids.append(int(parts[1]))
     return {'index': int(index), 'name': name, 'uuid': uuid,
-            'memory_mib': int(memory), 'utilization': int(utilization),
+            'memory_mib': int(memory), 'total_mib': int(total),
+            'free_mib': int(free),
+            'utilization': int(utilization),
             'compute_pids': pids}
 
 
 def gpu_snapshot(index):
     gpu = subprocess.run([
         'nvidia-smi', '-i', str(index),
-        '--query-gpu=index,name,uuid,memory.used,utilization.gpu',
+        '--query-gpu=index,name,uuid,memory.used,memory.total,memory.free,utilization.gpu',
         '--format=csv,noheader,nounits',
     ], capture_output=True, text=True, check=True)
     apps = subprocess.run([
@@ -62,7 +68,7 @@ def wait_ready(gpu, pending, stop, *, snapshot_fn=None,
                max_wait_seconds=None):
     snapshot_fn = snapshot_fn or gpu_snapshot
     sleep_fn = sleep_fn or stop.wait
-    required = 600 if gpu == 1 else 30
+    required = 120 if gpu == 1 else 30
     idle_since = None
     started = clock_fn()
     while pending and not stop.is_set():
@@ -74,8 +80,9 @@ def wait_ready(gpu, pending, stop, *, snapshot_fn=None,
                 not snapshot['uuid'].startswith('GPU-')):
             raise ValueError('balanced queue needs the two qualified RTX 3080 cards')
         now = clock_fn()
-        idle_since = (now if idle_since is None else idle_since) if idle_snapshot(
-            snapshot) else None
+        admitted = (shared_headroom_snapshot(snapshot) if gpu == 1 else
+                    idle_snapshot(snapshot))
+        idle_since = (now if idle_since is None else idle_since) if admitted else None
         if idle_since is not None and now - idle_since >= required:
             return True
         sleep_fn(30)
@@ -102,8 +109,8 @@ def validate_anchor(value, *, producer, scheduler, manifest, ledger,
         raise ValueError('balanced resume anchor differs from live inputs')
 
 
-def validate_idle_proof(value, *, manifest, ledger, producer, scheduler,
-                        snapshot, now=None):
+def validate_admission_proof(value, *, manifest, ledger, producer, scheduler,
+                             snapshot, now=None):
     expected = {
         'manifest_sha256': manifest, 'source_ledger_sha256': ledger,
         'producer_commit': producer, 'scheduler_commit': scheduler,
@@ -113,29 +120,31 @@ def validate_idle_proof(value, *, manifest, ledger, producer, scheduler,
     observed = datetime.fromisoformat(value['completed_utc'])
     age = (now - observed).total_seconds()
     if (any(value.get(key) != item for key, item in expected.items()) or
-            type(value.get('idle_duration_seconds')) is not int or
-            value['idle_duration_seconds'] < 600 or
+            type(value.get('admission_duration_seconds')) is not int or
+            value['admission_duration_seconds'] < 120 or
+            value.get('min_free_mib') != 5120 or
             not 0 <= age <= 1800 or
             snapshot['name'] != 'NVIDIA GeForce RTX 3080' or
-            not idle_snapshot(snapshot)):
-        raise ValueError('GPU 1 idle proof is stale or differs from live state')
+            not shared_headroom_snapshot(snapshot)):
+        raise ValueError('GPU 1 admission proof is stale or differs from live state')
 
 
-def load_anchored_idle_proof(anchor):
-    path = Path(anchor['idle_proof_path']).resolve()
+def load_anchored_admission_proof(anchor):
+    path = Path(anchor['admission_proof_path']).resolve()
     raw = path.read_bytes()
-    if hashlib.sha256(raw).hexdigest() != anchor.get('idle_proof_sha256'):
-        raise ValueError('GPU 1 idle proof differs from external anchor')
+    if hashlib.sha256(raw).hexdigest() != anchor.get('admission_proof_sha256'):
+        raise ValueError('GPU 1 admission proof differs from external anchor')
     return json.loads(raw)
 
 
-def make_idle_proof(*, manifest, ledger, producer, scheduler, gpu_uuid,
-                    original_pid, pending_count, reconstructable):
+def make_admission_proof(*, manifest, ledger, producer, scheduler, gpu_uuid,
+                         original_pid, pending_count, reconstructable):
     return {
-        'status': 'gpu1_idle_proof',
+        'status': 'gpu1_shared_admission_proof',
         'manifest_sha256': manifest, 'source_ledger_sha256': ledger,
         'producer_commit': producer, 'scheduler_commit': scheduler,
-        'gpu1_uuid': gpu_uuid, 'idle_duration_seconds': 600,
+        'gpu1_uuid': gpu_uuid, 'admission_duration_seconds': 120,
+        'min_free_mib': 5120,
         'original_queue_pid': original_pid,
         'pending_count': pending_count,
         'reconstructable': list(reconstructable),
@@ -180,10 +189,10 @@ def assert_stopped_coordinator(root, *, proc_root=Path('/proc')):
 
 
 def start_record(job_key, config_sha256, physical_gpu, gpu_uuid,
-                 scheduler_commit, producer_commit):
+                 scheduler_commit, producer_commit, snapshot=None):
     if physical_gpu not in (0, 1) or not gpu_uuid.startswith('GPU-'):
         raise ValueError('physical GPU assignment is invalid')
-    return {
+    record = {
         'kind': 'start', 'job_key': job_key, 'attempt': 1,
         'time_utc': datetime.now(timezone.utc).isoformat(),
         'config_sha256': config_sha256,
@@ -192,6 +201,10 @@ def start_record(job_key, config_sha256, physical_gpu, gpu_uuid,
         'scheduler_commit': scheduler_commit,
         'production_commit': producer_commit,
     }
+    if snapshot is not None:
+        record['free_memory_mib'] = snapshot['free_mib']
+        record['co_tenant_pids'] = list(snapshot['compute_pids'])
+    return record
 
 
 def claim_next(pending, mutex, *, ready, stop=None):
@@ -236,18 +249,24 @@ def dispatch_pending(keys, *, ready, run_one):
 
 def execute_one_job(row, config, producer_checkout, manifest, result_root, events,
                     manifest_sha256, scheduler_commit, producer_commit,
-                    physical_gpu, gpu_uuid, mutex, *, run_process=subprocess.run):
+                    physical_gpu, gpu_uuid, mutex, *, run_process=subprocess.run,
+                    snapshot_fn=gpu_snapshot):
     key = row['job_key']
     if config['device'] != 'cuda:0' or config['seed'] not in (70, 72):
         raise ValueError('balanced resume only accepts unstarted logical cuda:0 jobs')
     job_root = Path(config['output_dir']).resolve()
     if not job_root.is_relative_to(Path(result_root).resolve()):
         raise ValueError('job output escaped approved result root')
+    snapshot = snapshot_fn(physical_gpu)
+    if snapshot['uuid'] != gpu_uuid or not (
+            shared_headroom_snapshot(snapshot) if physical_gpu == 1 else
+            idle_snapshot(snapshot)):
+        raise RuntimeError('physical GPU no longer meets launch conditions')
     frozen_queue.reserve_attempt(job_root, 1, key)
     log = job_root / 'attempt-01.log'
     frozen_queue._append_event(events, start_record(
         key, row['config_sha256'], physical_gpu, gpu_uuid,
-        scheduler_commit, producer_commit), mutex)
+        scheduler_commit, producer_commit, snapshot), mutex)
     command = [sys.executable, '-u', str(Path(producer_checkout) /
                                          'run_party_drift_development.py'),
                '--job-key', key, '--manifest', str(manifest),
@@ -304,7 +323,8 @@ def execute_balanced_in_root(rows, configs, manifest, result_root,
                              scheduler_commit, producer_commit, gpu_uuids,
                              *, anchor_sha256=None, startup_command=None,
                              ready=None,
-                             run_process=subprocess.run):
+                             run_process=subprocess.run,
+                             snapshot_fn=gpu_snapshot):
     root = Path(result_root).resolve()
     events_path = root / 'ATTEMPTS.jsonl'
     if (root / 'QUEUE_COMPLETE.json').exists():
@@ -366,7 +386,7 @@ def execute_balanced_in_root(rows, configs, manifest, result_root,
             by_key[key], configs[key], producer_checkout, manifest,
             root, events_path, manifest_sha256, scheduler_commit,
             producer_commit, gpu, gpu_uuids[gpu], mutex,
-            run_process=run_process)
+            run_process=run_process, snapshot_fn=snapshot_fn)
 
     try:
         dispatch_pending(state['pending'], ready=ready, run_one=run_one)
@@ -499,7 +519,7 @@ def prepare_handoff(manifest, manifest_sha256, result_root,
     root = Path(result_root).resolve()
     output = Path(output).resolve()
     if output.is_relative_to(root):
-        raise ValueError('idle proof must live outside the frozen result tree')
+        raise ValueError('admission proof must live outside the frozen result tree')
     if (root / 'QUEUE_COMPLETE.json').exists():
         raise ValueError('original development queue already completed')
     assert_stopped_coordinator(root)
@@ -512,26 +532,26 @@ def prepare_handoff(manifest, manifest_sha256, result_root,
     source_sha = frozen_queue._sha256(root / 'ATTEMPTS.jsonl')
     if not wait_ready(1, state['pending'], threading.Event(),
                       max_wait_seconds=1200):
-        raise RuntimeError('GPU 1 never became continuously idle')
+        raise RuntimeError('GPU 1 never had continuous memory headroom')
     assert_stopped_coordinator(root)
     final_gpu = gpu_snapshot(1)
     if (final_gpu['uuid'] != snapshots[1]['uuid'] or
-            not idle_snapshot(final_gpu) or
+            not shared_headroom_snapshot(final_gpu) or
             frozen_queue._sha256(root / 'ATTEMPTS.jsonl') != source_sha or
             frozen_queue.running_worker_keys(manifest)):
         raise ValueError('handoff changed while GPU 1 was being observed')
     scheduler = _git_commit(Path(__file__).resolve().parent,
                             require_clean=True)
-    proof = make_idle_proof(
+    proof = make_admission_proof(
         manifest=manifest_sha256, ledger=source_sha,
         producer=producer, scheduler=scheduler,
         gpu_uuid=final_gpu['uuid'],
         original_pid=frozen_queue.active_queue_lock(root)['pid'],
         pending_count=len(state['pending']),
         reconstructable=state['reconstructable'])
-    validate_idle_proof(proof, manifest=manifest_sha256, ledger=source_sha,
-                        producer=producer, scheduler=scheduler,
-                        snapshot=final_gpu)
+    validate_admission_proof(proof, manifest=manifest_sha256, ledger=source_sha,
+                             producer=producer, scheduler=scheduler,
+                             snapshot=final_gpu)
     output.parent.mkdir(parents=True, exist_ok=True)
     frozen_queue._write_once(output, proof)
     return proof
@@ -559,8 +579,8 @@ def run_balanced_queue(manifest, manifest_sha256, result_root,
             manifest=manifest_sha256,
             ledger=frozen_queue._sha256(root / 'ATTEMPTS.jsonl'),
             gpu_uuids=[item['uuid'] for item in snapshots])
-        proof = load_anchored_idle_proof(anchor)
-        validate_idle_proof(
+        proof = load_anchored_admission_proof(anchor)
+        validate_admission_proof(
             proof, manifest=manifest_sha256,
             ledger=frozen_queue._sha256(root / 'ATTEMPTS.jsonl'),
             producer=producer_commit, scheduler=scheduler_commit,
@@ -569,7 +589,7 @@ def run_balanced_queue(manifest, manifest_sha256, result_root,
                 frozen_queue.active_queue_lock(root)['pid'] or
                 proof.get('pending_count') != len(state['pending']) or
                 proof.get('reconstructable') != state['reconstructable']):
-            raise ValueError('GPU 1 idle proof differs from paused queue state')
+            raise ValueError('GPU 1 admission proof differs from paused queue state')
         return execute_balanced_in_root(
             rows, configs, manifest, root, producer_checkout,
             manifest_sha256, scheduler_commit, producer_commit,
