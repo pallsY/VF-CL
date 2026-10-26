@@ -55,9 +55,9 @@ duplicates. The worker executable always comes from the original clean
 producer checkout.
 
 For a config with logical `cuda:0`, the scheduler sets
-`CUDA_VISIBLE_DEVICES=0` or `CUDA_VISIBLE_DEVICES=1` in the worker's
-environment. The original config remains byte-identical; inside the worker
-the chosen physical GPU is logical `cuda:0`. Only unstarted jobs are eligible
+`CUDA_VISIBLE_DEVICES` to the selected physical card's full `GPU-...` UUID,
+verified against `nvidia-smi`. The original config remains byte-identical;
+inside the worker the chosen physical GPU is logical `cuda:0`. Only unstarted jobs are eligible
 for this remapping. The append-only `start` event records physical GPU index,
 UUID, scheduler commit, producer commit, and environment mapping. If GPU 1
 becomes occupied again before claim, GPU 0 continues; no job is reserved for
@@ -78,3 +78,28 @@ checkpoint/readout audit remain the evidence boundary. If a training failure,
 source mismatch, duplicate claim, or outside compute process appears, fail
 stop and preserve all files. The run is not claimed as bitwise identical
 across physical cards without a separate identity check.
+
+## Operational handoff checklist
+
+1. While the original queue runs, `--check` verifies all sealed gates and
+   reports pending/active keys without using scores. Confirm GPU 1 has no
+   outside compute process before attempting a handoff.
+2. Send `SIGSTOP` only to the original queue coordinator. Its current worker
+   keeps running. Wait until the worker exits and the frozen success gate
+   verifies. If it fails, send `SIGCONT` to the coordinator and stop.
+3. Run `--prepare-output` into a new, independent NAS audit directory. This
+   requires the coordinator to be stopped and no worker to remain, verifies
+   600 continuous seconds of GPU 1 idleness, and writes an exclusive
+   `GPU1_IDLE_PROOF.json`. If it fails, send `SIGCONT` and stop.
+4. External-anchor the new scheduler commit, the proof file SHA-256, original
+   producer commit, original manifest SHA-256, source ledger SHA-256, and both
+   GPU UUIDs. Recheck GPU 1. If another compute process appears, send
+   `SIGCONT` and stop. The proof expires 30 minutes after observation.
+5. Only then stop the original coordinator (never its worker) and launch the
+   new scheduler once with the exact anchor path and SHA-256. It obtains the
+   same OS lock, reconstructs a sealed-but-unfinished event, writes a new
+   append-only queue lock, and dispatches only unstarted jobs.
+6. If the new scheduler fails before completion, keep every file. After
+   verifying that it and all its workers have exited, the frozen original
+   queue can be resumed with its documented `--recover-interruption-reason`
+   path, preserving both histories. Never run both coordinators together.

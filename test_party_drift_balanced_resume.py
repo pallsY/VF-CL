@@ -1,9 +1,11 @@
 import hashlib
 import json
+import os
 import tempfile
 import unittest
 import threading
 from types import SimpleNamespace
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import party_drift_balanced_resume as balanced
@@ -32,6 +34,94 @@ def sealed_job(root, key, digest, attempt=1):
 
 
 class BalancedAdmissionTests(unittest.TestCase):
+    def test_preparation_gpu_wait_has_bounded_timeout(self):
+        now = [0]
+        busy = {'name': 'NVIDIA GeForce RTX 3080', 'uuid': 'GPU-one',
+                'memory_mib': 500, 'utilization': 50,
+                'compute_pids': [123]}
+        self.assertFalse(balanced.wait_ready(
+            1, ['pending'], threading.Event(), snapshot_fn=lambda _gpu: busy,
+            clock_fn=lambda: now[0],
+            sleep_fn=lambda seconds: now.__setitem__(0, now[0] + seconds),
+            max_wait_seconds=120))
+        self.assertLessEqual(now[0], 120)
+
+    def test_prepared_proof_binds_stable_ledger_and_gpu_uuid(self):
+        proof = balanced.make_idle_proof(
+            manifest='m', ledger='l', producer='p', scheduler='s',
+            gpu_uuid='GPU-one', original_pid=123,
+            pending_count=24, reconstructable=['job-a'])
+        self.assertEqual(proof['idle_duration_seconds'], 600)
+        self.assertEqual(proof['source_ledger_sha256'], 'l')
+        self.assertEqual(proof['gpu1_uuid'], 'GPU-one')
+        self.assertEqual(proof['original_queue_pid'], 123)
+        self.assertEqual(proof['reconstructable'], ['job-a'])
+
+    def test_idle_proof_only_prepared_while_original_coordinator_stopped(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / 'results'
+            root.mkdir()
+            (root / 'QUEUE_LOCK.json').write_text(json.dumps({'pid': 123}))
+            proc = Path(tmp) / 'proc' / '123'
+            proc.mkdir(parents=True)
+            (proc / 'status').write_text('Name:\tpython\nState:\tS (sleeping)\n')
+            with self.assertRaises(ValueError):
+                balanced.assert_stopped_coordinator(root,
+                    proc_root=Path(tmp) / 'proc')
+            (proc / 'status').write_text('Name:\tpython\nState:\tT (stopped)\n')
+            balanced.assert_stopped_coordinator(root,
+                proc_root=Path(tmp) / 'proc')
+
+    def test_anchor_binds_idle_proof_bytes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            proof = Path(tmp) / 'GPU1_IDLE_PROOF.json'
+            proof.write_text('{"idle_duration_seconds":600}')
+            anchor = {'idle_proof_path': str(proof),
+                      'idle_proof_sha256': hashlib.sha256(
+                          proof.read_bytes()).hexdigest()}
+            self.assertEqual(balanced.load_anchored_idle_proof(
+                anchor)['idle_duration_seconds'], 600)
+            proof.write_text('{"idle_duration_seconds":0}')
+            with self.assertRaises(ValueError):
+                balanced.load_anchored_idle_proof(anchor)
+
+    def test_idle_proof_rejects_outside_process_or_stale_observation(self):
+        now = datetime(2026, 10, 27, 1, 0, tzinfo=timezone.utc)
+        proof = {'manifest_sha256': 'm', 'source_ledger_sha256': 'l',
+                 'producer_commit': 'p', 'scheduler_commit': 's',
+                 'gpu1_uuid': 'GPU-one', 'idle_duration_seconds': 600,
+                 'completed_utc': now.isoformat()}
+        snapshot = {'name': 'NVIDIA GeForce RTX 3080',
+                    'uuid': 'GPU-one', 'memory_mib': 1,
+                    'utilization': 0, 'compute_pids': []}
+        balanced.validate_idle_proof(proof, manifest='m', ledger='l',
+                                     producer='p', scheduler='s',
+                                     snapshot=snapshot, now=now)
+        with self.assertRaises(ValueError):
+            balanced.validate_idle_proof(
+                proof, manifest='m', ledger='l', producer='p', scheduler='s',
+                snapshot={**snapshot, 'compute_pids': [123]}, now=now)
+        with self.assertRaises(ValueError):
+            balanced.validate_idle_proof(
+                proof, manifest='m', ledger='l', producer='p', scheduler='s',
+                snapshot=snapshot, now=now + timedelta(minutes=31))
+
+    def test_gpu_probe_error_stops_other_lane_before_any_claim(self):
+        signaled = threading.Event()
+        calls = []
+        def ready(gpu, _pending, stop):
+            if gpu == 1:
+                signaled.set()
+                raise RuntimeError('GPU probe failed')
+            signaled.wait(1)
+            stop.wait(0.1)
+            return True
+        with self.assertRaises(RuntimeError):
+            balanced.dispatch_pending(
+                ['a', 'b', 'c'], ready=ready,
+                run_one=lambda key, gpu: calls.append((key, gpu)) or 'success')
+        self.assertEqual(calls, [])
+
     def test_handoff_rejects_original_queue_or_worker_still_running(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp) / 'results'
@@ -102,6 +192,10 @@ class BalancedAdmissionTests(unittest.TestCase):
             self.assertTrue((root / 'BALANCED_HANDOFF.json').is_file())
             handoff = json.loads((root / 'BALANCED_HANDOFF.json').read_text())
             self.assertEqual(handoff['reconstructed_keys'], [keys[0]])
+            self.assertEqual(handoff['new_scheduler_pid'], os.getpid())
+            self.assertEqual(handoff['reason'], 'scheduler_only_balancing')
+            self.assertIn('party_drift_balanced_resume.py',
+                          handoff['startup_command'])
 
     def test_manifest_rows_cannot_change_producer_or_output_root(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -180,7 +274,7 @@ class BalancedAdmissionTests(unittest.TestCase):
                 'producer-sha', 1, 'GPU-one', threading.Lock(),
                 run_process=fake_run)
             self.assertEqual(outcome, 'success')
-            self.assertEqual(commands[0][1], '1')
+            self.assertEqual(commands[0][1], 'GPU-one')
             self.assertEqual(commands[0][0][2], str(
                 producer / 'run_party_drift_development.py'))
             history = [json.loads(line) for line in events.read_text().splitlines()]
@@ -221,9 +315,10 @@ class BalancedAdmissionTests(unittest.TestCase):
 
     def test_mapping_keeps_approved_logical_device_and_records_physical_uuid(self):
         config = {'device': 'cuda:0', 'seed': 70}
-        env = balanced.worker_environment({'PATH': 'fixed'}, 1, config['seed'])
+        env = balanced.worker_environment({'PATH': 'fixed'}, 1,
+                                          config['seed'], 'GPU-one')
         self.assertEqual(config['device'], 'cuda:0')
-        self.assertEqual(env['CUDA_VISIBLE_DEVICES'], '1')
+        self.assertEqual(env['CUDA_VISIBLE_DEVICES'], 'GPU-one')
         self.assertEqual(env['PYTHONHASHSEED'], '70')
         event = balanced.start_record(
             'cifar100/drift/0.5/70', 'a' * 64, 1, 'GPU-1',
