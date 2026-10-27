@@ -34,6 +34,79 @@ def sealed_job(root, key, digest, attempt=1):
 
 
 class BalancedAdmissionTests(unittest.TestCase):
+    def test_gpu_zero_sharing_needs_two_minutes_above_3072_mib(self):
+        now = [0]
+        def snapshot(_gpu):
+            return {'name': 'NVIDIA GeForce RTX 3080', 'uuid': 'GPU-zero',
+                    'memory_mib': 6480, 'total_mib': 10240,
+                    'free_mib': 3000 if now[0] < 60 else 3396,
+                    'utilization': 100, 'compute_pids': [1065307]}
+        self.assertTrue(balanced.wait_ready(
+            0, ['pending'], threading.Event(), snapshot_fn=snapshot,
+            clock_fn=lambda: now[0],
+            sleep_fn=lambda seconds: now.__setitem__(0, now[0] + seconds),
+            max_wait_seconds=240))
+        self.assertGreaterEqual(now[0], 180)
+
+    def test_each_gpu_keeps_its_own_headroom_threshold(self):
+        self.assertFalse(balanced.shared_headroom_snapshot(
+            {'free_mib': 3071}, gpu=0))
+        self.assertTrue(balanced.shared_headroom_snapshot(
+            {'free_mib': 3072}, gpu=0))
+        self.assertFalse(balanced.shared_headroom_snapshot(
+            {'free_mib': 5119}, gpu=1))
+        self.assertTrue(balanced.shared_headroom_snapshot(
+            {'free_mib': 5120}, gpu=1))
+
+    def test_gpu_zero_sharing_accepts_cotenant_and_records_actual_free_memory(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            key = 'cifar100/sample_only_off/none/70'
+            events = root / 'ATTEMPTS.jsonl'
+            events.write_text('')
+            producer = root / 'frozen-producer'
+            producer.mkdir()
+            def fake_run(_command, **_kwargs):
+                sealed_job(root, key, 'm')
+                return SimpleNamespace(returncode=0)
+            outcome = balanced.execute_one_job(
+                {'job_key': key, 'config_sha256': 'a' * 64,
+                 'method': 'sample_only_off'},
+                {'output_dir': str(root / key), 'seed': 70,
+                 'device': 'cuda:0'}, producer, root / 'manifest.jsonl',
+                root, events, 'm', 's', 'p', 0, 'GPU-zero',
+                threading.Lock(), run_process=fake_run,
+                snapshot_fn=lambda _gpu: {
+                    'name': 'NVIDIA GeForce RTX 3080', 'uuid': 'GPU-zero',
+                    'memory_mib': 6480, 'total_mib': 10240,
+                    'free_mib': 3396, 'utilization': 21,
+                    'compute_pids': [1065307]})
+            self.assertEqual(outcome, 'success')
+            start = json.loads(events.read_text().splitlines()[0])
+            self.assertEqual(start['physical_gpu_index'], 0)
+            self.assertEqual(start['free_memory_mib'], 3396)
+            self.assertEqual(start['co_tenant_pids'], [1065307])
+
+    def test_gpu_zero_proof_binds_3072_mib_and_index(self):
+        now = datetime(2026, 10, 27, 1, 0, tzinfo=timezone.utc)
+        proof = balanced.make_admission_proof(
+            manifest='m', ledger='l', producer='p', scheduler='s',
+            gpu_uuid='GPU-zero', original_pid=670166, pending_count=20,
+            reconstructable=[], gpu_index=0)
+        self.assertEqual(proof['gpu_index'], 0)
+        self.assertEqual(proof['min_free_mib'], 3072)
+        proof['completed_utc'] = now.isoformat()
+        snapshot = {'name': 'NVIDIA GeForce RTX 3080',
+                    'uuid': 'GPU-zero', 'free_mib': 3396,
+                    'compute_pids': [1065307]}
+        balanced.validate_admission_proof(
+            proof, manifest='m', ledger='l', producer='p', scheduler='s',
+            snapshot=snapshot, now=now)
+        with self.assertRaises(ValueError):
+            balanced.validate_admission_proof(
+                proof, manifest='m', ledger='l', producer='p', scheduler='s',
+                snapshot={**snapshot, 'free_mib': 3071}, now=now)
+
     def test_preparation_gpu_wait_has_bounded_timeout(self):
         now = [0]
         busy = {'name': 'NVIDIA GeForce RTX 3080', 'uuid': 'GPU-one',
@@ -151,6 +224,66 @@ class BalancedAdmissionTests(unittest.TestCase):
             (proc / '124' / 'cmdline').write_bytes(b'')
             balanced.assert_original_queue_gone(root, '/tmp/manifest.jsonl',
                                                 proc_root=proc)
+
+    def test_handoff_rejects_live_prior_balanced_coordinator(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / 'results'
+            root.mkdir()
+            (root / 'QUEUE_LOCK_RESUME_01.json').write_text(
+                json.dumps({'pid': 670166}))
+            proc = Path(tmp) / 'proc' / '670166'
+            proc.mkdir(parents=True)
+            (proc / 'cmdline').write_bytes(
+                b'python\0party_drift_balanced_resume.py\0')
+            with self.assertRaises(RuntimeError):
+                balanced.assert_original_queue_gone(
+                    root, '/tmp/manifest.jsonl',
+                    proc_root=Path(tmp) / 'proc')
+
+    def test_second_handoff_appends_record_and_keeps_first(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / 'results'
+            root.mkdir()
+            old_key = 'cifar100/sample_only_off/none/70'
+            new_key = 'cifar100/sample_only_off/none/72'
+            rows = [{'job_key': key, 'config_sha256': str(i) * 64,
+                     'method': 'sample_only_off'}
+                    for i, key in enumerate((old_key, new_key), 1)]
+            configs = {key: {'output_dir': str(root / key),
+                             'seed': int(key.split('/')[-1]),
+                             'device': 'cuda:0'}
+                       for key in (old_key, new_key)}
+            sealed_job(root, old_key, 'm')
+            (root / old_key / 'attempt-01.plan.json').write_text(
+                json.dumps({'attempt': 1, 'job_key': old_key}))
+            (root / 'ATTEMPTS.jsonl').write_text(json.dumps({
+                'kind': 'start', 'job_key': old_key, 'attempt': 1,
+                'config_sha256': rows[0]['config_sha256']}) + '\n')
+            (root / 'QUEUE_LOCK.json').write_text(json.dumps({'pid': 1}))
+            (root / 'QUEUE_LOCK_RESUME_01.json').write_text(json.dumps({
+                'pid': 670166, 'manifest_sha256': 'm',
+                'production_commit': 'p'}))
+            (root / 'BALANCED_HANDOFF.json').write_text('{"first":true}')
+            producer = Path(tmp) / 'producer'
+            producer.mkdir()
+            def fake_run(command, **_kwargs):
+                sealed_job(root, command[command.index('--job-key') + 1], 'm')
+                return SimpleNamespace(returncode=0)
+            balanced.execute_balanced_in_root(
+                rows, configs, Path(tmp) / 'manifest.jsonl', root,
+                producer, 'm', 's', 'p', ['GPU-zero', 'GPU-one'],
+                ready=lambda _gpu, _pending, _stop: True,
+                run_process=fake_run,
+                snapshot_fn=lambda gpu: {
+                    'name': 'NVIDIA GeForce RTX 3080',
+                    'uuid': ['GPU-zero', 'GPU-one'][gpu],
+                    'memory_mib': 0, 'total_mib': 10240,
+                    'free_mib': 10240, 'utilization': 0,
+                    'compute_pids': []})
+            self.assertEqual((root / 'BALANCED_HANDOFF.json').read_text(),
+                             '{"first":true}')
+            self.assertTrue((root / 'BALANCED_HANDOFF_01.json').is_file())
+            self.assertTrue((root / 'QUEUE_LOCK_RESUME_02.json').is_file())
 
     def test_resumed_queue_preserves_sealed_job_and_completes_pending_once(self):
         with tempfile.TemporaryDirectory() as tmp:
