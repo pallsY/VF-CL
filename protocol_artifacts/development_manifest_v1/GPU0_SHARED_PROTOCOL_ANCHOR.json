@@ -1,0 +1,28 @@
+{
+  "anchor_kind": "party_drift_gpu0_shared_scheduling_protocol_v3",
+  "activation_status": "prepared_only_no_second_handoff",
+  "prior_shared_handoff_anchor_commit": "9a64e9fc0951c547d215d4e835f86d01c522ecaa",
+  "approved_manifest_sha256": "532f551f74e8db2e3f6af088d0bbf3995d9426bec822b357dd7726d4d0734c20",
+  "frozen_producer_commit": "b2b9546f82765c25e18394874ad0f79e786ffb82",
+  "new_scheduler_commit": "17a8aecc73d42eab87976bd9d9d13d91375a753d",
+  "qualified_host": "brf3080",
+  "physical_gpu_uuid_by_index": [
+    "GPU-6c7fee92-a6fe-5525-c554-bddb8e14943f",
+    "GPU-6569e526-43ea-74e1-264e-4b66417181e1"
+  ],
+  "admission": {
+    "gpu0_nvidia_smi_memory_free_min_mib": 3072,
+    "gpu1_nvidia_smi_memory_free_min_mib": 5120,
+    "continuous_seconds_per_gpu": 120,
+    "outside_compute_processes_allowed": true,
+    "check_again_immediately_before_each_launch": true
+  },
+  "second_handoff_requires": [
+    "prior coordinator stopped while its current child completes successfully",
+    "no active producer worker at handoff",
+    "separate GPU0 admission proof SHA-256 externally anchored before cutover",
+    "GPU0 reported free memory at least 3072 MiB immediately before resume",
+    "original 183-job manifest, frozen producer, and previous result trees unchanged"
+  ],
+  "development_accuracy_read_for_amendment": false
+}
