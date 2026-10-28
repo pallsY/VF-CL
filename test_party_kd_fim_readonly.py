@@ -2,7 +2,9 @@ import unittest
 
 import torch
 
-from diagnose_party_kd_fim_readonly import drift_metrics, frozen_fraction
+from diagnose_party_kd_fim_readonly import (
+    drift_metrics, frozen_fraction, gradient_cosine,
+)
 
 
 class ReadOnlyDiagnosticMathTests(unittest.TestCase):
@@ -17,6 +19,12 @@ class ReadOnlyDiagnosticMathTests(unittest.TestCase):
     def test_frozen_fraction_uses_parameter_count(self):
         state = {'weight': torch.zeros(10, 10), 'bias': torch.zeros(1)}
         self.assertAlmostEqual(frozen_fraction(state, {'weight': False, 'bias': True}), 1 / 101)
+
+    def test_gradient_cosine_keeps_direction_and_marks_zero_gradient(self):
+        self.assertAlmostEqual(
+            gradient_cosine(torch.tensor([1.0, 2.0]),
+                            torch.tensor([-1.0, -2.0])), -1.0)
+        self.assertIsNone(gradient_cosine(torch.zeros(2), torch.ones(2)))
 
 
 if __name__ == '__main__':
