@@ -239,8 +239,8 @@ def analyze_gradient_run(run):
     config = json.loads(config_path.read_text(encoding='utf-8'))
     snapshots = sorted((run / 'formal_snapshots').glob('event_*_CIL.pt'),
                        key=lambda path: int(path.stem.split('_')[1]))
-    if len(snapshots) != 13:
-        raise ValueError('ISOLET reference20 should have exactly 13 task snapshots')
+    if len(snapshots) < 2:
+        raise ValueError('reference20 needs adjacent task snapshots')
     rows = []
     previous = torch.load(snapshots[0], map_location='cpu', weights_only=True)
     for task_id, path in enumerate(snapshots[1:], start=1):
@@ -309,8 +309,8 @@ def analyze_run(run):
     config = json.loads(config_path.read_text(encoding='utf-8'))
     snapshots = sorted((run / 'formal_snapshots').glob('event_*_CIL.pt'),
                        key=lambda path: int(path.stem.split('_')[1]))
-    if len(snapshots) != 13:
-        raise ValueError('ISOLET reference20 should have exactly 13 task snapshots')
+    if len(snapshots) < 2:
+        raise ValueError('reference20 needs adjacent task snapshots')
     rows = []
     previous = torch.load(snapshots[0], map_location='cpu', weights_only=True)
     for task_id, path in enumerate(snapshots[1:], start=1):
@@ -330,13 +330,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--base', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--dataset', choices=('isolet', 'upmc_food101'),
+                        default='isolet')
     parser.add_argument('--mode', choices=('representation', 'gradient'),
                         default='representation')
     args = parser.parse_args()
     torch.set_num_threads(1)
-    runs = [args.base / f'isolet_seed{seed}_reference20' for seed in (54, 55)]
+    runs = [args.base / f'{args.dataset}_seed{seed}_reference20'
+            for seed in (54, 55)]
     if any(not run.is_dir() for run in runs):
-        raise FileNotFoundError('frozen ISOLET reference20 runs missing')
+        raise FileNotFoundError('frozen vector reference20 runs missing')
     if args.output.resolve().is_relative_to(args.base.resolve()):
         raise ValueError('diagnostic output must be outside source results')
     records = [(analyze_gradient_run(run) if args.mode == 'gradient' else
@@ -367,7 +370,7 @@ def main():
             }
     payload = {
         'scope': 'training_exemplars_only_hypothesis_generation',
-        'dataset': 'isolet', 'seeds': [54, 55],
+        'dataset': args.dataset, 'seeds': [54, 55],
         'mode': args.mode,
         'metric_note': (
             'Gradients are endpoint proxies on herded training exemplars, not '
