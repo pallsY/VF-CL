@@ -1,0 +1,968 @@
+{
+  "dataset": "upmc_food101",
+  "metric_note": "Gradients are endpoint proxies on herded training exemplars, not the gradients recorded during training or causal attribution.",
+  "mode": "gradient",
+  "runs": [
+    {
+      "config_sha256": "1eeb07c79238cdcfa16a437cee14f1299254e238e2323a2655692ccd4dadb202",
+      "rows": [
+        {
+          "new_training_exemplars": 200,
+          "old_training_exemplars": 220,
+          "party": [
+            {
+              "ce_new_gradient_norm": 1.561876893043518,
+              "ce_old_vs_ce_new_cosine": 0.357739120721817,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.02463488228070688,
+              "kd_vs_ce_new_cosine": 0.2946315109729767,
+              "party": 0,
+              "party_kd_to_ce_new_norm_ratio": 0.02180723325028986,
+              "party_kd_vs_ce_new_cosine": 0.5868853330612183,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.6015940376794211
+            },
+            {
+              "ce_new_gradient_norm": 1.8895639181137085,
+              "ce_old_vs_ce_new_cosine": 0.7612876892089844,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.017393538254919575,
+              "kd_vs_ce_new_cosine": -0.39354947209358215,
+              "party": 1,
+              "party_kd_to_ce_new_norm_ratio": 0.011638789333870678,
+              "party_kd_vs_ce_new_cosine": -0.13130030035972595,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.6323146451272882
+            },
+            {
+              "ce_new_gradient_norm": 2.4105224609375,
+              "ce_old_vs_ce_new_cosine": 0.16341054439544678,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.024755245221683198,
+              "kd_vs_ce_new_cosine": -0.7365071177482605,
+              "party": 2,
+              "party_kd_to_ce_new_norm_ratio": 0.019244114006538176,
+              "party_kd_vs_ce_new_cosine": -0.6329715847969055,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.6916313363080566
+            },
+            {
+              "ce_new_gradient_norm": 3.175585985183716,
+              "ce_old_vs_ce_new_cosine": 0.2943318784236908,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.014722379152156786,
+              "kd_vs_ce_new_cosine": -0.7090352773666382,
+              "party": 3,
+              "party_kd_to_ce_new_norm_ratio": 0.005376127572784394,
+              "party_kd_vs_ce_new_cosine": 0.3357156813144684,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.8510525599051277
+            }
+          ],
+          "task_id": 1
+        },
+        {
+          "new_training_exemplars": 200,
+          "old_training_exemplars": 420,
+          "party": [
+            {
+              "ce_new_gradient_norm": 4.861575603485107,
+              "ce_old_vs_ce_new_cosine": 0.8155280351638794,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.005780560263055243,
+              "kd_vs_ce_new_cosine": 0.7533450126647949,
+              "party": 0,
+              "party_kd_to_ce_new_norm_ratio": 0.0058910747236295205,
+              "party_kd_vs_ce_new_cosine": 0.7218598127365112,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.6617776684489892
+            },
+            {
+              "ce_new_gradient_norm": 4.2579216957092285,
+              "ce_old_vs_ce_new_cosine": 0.8768932819366455,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.007132815809777447,
+              "kd_vs_ce_new_cosine": 0.8252367973327637,
+              "party": 1,
+              "party_kd_to_ce_new_norm_ratio": 0.0030381934966273063,
+              "party_kd_vs_ce_new_cosine": 0.43928882479667664,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.655703861835817
+            },
+            {
+              "ce_new_gradient_norm": 6.021814823150635,
+              "ce_old_vs_ce_new_cosine": 0.4484291672706604,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.00966236332874087,
+              "kd_vs_ce_new_cosine": 0.35655084252357483,
+              "party": 2,
+              "party_kd_to_ce_new_norm_ratio": 0.00577240408741671,
+              "party_kd_vs_ce_new_cosine": 0.02150660939514637,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.8093342357338534
+            },
+            {
+              "ce_new_gradient_norm": 5.838048934936523,
+              "ce_old_vs_ce_new_cosine": 0.9274741411209106,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.006841616956727922,
+              "kd_vs_ce_new_cosine": 0.7253261208534241,
+              "party": 3,
+              "party_kd_to_ce_new_norm_ratio": 0.0031807430334617956,
+              "party_kd_vs_ce_new_cosine": 0.6557663083076477,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.8711787430827022
+            }
+          ],
+          "task_id": 2
+        },
+        {
+          "new_training_exemplars": 200,
+          "old_training_exemplars": 620,
+          "party": [
+            {
+              "ce_new_gradient_norm": 3.5445775985717773,
+              "ce_old_vs_ce_new_cosine": 0.9464935660362244,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.007373570146228206,
+              "kd_vs_ce_new_cosine": -0.5581605434417725,
+              "party": 0,
+              "party_kd_to_ce_new_norm_ratio": 0.0050986983047596034,
+              "party_kd_vs_ce_new_cosine": -0.42853331565856934,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.6520241369134652
+            },
+            {
+              "ce_new_gradient_norm": 2.9133803844451904,
+              "ce_old_vs_ce_new_cosine": 0.8854659795761108,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.006461288063122837,
+              "kd_vs_ce_new_cosine": 0.14815255999565125,
+              "party": 1,
+              "party_kd_to_ce_new_norm_ratio": 0.006605504337988722,
+              "party_kd_vs_ce_new_cosine": 0.47308075428009033,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.614664925937064
+            },
+            {
+              "ce_new_gradient_norm": 4.821927547454834,
+              "ce_old_vs_ce_new_cosine": 0.8099387884140015,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.011337221465856235,
+              "kd_vs_ce_new_cosine": -0.33283424377441406,
+              "party": 2,
+              "party_kd_to_ce_new_norm_ratio": 0.008795476110069752,
+              "party_kd_vs_ce_new_cosine": -0.06201762706041336,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.8004788265672864
+            },
+            {
+              "ce_new_gradient_norm": 4.888463497161865,
+              "ce_old_vs_ce_new_cosine": 0.9038458466529846,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.006199157961815871,
+              "kd_vs_ce_new_cosine": -0.09295845776796341,
+              "party": 3,
+              "party_kd_to_ce_new_norm_ratio": 0.003544587795657584,
+              "party_kd_vs_ce_new_cosine": 0.5178318619728088,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.8615430598059387
+            }
+          ],
+          "task_id": 3
+        },
+        {
+          "new_training_exemplars": 200,
+          "old_training_exemplars": 820,
+          "party": [
+            {
+              "ce_new_gradient_norm": 2.1850953102111816,
+              "ce_old_vs_ce_new_cosine": 0.6416001915931702,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.010444789534677425,
+              "kd_vs_ce_new_cosine": -0.47173988819122314,
+              "party": 0,
+              "party_kd_to_ce_new_norm_ratio": 0.008925097646425722,
+              "party_kd_vs_ce_new_cosine": 0.5793871879577637,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.5723556514260603
+            },
+            {
+              "ce_new_gradient_norm": 2.1889772415161133,
+              "ce_old_vs_ce_new_cosine": 0.7041157484054565,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.00821047627056967,
+              "kd_vs_ce_new_cosine": -0.44162264466285706,
+              "party": 1,
+              "party_kd_to_ce_new_norm_ratio": 0.006545081031981969,
+              "party_kd_vs_ce_new_cosine": 0.1481393277645111,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.5747713428756389
+            },
+            {
+              "ce_new_gradient_norm": 3.546938180923462,
+              "ce_old_vs_ce_new_cosine": 0.3734374940395355,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.011824552661613072,
+              "kd_vs_ce_new_cosine": -0.5386248230934143,
+              "party": 2,
+              "party_kd_to_ce_new_norm_ratio": 0.007782423034224047,
+              "party_kd_vs_ce_new_cosine": -0.1419678032398224,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.7003082996143708
+            },
+            {
+              "ce_new_gradient_norm": 3.577073574066162,
+              "ce_old_vs_ce_new_cosine": 0.8591141700744629,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.011788319432867388,
+              "kd_vs_ce_new_cosine": -0.7023237347602844,
+              "party": 3,
+              "party_kd_to_ce_new_norm_ratio": 0.005604271544744655,
+              "party_kd_vs_ce_new_cosine": 0.2870560586452484,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.7718422610549623
+            }
+          ],
+          "task_id": 4
+        },
+        {
+          "new_training_exemplars": 200,
+          "old_training_exemplars": 1020,
+          "party": [
+            {
+              "ce_new_gradient_norm": 2.818225860595703,
+              "ce_old_vs_ce_new_cosine": 0.8548242449760437,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.01319023409635264,
+              "kd_vs_ce_new_cosine": -0.2517295181751251,
+              "party": 0,
+              "party_kd_to_ce_new_norm_ratio": 0.00555834332163388,
+              "party_kd_vs_ce_new_cosine": -0.23435930907726288,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.6134199708512288
+            },
+            {
+              "ce_new_gradient_norm": 1.9413741827011108,
+              "ce_old_vs_ce_new_cosine": 0.9208565950393677,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.017550008053212236,
+              "kd_vs_ce_new_cosine": 0.5705801844596863,
+              "party": 1,
+              "party_kd_to_ce_new_norm_ratio": 0.007150721124782298,
+              "party_kd_vs_ce_new_cosine": 0.46278440952301025,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.5709828812805322
+            },
+            {
+              "ce_new_gradient_norm": 3.232957601547241,
+              "ce_old_vs_ce_new_cosine": 0.6755517721176147,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.01823052156241512,
+              "kd_vs_ce_new_cosine": -0.3059157431125641,
+              "party": 2,
+              "party_kd_to_ce_new_norm_ratio": 0.011524399471180214,
+              "party_kd_vs_ce_new_cosine": 0.07768068462610245,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.6787121437908723
+            },
+            {
+              "ce_new_gradient_norm": 4.108868598937988,
+              "ce_old_vs_ce_new_cosine": 0.8768635392189026,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.011096870458790273,
+              "kd_vs_ce_new_cosine": -0.1662464141845703,
+              "party": 3,
+              "party_kd_to_ce_new_norm_ratio": 0.005301573589008929,
+              "party_kd_vs_ce_new_cosine": 0.43408986926078796,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.8199261885454581
+            }
+          ],
+          "task_id": 5
+        },
+        {
+          "new_training_exemplars": 200,
+          "old_training_exemplars": 1220,
+          "party": [
+            {
+              "ce_new_gradient_norm": 2.7315165996551514,
+              "ce_old_vs_ce_new_cosine": 0.7660893797874451,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.008949549475416851,
+              "kd_vs_ce_new_cosine": 0.5170546174049377,
+              "party": 0,
+              "party_kd_to_ce_new_norm_ratio": 0.009696156395527516,
+              "party_kd_vs_ce_new_cosine": 0.8266474604606628,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.5821441837960613
+            },
+            {
+              "ce_new_gradient_norm": 2.4387266635894775,
+              "ce_old_vs_ce_new_cosine": 0.8300706744194031,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.007583465204143493,
+              "kd_vs_ce_new_cosine": 0.33665451407432556,
+              "party": 1,
+              "party_kd_to_ce_new_norm_ratio": 0.006453003875542698,
+              "party_kd_vs_ce_new_cosine": 0.3181208670139313,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.5675190362541198
+            },
+            {
+              "ce_new_gradient_norm": 3.1156411170959473,
+              "ce_old_vs_ce_new_cosine": 0.7529836893081665,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.0079729928961292,
+              "kd_vs_ce_new_cosine": -0.07368848472833633,
+              "party": 2,
+              "party_kd_to_ce_new_norm_ratio": 0.00612522618321196,
+              "party_kd_vs_ce_new_cosine": 0.634882390499115,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.773614712204156
+            },
+            {
+              "ce_new_gradient_norm": 4.649061679840088,
+              "ce_old_vs_ce_new_cosine": 0.8333620429039001,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.011090086955984381,
+              "kd_vs_ce_new_cosine": -0.30667823553085327,
+              "party": 3,
+              "party_kd_to_ce_new_norm_ratio": 0.007345040364463272,
+              "party_kd_vs_ce_new_cosine": -0.23492784798145294,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.7813205686795535
+            }
+          ],
+          "task_id": 6
+        },
+        {
+          "new_training_exemplars": 200,
+          "old_training_exemplars": 1420,
+          "party": [
+            {
+              "ce_new_gradient_norm": 1.8708924055099487,
+              "ce_old_vs_ce_new_cosine": 0.5249461531639099,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.01236166908943269,
+              "kd_vs_ce_new_cosine": 0.1352793276309967,
+              "party": 0,
+              "party_kd_to_ce_new_norm_ratio": 0.0072142548571977275,
+              "party_kd_vs_ce_new_cosine": 0.5110997557640076,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.5303066308448285
+            },
+            {
+              "ce_new_gradient_norm": 2.267035961151123,
+              "ce_old_vs_ce_new_cosine": 0.6138597130775452,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.01018558730493263,
+              "kd_vs_ce_new_cosine": -0.1801358163356781,
+              "party": 1,
+              "party_kd_to_ce_new_norm_ratio": 0.007578870325592372,
+              "party_kd_vs_ce_new_cosine": 0.34702378511428833,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.5565187903501012
+            },
+            {
+              "ce_new_gradient_norm": 2.4826269149780273,
+              "ce_old_vs_ce_new_cosine": 0.5333587527275085,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.010772071954169888,
+              "kd_vs_ce_new_cosine": -0.3046981990337372,
+              "party": 2,
+              "party_kd_to_ce_new_norm_ratio": 0.006830218552636482,
+              "party_kd_vs_ce_new_cosine": -0.13693736493587494,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.720981696656711
+            },
+            {
+              "ce_new_gradient_norm": 3.6644434928894043,
+              "ce_old_vs_ce_new_cosine": 0.5941511988639832,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.015565804127772729,
+              "kd_vs_ce_new_cosine": -0.43998804688453674,
+              "party": 3,
+              "party_kd_to_ce_new_norm_ratio": 0.009145224983555402,
+              "party_kd_vs_ce_new_cosine": -0.04046197980642319,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.7347530253535836
+            }
+          ],
+          "task_id": 7
+        },
+        {
+          "new_training_exemplars": 200,
+          "old_training_exemplars": 1620,
+          "party": [
+            {
+              "ce_new_gradient_norm": 1.867313265800476,
+              "ce_old_vs_ce_new_cosine": 0.8263664841651917,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.031837300122528125,
+              "kd_vs_ce_new_cosine": -0.42154958844184875,
+              "party": 0,
+              "party_kd_to_ce_new_norm_ratio": 0.022117018858146167,
+              "party_kd_vs_ce_new_cosine": -0.21983347833156586,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.515117906414443
+            },
+            {
+              "ce_new_gradient_norm": 2.5474178791046143,
+              "ce_old_vs_ce_new_cosine": 0.7289772033691406,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.012840611456908489,
+              "kd_vs_ce_new_cosine": -0.41370296478271484,
+              "party": 1,
+              "party_kd_to_ce_new_norm_ratio": 0.006344599101093204,
+              "party_kd_vs_ce_new_cosine": 0.23759843409061432,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.5381528930745603
+            },
+            {
+              "ce_new_gradient_norm": 3.1095733642578125,
+              "ce_old_vs_ce_new_cosine": 0.7360823750495911,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.017485729917034284,
+              "kd_vs_ce_new_cosine": -0.6347567439079285,
+              "party": 2,
+              "party_kd_to_ce_new_norm_ratio": 0.005001727262366038,
+              "party_kd_vs_ce_new_cosine": 0.27600038051605225,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.7718837213399385
+            },
+            {
+              "ce_new_gradient_norm": 3.610813856124878,
+              "ce_old_vs_ce_new_cosine": 0.8306284546852112,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.021266957743592194,
+              "kd_vs_ce_new_cosine": -0.6857104301452637,
+              "party": 3,
+              "party_kd_to_ce_new_norm_ratio": 0.008952294867410712,
+              "party_kd_vs_ce_new_cosine": -0.18788684904575348,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.6996172342869711
+            }
+          ],
+          "task_id": 8
+        },
+        {
+          "new_training_exemplars": 200,
+          "old_training_exemplars": 1820,
+          "party": [
+            {
+              "ce_new_gradient_norm": 3.0287327766418457,
+              "ce_old_vs_ce_new_cosine": 0.9001783728599548,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.00770827307235859,
+              "kd_vs_ce_new_cosine": -0.1080431416630745,
+              "party": 0,
+              "party_kd_to_ce_new_norm_ratio": 0.005431900196647739,
+              "party_kd_vs_ce_new_cosine": 0.03325776010751724,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.5807484955868653
+            },
+            {
+              "ce_new_gradient_norm": 2.393413782119751,
+              "ce_old_vs_ce_new_cosine": 0.7870512008666992,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.009888452525749087,
+              "kd_vs_ce_new_cosine": 0.11868231743574142,
+              "party": 1,
+              "party_kd_to_ce_new_norm_ratio": 0.006298232067781651,
+              "party_kd_vs_ce_new_cosine": 0.5219680070877075,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.48996816398208237
+            },
+            {
+              "ce_new_gradient_norm": 4.013587951660156,
+              "ce_old_vs_ce_new_cosine": 0.8525171875953674,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.006655828046677337,
+              "kd_vs_ce_new_cosine": -0.253465473651886,
+              "party": 2,
+              "party_kd_to_ce_new_norm_ratio": 0.0032113001878377647,
+              "party_kd_vs_ce_new_cosine": 0.0618303008377552,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.8000070183620636
+            },
+            {
+              "ce_new_gradient_norm": 4.539903163909912,
+              "ce_old_vs_ce_new_cosine": 0.7590082287788391,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.012580566290601477,
+              "kd_vs_ce_new_cosine": -0.3074952960014343,
+              "party": 3,
+              "party_kd_to_ce_new_norm_ratio": 0.007838644874726219,
+              "party_kd_vs_ce_new_cosine": -0.04899808019399643,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.6848528322683324
+            }
+          ],
+          "task_id": 9
+        }
+      ],
+      "run": "/brf/users/yangxx/VFCL-results/resource-lite-dev-full-v2-20261018/upmc_food101_seed54_reference20"
+    },
+    {
+      "config_sha256": "37562007542b87d45f075eeedbf3482462710afd8870a688e9ef89212c6a09a6",
+      "rows": [
+        {
+          "new_training_exemplars": 200,
+          "old_training_exemplars": 220,
+          "party": [
+            {
+              "ce_new_gradient_norm": 1.2236908674240112,
+              "ce_old_vs_ce_new_cosine": -0.18418359756469727,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.013982585883788536,
+              "kd_vs_ce_new_cosine": -0.4544908404350281,
+              "party": 0,
+              "party_kd_to_ce_new_norm_ratio": 0.015009043904552754,
+              "party_kd_vs_ce_new_cosine": 0.644988477230072,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.5720358657576277
+            },
+            {
+              "ce_new_gradient_norm": 0.9777597188949585,
+              "ce_old_vs_ce_new_cosine": -0.2042766958475113,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.050997602822857674,
+              "kd_vs_ce_new_cosine": -0.4432491064071655,
+              "party": 1,
+              "party_kd_to_ce_new_norm_ratio": 0.024502172812310298,
+              "party_kd_vs_ce_new_cosine": -0.11612632125616074,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.43957599548059034
+            },
+            {
+              "ce_new_gradient_norm": 2.297891616821289,
+              "ce_old_vs_ce_new_cosine": 0.03215521201491356,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.03455537675336188,
+              "kd_vs_ce_new_cosine": -0.6540024876594543,
+              "party": 2,
+              "party_kd_to_ce_new_norm_ratio": 0.021271929409312416,
+              "party_kd_vs_ce_new_cosine": -0.6871441006660461,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.6663595515677062
+            },
+            {
+              "ce_new_gradient_norm": 1.9169561862945557,
+              "ce_old_vs_ce_new_cosine": 0.052998315542936325,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.028687429472443616,
+              "kd_vs_ce_new_cosine": -0.5523663759231567,
+              "party": 3,
+              "party_kd_to_ce_new_norm_ratio": 0.010615701214146692,
+              "party_kd_vs_ce_new_cosine": -0.07385454326868057,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.7387757412916087
+            }
+          ],
+          "task_id": 1
+        },
+        {
+          "new_training_exemplars": 200,
+          "old_training_exemplars": 420,
+          "party": [
+            {
+              "ce_new_gradient_norm": 3.2085208892822266,
+              "ce_old_vs_ce_new_cosine": -0.18339574337005615,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.007263694061725525,
+              "kd_vs_ce_new_cosine": 0.3742660582065582,
+              "party": 0,
+              "party_kd_to_ce_new_norm_ratio": 0.004462044077593986,
+              "party_kd_vs_ce_new_cosine": 0.462480753660202,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.6584570245969487
+            },
+            {
+              "ce_new_gradient_norm": 3.132233142852783,
+              "ce_old_vs_ce_new_cosine": 0.30449122190475464,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.00925441542966422,
+              "kd_vs_ce_new_cosine": 0.24381978809833527,
+              "party": 1,
+              "party_kd_to_ce_new_norm_ratio": 0.004310331550040045,
+              "party_kd_vs_ce_new_cosine": 0.358598530292511,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.6592774959447614
+            },
+            {
+              "ce_new_gradient_norm": 5.219432353973389,
+              "ce_old_vs_ce_new_cosine": 0.19977666437625885,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.009698729674318604,
+              "kd_vs_ce_new_cosine": 0.11184955388307571,
+              "party": 2,
+              "party_kd_to_ce_new_norm_ratio": 0.006606166206968189,
+              "party_kd_vs_ce_new_cosine": -0.10857747495174408,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.8013261042652117
+            },
+            {
+              "ce_new_gradient_norm": 3.5488898754119873,
+              "ce_old_vs_ce_new_cosine": 0.7342104911804199,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.011583907679163955,
+              "kd_vs_ce_new_cosine": 0.24092312157154083,
+              "party": 3,
+              "party_kd_to_ce_new_norm_ratio": 0.005342514951841513,
+              "party_kd_vs_ce_new_cosine": 0.5364201068878174,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.8323082477700052
+            }
+          ],
+          "task_id": 2
+        },
+        {
+          "new_training_exemplars": 200,
+          "old_training_exemplars": 620,
+          "party": [
+            {
+              "ce_new_gradient_norm": 2.1197893619537354,
+              "ce_old_vs_ce_new_cosine": 0.8613338470458984,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.010277563919399314,
+              "kd_vs_ce_new_cosine": -0.3626522719860077,
+              "party": 0,
+              "party_kd_to_ce_new_norm_ratio": 0.008731529932771652,
+              "party_kd_vs_ce_new_cosine": -0.042912233620882034,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.5973884196005825
+            },
+            {
+              "ce_new_gradient_norm": 2.298313856124878,
+              "ce_old_vs_ce_new_cosine": 0.8968667387962341,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.009408837971106743,
+              "kd_vs_ce_new_cosine": -0.057926714420318604,
+              "party": 1,
+              "party_kd_to_ce_new_norm_ratio": 0.008338181276489713,
+              "party_kd_vs_ce_new_cosine": 0.5966603755950928,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.6052278954202007
+            },
+            {
+              "ce_new_gradient_norm": 3.8986032009124756,
+              "ce_old_vs_ce_new_cosine": 0.7814803719520569,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.014369848810479646,
+              "kd_vs_ce_new_cosine": -0.359182745218277,
+              "party": 2,
+              "party_kd_to_ce_new_norm_ratio": 0.010824110363261773,
+              "party_kd_vs_ce_new_cosine": -0.14316275715827942,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.7704858828365054
+            },
+            {
+              "ce_new_gradient_norm": 3.064009666442871,
+              "ce_old_vs_ce_new_cosine": 0.7614376544952393,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.008140871024009235,
+              "kd_vs_ce_new_cosine": 0.15774574875831604,
+              "party": 3,
+              "party_kd_to_ce_new_norm_ratio": 0.007599331148121899,
+              "party_kd_vs_ce_new_cosine": 0.7032838463783264,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.8135847400568441
+            }
+          ],
+          "task_id": 3
+        },
+        {
+          "new_training_exemplars": 200,
+          "old_training_exemplars": 820,
+          "party": [
+            {
+              "ce_new_gradient_norm": 1.5135401487350464,
+              "ce_old_vs_ce_new_cosine": 0.604403018951416,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.013393985653127103,
+              "kd_vs_ce_new_cosine": -0.20400038361549377,
+              "party": 0,
+              "party_kd_to_ce_new_norm_ratio": 0.009392704812430517,
+              "party_kd_vs_ce_new_cosine": 0.10447227954864502,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.49286318862451206
+            },
+            {
+              "ce_new_gradient_norm": 1.9719586372375488,
+              "ce_old_vs_ce_new_cosine": 0.009596449322998524,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.011010592786671106,
+              "kd_vs_ce_new_cosine": -0.07434600591659546,
+              "party": 1,
+              "party_kd_to_ce_new_norm_ratio": 0.0044972871647893835,
+              "party_kd_vs_ce_new_cosine": 0.42202669382095337,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.5393363414856551
+            },
+            {
+              "ce_new_gradient_norm": 2.559140682220459,
+              "ce_old_vs_ce_new_cosine": 0.1266547441482544,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.015087685164844482,
+              "kd_vs_ce_new_cosine": -0.42536434531211853,
+              "party": 2,
+              "party_kd_to_ce_new_norm_ratio": 0.010421171996738532,
+              "party_kd_vs_ce_new_cosine": -0.22400729358196259,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.5024661085496944
+            },
+            {
+              "ce_new_gradient_norm": 2.9192724227905273,
+              "ce_old_vs_ce_new_cosine": 0.7180714011192322,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.012556083675886835,
+              "kd_vs_ce_new_cosine": -0.4269847571849823,
+              "party": 3,
+              "party_kd_to_ce_new_norm_ratio": 0.006309599848207119,
+              "party_kd_vs_ce_new_cosine": 0.13832135498523712,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.7330906440179642
+            }
+          ],
+          "task_id": 4
+        },
+        {
+          "new_training_exemplars": 200,
+          "old_training_exemplars": 1020,
+          "party": [
+            {
+              "ce_new_gradient_norm": 1.9904589653015137,
+              "ce_old_vs_ce_new_cosine": 0.6682284474372864,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.012243877970711222,
+              "kd_vs_ce_new_cosine": -0.42066580057144165,
+              "party": 0,
+              "party_kd_to_ce_new_norm_ratio": 0.011989771626106923,
+              "party_kd_vs_ce_new_cosine": -0.24860182404518127,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.5350158744319532
+            },
+            {
+              "ce_new_gradient_norm": 1.7453505992889404,
+              "ce_old_vs_ce_new_cosine": 0.7134100198745728,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.009896173131088442,
+              "kd_vs_ce_new_cosine": 0.1277080625295639,
+              "party": 1,
+              "party_kd_to_ce_new_norm_ratio": 0.010547912482373205,
+              "party_kd_vs_ce_new_cosine": 0.5955647230148315,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.4817798876780227
+            },
+            {
+              "ce_new_gradient_norm": 3.1156833171844482,
+              "ce_old_vs_ce_new_cosine": 0.6008022427558899,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.018180773024940155,
+              "kd_vs_ce_new_cosine": -0.49566400051116943,
+              "party": 2,
+              "party_kd_to_ce_new_norm_ratio": 0.010966795881856943,
+              "party_kd_vs_ce_new_cosine": -0.12410194426774979,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.660235369734407
+            },
+            {
+              "ce_new_gradient_norm": 2.7889513969421387,
+              "ce_old_vs_ce_new_cosine": 0.7164879441261292,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.01219008624337584,
+              "kd_vs_ce_new_cosine": -0.45157453417778015,
+              "party": 3,
+              "party_kd_to_ce_new_norm_ratio": 0.006978055159941561,
+              "party_kd_vs_ce_new_cosine": 0.11006103456020355,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.7415665339523089
+            }
+          ],
+          "task_id": 5
+        },
+        {
+          "new_training_exemplars": 200,
+          "old_training_exemplars": 1220,
+          "party": [
+            {
+              "ce_new_gradient_norm": 2.225402593612671,
+              "ce_old_vs_ce_new_cosine": 0.5610330700874329,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.025015708674134336,
+              "kd_vs_ce_new_cosine": -0.10045638680458069,
+              "party": 0,
+              "party_kd_to_ce_new_norm_ratio": 0.014217871743831566,
+              "party_kd_vs_ce_new_cosine": -0.020709356293082237,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.5287612998069885
+            },
+            {
+              "ce_new_gradient_norm": 2.0685811042785645,
+              "ce_old_vs_ce_new_cosine": 0.6573496460914612,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.016067587115320914,
+              "kd_vs_ce_new_cosine": 0.06478624790906906,
+              "party": 1,
+              "party_kd_to_ce_new_norm_ratio": 0.006372621897452796,
+              "party_kd_vs_ce_new_cosine": 0.427509605884552,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.4706850369281437
+            },
+            {
+              "ce_new_gradient_norm": 2.499519109725952,
+              "ce_old_vs_ce_new_cosine": 0.6940537095069885,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.0215257223135859,
+              "kd_vs_ce_new_cosine": -0.27593329548835754,
+              "party": 2,
+              "party_kd_to_ce_new_norm_ratio": 0.0076311425699771545,
+              "party_kd_vs_ce_new_cosine": 0.24311307072639465,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.6785283737433271
+            },
+            {
+              "ce_new_gradient_norm": 3.2193524837493896,
+              "ce_old_vs_ce_new_cosine": 0.6384597420692444,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.02151897784431142,
+              "kd_vs_ce_new_cosine": -0.6709333658218384,
+              "party": 3,
+              "party_kd_to_ce_new_norm_ratio": 0.010871973659742176,
+              "party_kd_vs_ce_new_cosine": -0.23571085929870605,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.7053842753551856
+            }
+          ],
+          "task_id": 6
+        },
+        {
+          "new_training_exemplars": 200,
+          "old_training_exemplars": 1420,
+          "party": [
+            {
+              "ce_new_gradient_norm": 2.971092462539673,
+              "ce_old_vs_ce_new_cosine": 0.3871466815471649,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.00758092731288315,
+              "kd_vs_ce_new_cosine": -0.41582098603248596,
+              "party": 0,
+              "party_kd_to_ce_new_norm_ratio": 0.0056952123271649495,
+              "party_kd_vs_ce_new_cosine": 0.25783634185791016,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.5978626635236179
+            },
+            {
+              "ce_new_gradient_norm": 1.9449337720870972,
+              "ce_old_vs_ce_new_cosine": 0.6702123284339905,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.017599020017239047,
+              "kd_vs_ce_new_cosine": 0.17604988813400269,
+              "party": 1,
+              "party_kd_to_ce_new_norm_ratio": 0.010971432995631643,
+              "party_kd_vs_ce_new_cosine": 0.34868326783180237,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.46658159735683963
+            },
+            {
+              "ce_new_gradient_norm": 3.026991844177246,
+              "ce_old_vs_ce_new_cosine": 0.43517449498176575,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.010764051640878744,
+              "kd_vs_ce_new_cosine": -0.6093660593032837,
+              "party": 2,
+              "party_kd_to_ce_new_norm_ratio": 0.005164119749263634,
+              "party_kd_vs_ce_new_cosine": 0.23581722378730774,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.7466883865985506
+            },
+            {
+              "ce_new_gradient_norm": 2.998513698577881,
+              "ce_old_vs_ce_new_cosine": 0.5248801708221436,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.020103914016483527,
+              "kd_vs_ce_new_cosine": -0.36532875895500183,
+              "party": 3,
+              "party_kd_to_ce_new_norm_ratio": 0.010793962245037998,
+              "party_kd_vs_ce_new_cosine": -0.3195067048072815,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.6706153551292859
+            }
+          ],
+          "task_id": 7
+        },
+        {
+          "new_training_exemplars": 200,
+          "old_training_exemplars": 1620,
+          "party": [
+            {
+              "ce_new_gradient_norm": 2.4673912525177,
+              "ce_old_vs_ce_new_cosine": 0.6445133686065674,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.007991873650653219,
+              "kd_vs_ce_new_cosine": -0.1827702671289444,
+              "party": 0,
+              "party_kd_to_ce_new_norm_ratio": 0.005927383039541351,
+              "party_kd_vs_ce_new_cosine": 0.14525474607944489,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.5793470565657869
+            },
+            {
+              "ce_new_gradient_norm": 2.18253231048584,
+              "ce_old_vs_ce_new_cosine": 0.7421543598175049,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.01238505503181926,
+              "kd_vs_ce_new_cosine": -0.039865851402282715,
+              "party": 1,
+              "party_kd_to_ce_new_norm_ratio": 0.009878299494964281,
+              "party_kd_vs_ce_new_cosine": 0.625571072101593,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.4654844075210357
+            },
+            {
+              "ce_new_gradient_norm": 3.1261813640594482,
+              "ce_old_vs_ce_new_cosine": 0.7343968152999878,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.013147375231226293,
+              "kd_vs_ce_new_cosine": -0.27335575222969055,
+              "party": 2,
+              "party_kd_to_ce_new_norm_ratio": 0.00538875057627827,
+              "party_kd_vs_ce_new_cosine": 0.20219354331493378,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.7256348701200964
+            },
+            {
+              "ce_new_gradient_norm": 3.3681538105010986,
+              "ce_old_vs_ce_new_cosine": 0.7735075354576111,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.01837069671639416,
+              "kd_vs_ce_new_cosine": -0.5632074475288391,
+              "party": 3,
+              "party_kd_to_ce_new_norm_ratio": 0.010041782576007848,
+              "party_kd_vs_ce_new_cosine": -0.31068891286849976,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.735060415569234
+            }
+          ],
+          "task_id": 8
+        },
+        {
+          "new_training_exemplars": 200,
+          "old_training_exemplars": 1820,
+          "party": [
+            {
+              "ce_new_gradient_norm": 1.8470958471298218,
+              "ce_old_vs_ce_new_cosine": 0.8563814163208008,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.017542576870351233,
+              "kd_vs_ce_new_cosine": 0.09836337715387344,
+              "party": 0,
+              "party_kd_to_ce_new_norm_ratio": 0.01019738847265328,
+              "party_kd_vs_ce_new_cosine": 0.3712694048881531,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.3994699917988981
+            },
+            {
+              "ce_new_gradient_norm": 1.9928470849990845,
+              "ce_old_vs_ce_new_cosine": 0.8473600745201111,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "kd_to_ce_new_norm_ratio": 0.011177608896291505,
+              "kd_vs_ce_new_cosine": 0.0592198520898819,
+              "party": 1,
+              "party_kd_to_ce_new_norm_ratio": 0.009268833417388413,
+              "party_kd_vs_ce_new_cosine": 0.4075886309146881,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.41999918294672334
+            },
+            {
+              "ce_new_gradient_norm": 2.6726181507110596,
+              "ce_old_vs_ce_new_cosine": 0.8503645062446594,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.011308673606726915,
+              "kd_vs_ce_new_cosine": -0.19880221784114838,
+              "party": 2,
+              "party_kd_to_ce_new_norm_ratio": 0.006573617308084651,
+              "party_kd_vs_ce_new_cosine": 0.4420677721500397,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.7102737098418304
+            },
+            {
+              "ce_new_gradient_norm": 2.999903917312622,
+              "ce_old_vs_ce_new_cosine": 0.6932443380355835,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "kd_to_ce_new_norm_ratio": 0.019188875853377096,
+              "kd_vs_ce_new_cosine": -0.4156332314014435,
+              "party": 3,
+              "party_kd_to_ce_new_norm_ratio": 0.011314935777117266,
+              "party_kd_vs_ce_new_cosine": -0.1479356586933136,
+              "raw_ce_new_gradient_mass_in_fim_frozen_tensors": 0.5729983532524101
+            }
+          ],
+          "task_id": 9
+        }
+      ],
+      "run": "/brf/users/yangxx/VFCL-results/resource-lite-dev-full-v2-20261018/upmc_food101_seed55_reference20"
+    }
+  ],
+  "scope": "training_exemplars_only_hypothesis_generation",
+  "seeds": [
+    54,
+    55
+  ],
+  "summary": {
+    "0": {
+      "median_party_kd_vs_ce_new_cosine": 0.20154554396867752,
+      "median_raw_ce_gradient_mass_in_fim_frozen_tensors": 0.5800477760763261,
+      "party_kd_conflict_transitions": 6,
+      "transition_count": 18
+    },
+    "1": {
+      "median_party_kd_vs_ce_new_cosine": 0.41480766236782074,
+      "median_raw_ce_gradient_mass_in_fim_frozen_tensors": 0.5479275659178782,
+      "party_kd_conflict_transitions": 2,
+      "transition_count": 18
+    },
+    "2": {
+      "median_party_kd_vs_ce_new_cosine": -0.020255508832633495,
+      "median_raw_ce_gradient_mass_in_fim_frozen_tensors": 0.7233082833884037,
+      "party_kd_conflict_transitions": 9,
+      "transition_count": 18
+    },
+    "3": {
+      "median_party_kd_vs_ce_new_cosine": 0.03479952737689018,
+      "median_raw_ce_gradient_mass_in_fim_frozen_tensors": 0.7401711376219589,
+      "party_kd_conflict_transitions": 9,
+      "transition_count": 18
+    }
+  }
+}

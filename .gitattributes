@@ -1,0 +1,2 @@
+diagnostic_inputs/**/*.json -text
+diagnostic_outputs/*.json -text

@@ -1,0 +1,1238 @@
+{
+  "dataset": "upmc_food101",
+  "metric_note": "Representation drift and scatter are descriptive endpoint probes on herded old training exemplars, not causal attribution or deployable selection signals.",
+  "mode": "representation",
+  "runs": [
+    {
+      "config_sha256": "1eeb07c79238cdcfa16a437cee14f1299254e238e2323a2655692ccd4dadb202",
+      "rows": [
+        {
+          "aggregate_concat": {
+            "cosine_mean": 0.9191107749938965,
+            "relative_l2_mean": 0.406631201505661,
+            "scatter_log_change": -0.15294015407562256,
+            "scatter_log_current": 0.5121462941169739,
+            "scatter_log_old": 0.6650864481925964
+          },
+          "introduced_classes": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "old_classes": 11,
+          "old_training_exemplars": 220,
+          "party": [
+            {
+              "cosine_mean": 0.9163155555725098,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 0,
+              "relative_l2_mean": 0.41091302037239075,
+              "scatter_log_change": -0.06231669336557388,
+              "scatter_log_current": 0.08393429964780807,
+              "scatter_log_old": 0.14625099301338196
+            },
+            {
+              "cosine_mean": 0.8887495994567871,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 1,
+              "relative_l2_mean": 0.485481321811676,
+              "scatter_log_change": -0.09753510728478432,
+              "scatter_log_current": -0.08714310079813004,
+              "scatter_log_old": 0.010392006486654282
+            },
+            {
+              "cosine_mean": 0.8809143304824829,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 2,
+              "relative_l2_mean": 0.4920334219932556,
+              "scatter_log_change": -0.24846577644348145,
+              "scatter_log_current": 0.9843686819076538,
+              "scatter_log_old": 1.2328344583511353
+            },
+            {
+              "cosine_mean": 0.8472473621368408,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 3,
+              "relative_l2_mean": 0.5605272650718689,
+              "scatter_log_change": -0.20099394023418427,
+              "scatter_log_current": 0.2000117152929306,
+              "scatter_log_old": 0.40100565552711487
+            }
+          ],
+          "task_id": 1
+        },
+        {
+          "aggregate_concat": {
+            "cosine_mean": 0.8956444263458252,
+            "relative_l2_mean": 0.4604029953479767,
+            "scatter_log_change": -0.147139772772789,
+            "scatter_log_current": 0.19599546492099762,
+            "scatter_log_old": 0.3431352376937866
+          },
+          "introduced_classes": [
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ],
+          "old_classes": 21,
+          "old_training_exemplars": 420,
+          "party": [
+            {
+              "cosine_mean": 0.9094334840774536,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 0,
+              "relative_l2_mean": 0.4316295385360718,
+              "scatter_log_change": -0.17291568219661713,
+              "scatter_log_current": -0.21490806341171265,
+              "scatter_log_old": -0.04199238121509552
+            },
+            {
+              "cosine_mean": 0.8929190635681152,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 1,
+              "relative_l2_mean": 0.4590063989162445,
+              "scatter_log_change": -0.09759002923965454,
+              "scatter_log_current": -0.30506405234336853,
+              "scatter_log_old": -0.207474023103714
+            },
+            {
+              "cosine_mean": 0.8546258807182312,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 2,
+              "relative_l2_mean": 0.5432570576667786,
+              "scatter_log_change": -0.22589701414108276,
+              "scatter_log_current": 0.6855362057685852,
+              "scatter_log_old": 0.911433219909668
+            },
+            {
+              "cosine_mean": 0.8370122909545898,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 3,
+              "relative_l2_mean": 0.5630085468292236,
+              "scatter_log_change": -0.15218668803572655,
+              "scatter_log_current": -0.1074240654706955,
+              "scatter_log_old": 0.04476262256503105
+            }
+          ],
+          "task_id": 2
+        },
+        {
+          "aggregate_concat": {
+            "cosine_mean": 0.884905219078064,
+            "relative_l2_mean": 0.48374009132385254,
+            "scatter_log_change": -0.14737102575600147,
+            "scatter_log_current": 0.025171754881739616,
+            "scatter_log_old": 0.1725427806377411
+          },
+          "introduced_classes": [
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40
+          ],
+          "old_classes": 31,
+          "old_training_exemplars": 620,
+          "party": [
+            {
+              "cosine_mean": 0.9086947441101074,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 0,
+              "relative_l2_mean": 0.434596985578537,
+              "scatter_log_change": -0.1462378054857254,
+              "scatter_log_current": -0.31400755047798157,
+              "scatter_log_old": -0.16776974499225616
+            },
+            {
+              "cosine_mean": 0.9219683408737183,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 1,
+              "relative_l2_mean": 0.3937857747077942,
+              "scatter_log_change": -0.12595319747924805,
+              "scatter_log_current": -0.3816874623298645,
+              "scatter_log_old": -0.25573426485061646
+            },
+            {
+              "cosine_mean": 0.8442159295082092,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 2,
+              "relative_l2_mean": 0.5535245537757874,
+              "scatter_log_change": -0.1549054980278015,
+              "scatter_log_current": 0.5427732467651367,
+              "scatter_log_old": 0.6976787447929382
+            },
+            {
+              "cosine_mean": 0.8315680623054504,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 3,
+              "relative_l2_mean": 0.5755820274353027,
+              "scatter_log_change": -0.25890113413333893,
+              "scatter_log_current": -0.5060520172119141,
+              "scatter_log_old": -0.24715088307857513
+            }
+          ],
+          "task_id": 3
+        },
+        {
+          "aggregate_concat": {
+            "cosine_mean": 0.9010596871376038,
+            "relative_l2_mean": 0.44832301139831543,
+            "scatter_log_change": -0.09755433537065983,
+            "scatter_log_current": -0.11899988353252411,
+            "scatter_log_old": -0.02144554816186428
+          },
+          "introduced_classes": [
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50
+          ],
+          "old_classes": 41,
+          "old_training_exemplars": 820,
+          "party": [
+            {
+              "cosine_mean": 0.9287465214729309,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 0,
+              "relative_l2_mean": 0.3864082098007202,
+              "scatter_log_change": -0.0648747980594635,
+              "scatter_log_current": -0.4301169812679291,
+              "scatter_log_old": -0.3652421832084656
+            },
+            {
+              "cosine_mean": 0.9205762147903442,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 1,
+              "relative_l2_mean": 0.40194085240364075,
+              "scatter_log_change": -0.07326087355613708,
+              "scatter_log_current": -0.5106201767921448,
+              "scatter_log_old": -0.4373593032360077
+            },
+            {
+              "cosine_mean": 0.8886601328849792,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 2,
+              "relative_l2_mean": 0.46040448546409607,
+              "scatter_log_change": -0.15317341685295105,
+              "scatter_log_current": 0.38024500012397766,
+              "scatter_log_old": 0.5334184169769287
+            },
+            {
+              "cosine_mean": 0.7961661219596863,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 3,
+              "relative_l2_mean": 0.6600562334060669,
+              "scatter_log_change": -0.03305411338806152,
+              "scatter_log_current": -0.6899017095565796,
+              "scatter_log_old": -0.6568475961685181
+            }
+          ],
+          "task_id": 4
+        },
+        {
+          "aggregate_concat": {
+            "cosine_mean": 0.8934593200683594,
+            "relative_l2_mean": 0.45856595039367676,
+            "scatter_log_change": -0.11801855638623238,
+            "scatter_log_current": -0.17198729515075684,
+            "scatter_log_old": -0.05396873876452446
+          },
+          "introduced_classes": [
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60
+          ],
+          "old_classes": 51,
+          "old_training_exemplars": 1020,
+          "party": [
+            {
+              "cosine_mean": 0.9401052594184875,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 0,
+              "relative_l2_mean": 0.3420035243034363,
+              "scatter_log_change": -0.06820869445800781,
+              "scatter_log_current": -0.46499890089035034,
+              "scatter_log_old": -0.39679020643234253
+            },
+            {
+              "cosine_mean": 0.9267145395278931,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 1,
+              "relative_l2_mean": 0.3813630938529968,
+              "scatter_log_change": -0.075050950050354,
+              "scatter_log_current": -0.5413336753845215,
+              "scatter_log_old": -0.4662827253341675
+            },
+            {
+              "cosine_mean": 0.8452154397964478,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 2,
+              "relative_l2_mean": 0.5411263704299927,
+              "scatter_log_change": -0.1509702503681183,
+              "scatter_log_current": 0.2970750331878662,
+              "scatter_log_old": 0.4480452835559845
+            },
+            {
+              "cosine_mean": 0.8428281545639038,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 3,
+              "relative_l2_mean": 0.5559314489364624,
+              "scatter_log_change": -0.1743096113204956,
+              "scatter_log_current": -0.6550800800323486,
+              "scatter_log_old": -0.480770468711853
+            }
+          ],
+          "task_id": 5
+        },
+        {
+          "aggregate_concat": {
+            "cosine_mean": 0.8877614736557007,
+            "relative_l2_mean": 0.4739663898944855,
+            "scatter_log_change": -0.08149257302284241,
+            "scatter_log_current": -0.23502133786678314,
+            "scatter_log_old": -0.15352876484394073
+          },
+          "introduced_classes": [
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70
+          ],
+          "old_classes": 61,
+          "old_training_exemplars": 1220,
+          "party": [
+            {
+              "cosine_mean": 0.923224687576294,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 0,
+              "relative_l2_mean": 0.38830259442329407,
+              "scatter_log_change": -0.08834710717201233,
+              "scatter_log_current": -0.5781905055046082,
+              "scatter_log_old": -0.4898433983325958
+            },
+            {
+              "cosine_mean": 0.9306696653366089,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 1,
+              "relative_l2_mean": 0.37818047404289246,
+              "scatter_log_change": -0.0658910870552063,
+              "scatter_log_current": -0.6069968938827515,
+              "scatter_log_old": -0.5411058068275452
+            },
+            {
+              "cosine_mean": 0.874524712562561,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 2,
+              "relative_l2_mean": 0.48578402400016785,
+              "scatter_log_change": -0.08751112222671509,
+              "scatter_log_current": 0.2742973864078522,
+              "scatter_log_old": 0.36180850863456726
+            },
+            {
+              "cosine_mean": 0.7684383392333984,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 3,
+              "relative_l2_mean": 0.7132412195205688,
+              "scatter_log_change": -0.06721997261047363,
+              "scatter_log_current": -0.7252157926559448,
+              "scatter_log_old": -0.6579958200454712
+            }
+          ],
+          "task_id": 6
+        },
+        {
+          "aggregate_concat": {
+            "cosine_mean": 0.9011996984481812,
+            "relative_l2_mean": 0.4429034888744354,
+            "scatter_log_change": -0.06878882646560669,
+            "scatter_log_current": -0.2812418043613434,
+            "scatter_log_old": -0.2124529778957367
+          },
+          "introduced_classes": [
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80
+          ],
+          "old_classes": 71,
+          "old_training_exemplars": 1420,
+          "party": [
+            {
+              "cosine_mean": 0.9262209534645081,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 0,
+              "relative_l2_mean": 0.3862476944923401,
+              "scatter_log_change": -0.03729212284088135,
+              "scatter_log_current": -0.5517596006393433,
+              "scatter_log_old": -0.5144674777984619
+            },
+            {
+              "cosine_mean": 0.933436930179596,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 1,
+              "relative_l2_mean": 0.36929017305374146,
+              "scatter_log_change": -0.07860803604125977,
+              "scatter_log_current": -0.6402368545532227,
+              "scatter_log_old": -0.5616288185119629
+            },
+            {
+              "cosine_mean": 0.895512044429779,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 2,
+              "relative_l2_mean": 0.4297860264778137,
+              "scatter_log_change": -0.03516280651092529,
+              "scatter_log_current": 0.1423986703157425,
+              "scatter_log_old": 0.17756147682666779
+            },
+            {
+              "cosine_mean": 0.8211561441421509,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 3,
+              "relative_l2_mean": 0.595151424407959,
+              "scatter_log_change": -0.14391374588012695,
+              "scatter_log_current": -0.5123249888420105,
+              "scatter_log_old": -0.36841124296188354
+            }
+          ],
+          "task_id": 7
+        },
+        {
+          "aggregate_concat": {
+            "cosine_mean": 0.8951600790023804,
+            "relative_l2_mean": 0.4523874521255493,
+            "scatter_log_change": -0.06588184833526611,
+            "scatter_log_current": -0.32752642035484314,
+            "scatter_log_old": -0.261644572019577
+          },
+          "introduced_classes": [
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90
+          ],
+          "old_classes": 81,
+          "old_training_exemplars": 1620,
+          "party": [
+            {
+              "cosine_mean": 0.9215401411056519,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 0,
+              "relative_l2_mean": 0.38694825768470764,
+              "scatter_log_change": -0.0826910138130188,
+              "scatter_log_current": -0.5997675657272339,
+              "scatter_log_old": -0.5170765519142151
+            },
+            {
+              "cosine_mean": 0.9243820309638977,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 1,
+              "relative_l2_mean": 0.38877609372138977,
+              "scatter_log_change": -0.030702710151672363,
+              "scatter_log_current": -0.6227201819419861,
+              "scatter_log_old": -0.5920174717903137
+            },
+            {
+              "cosine_mean": 0.8815037608146667,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 2,
+              "relative_l2_mean": 0.46768370270729065,
+              "scatter_log_change": -0.0688682699110359,
+              "scatter_log_current": 0.003499338636174798,
+              "scatter_log_old": 0.0723676085472107
+            },
+            {
+              "cosine_mean": 0.8391129374504089,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 3,
+              "relative_l2_mean": 0.5545900464057922,
+              "scatter_log_change": -0.08975118398666382,
+              "scatter_log_current": -0.39222875237464905,
+              "scatter_log_old": -0.30247756838798523
+            }
+          ],
+          "task_id": 8
+        },
+        {
+          "aggregate_concat": {
+            "cosine_mean": 0.9115265011787415,
+            "relative_l2_mean": 0.4209739863872528,
+            "scatter_log_change": -0.0674511194229126,
+            "scatter_log_current": -0.3877931535243988,
+            "scatter_log_old": -0.3203420341014862
+          },
+          "introduced_classes": [
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100
+          ],
+          "old_classes": 91,
+          "old_training_exemplars": 1820,
+          "party": [
+            {
+              "cosine_mean": 0.9260500073432922,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 0,
+              "relative_l2_mean": 0.3956376314163208,
+              "scatter_log_change": -0.055358290672302246,
+              "scatter_log_current": -0.6426539421081543,
+              "scatter_log_old": -0.587295651435852
+            },
+            {
+              "cosine_mean": 0.948474645614624,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 1,
+              "relative_l2_mean": 0.3281151354312897,
+              "scatter_log_change": -0.05086177587509155,
+              "scatter_log_current": -0.668790876865387,
+              "scatter_log_old": -0.6179291009902954
+            },
+            {
+              "cosine_mean": 0.8983154296875,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 2,
+              "relative_l2_mean": 0.4324696362018585,
+              "scatter_log_change": -0.04256939888000488,
+              "scatter_log_current": -0.09589056670665741,
+              "scatter_log_old": -0.05332116782665253
+            },
+            {
+              "cosine_mean": 0.8599806427955627,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 3,
+              "relative_l2_mean": 0.5146653056144714,
+              "scatter_log_change": -0.09396091103553772,
+              "scatter_log_current": -0.3552786409854889,
+              "scatter_log_old": -0.26131772994995117
+            }
+          ],
+          "task_id": 9
+        }
+      ],
+      "run": "/brf/users/yangxx/VFCL-results/resource-lite-dev-full-v2-20261018/upmc_food101_seed54_reference20"
+    },
+    {
+      "config_sha256": "37562007542b87d45f075eeedbf3482462710afd8870a688e9ef89212c6a09a6",
+      "rows": [
+        {
+          "aggregate_concat": {
+            "cosine_mean": 0.9220317006111145,
+            "relative_l2_mean": 0.40069901943206787,
+            "scatter_log_change": -0.11374235153198242,
+            "scatter_log_current": 0.5431849956512451,
+            "scatter_log_old": 0.6569273471832275
+          },
+          "introduced_classes": [
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20
+          ],
+          "old_classes": 11,
+          "old_training_exemplars": 220,
+          "party": [
+            {
+              "cosine_mean": 0.9199927449226379,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 0,
+              "relative_l2_mean": 0.39643144607543945,
+              "scatter_log_change": -0.10626579821109772,
+              "scatter_log_current": 0.11086942255496979,
+              "scatter_log_old": 0.2171352207660675
+            },
+            {
+              "cosine_mean": 0.9229438304901123,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 1,
+              "relative_l2_mean": 0.4038592278957367,
+              "scatter_log_change": -0.09829546883702278,
+              "scatter_log_current": -0.14976704120635986,
+              "scatter_log_old": -0.05147157236933708
+            },
+            {
+              "cosine_mean": 0.8917547464370728,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 2,
+              "relative_l2_mean": 0.4673362672328949,
+              "scatter_log_change": -0.20865309238433838,
+              "scatter_log_current": 1.0774346590042114,
+              "scatter_log_old": 1.2860877513885498
+            },
+            {
+              "cosine_mean": 0.8311851024627686,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 3,
+              "relative_l2_mean": 0.5767176151275635,
+              "scatter_log_change": -0.17772696912288666,
+              "scatter_log_current": 0.14728839695453644,
+              "scatter_log_old": 0.3250153660774231
+            }
+          ],
+          "task_id": 1
+        },
+        {
+          "aggregate_concat": {
+            "cosine_mean": 0.8945075869560242,
+            "relative_l2_mean": 0.4689852297306061,
+            "scatter_log_change": -0.15721310675144196,
+            "scatter_log_current": 0.21304424107074738,
+            "scatter_log_old": 0.37025734782218933
+          },
+          "introduced_classes": [
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ],
+          "old_classes": 21,
+          "old_training_exemplars": 420,
+          "party": [
+            {
+              "cosine_mean": 0.9070228934288025,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 0,
+              "relative_l2_mean": 0.4318358600139618,
+              "scatter_log_change": -0.1201433539390564,
+              "scatter_log_current": -0.17047585546970367,
+              "scatter_log_old": -0.05033250153064728
+            },
+            {
+              "cosine_mean": 0.8924077153205872,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 1,
+              "relative_l2_mean": 0.4772717356681824,
+              "scatter_log_change": -0.11928907036781311,
+              "scatter_log_current": -0.3222023546695709,
+              "scatter_log_old": -0.2029132843017578
+            },
+            {
+              "cosine_mean": 0.8746924996376038,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 2,
+              "relative_l2_mean": 0.5085010528564453,
+              "scatter_log_change": -0.2164677381515503,
+              "scatter_log_current": 0.7690632343292236,
+              "scatter_log_old": 0.9855309724807739
+            },
+            {
+              "cosine_mean": 0.8355628848075867,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 3,
+              "relative_l2_mean": 0.5695788860321045,
+              "scatter_log_change": -0.2629439365118742,
+              "scatter_log_current": -0.2918628752231598,
+              "scatter_log_old": -0.02891893871128559
+            }
+          ],
+          "task_id": 2
+        },
+        {
+          "aggregate_concat": {
+            "cosine_mean": 0.8815076351165771,
+            "relative_l2_mean": 0.4861045479774475,
+            "scatter_log_change": -0.12176652625203133,
+            "scatter_log_current": 0.057064902037382126,
+            "scatter_log_old": 0.17883142828941345
+          },
+          "introduced_classes": [
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40
+          ],
+          "old_classes": 31,
+          "old_training_exemplars": 620,
+          "party": [
+            {
+              "cosine_mean": 0.9098495244979858,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 0,
+              "relative_l2_mean": 0.4284299910068512,
+              "scatter_log_change": -0.10049407184123993,
+              "scatter_log_current": -0.23116308450698853,
+              "scatter_log_old": -0.1306690126657486
+            },
+            {
+              "cosine_mean": 0.918069064617157,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 1,
+              "relative_l2_mean": 0.4085029363632202,
+              "scatter_log_change": -0.08048355579376221,
+              "scatter_log_current": -0.33677542209625244,
+              "scatter_log_old": -0.25629186630249023
+            },
+            {
+              "cosine_mean": 0.8453187942504883,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 2,
+              "relative_l2_mean": 0.5421185493469238,
+              "scatter_log_change": -0.1484755277633667,
+              "scatter_log_current": 0.5789319276809692,
+              "scatter_log_old": 0.7274074554443359
+            },
+            {
+              "cosine_mean": 0.8162438273429871,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 3,
+              "relative_l2_mean": 0.5989508628845215,
+              "scatter_log_change": -0.18028023838996887,
+              "scatter_log_current": -0.5934433937072754,
+              "scatter_log_old": -0.4131631553173065
+            }
+          ],
+          "task_id": 3
+        },
+        {
+          "aggregate_concat": {
+            "cosine_mean": 0.9044850468635559,
+            "relative_l2_mean": 0.4415165185928345,
+            "scatter_log_change": -0.10578790493309498,
+            "scatter_log_current": -0.11448359489440918,
+            "scatter_log_old": -0.008695689961314201
+          },
+          "introduced_classes": [
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50
+          ],
+          "old_classes": 41,
+          "old_training_exemplars": 820,
+          "party": [
+            {
+              "cosine_mean": 0.935796320438385,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 0,
+              "relative_l2_mean": 0.3653193712234497,
+              "scatter_log_change": -0.08585000038146973,
+              "scatter_log_current": -0.40044525265693665,
+              "scatter_log_old": -0.3145952522754669
+            },
+            {
+              "cosine_mean": 0.9173622727394104,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 1,
+              "relative_l2_mean": 0.41881147027015686,
+              "scatter_log_change": -0.07587692141532898,
+              "scatter_log_current": -0.5119926333427429,
+              "scatter_log_old": -0.43611571192741394
+            },
+            {
+              "cosine_mean": 0.8911959528923035,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 2,
+              "relative_l2_mean": 0.45370787382125854,
+              "scatter_log_change": -0.14567962288856506,
+              "scatter_log_current": 0.4147804081439972,
+              "scatter_log_old": 0.5604600310325623
+            },
+            {
+              "cosine_mean": 0.8164443373680115,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 3,
+              "relative_l2_mean": 0.6269381642341614,
+              "scatter_log_change": -0.0665702223777771,
+              "scatter_log_current": -0.8161163926124573,
+              "scatter_log_old": -0.7495461702346802
+            }
+          ],
+          "task_id": 4
+        },
+        {
+          "aggregate_concat": {
+            "cosine_mean": 0.8921447992324829,
+            "relative_l2_mean": 0.45932215452194214,
+            "scatter_log_change": -0.10303507372736931,
+            "scatter_log_current": -0.16429255902767181,
+            "scatter_log_old": -0.061257485300302505
+          },
+          "introduced_classes": [
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60
+          ],
+          "old_classes": 51,
+          "old_training_exemplars": 1020,
+          "party": [
+            {
+              "cosine_mean": 0.9327308535575867,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 0,
+              "relative_l2_mean": 0.3593689501285553,
+              "scatter_log_change": -0.06795626878738403,
+              "scatter_log_current": -0.451529860496521,
+              "scatter_log_old": -0.38357359170913696
+            },
+            {
+              "cosine_mean": 0.94640052318573,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 1,
+              "relative_l2_mean": 0.32732659578323364,
+              "scatter_log_change": -0.06816768646240234,
+              "scatter_log_current": -0.5197442770004272,
+              "scatter_log_old": -0.4515765905380249
+            },
+            {
+              "cosine_mean": 0.854412317276001,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 2,
+              "relative_l2_mean": 0.5222119092941284,
+              "scatter_log_change": -0.12868094444274902,
+              "scatter_log_current": 0.32711517810821533,
+              "scatter_log_old": 0.45579612255096436
+            },
+            {
+              "cosine_mean": 0.8155767917633057,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 3,
+              "relative_l2_mean": 0.5958871245384216,
+              "scatter_log_change": -0.16159671545028687,
+              "scatter_log_current": -0.742033064365387,
+              "scatter_log_old": -0.5804363489151001
+            }
+          ],
+          "task_id": 5
+        },
+        {
+          "aggregate_concat": {
+            "cosine_mean": 0.8951672315597534,
+            "relative_l2_mean": 0.4579627811908722,
+            "scatter_log_change": -0.080302894115448,
+            "scatter_log_current": -0.22394651174545288,
+            "scatter_log_old": -0.14364361763000488
+          },
+          "introduced_classes": [
+            61,
+            62,
+            63,
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70
+          ],
+          "old_classes": 61,
+          "old_training_exemplars": 1220,
+          "party": [
+            {
+              "cosine_mean": 0.9276031255722046,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 0,
+              "relative_l2_mean": 0.37532851099967957,
+              "scatter_log_change": -0.07654920220375061,
+              "scatter_log_current": -0.5509934425354004,
+              "scatter_log_old": -0.4744442403316498
+            },
+            {
+              "cosine_mean": 0.9322128295898438,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 1,
+              "relative_l2_mean": 0.36965686082839966,
+              "scatter_log_change": -0.09800100326538086,
+              "scatter_log_current": -0.6283856630325317,
+              "scatter_log_old": -0.5303846597671509
+            },
+            {
+              "cosine_mean": 0.8887115716934204,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 2,
+              "relative_l2_mean": 0.4595101773738861,
+              "scatter_log_change": -0.08045250177383423,
+              "scatter_log_current": 0.3062915503978729,
+              "scatter_log_old": 0.38674405217170715
+            },
+            {
+              "cosine_mean": 0.776829183101654,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 3,
+              "relative_l2_mean": 0.6968676447868347,
+              "scatter_log_change": -0.07755386829376221,
+              "scatter_log_current": -0.8037949204444885,
+              "scatter_log_old": -0.7262410521507263
+            }
+          ],
+          "task_id": 6
+        },
+        {
+          "aggregate_concat": {
+            "cosine_mean": 0.8982008099555969,
+            "relative_l2_mean": 0.45432811975479126,
+            "scatter_log_change": -0.055346354842185974,
+            "scatter_log_current": -0.27002042531967163,
+            "scatter_log_old": -0.21467407047748566
+          },
+          "introduced_classes": [
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78,
+            79,
+            80
+          ],
+          "old_classes": 71,
+          "old_training_exemplars": 1420,
+          "party": [
+            {
+              "cosine_mean": 0.9218690395355225,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 0,
+              "relative_l2_mean": 0.4135279357433319,
+              "scatter_log_change": -0.029461681842803955,
+              "scatter_log_current": -0.5422537922859192,
+              "scatter_log_old": -0.5127921104431152
+            },
+            {
+              "cosine_mean": 0.9280424118041992,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 1,
+              "relative_l2_mean": 0.38587862253189087,
+              "scatter_log_change": -0.030019819736480713,
+              "scatter_log_current": -0.6081408858299255,
+              "scatter_log_old": -0.5781210660934448
+            },
+            {
+              "cosine_mean": 0.9001345634460449,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 2,
+              "relative_l2_mean": 0.4274778664112091,
+              "scatter_log_change": -0.03781627118587494,
+              "scatter_log_current": 0.1667862981557846,
+              "scatter_log_old": 0.20460256934165955
+            },
+            {
+              "cosine_mean": 0.8225499391555786,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 3,
+              "relative_l2_mean": 0.5986509919166565,
+              "scatter_log_change": -0.11172497272491455,
+              "scatter_log_current": -0.5618270039558411,
+              "scatter_log_old": -0.4501020312309265
+            }
+          ],
+          "task_id": 7
+        },
+        {
+          "aggregate_concat": {
+            "cosine_mean": 0.8954137563705444,
+            "relative_l2_mean": 0.45161324739456177,
+            "scatter_log_change": -0.06269758939743042,
+            "scatter_log_current": -0.3145839273929596,
+            "scatter_log_old": -0.2518863379955292
+          },
+          "introduced_classes": [
+            81,
+            82,
+            83,
+            84,
+            85,
+            86,
+            87,
+            88,
+            89,
+            90
+          ],
+          "old_classes": 81,
+          "old_training_exemplars": 1620,
+          "party": [
+            {
+              "cosine_mean": 0.9286666512489319,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 0,
+              "relative_l2_mean": 0.3700762987136841,
+              "scatter_log_change": -0.08359462022781372,
+              "scatter_log_current": -0.5977703332901001,
+              "scatter_log_old": -0.5141757130622864
+            },
+            {
+              "cosine_mean": 0.9283654689788818,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 1,
+              "relative_l2_mean": 0.3800044357776642,
+              "scatter_log_change": -0.030252933502197266,
+              "scatter_log_current": -0.5897787809371948,
+              "scatter_log_old": -0.5595258474349976
+            },
+            {
+              "cosine_mean": 0.8800567388534546,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 2,
+              "relative_l2_mean": 0.46819624304771423,
+              "scatter_log_change": -0.05754996836185455,
+              "scatter_log_current": 0.04395204782485962,
+              "scatter_log_old": 0.10150201618671417
+            },
+            {
+              "cosine_mean": 0.8403434753417969,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 3,
+              "relative_l2_mean": 0.5502774715423584,
+              "scatter_log_change": -0.08690989017486572,
+              "scatter_log_current": -0.4284824728965759,
+              "scatter_log_old": -0.3415725827217102
+            }
+          ],
+          "task_id": 8
+        },
+        {
+          "aggregate_concat": {
+            "cosine_mean": 0.9118528366088867,
+            "relative_l2_mean": 0.4204973578453064,
+            "scatter_log_change": -0.07625684142112732,
+            "scatter_log_current": -0.38946306705474854,
+            "scatter_log_old": -0.3132062256336212
+          },
+          "introduced_classes": [
+            91,
+            92,
+            93,
+            94,
+            95,
+            96,
+            97,
+            98,
+            99,
+            100
+          ],
+          "old_classes": 91,
+          "old_training_exemplars": 1820,
+          "party": [
+            {
+              "cosine_mean": 0.9337830543518066,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 0,
+              "relative_l2_mean": 0.37334391474723816,
+              "scatter_log_change": -0.06287640333175659,
+              "scatter_log_current": -0.6595866084098816,
+              "scatter_log_old": -0.596710205078125
+            },
+            {
+              "cosine_mean": 0.9501355290412903,
+              "fim_frozen_param_fraction_after_task": 0.0025940337224383916,
+              "fim_frozen_param_fraction_during_task": 0.0025940337224383916,
+              "party": 1,
+              "relative_l2_mean": 0.3252948224544525,
+              "scatter_log_change": -0.035359978675842285,
+              "scatter_log_current": -0.6294374465942383,
+              "scatter_log_old": -0.594077467918396
+            },
+            {
+              "cosine_mean": 0.8978493213653564,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 2,
+              "relative_l2_mean": 0.4332270324230194,
+              "scatter_log_change": -0.054036820307374,
+              "scatter_log_current": -0.07214271277189255,
+              "scatter_log_old": -0.018105892464518547
+            },
+            {
+              "cosine_mean": 0.8581627011299133,
+              "fim_frozen_param_fraction_after_task": 0.001558846453624318,
+              "fim_frozen_param_fraction_during_task": 0.001558846453624318,
+              "party": 3,
+              "relative_l2_mean": 0.5211984515190125,
+              "scatter_log_change": -0.12340250611305237,
+              "scatter_log_current": -0.4073761999607086,
+              "scatter_log_old": -0.28397369384765625
+            }
+          ],
+          "task_id": 9
+        }
+      ],
+      "run": "/brf/users/yangxx/VFCL-results/resource-lite-dev-full-v2-20261018/upmc_food101_seed55_reference20"
+    }
+  ],
+  "scope": "training_exemplars_only_hypothesis_generation",
+  "seeds": [
+    54,
+    55
+  ],
+  "summary": {
+    "0": {
+      "high_fim_freeze_transition_count": 0,
+      "mean_scatter_log_change": -0.08396853382388751,
+      "median_relative_l2": 0.38762542605400085,
+      "transition_count": 18
+    },
+    "1": {
+      "high_fim_freeze_transition_count": 0,
+      "mean_scatter_log_change": -0.07395556693275769,
+      "median_relative_l2": 0.3873273581266403,
+      "transition_count": 18
+    },
+    "2": {
+      "high_fim_freeze_transition_count": 0,
+      "mean_scatter_log_change": -0.12474089114564574,
+      "median_relative_l2": 0.46793997287750244,
+      "transition_count": 18
+    },
+    "3": {
+      "high_fim_freeze_transition_count": 0,
+      "mean_scatter_log_change": -0.13683336776577765,
+      "median_relative_l2": 0.5761498212814331,
+      "transition_count": 18
+    }
+  }
+}
