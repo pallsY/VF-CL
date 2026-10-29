@@ -382,6 +382,9 @@ def get_config():
     p.add_argument('--fim_freeze_frac', default=0.25, type=float,
                    help='Fraction of most-FIM-important bottom param-tensors to freeze per task '
                         '(quantile-based; replaces the mis-calibrated mean-k*std threshold that froze 100%%)')
+    p.add_argument('--fim_mask_policy', default='cumulative',
+                   choices=('cumulative', 'fresh', 'off'),
+                   help='Opt-in FIM mask policy; default preserves frozen behavior.')
     # EWC baseline (Kirkpatrick et al., PNAS 2017 / online EWC, Schwarz et al. 2018)
     p.add_argument('--ewc_lambda', default=1000.0, type=float,
                    help='EWC penalty strength: loss += (lambda/2) * sum F (theta-theta*)^2. '

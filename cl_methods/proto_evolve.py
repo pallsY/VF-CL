@@ -1311,6 +1311,9 @@ class ProtoEvolveCL:
     # behind a hasattr() guard, so its removal is a safe no-op there.
 
     def _compute_fim(self, loader, task_id):
+        policy = getattr(self.args, 'fim_mask_policy', 'cumulative')
+        if policy not in ('cumulative', 'fresh', 'off'):
+            raise ValueError('invalid FIM mask policy')
         for b in self.trainer.bottoms: b.train()
         self.trainer.top_model.train()
         fim = [{n: torch.zeros_like(p) for n, p in self.trainer.bottoms[k].named_parameters()}
@@ -1338,6 +1341,8 @@ class ProtoEvolveCL:
             vals = torch.tensor(list(imps.values()))
             if vals.numel() == 0 or vals.sum() == 0:
                 # Don't wipe accumulated mask just because this task gave no signal
+                if policy != 'cumulative':
+                    self.fim_masks[k] = {n: False for n in fim[k]}
                 continue
             # Freeze the top `frac` most-important tensors (quantile threshold).
             # BUG FIX: the old threshold kappa = mean - (k0 + alpha*log(t+2))*std
@@ -1350,7 +1355,9 @@ class ProtoEvolveCL:
             for n in fim[k]:
                 is_important_now = imps[n] >= kappa
                 was_important_before = self.fim_masks[k].get(n, False)
-                new_state = was_important_before or is_important_now
+                new_state = (was_important_before or is_important_now
+                             if policy == 'cumulative' else
+                             is_important_now if policy == 'fresh' else False)
                 if new_state and not was_important_before:
                     n_new_freeze += 1
                 self.fim_masks[k][n] = new_state
