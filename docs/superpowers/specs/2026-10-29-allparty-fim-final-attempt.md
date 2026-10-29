@@ -7,6 +7,7 @@
 - 源算法为生产提交 `b2b9546f82765c25e18394874ad0f79e786ffb82`，另开开发分支，只做显式启用的 FIM 掩码策略。`all_party` 回放及 70/71/72 的旧清单不变。
 - 开发种子固定 `80,81,82,83,84`。三个数据集为 `cifar100,isolet,upmc_food101`。沿用上一轮三个数据集各自锁定的 30/类训练留出及其 SHA、配对验证划分；绝不读取官方测试。该留出已被反复使用，本轮只能作探索性方案选择。
 - 各数据集的源数据 SHA、留出及验证清单 SHA 必须与旧清单锚点匹配。新清单、配置、代码提交和结果根在运行前单独封存。不得写入旧结果根，也不得重复启动已封存作业。
+- 唯一新根为 `/brf/users/yangxx/VFCL-results/allparty-fim-final-attempt-v1-20261029`；阶段 A、B 分别在其 `development-a`、`development-b` 子目录，正式阶段仅可在独立 `formal` 子目录。清单分别写在 `manifests/stage-a`、`manifests/stage-b`，判定写在 `adjudication`。每阶段已有根目录时拒绝自动重启。
 - 共同设定：四方、每旧类 20 个 herding 样本、训练期每步 64 个旧样本、`all_party`、`alpha=0.25`、uniform PartyKD 权重 1、原有全宽 logit KD、原有头部整合及读数规则；除 FIM 掩码外不改变优化、训练预算、数据划分或类别顺序。**按源配置保留轮数：CIFAR-100 与 ISOLET 每任务 50 epoch，UPMC Food101 每任务 20 epoch。**这项纠正于任何新作业启动前追加，原协议提交保留在历史中。
 
 ## 三种 FIM 规则
