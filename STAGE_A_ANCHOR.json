@@ -1,0 +1,16 @@
+{
+  "code_commit": "d848b22889765e15264f3e1335481396402e93a8",
+  "created_utc": "2026-10-29T03:17:04.983271+00:00",
+  "expected_jobs": 65,
+  "gpu_uuid": {
+    "0": "GPU-6c7fee92-a6fe-5525-c554-bddb8e14943f",
+    "1": "GPU-6569e526-43ea-74e1-264e-4b66417181e1"
+  },
+  "manifest_path": "/brf/users/yangxx/VFCL-results/allparty-fim-final-attempt-v1-20261029/manifests/stage-a/manifest.jsonl",
+  "manifest_sha256": "de1eabbecfcd1fcb7c1c38b5d61cc36329423931e06a781d9eae9f843ed39528",
+  "official_test_accessed": false,
+  "protocol_sha256": "10e335ae9c43a3ad33b0c3f6cbed5a3b233e3bd47fb21030f9332d6d0d137bd5",
+  "result_root": "/brf/users/yangxx/VFCL-results/allparty-fim-final-attempt-v1-20261029/development-a",
+  "source_commit": "b2b9546f82765c25e18394874ad0f79e786ffb82",
+  "status": "stage_a_prelaunch_frozen"
+}
