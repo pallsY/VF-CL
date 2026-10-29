@@ -39,6 +39,8 @@ class FIMPolicyTests(unittest.TestCase):
         self.assertEqual(baseline[0].fim_masks, fresh[0].fim_masks)
         self.assertTrue(any(any(m.values()) for m in baseline[0].fim_masks))
         self.assertFalse(any(any(m.values()) for m in off[0].fim_masks))
+        self.assertIsNotNone(baseline[2])
+        self.assertGreater(float(baseline[2].abs().sum()), 0)
         for run in (fresh, off):
             for expected, actual in zip(baseline[1], run[1]):
                 for name in expected:
@@ -53,6 +55,25 @@ class FIMPolicyTests(unittest.TestCase):
         self.assertTrue(all(all(mask.values()) for mask in cumulative))
         self.assertTrue(all(sum(mask.values()) == 1 for mask in fresh))
         self.assertFalse(any(any(mask.values()) for mask in off))
+
+    def test_missing_policy_preserves_cumulative_default(self):
+        prior = [{'weight': True, 'bias': True} for _ in range(2)]
+        explicit = self._run('cumulative', prior)[0].fim_masks
+        torch.manual_seed(19)
+        bottoms = [nn.Linear(2, 2), nn.Linear(2, 2)]
+        top = nn.Linear(4, 2)
+        method = ProtoEvolveCL.__new__(ProtoEvolveCL)
+        method.trainer = SimpleNamespace(
+            bottoms=bottoms, top_model=top,
+            _aggregate=lambda parts: torch.cat(parts, dim=1))
+        method.args = SimpleNamespace(
+            num_parties=2, device='cpu', data='tabvfl',
+            party_col_ranges=[(0, 2), (2, 4)], fim_freeze_frac=0.0)
+        method.fim_masks = deepcopy(prior)
+        method._compute_fim([(
+            torch.tensor([[1., 2., 3., 4.], [4., 3., 2., 1.]]),
+            torch.tensor([0, 1]))], 0)
+        self.assertEqual(method.fim_masks, explicit)
 
 
 if __name__ == '__main__':
