@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- Three datasets; seeds 80–84; F0/F1/F-off; all-party alpha 0.25; 20 old exemplars/class; fixed 30/class development holdout; 50 epochs/task.
+- Three datasets; seeds 80–84; F0/F1/F-off; all-party alpha 0.25; 20 old exemplars/class; fixed 30/class development holdout; 50 epochs/task for CIFAR-100 and ISOLET, 20 for UPMC as in source configs.
 - Stage A = 45 method + 20 baselines, stage B = 15 no-PartyKD after selection, stage C = 9 official runs only after both gates.
 - Same data SHA, holdout SHA, validation SHA and native readout as prior 183-job manifest; no official test access in A or B.
 - One attempt per job, append-only ledger, no automatic retry; all failures preserve logs and stop the queue.
