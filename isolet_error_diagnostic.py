@@ -62,26 +62,66 @@ def checked_jobs():
     if digest(manifest) != MANIFEST_SHA:
         raise ValueError('stage-A manifest SHA changed')
     queue = json.loads((root / 'QUEUE_COMPLETE.json').read_text())
+    attempts_path = root / 'ATTEMPTS.jsonl'
     if ((root / 'QUEUE_FAILURE.json').exists() or
             queue.get('status') != 'complete' or
             queue.get('successes') != 65 or
             queue.get('accounted_for') != 65 or
             queue.get('manifest_sha256') != MANIFEST_SHA or
-            queue.get('code_commit') != CODE_COMMIT):
+            queue.get('code_commit') != CODE_COMMIT or
+            queue.get('attempts_sha256') != digest(attempts_path)):
         raise ValueError('stage A was not completely sealed')
     rows = [json.loads(line) for line in manifest.read_text().splitlines()]
     if len(rows) != 65 or len({r['job_key'] for r in rows}) != 65:
         raise ValueError('stage-A allowlist is incomplete')
+    events = [json.loads(line) for line in attempts_path.read_text().splitlines()]
+    if len(events) != 130:
+        raise ValueError('stage-A attempt ledger is incomplete')
+    by_key = {row['job_key']: [] for row in rows}
+    for event in events:
+        if event.get('job_key') not in by_key:
+            raise ValueError('stage-A ledger contains an unlisted job')
+        by_key[event['job_key']].append(event)
+    uuids = {0: 'GPU-6c7fee92-a6fe-5525-c554-bddb8e14943f',
+             1: 'GPU-6569e526-43ea-74e1-264e-4b66417181e1'}
+    cache = {}
+    def pinned_digest(path):
+        path = Path(path)
+        if path not in cache:
+            cache[path] = digest(path)
+        return cache[path]
     selected = {}
     for row in rows:
         key = row['job_key']
+        pair = by_key[key]
+        if (len(pair) != 2 or pair[0].get('kind') != 'start' or
+                pair[1].get('kind') != 'finish' or
+                pair[0].get('attempt') != 1 or
+                pair[1].get('attempt') != 1 or
+                pair[0].get('config_sha256') != row['config_sha256'] or
+                pair[0].get('gpu_index') != row['physical_gpu'] or
+                pair[0].get('gpu_uuid') != uuids[row['physical_gpu']] or
+                pair[1].get('classification') != 'success' or
+                pair[1].get('returncode') != 0):
+            raise ValueError(f'stage-A attempt differs: {key}')
+        config_path = manifest.parent / row['config_relpath']
+        if digest(config_path) != row['config_sha256']:
+            raise ValueError(f'config SHA changed: {key}')
+        config = json.loads(config_path.read_text())
+        job_root = Path(config['output_dir'])
+        gate_path = job_root / 'attempt-01/JOB_SUCCESS.json'
+        if (digest(gate_path) != pair[1].get('job_success_sha256') or
+                digest(job_root / 'attempt-01.log') != pair[1].get('log_sha256')):
+            raise ValueError(f'job gate or log differs from ledger: {key}')
         if key.startswith('isolet/f0/0.25/') or key.startswith('isolet/icarl/none/'):
-            config_path = manifest.parent / row['config_relpath']
-            if digest(config_path) != row['config_sha256']:
-                raise ValueError(f'config SHA changed: {key}')
-            config = json.loads(config_path.read_text())
-            run = Path(config['output_dir']) / 'attempt-01'
-            gate_path = run / 'JOB_SUCCESS.json'
+            for field, config_field in (
+                    ('source_config_sha256', 'development_source_config_path'),
+                    ('source_data_sha256', 'development_source_data_path'),
+                    ('holdout_sha256', 'development_holdout_manifest'),
+                    ('validation_manifest_sha256', 'pilot_paired_validation_manifest')):
+                if pinned_digest(config[config_field]) != row[field]:
+                    raise ValueError(f'stage-A source differs: {key}, {field}')
+            run = job_root / 'attempt-01'
             gate = json.loads(gate_path.read_text())
             checkpoint = run / 'checkpoints/formal_final.pt'
             readout_path = run / 'HOLDOUT_READOUT.json'
@@ -177,7 +217,7 @@ def analyze(paired):
     last = max(tasks)
     owner = {label: task for task, classes in tasks.items() for label in classes}
     output = {name: [] for name in ('task', 'error_type', 'class', 'sample', 'bias')}
-    group_deltas = {name: [] for name in
+    group_rows = {name: [] for name in
                     ('old', 'final', *ERROR_TYPES, 'e_set', 'non_e_set')}
     sample = {}
     for seed in SEEDS:
@@ -215,7 +255,11 @@ def analyze(paired):
             ('e_set', [j for j, y in enumerate(truth) if y in ESET]),
             ('non_e_set', [j for j, y in enumerate(truth) if y not in ESET]),
         ):
-            group_deltas[name].append(paired_excess(truth, fp, ip, positions)[2])
+            a, b, d = paired_excess(truth, fp, ip, positions)
+            group_rows[name].append(dict(seed=seed,
+                f0_only_wrong=a, icarl_only_wrong=b, net=d,
+                f0_errors=sum(fp[j] != truth[j] for j in positions),
+                icarl_errors=sum(ip[j] != truth[j] for j in positions)))
         for name in ERROR_TYPES:
             f_errors = [j for j, y in enumerate(truth) if fp[j] != y and
                         error_type(y, fp[j], tasks) == name]
@@ -224,7 +268,9 @@ def analyze(paired):
             f_only = sum(ip[j] == truth[j] for j in f_errors)
             i_only = sum(fp[j] == truth[j] for j in i_errors)
             d = f_only - i_only
-            group_deltas[name].append(d)
+            group_rows[name].append(dict(seed=seed,
+                f0_only_wrong=f_only, icarl_only_wrong=i_only, net=d,
+                f0_errors=len(f_errors), icarl_errors=len(i_errors)))
             output['error_type'].append(dict(seed=seed, error_type=name,
                 f0_errors=len(f_errors), icarl_errors=len(i_errors),
                 f0_only_wrong=f_only, icarl_only_wrong=i_only, net_f0_excess=d))
@@ -262,19 +308,29 @@ def analyze(paired):
         letter=chr(65 + rec['truth']), **{k: rec[k] for k in
         ('f0_only_wrong', 'icarl_only_wrong', 'both_wrong', 'both_correct')})
         for source_id, rec in sorted(sample.items())]
-    return output, {name: {'per_seed_net': values,
-                            'pooled_net': sum(values),
-                            'pattern': sign_pattern(values)}
-                    for name, values in group_deltas.items()}
+    groups = {}
+    for name, rows in group_rows.items():
+        values = [row['net'] for row in rows]
+        groups[name] = {'per_seed': rows, 'per_seed_net': values,
+            'pooled_net': sum(values), 'pattern': sign_pattern(values),
+            **{f'pooled_{field}': sum(row[field] for row in rows)
+               for field in ('f0_only_wrong', 'icarl_only_wrong',
+                             'f0_errors', 'icarl_errors')}}
+    return output, groups
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output-root', type=Path, default=OUTPUT)
+    parser.add_argument('--preflight-only', action='store_true')
     args = parser.parse_args()
     if args.output_root != OUTPUT or args.output_root.exists():
         raise ValueError('analysis output must be the new locked empty root')
     jobs = checked_jobs()
+    if args.preflight_only:
+        print(json.dumps({'status': 'preflight_passed', 'paired_jobs': len(jobs),
+                          'sample_predictions_opened': False}))
+        return
     paired, prediction_rows = {}, []
     with tempfile.TemporaryDirectory(prefix='isolet-error-inference-') as temporary:
         for seed in SEEDS:
