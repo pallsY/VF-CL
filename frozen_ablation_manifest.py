@@ -77,6 +77,9 @@ def _sha(path):
 
 
 def manifest_entries():
+    orchestration_commit = subprocess.check_output(
+        ['git', '-C', str(Path(__file__).parent), 'rev-parse', 'HEAD'],
+        text=True).strip()
     anchor_path = SOURCE_ROOT / 'audit/ADAPTIVE_SAMPLE_ONLY_FINAL_ANCHOR.json'
     if _sha(anchor_path) != SOURCE_ANCHOR_SHA:
         raise ValueError('original formal anchor changed')
@@ -115,6 +118,7 @@ def manifest_entries():
             'job_key': key, 'dataset': dataset, 'arm': arm, 'seed': seed,
             'physical_gpu': gpu, 'gpu_uuid': uuids[gpu],
             'code_commit': BASE_COMMIT if arm == 'no_partykd' else PATCH_COMMIT,
+            'orchestration_commit': orchestration_commit,
             'source_commit': BASE_COMMIT,
             'source_formal_anchor_sha256': SOURCE_ANCHOR_SHA,
             'source_config_sha256': _sha(source_path),
