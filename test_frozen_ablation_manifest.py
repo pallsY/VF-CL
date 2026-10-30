@@ -1,6 +1,7 @@
 import unittest
 
-from frozen_ablation_manifest import derive_config, expected_keys, semantic_diff
+from frozen_ablation_manifest import (auxiliary_data_paths, derive_config,
+                                       expected_keys, semantic_diff)
 
 
 class FrozenManifestTests(unittest.TestCase):
@@ -44,6 +45,14 @@ class FrozenManifestTests(unittest.TestCase):
         self.assertEqual(target['fim_freeze_frac'], 0.0)
         with self.assertRaises(ValueError):
             derive_config({**self.source, 'seed': 43}, 'isolet', 'fim_off', 42)
+
+    def test_formal_data_inventory_includes_test_and_metadata(self):
+        cifar = auxiliary_data_paths({'data_path': '/data'}, 'cifar100')
+        self.assertEqual(set(cifar), {'meta', 'test'})
+        isolet = auxiliary_data_paths(
+            {'vector_npz': '/data/isolet/isolet_vfl.npz'}, 'isolet')
+        self.assertEqual(isolet['metadata'].name,
+                         'isolet_vfl.metadata.json')
 
 
 if __name__ == '__main__':

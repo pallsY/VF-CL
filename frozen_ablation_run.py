@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import threading
@@ -15,9 +16,9 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from frozen_ablation_manifest import (
-    BASE_COMMIT, DATA_SHA, PATCH_COMMIT, RESULT_ROOT, SOURCE_ROOT,
+    AUX_DATA_SHA, BASE_COMMIT, DATA_SHA, PATCH_COMMIT, RESULT_ROOT, SOURCE_ROOT,
     SOURCE_ANCHOR_SHA,
-    _bytes, _sha, derive_config, expected_keys, semantic_diff,
+    _sha, auxiliary_data_paths, derive_config, expected_keys, semantic_diff,
 )
 
 GPU_UUID = {
@@ -89,8 +90,13 @@ def verify_formal_seal(run):
     if any(not path.is_file() for path in paths.values()):
         raise ValueError('formal result or single test-access seal is absent')
     complete = json.loads(paths['formal_complete_sha256'].read_text())
+    sealed = json.loads(paths['formal_sealed_sha256'].read_text())
+    published = json.loads(paths['formal_published_sha256'].read_text())
     access = json.loads(paths['test_access_sha256'].read_text())
     if (complete.get('status') != 'complete' or
+            sealed.get('status') != 'sealed' or
+            published.get('status') != 'published' or
+            published.get('results_sha256') != _sha(paths['results_sha256']) or
             access.get('status') != 'consumed' or
             access.get('access', {}).get('split') != 'test' or
             access.get('access', {}).get('event') != 'first_iteration'):
@@ -148,6 +154,13 @@ def load_jobs(manifest, digest, code_roots):
         if (data_cache[data_path] != DATA_SHA[dataset] or
                 row.get('source_data_sha256') != data_cache[data_path]):
             raise ValueError('original formal training data changed')
+        if row.get('auxiliary_data_sha256') != AUX_DATA_SHA[dataset]:
+            raise ValueError('formal auxiliary data anchor differs')
+        for name, path in auxiliary_data_paths(source, dataset).items():
+            if path not in data_cache:
+                data_cache[path] = _sha(path)
+            if data_cache[path] != AUX_DATA_SHA[dataset][name]:
+                raise ValueError(f'original formal auxiliary data changed: {name}')
         config_path = (manifest.parent / row['config_relpath']).resolve()
         if (not config_path.is_relative_to(manifest.parent / 'configs') or
                 _sha(config_path) != row['config_sha256']):
@@ -214,6 +227,8 @@ def worker(manifest, digest, key, code_root, code_roots):
 def run_queue(manifest, digest, code_roots):
     jobs = load_jobs(manifest, digest, code_roots)
     root = Path(RESULT_ROOT)
+    if shutil.disk_usage(root).free < 40 * (1 << 30):
+        raise RuntimeError('formal ablation needs at least 40 GiB free before launch')
     if any((root / name).exists() for name in
            ('QUEUE_LOCK.json', 'ATTEMPTS.jsonl', 'QUEUE_COMPLETE.json',
             'QUEUE_FAILURE.json')):
@@ -228,11 +243,15 @@ def run_queue(manifest, digest, code_roots):
     mutex, stop = threading.Lock(), threading.Event()
     outcomes = {}
 
-    def append(value):
-        with mutex, (root / 'ATTEMPTS.jsonl').open('a', encoding='utf-8') as stream:
+    def append_unlocked(value):
+        with (root / 'ATTEMPTS.jsonl').open('a', encoding='utf-8') as stream:
             stream.write(json.dumps(value, sort_keys=True) + '\n')
             stream.flush()
             os.fsync(stream.fileno())
+
+    def append(value):
+        with mutex:
+            append_unlocked(value)
 
     def lane(index):
         assigned = sorted((job for job in jobs if job[0]['physical_gpu'] == index),
@@ -243,16 +262,7 @@ def run_queue(manifest, digest, code_roots):
             admission = wait_headroom(index, stop)
             if admission is None:
                 return
-            if not gpu_eligible(gpu_snapshot(index), index):
-                raise RuntimeError('GPU headroom disappeared at launch')
             key = row['job_key']
-            job_root.mkdir(parents=True, exist_ok=False)
-            write_once(job_root / 'attempt-01.plan.json', {'job_key': key, 'attempt': 1})
-            append({'kind': 'start', 'job_key': key, 'attempt': 1,
-                    'config_sha256': row['config_sha256'],
-                    'code_commit': row['code_commit'],
-                    'gpu_index': index, 'gpu_uuid': GPU_UUID[index],
-                    'time_utc': now()})
             log = job_root / 'attempt-01.log'
             env = os.environ.copy()
             env.update({'CUDA_VISIBLE_DEVICES': ','.join(GPU_UUID[i] for i in (0, 1)),
@@ -265,10 +275,38 @@ def run_queue(manifest, digest, code_roots):
                        '--base-code', str(code_roots['no_partykd']),
                        '--patch-code', str(code_roots['fim_off']),
                        '--code-root', str(code_roots[row['arm']])]
-            with log.open('x', encoding='utf-8') as stream:
-                process = subprocess.run(command, cwd=code_roots[row['arm']],
-                                         env=env, stdout=stream,
-                                         stderr=subprocess.STDOUT)
+            with mutex:
+                if stop.is_set():
+                    return
+                if not gpu_eligible(gpu_snapshot(index), index):
+                    raise RuntimeError('GPU headroom disappeared at launch')
+                job_root.mkdir(parents=True, exist_ok=False)
+                write_once(job_root / 'attempt-01.plan.json',
+                           {'job_key': key, 'attempt': 1})
+                append_unlocked({'kind': 'start', 'job_key': key, 'attempt': 1,
+                                 'config_sha256': row['config_sha256'],
+                                 'code_commit': row['code_commit'],
+                                 'gpu_index': index, 'gpu_uuid': GPU_UUID[index],
+                                 'time_utc': now()})
+                try:
+                    with log.open('x', encoding='utf-8') as stream:
+                        process = subprocess.Popen(
+                            command, cwd=code_roots[row['arm']], env=env,
+                            stdout=stream, stderr=subprocess.STDOUT)
+                except Exception as exc:
+                    outcomes[key] = 'infrastructure_candidate'
+                    stop.set()
+                    append_unlocked({'kind': 'finish', 'job_key': key,
+                                     'attempt': 1,
+                                     'classification': 'infrastructure_candidate',
+                                     'returncode': None,
+                                     'log_sha256': _sha(log) if log.is_file() else None,
+                                     'job_success_sha256': None,
+                                     'test_accessed': False,
+                                     'launch_error': str(exc),
+                                     'time_utc': now()})
+                    return
+            process.wait()
             gate = job_root / 'attempt-01/JOB_SUCCESS.json'
             log_text = log.read_text(encoding='utf-8', errors='replace')
             freeze_count = (len(re.findall(r'FIM applied freeze: 0/\d+ bottom elements '
@@ -283,6 +321,8 @@ def run_queue(manifest, digest, code_roots):
                 classification = 'training_or_audit_failure'
             with mutex:
                 outcomes[key] = classification
+                if classification != 'success':
+                    stop.set()
             append({'kind': 'finish', 'job_key': key, 'attempt': 1,
                     'classification': classification,
                     'returncode': process.returncode,
@@ -292,7 +332,6 @@ def run_queue(manifest, digest, code_roots):
                     'fim_zero_freeze_logs': freeze_count,
                     'time_utc': now()})
             if classification != 'success':
-                stop.set()
                 return
 
     error = None
@@ -330,16 +369,18 @@ def main():
     parser.add_argument('--job-key')
     parser.add_argument('--code-root', type=Path)
     args = parser.parse_args()
-    roots = {'no_partykd': args.base_code, 'fim_off': args.patch_code}
+    roots = {'no_partykd': args.base_code.resolve(),
+             'fim_off': args.patch_code.resolve()}
+    manifest = args.manifest.resolve()
     if args.worker:
         if not args.job_key or not args.code_root:
             raise ValueError('worker needs job and code-root binding')
-        worker(args.manifest, args.manifest_sha256, args.job_key,
-               args.code_root, roots)
+        worker(manifest, args.manifest_sha256, args.job_key,
+               args.code_root.resolve(), roots)
     elif args.job_key or args.code_root:
         raise ValueError('queue cannot select a single unlisted job')
     else:
-        print(json.dumps(run_queue(args.manifest, args.manifest_sha256,
+        print(json.dumps(run_queue(manifest, args.manifest_sha256,
                                    roots), sort_keys=True))
 
 

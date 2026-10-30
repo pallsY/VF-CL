@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import shutil
 import subprocess
 from pathlib import Path
 from pathlib import PurePosixPath
@@ -17,6 +18,18 @@ DATA_SHA = {
     'cifar100': '735e79b04f092ca3d2e6d07f368c0a7d70d48c48d28865950cc24454cf45129b',
     'isolet': 'd34312670de93198afcd2b126c95b79bae2b4cffeb30d480f097faf046b69514',
     'upmc_food101': 'dbdd3a2979203ba0ee804de7d3b128426f869b0a127e4b87ebbe023e5750023b',
+}
+AUX_DATA_SHA = {
+    'cifar100': {
+        'meta': 'a5d4786345c961390f865e93b434dbd5c6904ce880667e0cb888c97d449f28b9',
+        'test': '4b67687d9933c4db8f0831104447f15b93774f4f464bd0516f0f0f2ac83b7864',
+    },
+    'isolet': {
+        'metadata': '79396dea1751b6094a5769f2dd789ad58b3ea9582a12c8c98d3ec07d8d1eb3cd',
+    },
+    'upmc_food101': {
+        'metadata': 'a9f81a847969dab024d0831e6505e764f8fce58d27828f18eb593d8001358c8c',
+    },
 }
 DATASETS = ('cifar100', 'isolet', 'upmc_food101')
 SEEDS = (42, 43, 44)
@@ -76,6 +89,14 @@ def _sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def auxiliary_data_paths(source, dataset):
+    if dataset == 'cifar100':
+        base = Path(source['data_path']) / 'cifar-100-python'
+        return {name: base / name for name in AUX_DATA_SHA[dataset]}
+    base = Path(source['vector_npz'])
+    return {'metadata': base.with_suffix('.metadata.json')}
+
+
 def manifest_entries():
     orchestration_commit = subprocess.check_output(
         ['git', '-C', str(Path(__file__).parent), 'rev-parse', 'HEAD'],
@@ -113,6 +134,11 @@ def manifest_entries():
             data_cache[data] = _sha(data)
         if data_cache[data] != DATA_SHA[dataset]:
             raise ValueError(f'training data SHA differs: {key}')
+        for name, path in auxiliary_data_paths(source, dataset).items():
+            if path not in data_cache:
+                data_cache[path] = _sha(path)
+            if data_cache[path] != AUX_DATA_SHA[dataset][name]:
+                raise ValueError(f'formal auxiliary data SHA differs: {key}, {name}')
         config_relpath = 'configs/' + key.replace('/', '_') + '.json'
         row = {
             'job_key': key, 'dataset': dataset, 'arm': arm, 'seed': seed,
@@ -123,6 +149,7 @@ def manifest_entries():
             'source_formal_anchor_sha256': SOURCE_ANCHOR_SHA,
             'source_config_sha256': _sha(source_path),
             'source_data_sha256': data_cache[data],
+            'auxiliary_data_sha256': AUX_DATA_SHA[dataset],
             'config_relpath': config_relpath,
             'config_sha256': hashlib.sha256(_bytes(config)).hexdigest(),
             'config_semantic_diff': semantic_diff(source, config),
@@ -137,6 +164,8 @@ def write_manifest(entries):
     root = Path(RESULT_ROOT)
     if root.exists():
         raise FileExistsError('ablation result root already exists')
+    if shutil.disk_usage(root.parent).free < 40 * (1 << 30):
+        raise RuntimeError('formal ablation needs at least 40 GiB free before manifest write')
     manifest_dir = root / 'manifests'
     manifest_dir.mkdir(parents=True, exist_ok=False)
     for row, config in entries:
