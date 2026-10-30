@@ -15,27 +15,10 @@ from frozen_ablation_manifest import BASE_COMMIT, PATCH_COMMIT, SOURCE_ROOT
 def smoke_config(source, mode, output):
     if mode not in ('base', 'default_on', 'off'):
         raise ValueError('unknown smoke mode')
-    if source.get('custom_tasks'):
-        tasks = source['custom_tasks'].split('|')[:2]
-    else:
-        per_task = source['classes_per_task']
-        tasks = [','.join(str(label) for label in range(task * per_task,
-                  (task + 1) * per_task)) for task in (0, 1)]
-    if len(tasks) != 2:
-        raise ValueError('source lacks two tasks')
-    classes = [int(label) for task in tasks for label in task.split(',')]
-    if classes != list(range(len(classes))):
-        raise ValueError('smoke tasks do not start at class zero')
     config = dict(source)
-    config.update(num_tasks=2, num_classes=len(classes),
-                  custom_tasks='|'.join(tasks), epochs_per_task=1,
-                  device='cpu', num_workers=2, save_task_checkpoints=1,
+    config.update(epochs_per_task=1, device='cpu', num_workers=2,
                   results_dir=str(output), output_dir=str(output / 'run'),
                   exp_name='run')
-    # The formal BiC cache requires all ten CIFAR tasks; it is output-only and
-    # is disabled solely for this two-task training-equivalence smoke.
-    if source.get('data') == 'cifar100':
-        config['bic_enabled'] = 0
     if mode != 'base':
         config['fim_apply_mask'] = 0 if mode == 'off' else 1
     return config
@@ -89,20 +72,20 @@ def run_smoke(dataset, mode, code_root, output):
     import vfl_trainer
     from cl_methods.proto_evolve import ProtoEvolveCL
 
-    class StopBeforeTest(Exception):
+    class StopAfterTwoTasks(Exception):
         pass
     class NoTestDataset(data_utils.VFLDataset):
         def authorize_formal_access(self, **kwargs):
             if kwargs.get('split') == 'test':
-                raise StopBeforeTest
+                raise RuntimeError('smoke reached official test authorization')
             return super().authorize_formal_access(**kwargs)
         def get_test_loader(self, classes):
-            raise StopBeforeTest
+            raise RuntimeError('smoke reached official test loader')
 
     runner.VFLDataset = NoTestDataset
     task = {'id': None}
     applied_freeze = []
-    losses, gradients, fim_scores = [], [], []
+    losses, gradients, fim_scores, states = [], [], [], []
     original_before = ProtoEvolveCL.before_task
     def before_task(self, task_id, *args):
         task['id'] = int(task_id)
@@ -112,6 +95,18 @@ def run_smoke(dataset, mode, code_root, output):
                                    for p in bottom.parameters() if not p.requires_grad)})
         return result
     ProtoEvolveCL.before_task = before_task
+    original_after = ProtoEvolveCL.after_task
+    def after_task(self, loader, task_id):
+        result = original_after(self, loader, task_id)
+        states.append({'task': int(task_id),
+                       'model_sha256': value_hash(self.trainer.get_state(), torch, np),
+                       'memory_mask_sha256': value_hash(self.get_state(), torch, np),
+                       'rng_sha256': value_hash(runner._capture_rng_state(), torch, np),
+                       'fim_masks_sha256': value_hash(self.fim_masks, torch, np)})
+        if int(task_id) == 1:
+            raise StopAfterTwoTasks
+        return result
+    ProtoEvolveCL.after_task = after_task
     original_epoch = vfl_trainer.VFLTrainer.train_epoch
     def train_epoch(self, *args, **kwargs):
         value = original_epoch(self, *args, **kwargs)
@@ -139,27 +134,18 @@ def run_smoke(dataset, mode, code_root, output):
     stopped = False
     try:
         runner.run_experiment(SimpleNamespace(**config))
-    except StopBeforeTest:
+    except StopAfterTwoTasks:
         stopped = True
     if (not stopped or
             (output / 'run/formal_access/test.consumed.json').exists() or
             (output / 'run/results.json').exists()):
-        raise ValueError('smoke reached official test or failed to stop before it')
-    snapshots = output / 'run/formal_snapshots'
-    states = []
-    for event in (0, 1):
-        path = snapshots / f'event_{event}_CIL.pt'
-        payload = runner._decode_checkpoint_value(torch.load(
-            path, map_location='cpu', weights_only=True))
-        states.append({'task': event,
-                       'model_sha256': value_hash(payload['trainer_state'], torch, np),
-                       'memory_mask_sha256': value_hash(payload['cl_state'], torch, np),
-                       'rng_sha256': value_hash(payload['rng_state'], torch, np),
-                       'fim_masks_sha256': value_hash(
-                           payload['cl_state']['fim_masks'], torch, np)})
+        raise ValueError('smoke reached official test or failed to stop after two tasks')
+    if len(states) != 2 or [row['task'] for row in states] != [0, 1]:
+        raise ValueError('smoke did not capture both task boundaries')
     record = {'dataset': dataset, 'mode': mode, 'code_commit': expected,
               'source_config_sha256': hashlib.sha256(source_path.read_bytes()).hexdigest(),
-              'test_accessed': False, 'states': states,
+              'test_accessed': False, 'stopped_after_two_tasks': True,
+              'states': states,
               'losses': losses, 'gradient_steps': gradients,
               'fim_scores': fim_scores,
               'applied_freeze': applied_freeze}
@@ -180,6 +166,7 @@ def compare_smokes(root):
         if (any(entries[mode].get('dataset') != dataset or
                 entries[mode].get('mode') != mode or
                 entries[mode].get('test_accessed') is not False or
+                entries[mode].get('stopped_after_two_tasks') is not True or
                 entries[mode].get('code_commit') !=
                 (BASE_COMMIT if mode == 'base' else PATCH_COMMIT)
                 for mode in entries) or
@@ -198,8 +185,6 @@ def compare_smokes(root):
             if ([row for row in base[field] if row['task'] == 0] !=
                     [row for row in off[field] if row['task'] == 0]):
                 raise ValueError(f'FIM-off task-0 {field} differs: {dataset}')
-        if not (root / dataset / 'off/run/FORMAL_EVALUATION_PENDING.json').is_file():
-            raise ValueError(f'FIM-off training did not reach final checkpoint: {dataset}')
         if (len(off['applied_freeze']) != 2 or
                 any(row['frozen_elements'] != 0 for row in off['applied_freeze'])):
             raise ValueError(f'FIM-off applied a nonzero freeze: {dataset}')
