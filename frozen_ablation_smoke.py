@@ -15,7 +15,12 @@ from frozen_ablation_manifest import BASE_COMMIT, PATCH_COMMIT, SOURCE_ROOT
 def smoke_config(source, mode, output):
     if mode not in ('base', 'default_on', 'off'):
         raise ValueError('unknown smoke mode')
-    tasks = source['custom_tasks'].split('|')[:2]
+    if source.get('custom_tasks'):
+        tasks = source['custom_tasks'].split('|')[:2]
+    else:
+        per_task = source['classes_per_task']
+        tasks = [','.join(str(label) for label in range(task * per_task,
+                  (task + 1) * per_task)) for task in (0, 1)]
     if len(tasks) != 2:
         raise ValueError('source lacks two tasks')
     classes = [int(label) for task in tasks for label in task.split(',')]
