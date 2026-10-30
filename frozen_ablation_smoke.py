@@ -11,6 +11,8 @@ from types import SimpleNamespace
 
 from frozen_ablation_manifest import BASE_COMMIT, PATCH_COMMIT, SOURCE_ROOT
 
+TRAIN_PER_CLASS = 64
+
 
 def smoke_config(source, mode, output):
     if mode not in ('base', 'default_on', 'off'):
@@ -75,6 +77,16 @@ def run_smoke(dataset, mode, code_root, output):
     class StopAfterTwoTasks(Exception):
         pass
     class NoTestDataset(data_utils.VFLDataset):
+        def _loader(self, dataset, indices, key, shuffle, audit=False):
+            if key[0] == 'train':
+                counts, selected = {}, []
+                for index in indices:
+                    label = int(self.trainset.targets[index])
+                    if counts.get(label, 0) < TRAIN_PER_CLASS:
+                        selected.append(index)
+                        counts[label] = counts.get(label, 0) + 1
+                indices = selected
+            return super()._loader(dataset, indices, key, shuffle, audit=audit)
         def authorize_formal_access(self, **kwargs):
             if kwargs.get('split') == 'test':
                 raise RuntimeError('smoke reached official test authorization')
@@ -142,9 +154,14 @@ def run_smoke(dataset, mode, code_root, output):
         raise ValueError('smoke reached official test or failed to stop after two tasks')
     if len(states) != 2 or [row['task'] for row in states] != [0, 1]:
         raise ValueError('smoke did not capture both task boundaries')
+    data_flow = output / 'run/data_flow_audit.jsonl'
+    if not data_flow.is_file():
+        raise ValueError('smoke training data flow was not recorded')
     record = {'dataset': dataset, 'mode': mode, 'code_commit': expected,
               'source_config_sha256': hashlib.sha256(source_path.read_bytes()).hexdigest(),
               'test_accessed': False, 'stopped_after_two_tasks': True,
+              'train_per_class': TRAIN_PER_CLASS,
+              'data_flow_sha256': hashlib.sha256(data_flow.read_bytes()).hexdigest(),
               'states': states,
               'losses': losses, 'gradient_steps': gradients,
               'fim_scores': fim_scores,
@@ -167,6 +184,7 @@ def compare_smokes(root):
                 entries[mode].get('mode') != mode or
                 entries[mode].get('test_accessed') is not False or
                 entries[mode].get('stopped_after_two_tasks') is not True or
+                entries[mode].get('train_per_class') != TRAIN_PER_CLASS or
                 entries[mode].get('code_commit') !=
                 (BASE_COMMIT if mode == 'base' else PATCH_COMMIT)
                 for mode in entries) or
@@ -174,7 +192,7 @@ def compare_smokes(root):
                      for mode in entries}) != 1):
             raise ValueError(f'smoke provenance differs: {dataset}')
         for field in ('states', 'losses', 'gradient_steps',
-                      'fim_scores', 'applied_freeze'):
+                      'fim_scores', 'applied_freeze', 'data_flow_sha256'):
             if base[field] != default[field]:
                 raise ValueError(f'default-on differs from producer: {dataset}, {field}')
         for field in ('model_sha256', 'memory_mask_sha256', 'rng_sha256',
@@ -185,6 +203,8 @@ def compare_smokes(root):
             if ([row for row in base[field] if row['task'] == 0] !=
                     [row for row in off[field] if row['task'] == 0]):
                 raise ValueError(f'FIM-off task-0 {field} differs: {dataset}')
+        if off['data_flow_sha256'] != base['data_flow_sha256']:
+            raise ValueError(f'FIM-off data order differs: {dataset}')
         if (len(off['applied_freeze']) != 2 or
                 any(row['frozen_elements'] != 0 for row in off['applied_freeze'])):
             raise ValueError(f'FIM-off applied a nonzero freeze: {dataset}')
