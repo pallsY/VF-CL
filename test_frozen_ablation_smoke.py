@@ -18,6 +18,7 @@ class SmokeConfigTests(unittest.TestCase):
         self.assertEqual(base['custom_tasks'], '0,1|2,3')
         self.assertEqual(base['epochs_per_task'], 1)
         self.assertEqual(base['device'], 'cpu')
+        self.assertEqual(base['num_workers'], 2)
         self.assertNotIn('fim_apply_mask', base)
         self.assertEqual(on['fim_apply_mask'], 1)
         self.assertEqual(off['fim_apply_mask'], 0)

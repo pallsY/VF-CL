@@ -24,7 +24,7 @@ def smoke_config(source, mode, output):
     config = dict(source)
     config.update(num_tasks=2, num_classes=len(classes),
                   custom_tasks='|'.join(tasks), epochs_per_task=1,
-                  device='cpu', num_workers=0, save_task_checkpoints=1,
+                  device='cpu', num_workers=2, save_task_checkpoints=1,
                   results_dir=str(output), output_dir=str(output / 'run'),
                   exp_name='run')
     if mode != 'base':
@@ -168,6 +168,15 @@ def compare_smokes(root):
                    for mode in ('base', 'default_on', 'off')}
         base, default, off = (entries[mode]
                               for mode in ('base', 'default_on', 'off'))
+        if (any(entries[mode].get('dataset') != dataset or
+                entries[mode].get('mode') != mode or
+                entries[mode].get('test_accessed') is not False or
+                entries[mode].get('code_commit') !=
+                (BASE_COMMIT if mode == 'base' else PATCH_COMMIT)
+                for mode in entries) or
+                len({entries[mode].get('source_config_sha256')
+                     for mode in entries}) != 1):
+            raise ValueError(f'smoke provenance differs: {dataset}')
         for field in ('states', 'losses', 'gradient_steps',
                       'fim_scores', 'applied_freeze'):
             if base[field] != default[field]:
@@ -185,6 +194,10 @@ def compare_smokes(root):
         if (len(off['applied_freeze']) != 2 or
                 any(row['frozen_elements'] != 0 for row in off['applied_freeze'])):
             raise ValueError(f'FIM-off applied a nonzero freeze: {dataset}')
+        if (len(default['applied_freeze']) != 2 or
+                default['applied_freeze'][1]['frozen_elements'] <= 0 or
+                off['states'][1]['model_sha256'] == base['states'][1]['model_sha256']):
+            raise ValueError(f'FIM-off did not change task-1 training: {dataset}')
         reports[dataset] = {'default_on_bitwise': True,
                             'off_task0_identical': True,
                             'off_applied_freeze_fraction': 0,

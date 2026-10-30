@@ -6,6 +6,7 @@ import json
 import os
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import threading
@@ -241,7 +242,16 @@ def run_queue(manifest, digest, code_roots):
     with (root / 'ATTEMPTS.jsonl').open('x', encoding='utf-8'):
         pass
     mutex, stop = threading.Lock(), threading.Event()
-    outcomes = {}
+    outcomes, active = {}, {}
+
+    def stop_active(except_index=None):
+        stop.set()
+        for lane_index, process in active.items():
+            if lane_index != except_index and process.poll() is None:
+                try:
+                    os.killpg(process.pid, signal.SIGTERM)
+                except ProcessLookupError:
+                    pass
 
     def append_unlocked(value):
         with (root / 'ATTEMPTS.jsonl').open('a', encoding='utf-8') as stream:
@@ -292,10 +302,12 @@ def run_queue(manifest, digest, code_roots):
                     with log.open('x', encoding='utf-8') as stream:
                         process = subprocess.Popen(
                             command, cwd=code_roots[row['arm']], env=env,
-                            stdout=stream, stderr=subprocess.STDOUT)
+                            stdout=stream, stderr=subprocess.STDOUT,
+                            start_new_session=True)
+                        active[index] = process
                 except Exception as exc:
                     outcomes[key] = 'infrastructure_candidate'
-                    stop.set()
+                    stop_active(except_index=index)
                     append_unlocked({'kind': 'finish', 'job_key': key,
                                      'attempt': 1,
                                      'classification': 'infrastructure_candidate',
@@ -307,6 +319,8 @@ def run_queue(manifest, digest, code_roots):
                                      'time_utc': now()})
                     return
             process.wait()
+            with mutex:
+                active.pop(index, None)
             gate = job_root / 'attempt-01/JOB_SUCCESS.json'
             log_text = log.read_text(encoding='utf-8', errors='replace')
             freeze_count = (len(re.findall(r'FIM applied freeze: 0/\d+ bottom elements '
@@ -315,6 +329,8 @@ def run_queue(manifest, digest, code_roots):
             if (process.returncode == 0 and gate.is_file() and
                     (freeze_count is None or freeze_count == config['num_tasks'])):
                 classification = 'success'
+            elif stop.is_set() and process.returncode != 0:
+                classification = 'cancelled_by_peer_failure'
             elif 'out of memory' in log_text.lower() or process.returncode in (-9, 137):
                 classification = 'infrastructure_candidate'
             else:
@@ -322,7 +338,7 @@ def run_queue(manifest, digest, code_roots):
             with mutex:
                 outcomes[key] = classification
                 if classification != 'success':
-                    stop.set()
+                    stop_active(except_index=index)
             append({'kind': 'finish', 'job_key': key, 'attempt': 1,
                     'classification': classification,
                     'returncode': process.returncode,
@@ -341,7 +357,8 @@ def run_queue(manifest, digest, code_roots):
             try:
                 future.result()
             except Exception as exc:
-                stop.set()
+                with mutex:
+                    stop_active()
                 error = str(exc)
     complete = not stop.is_set() and len(outcomes) == 18 and all(
         value == 'success' for value in outcomes.values())

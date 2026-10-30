@@ -86,7 +86,27 @@ def _bytes(value):
 
 
 def _sha(path):
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    digest = hashlib.sha256()
+    with Path(path).open('rb') as stream:
+        for chunk in iter(lambda: stream.read(1 << 20), b''):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def original_tree_sha256(root):
+    root = Path(root)
+    if not root.is_dir() or root.is_symlink():
+        raise ValueError('original formal job tree is absent or a symlink')
+    rows = []
+    for path in sorted(root.rglob('*'),
+                       key=lambda item: item.relative_to(root).as_posix()):
+        if path.is_symlink():
+            raise ValueError('original formal job tree contains a symlink')
+        if path.is_file():
+            rows.append([path.relative_to(root).as_posix(),
+                         path.stat().st_size, _sha(path)])
+    return hashlib.sha256(json.dumps(
+        rows, ensure_ascii=False, separators=(',', ':')).encode()).hexdigest()
 
 
 def auxiliary_data_paths(source, dataset):
@@ -109,7 +129,11 @@ def manifest_entries():
             anchor.get('basic_passed') != 9 or
             anchor.get('verified_original_trees') != 9):
         raise ValueError('original nine formal jobs are not anchored')
-    data_cache = {}
+    gate_path = SOURCE_ROOT / anchor['final_gate']['relative_path']
+    if _sha(gate_path) != anchor['final_gate']['sha256']:
+        raise ValueError('original formal final gate changed')
+    final_gate = json.loads(gate_path.read_text(encoding='utf-8'))
+    data_cache, tree_cache = {}, {}
     entries = []
     uuids = {0: 'GPU-6c7fee92-a6fe-5525-c554-bddb8e14943f',
              1: 'GPU-6569e526-43ea-74e1-264e-4b66417181e1'}
@@ -118,6 +142,13 @@ def manifest_entries():
         seed = int(seed_text)
         source_path = (SOURCE_ROOT / 'full' / dataset / 'adaptive' /
                        str(seed) / 'run/config.json')
+        source_job = source_path.parent.parent
+        old_key = f'{dataset}/adaptive/{seed}'
+        if source_job not in tree_cache:
+            tree_cache[source_job] = original_tree_sha256(source_job)
+        tree_sha = tree_cache[source_job]
+        if final_gate['original_tree_sha256'].get(old_key) != tree_sha:
+            raise ValueError(f'original formal job tree changed: {old_key}')
         source = json.loads(source_path.read_text(encoding='utf-8'))
         if (source.get('output_dir') != str(source_path.parent) or
                 source.get('results_dir') != str(source_path.parent.parent) or
@@ -148,6 +179,7 @@ def manifest_entries():
             'source_commit': BASE_COMMIT,
             'source_formal_anchor_sha256': SOURCE_ANCHOR_SHA,
             'source_config_sha256': _sha(source_path),
+            'original_tree_sha256': tree_sha,
             'source_data_sha256': data_cache[data],
             'auxiliary_data_sha256': AUX_DATA_SHA[dataset],
             'config_relpath': config_relpath,

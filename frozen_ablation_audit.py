@@ -14,7 +14,8 @@ from pathlib import Path
 from frozen_ablation_manifest import (
     AUX_DATA_SHA, BASE_COMMIT, DATASETS, DATA_SHA, PATCH_COMMIT,
     RESULT_ROOT, SEEDS, SOURCE_ANCHOR_SHA, SOURCE_ROOT,
-    auxiliary_data_paths, derive_config, expected_keys, semantic_diff,
+    auxiliary_data_paths, derive_config, expected_keys,
+    original_tree_sha256, semantic_diff,
 )
 
 GPU_UUID = {
@@ -24,7 +25,11 @@ GPU_UUID = {
 
 
 def sha(path):
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    digest = hashlib.sha256()
+    with Path(path).open('rb') as stream:
+        for chunk in iter(lambda: stream.read(1 << 20), b''):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def party_kd_contribution_label(deltas):
@@ -67,6 +72,10 @@ def audit_metadata(manifest, digest):
             anchor.get('producer_commit') != BASE_COMMIT or
             anchor.get('basic_passed') != 9):
         raise ValueError('original formal anchor changed')
+    final_gate_path = SOURCE_ROOT / anchor['final_gate']['relative_path']
+    if sha(final_gate_path) != anchor['final_gate']['sha256']:
+        raise ValueError('original formal final gate changed')
+    original_trees = json.loads(final_gate_path.read_text())['original_tree_sha256']
     old_ledger = SOURCE_ROOT / 'audit/attestations.jsonl'
     if sha(old_ledger) != anchor['ledger']['sha256']:
         raise ValueError('original formal audit ledger changed')
@@ -79,7 +88,7 @@ def audit_metadata(manifest, digest):
             old_attest[record['job']] = record
     if len(old_attest) != 9:
         raise ValueError('original formal attestations are incomplete')
-    cache = {}
+    cache, tree_cache = {}, {}
     def cached_sha(path):
         path = Path(path)
         if path not in cache:
@@ -94,6 +103,11 @@ def audit_metadata(manifest, digest):
         source_config_path = source / 'config.json'
         source_config = json.loads(source_config_path.read_text())
         old_key = f'{dataset}/adaptive/{seed}'
+        if source.parent not in tree_cache:
+            tree_cache[source.parent] = original_tree_sha256(source.parent)
+        if (row.get('original_tree_sha256') != original_trees.get(old_key) or
+                tree_cache[source.parent] != row['original_tree_sha256']):
+            raise ValueError(f'original formal tree changed: {key}')
         original_published = source / 'FORMAL_EVALUATION_PUBLISHED.json'
         if (cached_sha(source_config_path) != row['source_config_sha256'] or
                 cached_sha(original_published) != old_attest[old_key]['file_sha256'][
