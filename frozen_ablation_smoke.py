@@ -32,6 +32,10 @@ def smoke_config(source, mode, output):
                   device='cpu', num_workers=2, save_task_checkpoints=1,
                   results_dir=str(output), output_dir=str(output / 'run'),
                   exp_name='run')
+    # The formal BiC cache requires all ten CIFAR tasks; it is output-only and
+    # is disabled solely for this two-task training-equivalence smoke.
+    if source.get('data') == 'cifar100':
+        config['bic_enabled'] = 0
     if mode != 'base':
         config['fim_apply_mask'] = 0 if mode == 'off' else 1
     return config

@@ -26,11 +26,13 @@ class SmokeConfigTests(unittest.TestCase):
 
     def test_cifar_standard_schedule_without_custom_tasks(self):
         source = {'custom_tasks': '', 'classes_per_task': 10,
-                  'num_tasks': 10, 'num_classes': 100}
+                  'num_tasks': 10, 'num_classes': 100,
+                  'data': 'cifar100', 'bic_enabled': 1}
         config = smoke_config(source, 'base', Path('/tmp/smoke'))
         self.assertEqual(config['num_classes'], 20)
         self.assertEqual(config['custom_tasks'],
                          '0,1,2,3,4,5,6,7,8,9|10,11,12,13,14,15,16,17,18,19')
+        self.assertEqual(config['bic_enabled'], 0)
 
 
 if __name__ == '__main__':
