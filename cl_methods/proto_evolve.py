@@ -333,15 +333,27 @@ class ProtoEvolveCL:
             self._freeze_dependency_snapshot(self.current_task_classes)
         self.current_task_classes = list(new_classes)
         # Apply FIM freeze (computed in after_task of previous task)
+        if task_id == 0 and getattr(self.args, 'fim_apply_mask', 1) == 0:
+            total = sum(p.numel() for bottom in self.trainer.bottoms
+                        for p in bottom.parameters())
+            print(f"  FIM applied freeze: 0/{total} bottom elements (fraction=0.000000)")
         if task_id > 0:
-            total_f, total_p = 0, 0
-            for k in range(self.args.num_parties):
-                for n, p in self.trainer.bottoms[k].named_parameters():
-                    total_p += 1
-                    if self.fim_masks[k].get(n, False):
-                        p.requires_grad = False
-                        total_f += 1
-            print(f"  FIM freeze: {total_f}/{total_p} bottom params frozen")
+            if getattr(self.args, 'fim_apply_mask', 1) == 0:
+                total = sum(p.numel() for bottom in self.trainer.bottoms
+                            for p in bottom.parameters())
+                if any(not p.requires_grad for bottom in self.trainer.bottoms
+                       for p in bottom.parameters()):
+                    raise RuntimeError('FIM-off found an already frozen bottom parameter')
+                print(f"  FIM applied freeze: 0/{total} bottom elements (fraction=0.000000)")
+            else:
+                total_f, total_p = 0, 0
+                for k in range(self.args.num_parties):
+                    for n, p in self.trainer.bottoms[k].named_parameters():
+                        total_p += 1
+                        if self.fim_masks[k].get(n, False):
+                            p.requires_grad = False
+                            total_f += 1
+                print(f"  FIM freeze: {total_f}/{total_p} bottom params frozen")
 
     @torch.no_grad()
     def _compute_protos(self, loader, replay_capacity=0, replay_seed=0):
