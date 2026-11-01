@@ -14,13 +14,15 @@ The spec is `docs/superpowers/specs/2026-11-01-3090-numerical-diagnosis.md`. Dia
 
 ### Task 1: Minimal diagnostic wrapper and meaningful checks
 
-- [ ] Add `test_frozen_ablation_fim_diagnosis.py`, testing that a within-tolerance perturbation that flips selection still fails, nonfinite/missing/mismatched shape/dtype reject, hash/provenance mismatches reject, and immutable fresh output/no-test protections are retained. Run before implementation and observe failure.
-- [ ] Add `frozen_ablation_fim_diagnosis.py`: capture via external wrapper around existing `smoke.value_hash`, using the tracked mean/quantile caller context; save tensor and actual output without changing computation. Run existing admission base. Verify new candidate matches old numerical evidence, exact full tensor hashes and expected8 quantile records. Replay mean on same raw inputs using reference GPU and recorded gates; reconstruct old mean/threshold hashes. Compare per-row values and exact selections/cumulative masks; write evidence and report with explicit two-task-only scope, never `admitted`.
-- [ ] Run new tests plus existing GPU admission tests on Linux. Review wrapper identity, no-test path, hash binding, tolerance/selection logic and immutable old evidence. Commit and publish code/spec before numerical execution.
+- [x] Add `test_frozen_ablation_fim_diagnosis.py`, testing that a within-tolerance perturbation that flips selection still fails, nonfinite/missing/mismatched shape/dtype reject, hash/provenance mismatches reject, and immutable fresh output/no-test protections are retained. Run before implementation and observe failure.
+- [x] Add `frozen_ablation_fim_diagnosis.py`: capture via external wrapper around existing `smoke.value_hash`, using the tracked mean/quantile caller context; save tensor and actual output without changing computation. Run existing admission base. Verify new candidate matches old numerical evidence, exact full tensor hashes and expected8 quantile records. Replay mean on same raw inputs using reference GPU and recorded gates; reconstruct old mean/threshold hashes. Compare per-row values and exact selections/cumulative masks; write evidence and report with explicit two-task-only scope, never `admitted`.
+- [x] Run new tests plus existing GPU admission tests on Linux. Review wrapper identity, no-test path, hash binding, tolerance/selection logic and immutable old evidence. Commit and publish code/spec before numerical execution.
 
 ### Task 2: Execute and preserve bounded diagnosis
 
-- [ ] Read only current scheduler/ledger/status; verify live identities. Seal spec/code SHA on NAS and GitHub before run.
-- [ ] Capture3090 once under its original resource gate; preserve failures and do not automatically retry.
-- [ ] Replay captured raw tensors on3080 GPU1 under gate; compare only after provenance reconstruction succeeds.
-- [ ] Preserve raw evidence, report SHA and independent review. Report actual conclusion and limitations; prepare next protocol only if diagnosis passes. Do not activate hardware or handoff this turn.
+- [x] Read only current scheduler/ledger/status; verify live identities. Seal spec/code SHA on NAS and GitHub before run.
+- [x] Capture3090 once under its original resource gate; preserve failures and do not automatically retry.
+- [x] Replay captured raw tensors on3080 GPU1 under gate; compare only after provenance reconstruction succeeds.
+- [x] Preserve raw evidence, report SHA and independent review. Report actual conclusion and limitations; prepare next protocol only if diagnosis passes. Do not activate hardware or handoff this turn.
+
+Execution note: 7e9014d failed before training because the parent omitted startup environment variables. Evidence was preserved; the user explicitly approved one new-directory retry using fixed launcher 914818f. That capture and replay completed, with independent CPU audit. No automatic retry or formal activation occurred.
