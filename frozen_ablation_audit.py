@@ -43,6 +43,31 @@ def verify_run_gate(run, gate):
     return sealed_hashes
 
 
+def verify_historical_source(run):
+    """Use only after the entire historical tree matches its pinned final audit.
+
+    NFS mount device numbers can change between sessions; all other file
+    identity fields and both result digest definitions remain binding.
+    """
+    import adaptive_consolidation_audit as producer
+    run = Path(run)
+    published = producer._safe_json(run / 'FORMAL_EVALUATION_PUBLISHED.json')
+    for name in ('results', 'checkpoint'):
+        expected = published[name]
+        path = (run / expected['path']).resolve()
+        if not path.is_relative_to(run.resolve()):
+            raise ValueError('historical artifact escaped anchored root')
+        actual = producer._formal_file_record(path, run)
+        if {k: v for k, v in actual.items() if k != 'device'} != {
+                k: v for k, v in expected.items() if k != 'device'}:
+            raise ValueError('historical artifact file identity changed')
+    results = producer._safe_json(run / 'results.json')
+    content_sha = hashlib.sha256(producer._strict_json(results).encode('utf-8')).hexdigest()
+    if content_sha != published['results_sha256']:
+        raise ValueError('historical result content changed')
+    return content_sha
+
+
 def party_kd_contribution_label(deltas):
     if set(deltas) != set(DATASETS):
         raise ValueError('PartyKD requires three dataset means')
@@ -182,7 +207,7 @@ def audit_metadata(manifest, digest):
                     'run/FORMAL_EVALUATION_PUBLISHED.json']):
             raise ValueError(f'original formal job changed: {key}')
         if source not in source_seals:
-            source_seals[source] = verify_formal_seal(source)
+            source_seals[source] = verify_historical_source(source)
         data_path = (Path(source_config['data_path']) / 'cifar-100-python/train'
                      if dataset == 'cifar100' else Path(source_config['vector_npz']))
         if (cached_sha(data_path) != DATA_SHA[dataset] or

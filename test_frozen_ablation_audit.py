@@ -1,11 +1,27 @@
 import unittest
 from fractions import Fraction
 
-from frozen_ablation_audit import party_kd_contribution_label, verify_run_gate
+from frozen_ablation_audit import party_kd_contribution_label, verify_run_gate, verify_historical_source
 import test_frozen_ablation_run as run_tests
 
 
 class AblationInterpretationTests(unittest.TestCase):
+    def test_historical_mount_device_change_preserves_content_binding(self):
+        import json
+        case = run_tests.AblationRunTests()
+        self.addCleanup(case.doCleanups)
+        fixture = case.producer_fixture()
+        path = fixture.run / 'FORMAL_EVALUATION_PUBLISHED.json'
+        published = json.loads(path.read_text())
+        for name in ('results', 'checkpoint'):
+            published[name]['device'] += 100
+        path.chmod(0o600)
+        path.write_text(json.dumps(published))
+        verify_historical_source(fixture.run)
+        fixture.results.write_text('{"changed":true}')
+        with self.assertRaises(ValueError):
+            verify_historical_source(fixture.run)
+
     def test_gate_binds_file_and_content_hashes_from_real_publication(self):
         case = run_tests.AblationRunTests()
         self.addCleanup(case.doCleanups)

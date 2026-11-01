@@ -2,7 +2,9 @@
 
 用户于 2026-11-01 明确授权修复、检查同类错误、检查其他服务器，并重新实验。本授权为旧协议“已访问测试不得重跑”的本次明确例外；旧批次保留失败状态，不改写成功标记，不复用其准确率进行选择。
 
-新结果根 `/brf/users/yangxx/VFCL-results/frozen-method-module-ablation-v2-20261101`。全部 18 项从头运行，两个臂、三个数据集、42/43/44、完整训练预算、数据、读数与 PartyKD 解释门槛沿用原协议。原生产 e2a559dc4945729848225cf21fdc95451762c231、FIM补丁 b13ac243d7b4acd3f6a512e4addc7122e4f4a38c 不变。
+最终新结果根 `/brf/users/yangxx/VFCL-results/frozen-method-module-ablation-v2r2-20261101`。首份v2根只生成过清单，在预启动来源核验中停止、从未启动作业，清单保留。全部 18 项从头运行，两个臂、三个数据集、42/43/44、完整训练预算、数据、读数与 PartyKD 解释门槛沿用原协议。原生产 e2a559dc4945729848225cf21fdc95451762c231、FIM补丁 b13ac243d7b4acd3f6a512e4addc7122e4f4a38c 不变。
+
+历史来源NFS文件设备号由60变65，核对文件摘要、inode、mtime等其他字段不变。历史来源先通过原独立最终treeSHA和ledger锚定，再校验发布结果/模型文件record除device外全部字段及canonical内容摘要；仅允许历史挂载device变化。新作业仍使用原位完整seal检查。
 
 修复审计哈希语义：明确区分 results.json 原始文件哈希和发布器 `_strict_json` 规范化内容哈希，分别验证；使用真实生产serializer及发布fixture覆盖格式差异、内容篡改、封印不一致、重复测试访问。逐字段检查checkpoint、transaction、evaluation、单次测试访问。新增完整合成发布到审计端到端预检，绝不访问真实测试集。
 

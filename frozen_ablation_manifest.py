@@ -13,7 +13,7 @@ from pathlib import PurePosixPath
 
 SOURCE_ROOT = Path('/brf/users/yangxx/VFCL-results/adaptive-sample-only-fourparty-v1-20261017')
 RESULT_ROOT = PurePosixPath(
-    '/brf/users/yangxx/VFCL-results/frozen-method-module-ablation-v2-20261101')
+    '/brf/users/yangxx/VFCL-results/frozen-method-module-ablation-v2r2-20261101')
 SMOKE_PRODUCER_COMMIT = 'af049e37e37fd2882bb8768913e55be96c0a50c3'
 BASE_COMMIT = 'e2a559dc4945729848225cf21fdc95451762c231'
 PATCH_COMMIT = 'b13ac243d7b4acd3f6a512e4addc7122e4f4a38c'
