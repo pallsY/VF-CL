@@ -193,6 +193,7 @@ class AblationRunTests(unittest.TestCase):
         published_path = fixture.run / 'FORMAL_EVALUATION_PUBLISHED.json'
         published = json.loads(published_path.read_text())
         published['results'] = producer._formal_file_record(fixture.results, fixture.run)
+        published_path.chmod(0o600)
         published_path.write_text(json.dumps(published))
         with self.assertRaisesRegex(ValueError, 'publication content or file record'):
             verify_formal_seal(fixture.run)
