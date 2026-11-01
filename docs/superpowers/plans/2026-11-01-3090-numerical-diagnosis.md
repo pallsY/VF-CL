@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-The spec is `docs/superpowers/specs/2026-11-02-3090-numerical-diagnosis.md`. Diagnostic atol=1e-12 and rtol=1e-6; selections exact. Never edit existing smoke/admission/training/queue files, formal manifests or outputs. Capture/replay only in fresh allowlisted admission directories. No real test loader or formal worker. Original rejection stays rejected.
+The spec is `docs/superpowers/specs/2026-11-01-3090-numerical-diagnosis.md`. Diagnostic atol=1e-12 and rtol=1e-6; selections exact. Never edit existing smoke/admission/training/queue files, formal manifests or outputs. Capture/replay only in fresh allowlisted admission directories. No real test loader or formal worker. Original rejection stays rejected.
 
 ### Task 1: Minimal diagnostic wrapper and meaningful checks
 
