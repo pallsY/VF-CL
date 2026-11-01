@@ -7,6 +7,7 @@ import json
 import math
 import re
 import statistics
+import subprocess
 from collections import defaultdict
 from fractions import Fraction
 from pathlib import Path
@@ -15,7 +16,8 @@ from frozen_ablation_manifest import (
     AUX_DATA_SHA, BASE_COMMIT, DATASETS, DATA_SHA, PATCH_COMMIT,
     RESULT_ROOT, SEEDS, SOURCE_ANCHOR_SHA, SOURCE_ROOT,
     auxiliary_data_paths, derive_config, expected_keys,
-    original_tree_sha256, semantic_diff,
+    original_tree_sha256, runtime_identity, semantic_diff,
+    validate_smoke_comparison, _bytes,
 )
 
 GPU_UUID = {
@@ -49,6 +51,49 @@ def audit_metadata(manifest, digest):
     rows = [json.loads(line) for line in manifest.read_text().splitlines()]
     if len(rows) != 18 or {row['job_key'] for row in rows} != expected_keys():
         raise ValueError('formal ablation matrix is incomplete')
+    evidence = manifest.parent / 'preflight'
+    preflight_path = evidence / 'PRELAUNCH_PREFLIGHT.json'
+    smoke_path = evidence / 'SMOKE_COMPARISON.json'
+    review_path = evidence / 'PATCH_REVIEW.json'
+    if any(not path.is_file() for path in
+           (preflight_path, smoke_path, review_path)):
+        raise ValueError('preflight evidence is missing from the sealed root')
+    preflight = json.loads(preflight_path.read_text())
+    review = json.loads(review_path.read_text())
+    comparison = json.loads(smoke_path.read_text())
+    validate_smoke_comparison(comparison)
+    from frozen_ablation_smoke import validate_smoke_records
+    validate_smoke_records(evidence / 'smokes', comparison)
+    row_hashes = {
+        name: {row.get(name) for row in rows}
+        for name in ('preflight_sha256', 'smoke_comparison_sha256',
+                     'patch_review_sha256', 'patch_diff_sha256')
+    }
+    if any(len(values) != 1 for values in row_hashes.values()):
+        raise ValueError('preflight hashes differ across manifest rows')
+    expected_diff = hashlib.sha256(subprocess.check_output([
+        'git', '-C', str(Path(__file__).parent), 'diff',
+        f'{BASE_COMMIT}..{PATCH_COMMIT}', '--',
+        'config.py', 'cl_methods/proto_evolve.py',
+    ])).hexdigest()
+    if (next(iter(row_hashes['preflight_sha256'])) != sha(preflight_path) or
+            next(iter(row_hashes['smoke_comparison_sha256'])) != sha(smoke_path) or
+            next(iter(row_hashes['patch_review_sha256'])) != sha(review_path) or
+            next(iter(row_hashes['patch_diff_sha256'])) != expected_diff or
+            preflight.get('status') != 'approved' or
+            preflight.get('schema_version') != 1 or
+            preflight.get('base_commit') != BASE_COMMIT or
+            preflight.get('patch_commit') != PATCH_COMMIT or
+            preflight.get('patch_diff_sha256') != expected_diff or
+            preflight.get('smoke_comparison_sha256') != sha(smoke_path) or
+            preflight.get('patch_review_sha256') != sha(review_path) or
+            preflight.get('reviewer_id') != review.get('reviewer_id') or
+            review.get('verdict') != 'approved' or
+            review.get('base_commit') != BASE_COMMIT or
+            review.get('patch_commit') != PATCH_COMMIT or
+            review.get('patch_diff_sha256') != expected_diff or
+            review.get('blocking_findings') != []):
+        raise ValueError('preflight evidence does not bind the approved smoke and FIM patch')
     queue = json.loads((root / 'QUEUE_COMPLETE.json').read_text())
     ledger_path = root / 'ATTEMPTS.jsonl'
     if (queue.get('status') != 'complete' or
@@ -102,12 +147,21 @@ def audit_metadata(manifest, digest):
         source = SOURCE_ROOT / 'full' / dataset / 'adaptive' / str(seed) / 'run'
         source_config_path = source / 'config.json'
         source_config = json.loads(source_config_path.read_text())
+        original_success = json.loads(
+            (source.parent / 'JOB_SUCCESS.json').read_text())
+        formal_runtime = original_success.get('runtime')
         old_key = f'{dataset}/adaptive/{seed}'
         if source.parent not in tree_cache:
             tree_cache[source.parent] = original_tree_sha256(source.parent)
         if (row.get('original_tree_sha256') != original_trees.get(old_key) or
                 tree_cache[source.parent] != row['original_tree_sha256']):
             raise ValueError(f'original formal tree changed: {key}')
+        if (not isinstance(formal_runtime, dict) or
+                row.get('runtime') != formal_runtime or
+                row.get('runtime_sha256') != hashlib.sha256(
+                    _bytes(formal_runtime)).hexdigest() or
+                runtime_identity() != formal_runtime):
+            raise ValueError(f'formal training runtime differs: {key}')
         original_published = source / 'FORMAL_EVALUATION_PUBLISHED.json'
         if (cached_sha(source_config_path) != row['source_config_sha256'] or
                 cached_sha(original_published) != old_attest[old_key]['file_sha256'][
@@ -164,6 +218,11 @@ def audit_metadata(manifest, digest):
                 gate.get('config_sha256') != row['config_sha256'] or
                 gate.get('training_code_commit') != code):
             raise ValueError(f'formal ablation gate differs: {key}')
+        runtime_path = run / 'JOB_RUNTIME.json'
+        if (not runtime_path.is_file() or
+                json.loads(runtime_path.read_text()).get('runtime') !=
+                formal_runtime or gate.get('runtime') != formal_runtime):
+            raise ValueError(f'ablation runtime identity differs: {key}')
         expected_files = {
             'results_sha256': run / 'results.json',
             'checkpoint_sha256': run / 'checkpoints/formal_final.pt',

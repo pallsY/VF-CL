@@ -19,7 +19,9 @@ from types import SimpleNamespace
 from frozen_ablation_manifest import (
     AUX_DATA_SHA, BASE_COMMIT, DATA_SHA, PATCH_COMMIT, RESULT_ROOT, SOURCE_ROOT,
     SOURCE_ANCHOR_SHA,
-    _sha, auxiliary_data_paths, derive_config, expected_keys, semantic_diff,
+    _sha, auxiliary_data_paths, derive_config, expected_keys,
+    patch_diff_sha256, runtime_identity, semantic_diff,
+    validate_smoke_comparison, _bytes,
 )
 
 GPU_UUID = {
@@ -116,6 +118,63 @@ def code_identity(path, expected):
     return path
 
 
+def verify_preflight(manifest, rows):
+    manifest = Path(manifest).resolve()
+    evidence = manifest.parent / 'preflight'
+    record_path = evidence / 'PRELAUNCH_PREFLIGHT.json'
+    smoke_path = evidence / 'SMOKE_COMPARISON.json'
+    review_path = evidence / 'PATCH_REVIEW.json'
+    if any(not path.is_file() for path in (record_path, smoke_path, review_path)):
+        raise ValueError('preflight evidence is missing')
+    values = {name: {row.get(name) for row in rows} for name in (
+        'preflight_sha256', 'smoke_comparison_sha256',
+        'patch_review_sha256', 'patch_diff_sha256')}
+    if any(len(value) != 1 for value in values.values()):
+        raise ValueError('preflight identity differs across manifest rows')
+    record = json.loads(record_path.read_text())
+    review = json.loads(review_path.read_text())
+    comparison = json.loads(smoke_path.read_text())
+    validate_smoke_comparison(comparison)
+    from frozen_ablation_smoke import validate_smoke_records
+    validate_smoke_records(evidence / 'smokes', comparison)
+    preflight_sha = next(iter(values['preflight_sha256']))
+    smoke_sha = next(iter(values['smoke_comparison_sha256']))
+    review_sha = next(iter(values['patch_review_sha256']))
+    diff_sha = next(iter(values['patch_diff_sha256']))
+    if (preflight_sha != _sha(record_path) or
+            smoke_sha != _sha(smoke_path) or
+            review_sha != _sha(review_path) or
+            diff_sha != patch_diff_sha256() or
+            record.get('status') != 'approved' or
+            record.get('schema_version') != 1 or
+            record.get('reviewer_id') != review.get('reviewer_id') or
+            record.get('base_commit') != BASE_COMMIT or
+            record.get('patch_commit') != PATCH_COMMIT or
+            record.get('patch_diff_sha256') != diff_sha or
+            record.get('smoke_comparison_sha256') != smoke_sha or
+            record.get('patch_review_sha256') != review_sha or
+            review.get('verdict') != 'approved' or
+            review.get('base_commit') != BASE_COMMIT or
+            review.get('patch_commit') != PATCH_COMMIT or
+            review.get('patch_diff_sha256') != diff_sha or
+            review.get('blocking_findings') != []):
+        raise ValueError('preflight evidence does not match the frozen code and manifest')
+    return record
+
+
+def fail_stop_peers(active, failed_index, stop):
+    stop.set()
+    signaled = False
+    for lane_index, process in active.items():
+        if lane_index != failed_index and process.poll() is None:
+            try:
+                os.killpg(process.pid, signal.SIGTERM)
+                signaled = True
+            except ProcessLookupError:
+                pass
+    return signaled
+
+
 def load_jobs(manifest, digest, code_roots):
     manifest = Path(manifest).resolve()
     if (_sha(manifest) != digest or
@@ -124,12 +183,14 @@ def load_jobs(manifest, digest, code_roots):
     rows = [json.loads(line) for line in manifest.read_text().splitlines()]
     if len(rows) != 18 or {row.get('job_key') for row in rows} != expected_keys():
         raise ValueError('formal ablation allowlist is incomplete or duplicated')
+    verify_preflight(manifest, rows)
     code_identity(Path(__file__).resolve().parent,
                   rows[0]['orchestration_commit'])
     if _sha(SOURCE_ROOT / 'audit/ADAPTIVE_SAMPLE_ONLY_FINAL_ANCHOR.json') != SOURCE_ANCHOR_SHA:
         raise ValueError('original formal anchor changed after manifest generation')
     jobs = []
     data_cache = {}
+    current_runtime = runtime_identity()
     for row in rows:
         dataset, arm, seed_text = row['job_key'].split('/')
         seed = int(seed_text)
@@ -148,6 +209,14 @@ def load_jobs(manifest, digest, code_roots):
         if _sha(source_path) != row['source_config_sha256']:
             raise ValueError('original formal source config changed')
         source = json.loads(source_path.read_text())
+        original_success = json.loads(
+            (source_path.parent.parent / 'JOB_SUCCESS.json').read_text())
+        formal_runtime = original_success.get('runtime')
+        runtime_sha = hashlib.sha256(_bytes(formal_runtime)).hexdigest()
+        if (row.get('runtime') != formal_runtime or
+                row.get('runtime_sha256') != runtime_sha or
+                current_runtime != formal_runtime):
+            raise ValueError('training runtime differs from original formal job')
         data_path = (Path(source['data_path']) / 'cifar-100-python/train'
                      if dataset == 'cifar100' else Path(source['vector_npz']))
         if data_path not in data_cache:
@@ -205,6 +274,7 @@ def worker(manifest, digest, key, code_root, code_roots):
         'job_key': key, 'attempt': 1, 'manifest_sha256': digest,
         'config_sha256': row['config_sha256'],
         'training_code_commit': row['code_commit'],
+        'runtime': runtime_identity(),
     })
     sys.path.insert(0, str(Path(code_root).resolve()))
     from config import (validate_adaptive_head_consolidation,
@@ -222,6 +292,7 @@ def worker(manifest, digest, key, code_root, code_roots):
         'status': 'success', 'job_key': key, 'attempt': 1,
         'manifest_sha256': digest, 'config_sha256': row['config_sha256'],
         'training_code_commit': row['code_commit'], **sealed,
+        'runtime': runtime_identity(),
     })
 
 
@@ -241,17 +312,25 @@ def run_queue(manifest, digest, code_roots):
     })
     with (root / 'ATTEMPTS.jsonl').open('x', encoding='utf-8'):
         pass
-    mutex, stop = threading.Lock(), threading.Event()
+    mutex, stop, settling = (threading.Lock(), threading.Event(),
+                             threading.Event())
+    settlement_lock = threading.Lock()
+    settling_lanes = set()
     outcomes, active = {}, {}
 
+    def begin_settlement(lane_index):
+        with settlement_lock:
+            settling_lanes.add(lane_index)
+            settling.set()
+
+    def end_settlement(lane_index):
+        with settlement_lock:
+            settling_lanes.discard(lane_index)
+            if not settling_lanes:
+                settling.clear()
+
     def stop_active(except_index=None):
-        stop.set()
-        for lane_index, process in active.items():
-            if lane_index != except_index and process.poll() is None:
-                try:
-                    os.killpg(process.pid, signal.SIGTERM)
-                except ProcessLookupError:
-                    pass
+        fail_stop_peers(active, except_index, stop)
 
     def append_unlocked(value):
         with (root / 'ATTEMPTS.jsonl').open('a', encoding='utf-8') as stream:
@@ -285,68 +364,106 @@ def run_queue(manifest, digest, code_roots):
                        '--base-code', str(code_roots['no_partykd']),
                        '--patch-code', str(code_roots['fim_off']),
                        '--code-root', str(code_roots[row['arm']])]
-            with mutex:
-                if stop.is_set():
-                    return
-                if not gpu_eligible(gpu_snapshot(index), index):
-                    raise RuntimeError('GPU headroom disappeared at launch')
-                job_root.mkdir(parents=True, exist_ok=False)
-                write_once(job_root / 'attempt-01.plan.json',
-                           {'job_key': key, 'attempt': 1})
-                append_unlocked({'kind': 'start', 'job_key': key, 'attempt': 1,
-                                 'config_sha256': row['config_sha256'],
-                                 'code_commit': row['code_commit'],
-                                 'gpu_index': index, 'gpu_uuid': GPU_UUID[index],
-                                 'time_utc': now()})
-                try:
-                    with log.open('x', encoding='utf-8') as stream:
-                        process = subprocess.Popen(
-                            command, cwd=code_roots[row['arm']], env=env,
-                            stdout=stream, stderr=subprocess.STDOUT,
-                            start_new_session=True)
-                        active[index] = process
-                except Exception as exc:
-                    outcomes[key] = 'infrastructure_candidate'
-                    stop_active(except_index=index)
-                    append_unlocked({'kind': 'finish', 'job_key': key,
-                                     'attempt': 1,
-                                     'classification': 'infrastructure_candidate',
-                                     'returncode': None,
-                                     'log_sha256': _sha(log) if log.is_file() else None,
-                                     'job_success_sha256': None,
-                                     'test_accessed': False,
-                                     'launch_error': str(exc),
-                                     'time_utc': now()})
-                    return
+            while True:
+                waiting_for_settlement = False
+                with mutex:
+                    if stop.is_set():
+                        return
+                    for active_lane, active_process in active.items():
+                        if active_process.poll() is not None:
+                            begin_settlement(active_lane)
+                    if settling.is_set():
+                        waiting_for_settlement = True
+                    else:
+                        snapshot = gpu_snapshot(index)
+                        if stop.is_set() or settling.is_set():
+                            waiting_for_settlement = True
+                        elif not gpu_eligible(snapshot, index):
+                            raise RuntimeError('GPU headroom disappeared at launch')
+                        else:
+                            job_root.mkdir(parents=True, exist_ok=False)
+                            write_once(job_root / 'attempt-01.plan.json',
+                                       {'job_key': key, 'attempt': 1})
+                            append_unlocked({'kind': 'start', 'job_key': key,
+                                             'attempt': 1,
+                                             'config_sha256': row['config_sha256'],
+                                             'code_commit': row['code_commit'],
+                                             'gpu_index': index,
+                                             'gpu_uuid': GPU_UUID[index],
+                                             'time_utc': now()})
+                            try:
+                                with log.open('x', encoding='utf-8') as stream:
+                                    process = subprocess.Popen(
+                                        command, cwd=code_roots[row['arm']],
+                                        env=env, stdout=stream,
+                                        stderr=subprocess.STDOUT,
+                                        start_new_session=True)
+                                    active[index] = process
+                            except Exception as exc:
+                                outcomes[key] = 'infrastructure_candidate'
+                                stop_active(except_index=index)
+                                append_unlocked({
+                                    'kind': 'finish', 'job_key': key,
+                                    'attempt': 1,
+                                    'classification': 'infrastructure_candidate',
+                                    'returncode': None,
+                                    'log_sha256': _sha(log) if log.is_file() else None,
+                                    'job_success_sha256': None,
+                                    'test_accessed': False,
+                                    'launch_error': str(exc),
+                                    'time_utc': now(),
+                                })
+                                return
+                if not waiting_for_settlement:
+                    break
+                stop.wait(0.05)
             process.wait()
-            with mutex:
-                active.pop(index, None)
-            gate = job_root / 'attempt-01/JOB_SUCCESS.json'
-            log_text = log.read_text(encoding='utf-8', errors='replace')
-            freeze_count = (len(re.findall(r'FIM applied freeze: 0/\d+ bottom elements '
-                                           r'\(fraction=0\.000000\)', log_text))
-                            if row['arm'] == 'fim_off' else None)
-            if (process.returncode == 0 and gate.is_file() and
-                    (freeze_count is None or freeze_count == config['num_tasks'])):
-                classification = 'success'
-            elif stop.is_set() and process.returncode != 0:
-                classification = 'cancelled_by_peer_failure'
-            elif 'out of memory' in log_text.lower() or process.returncode in (-9, 137):
-                classification = 'infrastructure_candidate'
-            else:
-                classification = 'training_or_audit_failure'
-            with mutex:
-                outcomes[key] = classification
-                if classification != 'success':
+            begin_settlement(index)
+            try:
+                stopped_before_exit = stop.is_set()
+                gate = job_root / 'attempt-01/JOB_SUCCESS.json'
+                if process.returncode != 0 or not gate.is_file():
+                    stop.set()
+                with mutex:
+                    active.pop(index, None)
+                    if stop.is_set():
+                        fail_stop_peers(active, index, stop)
+                log_text = log.read_text(encoding='utf-8', errors='replace')
+                freeze_count = (len(re.findall(
+                    r'FIM applied freeze: 0/\d+ bottom elements '
+                    r'\(fraction=0\.000000\)', log_text))
+                    if row['arm'] == 'fim_off' else None)
+                if (process.returncode == 0 and gate.is_file() and
+                        (freeze_count is None or
+                         freeze_count == config['num_tasks'])):
+                    classification = 'success'
+                elif stopped_before_exit and process.returncode != 0:
+                    classification = 'cancelled_by_peer_failure'
+                elif ('out of memory' in log_text.lower() or
+                      process.returncode in (-9, 137)):
+                    classification = 'infrastructure_candidate'
+                else:
+                    classification = 'training_or_audit_failure'
+                with mutex:
+                    outcomes[key] = classification
+                    if classification != 'success':
+                        stop_active(except_index=index)
+                append({'kind': 'finish', 'job_key': key, 'attempt': 1,
+                        'classification': classification,
+                        'returncode': process.returncode,
+                        'log_sha256': _sha(log),
+                        'job_success_sha256': (
+                            _sha(gate) if classification == 'success' else None),
+                        'test_accessed': (job_root /
+                            'attempt-01/formal_access/test.consumed.json').exists(),
+                        'fim_zero_freeze_logs': freeze_count,
+                        'time_utc': now()})
+            except BaseException:
+                with mutex:
                     stop_active(except_index=index)
-            append({'kind': 'finish', 'job_key': key, 'attempt': 1,
-                    'classification': classification,
-                    'returncode': process.returncode,
-                    'log_sha256': _sha(log),
-                    'job_success_sha256': _sha(gate) if classification == 'success' else None,
-                    'test_accessed': (job_root / 'attempt-01/formal_access/test.consumed.json').exists(),
-                    'fim_zero_freeze_logs': freeze_count,
-                    'time_utc': now()})
+                raise
+            finally:
+                end_settlement(index)
             if classification != 'success':
                 return
 

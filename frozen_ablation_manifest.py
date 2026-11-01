@@ -3,7 +3,9 @@
 import argparse
 import hashlib
 import json
+import platform
 import shutil
+import socket
 import subprocess
 from pathlib import Path
 from pathlib import PurePosixPath
@@ -36,6 +38,15 @@ SEEDS = (42, 43, 44)
 ARMS = ('no_partykd', 'fim_off')
 EPOCHS = {'cifar100': 50, 'isolet': 50, 'upmc_food101': 20}
 RUNTIME_FIELDS = frozenset(('output_dir', 'results_dir', 'exp_name'))
+PREFLIGHT_FLAGS = {
+    'default_on_bitwise': True,
+    'off_task0_identical': True,
+    'sample_order_identical_all_tasks': True,
+    'fim_tensor_values_compared': True,
+    'off_task1_model_diverged': True,
+    'off_applied_freeze_fraction': 0,
+    'test_accessed': False,
+}
 
 
 def expected_keys():
@@ -93,6 +104,104 @@ def _sha(path):
     return digest.hexdigest()
 
 
+def patch_diff_sha256():
+    diff = subprocess.check_output([
+        'git', '-C', str(Path(__file__).parent), 'diff',
+        f'{BASE_COMMIT}..{PATCH_COMMIT}', '--',
+        'config.py', 'cl_methods/proto_evolve.py',
+    ])
+    return hashlib.sha256(diff).hexdigest()
+
+
+def validate_smoke_comparison(comparison):
+    if not isinstance(comparison, dict) or set(comparison) != set(DATASETS):
+        raise ValueError('preflight smoke comparison must cover all datasets')
+    for dataset, report in comparison.items():
+        if not isinstance(report, dict) or any(
+                report.get(field) != value
+                for field, value in PREFLIGHT_FLAGS.items()):
+            raise ValueError(f'preflight smoke did not pass for {dataset}')
+        for field in ('raw_smoke_sha256', 'raw_config_sha256',
+                      'raw_no_test_sha256'):
+            hashes = report.get(field)
+            if (not isinstance(hashes, dict) or
+                    set(hashes) != {'base', 'default_on', 'off'} or
+                    any(not isinstance(value, str) or len(value) != 64
+                        for value in hashes.values())):
+                raise ValueError(f'preflight raw smoke hashes are missing: {dataset}')
+        if (not isinstance(report.get('orchestration_commit'), str) or
+                len(report['orchestration_commit']) != 40 or
+                not isinstance(report.get('smoke_script_sha256'), str) or
+                len(report['smoke_script_sha256']) != 64):
+            raise ValueError(f'preflight smoke code identity is missing: {dataset}')
+
+
+def _pretty_bytes(value):
+    return (json.dumps(value, sort_keys=True, indent=2, allow_nan=False) +
+            '\n').encode('utf-8')
+
+
+def runtime_identity():
+    import numpy as np
+    import PIL
+    import sklearn
+    import torch
+    import torchvision
+    return {
+        'cuda_runtime': torch.version.cuda,
+        'host': socket.gethostname(),
+        'numpy': np.__version__,
+        'pillow': PIL.__version__,
+        'python': platform.python_version(),
+        'scikit_learn': sklearn.__version__,
+        'torch': torch.__version__,
+        'torchvision': torchvision.__version__,
+    }
+
+
+def load_preflight(smoke_path, smoke_root, review_path):
+    smoke_bytes = Path(smoke_path).read_bytes()
+    review_bytes = Path(review_path).read_bytes()
+    comparison = json.loads(smoke_bytes)
+    review = json.loads(review_bytes)
+    validate_smoke_comparison(comparison)
+    from frozen_ablation_smoke import validate_smoke_records
+    validate_smoke_records(smoke_root, comparison)
+    expected_diff = patch_diff_sha256()
+    if (review.get('verdict') != 'approved' or
+            not isinstance(review.get('reviewer_id'), str) or
+            not review['reviewer_id'].strip() or
+            review.get('base_commit') != BASE_COMMIT or
+            review.get('patch_commit') != PATCH_COMMIT or
+            review.get('patch_diff_sha256') != expected_diff or
+            review.get('blocking_findings') != []):
+        raise ValueError('independent patch review is absent or does not approve this diff')
+    record = {
+        'schema_version': 1,
+        'status': 'approved',
+        'reviewer_id': review['reviewer_id'],
+        'base_commit': BASE_COMMIT,
+        'patch_commit': PATCH_COMMIT,
+        'patch_diff_sha256': expected_diff,
+        'smoke_comparison_sha256': hashlib.sha256(smoke_bytes).hexdigest(),
+        'patch_review_sha256': hashlib.sha256(review_bytes).hexdigest(),
+    }
+    preflight_bytes = _pretty_bytes(record)
+    record['preflight_sha256'] = hashlib.sha256(preflight_bytes).hexdigest()
+    smoke_root = Path(smoke_root)
+    smoke_files = {}
+    for dataset in DATASETS:
+        for mode in ('base', 'default_on', 'off'):
+            for name in ('SMOKE_RESULT.json', 'SMOKE_CONFIG.json',
+                         'NO_TEST_ACCESS.json'):
+                relative = Path('smokes') / dataset / mode / name
+                smoke_files[relative] = (
+                    smoke_root / dataset / mode / name).read_bytes()
+    return {'record': record, 'preflight_bytes': preflight_bytes,
+            'smoke_bytes': smoke_bytes, 'review_bytes': review_bytes,
+            'smoke_files': smoke_files}
+
+
 def original_tree_sha256(root):
     root = Path(root)
     if not root.is_dir() or root.is_symlink():
@@ -117,7 +226,7 @@ def auxiliary_data_paths(source, dataset):
     return {'metadata': base.with_suffix('.metadata.json')}
 
 
-def manifest_entries():
+def manifest_entries(preflight):
     orchestration_commit = subprocess.check_output(
         ['git', '-C', str(Path(__file__).parent), 'rev-parse', 'HEAD'],
         text=True).strip()
@@ -135,6 +244,7 @@ def manifest_entries():
     final_gate = json.loads(gate_path.read_text(encoding='utf-8'))
     data_cache, tree_cache = {}, {}
     entries = []
+    current_runtime = runtime_identity()
     uuids = {0: 'GPU-6c7fee92-a6fe-5525-c554-bddb8e14943f',
              1: 'GPU-6569e526-43ea-74e1-264e-4b66417181e1'}
     for key in sorted(expected_keys()):
@@ -150,6 +260,10 @@ def manifest_entries():
         if final_gate['original_tree_sha256'].get(old_key) != tree_sha:
             raise ValueError(f'original formal job tree changed: {old_key}')
         source = json.loads(source_path.read_text(encoding='utf-8'))
+        original_success = json.loads((source_job / 'JOB_SUCCESS.json').read_text())
+        formal_runtime = original_success.get('runtime')
+        if not isinstance(formal_runtime, dict) or current_runtime != formal_runtime:
+            raise ValueError(f'current runtime differs from original formal run: {key}')
         if (source.get('output_dir') != str(source_path.parent) or
                 source.get('results_dir') != str(source_path.parent.parent) or
                 source.get('exp_name') != 'run'):
@@ -180,11 +294,18 @@ def manifest_entries():
             'source_formal_anchor_sha256': SOURCE_ANCHOR_SHA,
             'source_config_sha256': _sha(source_path),
             'original_tree_sha256': tree_sha,
+            'runtime': formal_runtime,
+            'runtime_sha256': hashlib.sha256(_bytes(formal_runtime)).hexdigest(),
             'source_data_sha256': data_cache[data],
             'auxiliary_data_sha256': AUX_DATA_SHA[dataset],
             'config_relpath': config_relpath,
             'config_sha256': hashlib.sha256(_bytes(config)).hexdigest(),
             'config_semantic_diff': semantic_diff(source, config),
+            'preflight_sha256': preflight['record']['preflight_sha256'],
+            'smoke_comparison_sha256': preflight['record'][
+                'smoke_comparison_sha256'],
+            'patch_review_sha256': preflight['record']['patch_review_sha256'],
+            'patch_diff_sha256': preflight['record']['patch_diff_sha256'],
         }
         entries.append((row, config))
     if len(entries) != 18:
@@ -192,7 +313,7 @@ def manifest_entries():
     return entries
 
 
-def write_manifest(entries):
+def write_manifest(entries, preflight):
     root = Path(RESULT_ROOT)
     if root.exists():
         raise FileExistsError('ablation result root already exists')
@@ -200,6 +321,19 @@ def write_manifest(entries):
         raise RuntimeError('formal ablation needs at least 40 GiB free before manifest write')
     manifest_dir = root / 'manifests'
     manifest_dir.mkdir(parents=True, exist_ok=False)
+    evidence_dir = manifest_dir / 'preflight'
+    evidence_dir.mkdir()
+    for name, data in (
+            ('PRELAUNCH_PREFLIGHT.json', preflight['preflight_bytes']),
+            ('SMOKE_COMPARISON.json', preflight['smoke_bytes']),
+            ('PATCH_REVIEW.json', preflight['review_bytes'])):
+        with (evidence_dir / name).open('xb') as stream:
+            stream.write(data)
+    for relative, data in preflight['smoke_files'].items():
+        path = evidence_dir / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open('xb') as stream:
+            stream.write(data)
     for row, config in entries:
         path = manifest_dir / row['config_relpath']
         path.parent.mkdir(exist_ok=True)
@@ -219,6 +353,9 @@ def write_manifest(entries):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--write', action='store_true')
+    parser.add_argument('--smoke-comparison', type=Path, required=True)
+    parser.add_argument('--smoke-root', type=Path, required=True)
+    parser.add_argument('--patch-review', type=Path, required=True)
     args = parser.parse_args()
     commit = subprocess.check_output(
         ['git', '-C', str(Path(__file__).parent), 'rev-parse', 'HEAD'],
@@ -228,12 +365,14 @@ def main():
         text=True).strip()
     if status:
         raise ValueError('manifest generator checkout is not clean')
-    entries = manifest_entries()
+    preflight = load_preflight(args.smoke_comparison, args.smoke_root,
+                               args.patch_review)
+    entries = manifest_entries(preflight)
     payload = b''.join(_bytes(row) for row, _ in entries)
     preview = {'jobs': len(entries), 'manifest_sha256': hashlib.sha256(payload).hexdigest(),
                'orchestration_commit': commit, 'written': False}
     if args.write:
-        if write_manifest(entries) != preview['manifest_sha256']:
+        if write_manifest(entries, preflight) != preview['manifest_sha256']:
             raise AssertionError('written manifest differs from dry run')
         preview['written'] = True
     print(json.dumps(preview, sort_keys=True))

@@ -25,14 +25,14 @@
 - [ ] Write focused failing tests for default-on equality, off-mode zero applied freezes after identical FIM/mask computation, and invalid switch values.
 - [ ] Add a default-on integer argument `fim_apply_mask=1`; branch only where prior FIM masks set bottom `requires_grad=False`. Print actual frozen parameter count/fraction for off mode while preserving legacy default logging and method state.
 - [ ] Run the new tests and existing ProtoEvolve/FIM tests, compile, check the complete diff against e2a559dc…, commit.
-- [ ] On server, run matched two-task no-test smoke for all three datasets at one fixed seed under source and patched-default-on commits. Compare task 0/1 model, memory, FIM masks, losses, gradients and RNG bytewise; verify off mode computes the same task-0 FIM and freezes zero applied parameters. Record hashes and paths before 18 jobs.
+- [ ] On server, run matched two-task no-test smoke for all three datasets at one fixed seed under source and patched-default-on commits. Record exact per-task sampler epoch indices; compare full per-parameter FIM tensor bytes as well as model, memory, FIM masks, losses, gradients and RNG bytewise. Verify FIM-off matches base at task 0, applies zero freezes, and diverges in task-1 model updates. Save the comparison; do not depend on the first-access data-flow audit file as sample-order evidence.
 
 ### Task 2: Exact manifest and config differences
 
 **Files:** `frozen_ablation_manifest.py`, `test_frozen_ablation_manifest.py`.
 
 - [ ] Write tests for the exact 18-key matrix; no-PartyKD's three allowed semantic changes; FIM-off's one added switch; path-only differences; source config and data SHA checks; and duplicate/extra job rejection.
-- [ ] Build the two arm configs from each original `full/<dataset>/adaptive/<seed>/run/config.json`; retain every source value except the enumerated arm changes and new output path/name. Bind each row to the producer commit (no-PartyKD) or audited patch commit (FIM-off), source config SHA, data SHA, result path and physical GPU UUID.
+- [ ] Build the two arm configs from each original `full/<dataset>/adaptive/<seed>/run/config.json`; retain every source value except the enumerated arm changes and new output path/name. Require the passing smoke comparison plus independent approved patch-diff review before writing the manifest. Bind every row to all preflight hashes, the producer commit (no-PartyKD) or audited patch commit (FIM-off), original `JOB_SUCCESS.runtime`, source config SHA, data SHA, result path and physical GPU UUID. Copy and revalidate the nine raw smoke result/config/no-test records. Manifest, queue, worker and audit all reject a runtime identity mismatch.
 - [ ] Generate the new manifest once after preflight, hash exact bytes, independently review, and anchor on NAS plus GitHub before training.
 
 ### Task 3: Fail-stop execution

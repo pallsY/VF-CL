@@ -7,10 +7,90 @@ from types import SimpleNamespace
 from unittest import mock
 
 import frozen_ablation_run as queue
-from frozen_ablation_run import gpu_eligible, verify_formal_seal
+from frozen_ablation_manifest import (BASE_COMMIT, DATASETS, PATCH_COMMIT,
+                                       _pretty_bytes, patch_diff_sha256)
+from frozen_ablation_run import (gpu_eligible, verify_formal_seal,
+                                 verify_preflight, fail_stop_peers)
 
 
 class AblationRunTests(unittest.TestCase):
+    def test_nonzero_exit_immediately_stops_peer_process_group(self):
+        stop = __import__('threading').Event()
+        class Process:
+            pid = 12345
+            def poll(self):
+                return None
+        with mock.patch('frozen_ablation_run.os.killpg', create=True) as killpg:
+            self.assertTrue(fail_stop_peers({1: Process()}, 0, stop))
+        self.assertTrue(stop.is_set())
+        killpg.assert_called_once_with(12345, queue.signal.SIGTERM)
+
+    def test_queue_preflight_requires_smoke_and_review_artifacts(self):
+        with tempfile.TemporaryDirectory() as directory:
+            manifest = Path(directory) / 'manifests/manifest.jsonl'
+            manifest.parent.mkdir()
+            with self.assertRaisesRegex(ValueError, 'preflight'):
+                verify_preflight(manifest, [{'preflight_sha256': 'a' * 64}])
+
+    def test_queue_preflight_accepts_only_hash_bound_smoke_and_review(self):
+        with tempfile.TemporaryDirectory() as directory:
+            manifest = Path(directory) / 'manifests/manifest.jsonl'
+            evidence = manifest.parent / 'preflight'
+            evidence.mkdir(parents=True)
+            report = {
+                'default_on_bitwise': True,
+                'off_task0_identical': True,
+                'sample_order_identical_all_tasks': True,
+                'fim_tensor_values_compared': True,
+                'off_task1_model_diverged': True,
+                'off_applied_freeze_fraction': 0,
+                'test_accessed': False,
+                'orchestration_commit': 'a' * 40,
+                'smoke_script_sha256': 'b' * 64,
+                'raw_smoke_sha256': {mode: 'c' * 64 for mode in
+                                     ('base', 'default_on', 'off')},
+                'raw_config_sha256': {mode: 'd' * 64 for mode in
+                                      ('base', 'default_on', 'off')},
+                'raw_no_test_sha256': {mode: 'e' * 64 for mode in
+                                       ('base', 'default_on', 'off')},
+            }
+            smoke_bytes = _pretty_bytes({dataset: report for dataset in DATASETS})
+            smoke_path = evidence / 'SMOKE_COMPARISON.json'
+            smoke_path.write_bytes(smoke_bytes)
+            diff_sha = patch_diff_sha256()
+            review = {'reviewer_id': 'independent-reviewer',
+                      'verdict': 'approved', 'base_commit': BASE_COMMIT,
+                      'patch_commit': PATCH_COMMIT,
+                      'patch_diff_sha256': diff_sha,
+                      'blocking_findings': []}
+            review_bytes = _pretty_bytes(review)
+            review_path = evidence / 'PATCH_REVIEW.json'
+            review_path.write_bytes(review_bytes)
+            record = {'schema_version': 1, 'status': 'approved',
+                      'reviewer_id': review['reviewer_id'],
+                      'base_commit': BASE_COMMIT,
+                      'patch_commit': PATCH_COMMIT,
+                      'patch_diff_sha256': diff_sha,
+                      'smoke_comparison_sha256': hashlib.sha256(
+                          smoke_bytes).hexdigest(),
+                      'patch_review_sha256': hashlib.sha256(
+                          review_bytes).hexdigest()}
+            record_bytes = _pretty_bytes(record)
+            (evidence / 'PRELAUNCH_PREFLIGHT.json').write_bytes(record_bytes)
+            row = {
+                'preflight_sha256': hashlib.sha256(record_bytes).hexdigest(),
+                'smoke_comparison_sha256': hashlib.sha256(smoke_bytes).hexdigest(),
+                'patch_review_sha256': hashlib.sha256(review_bytes).hexdigest(),
+                'patch_diff_sha256': diff_sha,
+            }
+            with mock.patch('frozen_ablation_smoke.validate_smoke_records'):
+                self.assertEqual(verify_preflight(manifest, [row])['status'],
+                                 'approved')
+            smoke_path.write_bytes(smoke_bytes + b' ')
+            with mock.patch('frozen_ablation_smoke.validate_smoke_records'):
+                with self.assertRaisesRegex(ValueError, 'preflight'):
+                    verify_preflight(manifest, [row])
+
     def test_gpu_admission_requires_correct_physical_card_and_headroom(self):
         good = {'index': 0,
                 'uuid': 'GPU-6c7fee92-a6fe-5525-c554-bddb8e14943f',

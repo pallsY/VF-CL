@@ -1,10 +1,29 @@
 import unittest
 from pathlib import Path
 
-from frozen_ablation_smoke import smoke_config
+from frozen_ablation_smoke import (sample_order_sha256,
+                                   validate_sample_orders, smoke_config)
 
 
 class SmokeConfigTests(unittest.TestCase):
+    def test_sample_order_digest_changes_when_epoch_order_changes(self):
+        first = [{'loader_key': "('train', (0, 1))",
+                  'epoch_orders': [[3, 1, 2]]}]
+        second = [{'loader_key': "('train', (0, 1))",
+                   'epoch_orders': [[1, 3, 2]]}]
+        self.assertNotEqual(sample_order_sha256(first),
+                            sample_order_sha256(second))
+
+    def test_comparison_rejects_unrecorded_or_different_sample_orders(self):
+        base = {'states': [{'task': 0, 'sample_order_sha256': 'a'},
+                           {'task': 1, 'sample_order_sha256': 'b'}]}
+        default = {'states': [{'task': 0, 'sample_order_sha256': 'a'},
+                              {'task': 1, 'sample_order_sha256': 'b'}]}
+        off = {'states': [{'task': 0, 'sample_order_sha256': 'a'},
+                          {'task': 1, 'sample_order_sha256': 'c'}]}
+        with self.assertRaisesRegex(ValueError, 'sample order'):
+            validate_sample_orders(base, default, off)
+
     def test_two_task_cpu_smoke_preserves_source_and_only_changes_mask_flag(self):
         source = {'custom_tasks': '0,1|2,3|4,5', 'seed': 42,
                   'fim_freeze_frac': 0.0, 'device': 'cuda:1',

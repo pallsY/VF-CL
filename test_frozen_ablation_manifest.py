@@ -1,10 +1,38 @@
 import unittest
 
 from frozen_ablation_manifest import (auxiliary_data_paths, derive_config,
-                                       expected_keys, semantic_diff)
+                                       expected_keys, semantic_diff,
+                                       validate_smoke_comparison)
 
 
 class FrozenManifestTests(unittest.TestCase):
+    def test_smoke_comparison_requires_every_dataset_and_each_gate(self):
+        report = {
+            'default_on_bitwise': True,
+            'off_task0_identical': True,
+            'sample_order_identical_all_tasks': True,
+            'fim_tensor_values_compared': True,
+            'off_task1_model_diverged': True,
+            'off_applied_freeze_fraction': 0,
+            'test_accessed': False,
+            'orchestration_commit': 'a' * 40,
+            'smoke_script_sha256': 'b' * 64,
+            'raw_smoke_sha256': {mode: 'c' * 64 for mode in
+                                 ('base', 'default_on', 'off')},
+            'raw_config_sha256': {mode: 'd' * 64 for mode in
+                                  ('base', 'default_on', 'off')},
+            'raw_no_test_sha256': {mode: 'e' * 64 for mode in
+                                   ('base', 'default_on', 'off')},
+        }
+        comparison = {name: report for name in
+                      ('cifar100', 'isolet', 'upmc_food101')}
+        validate_smoke_comparison(comparison)
+        with self.assertRaisesRegex(ValueError, 'all datasets'):
+            validate_smoke_comparison({'isolet': report})
+        with self.assertRaisesRegex(ValueError, 'did not pass'):
+            validate_smoke_comparison({**comparison, 'cifar100': {
+                **report, 'fim_tensor_values_compared': False}})
+
     def setUp(self):
         self.source = {
             'seed': 42, 'cl_method': 'proto_evolve',
