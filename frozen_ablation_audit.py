@@ -12,12 +12,14 @@ from collections import defaultdict
 from fractions import Fraction
 from pathlib import Path
 
+from frozen_ablation_seal import verify_formal_seal
+
 from frozen_ablation_manifest import (
     AUX_DATA_SHA, BASE_COMMIT, DATASETS, DATA_SHA, PATCH_COMMIT,
-    RESULT_ROOT, SEEDS, SOURCE_ANCHOR_SHA, SOURCE_ROOT,
+    RESULT_ROOT, SEEDS, SOURCE_ANCHOR_SHA, SOURCE_ROOT, SMOKE_PRODUCER_COMMIT,
     auxiliary_data_paths, derive_config, expected_keys,
     original_tree_sha256, runtime_identity, semantic_diff,
-    validate_smoke_comparison, _bytes,
+    validate_smoke_comparison, validate_publication_preflight, _bytes,
 )
 
 GPU_UUID = {
@@ -32,6 +34,13 @@ def sha(path):
         for chunk in iter(lambda: stream.read(1 << 20), b''):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def verify_run_gate(run, gate):
+    sealed_hashes = verify_formal_seal(run)
+    if any(gate.get(field) != value for field, value in sealed_hashes.items()):
+        raise ValueError('formal ablation result hashes differ from gate')
+    return sealed_hashes
 
 
 def party_kd_contribution_label(deltas):
@@ -63,7 +72,12 @@ def audit_metadata(manifest, digest):
     comparison = json.loads(smoke_path.read_text())
     validate_smoke_comparison(comparison)
     from frozen_ablation_smoke import validate_smoke_records
-    validate_smoke_records(evidence / 'smokes', comparison)
+    validate_smoke_records(evidence / 'smokes', comparison,
+                           producer_commit=SMOKE_PRODUCER_COMMIT)
+    publication_sha = validate_publication_preflight(evidence / 'publication')
+    if (any(row.get('publication_preflight_sha256') != publication_sha for row in rows) or
+            preflight.get('publication_preflight_sha256') != publication_sha):
+        raise ValueError('publication preflight identity differs')
     row_hashes = {
         name: {row.get(name) for row in rows}
         for name in ('preflight_sha256', 'smoke_comparison_sha256',
@@ -133,7 +147,7 @@ def audit_metadata(manifest, digest):
             old_attest[record['job']] = record
     if len(old_attest) != 9:
         raise ValueError('original formal attestations are incomplete')
-    cache, tree_cache = {}, {}
+    cache, tree_cache, source_seals = {}, {}, {}
     def cached_sha(path):
         path = Path(path)
         if path not in cache:
@@ -167,9 +181,8 @@ def audit_metadata(manifest, digest):
                 cached_sha(original_published) != old_attest[old_key]['file_sha256'][
                     'run/FORMAL_EVALUATION_PUBLISHED.json']):
             raise ValueError(f'original formal job changed: {key}')
-        old_pub = json.loads(original_published.read_text())
-        if cached_sha(source / 'results.json') != old_pub['results_sha256']:
-            raise ValueError(f'original formal score source changed: {key}')
+        if source not in source_seals:
+            source_seals[source] = verify_formal_seal(source)
         data_path = (Path(source_config['data_path']) / 'cifar-100-python/train'
                      if dataset == 'cifar100' else Path(source_config['vector_npz']))
         if (cached_sha(data_path) != DATA_SHA[dataset] or
@@ -223,31 +236,7 @@ def audit_metadata(manifest, digest):
                 json.loads(runtime_path.read_text()).get('runtime') !=
                 formal_runtime or gate.get('runtime') != formal_runtime):
             raise ValueError(f'ablation runtime identity differs: {key}')
-        expected_files = {
-            'results_sha256': run / 'results.json',
-            'checkpoint_sha256': run / 'checkpoints/formal_final.pt',
-            'formal_complete_sha256': run / 'FORMAL_EVALUATION_COMPLETE.json',
-            'formal_sealed_sha256': run / 'FORMAL_EVALUATION_SEALED.json',
-            'formal_published_sha256': run / 'FORMAL_EVALUATION_PUBLISHED.json',
-            'test_access_sha256': run / 'formal_access/test.consumed.json',
-        }
-        if any(cached_sha(path) != gate[field]
-               for field, path in expected_files.items()):
-            raise ValueError(f'formal ablation result hashes differ: {key}')
-        access_files = list((run / 'formal_access').glob('test.*.json'))
-        access = json.loads(expected_files['test_access_sha256'].read_text())
-        published = json.loads(expected_files['formal_published_sha256'].read_text())
-        complete = json.loads(expected_files['formal_complete_sha256'].read_text())
-        sealed = json.loads(expected_files['formal_sealed_sha256'].read_text())
-        if (len(access_files) != 1 or
-                access.get('status') != 'consumed' or
-                access.get('access', {}).get('split') != 'test' or
-                access.get('access', {}).get('event') != 'first_iteration' or
-                complete.get('status') != 'complete' or
-                sealed.get('status') != 'sealed' or
-                published.get('status') != 'published' or
-                published.get('results_sha256') != gate['results_sha256']):
-            raise ValueError(f'formal test was not accessed exactly once: {key}')
+        verify_run_gate(run, gate)
         if arm == 'fim_off':
             count = len(re.findall(r'FIM applied freeze: 0/\d+ bottom elements '
                                    r'\(fraction=0\.000000\)', log.read_text()))

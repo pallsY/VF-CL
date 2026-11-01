@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import platform
+import re
 import shutil
 import socket
 import subprocess
@@ -12,7 +13,8 @@ from pathlib import PurePosixPath
 
 SOURCE_ROOT = Path('/brf/users/yangxx/VFCL-results/adaptive-sample-only-fourparty-v1-20261017')
 RESULT_ROOT = PurePosixPath(
-    '/brf/users/yangxx/VFCL-results/frozen-method-module-ablation-v1-20261031')
+    '/brf/users/yangxx/VFCL-results/frozen-method-module-ablation-v2-20261101')
+SMOKE_PRODUCER_COMMIT = 'af049e37e37fd2882bb8768913e55be96c0a50c3'
 BASE_COMMIT = 'e2a559dc4945729848225cf21fdc95451762c231'
 PATCH_COMMIT = 'b13ac243d7b4acd3f6a512e4addc7122e4f4a38c'
 SOURCE_ANCHOR_SHA = '08db7e2c0c2ee6c1471aa576812baa3de6a1f95268b582d53df7a57ed66d8f3c'
@@ -159,14 +161,41 @@ def runtime_identity():
     }
 
 
-def load_preflight(smoke_path, smoke_root, review_path):
+def validate_publication_preflight(root):
+    root = Path(root)
+    report_path = root / 'PUBLICATION_PREFLIGHT.json'
+    report = json.loads(report_path.read_text())
+    log_text = (root / 'publication-tests.log').read_text(encoding='utf-8')
+    code = Path(__file__).resolve().parent
+    commit = subprocess.check_output(['git', '-C', str(code), 'rev-parse', 'HEAD'], text=True).strip()
+    if (report.get('status') != 'passed' or report.get('returncode') != 0 or
+            report.get('platform') != 'linux' or
+            report.get('linux_producer_fixture_passed') is not True or
+            report.get('skipped_tests') != 0 or
+            'skipped' in log_text.lower() or
+            not re.search(r'^test_full_linux_producer_fixture_passes_formal_seal .* \.\.\. ok$', log_text, re.M) or
+            report.get('orchestration_commit') != commit or
+            report.get('real_test_access') is not False or
+            report.get('log_sha256') != _sha(root / 'publication-tests.log')):
+        raise ValueError('synthetic publication preflight did not pass this code')
+    modules = ('test_frozen_ablation_run', 'test_frozen_ablation_audit',
+               'test_frozen_ablation_manifest', 'test_frozen_ablation_smoke',
+               'test_frozen_fim_application')
+    if report.get('test_source_sha256') != {m: _sha(code / (m + '.py')) for m in modules}:
+        raise ValueError('publication preflight test sources changed')
+    return _sha(report_path)
+
+
+def load_preflight(smoke_path, smoke_root, review_path, publication_root):
     smoke_bytes = Path(smoke_path).read_bytes()
     review_bytes = Path(review_path).read_bytes()
     comparison = json.loads(smoke_bytes)
     review = json.loads(review_bytes)
     validate_smoke_comparison(comparison)
     from frozen_ablation_smoke import validate_smoke_records
-    validate_smoke_records(smoke_root, comparison)
+    validate_smoke_records(smoke_root, comparison,
+                           producer_commit=SMOKE_PRODUCER_COMMIT)
+    publication_sha = validate_publication_preflight(publication_root)
     expected_diff = patch_diff_sha256()
     if (review.get('verdict') != 'approved' or
             not isinstance(review.get('reviewer_id'), str) or
@@ -185,6 +214,7 @@ def load_preflight(smoke_path, smoke_root, review_path):
         'patch_diff_sha256': expected_diff,
         'smoke_comparison_sha256': hashlib.sha256(smoke_bytes).hexdigest(),
         'patch_review_sha256': hashlib.sha256(review_bytes).hexdigest(),
+        'publication_preflight_sha256': publication_sha,
     }
     preflight_bytes = _pretty_bytes(record)
     record['preflight_sha256'] = hashlib.sha256(preflight_bytes).hexdigest()
@@ -197,6 +227,8 @@ def load_preflight(smoke_path, smoke_root, review_path):
                 relative = Path('smokes') / dataset / mode / name
                 smoke_files[relative] = (
                     smoke_root / dataset / mode / name).read_bytes()
+    for name in ('PUBLICATION_PREFLIGHT.json', 'publication-tests.log'):
+        smoke_files[Path('publication') / name] = (Path(publication_root) / name).read_bytes()
     return {'record': record, 'preflight_bytes': preflight_bytes,
             'smoke_bytes': smoke_bytes, 'review_bytes': review_bytes,
             'smoke_files': smoke_files}
@@ -306,6 +338,7 @@ def manifest_entries(preflight):
                 'smoke_comparison_sha256'],
             'patch_review_sha256': preflight['record']['patch_review_sha256'],
             'patch_diff_sha256': preflight['record']['patch_diff_sha256'],
+            'publication_preflight_sha256': preflight['record']['publication_preflight_sha256'],
         }
         entries.append((row, config))
     if len(entries) != 18:
@@ -356,6 +389,7 @@ def main():
     parser.add_argument('--smoke-comparison', type=Path, required=True)
     parser.add_argument('--smoke-root', type=Path, required=True)
     parser.add_argument('--patch-review', type=Path, required=True)
+    parser.add_argument('--publication-preflight', type=Path, required=True)
     args = parser.parse_args()
     commit = subprocess.check_output(
         ['git', '-C', str(Path(__file__).parent), 'rev-parse', 'HEAD'],
@@ -366,7 +400,7 @@ def main():
     if status:
         raise ValueError('manifest generator checkout is not clean')
     preflight = load_preflight(args.smoke_comparison, args.smoke_root,
-                               args.patch_review)
+                               args.patch_review, args.publication_preflight)
     entries = manifest_entries(preflight)
     payload = b''.join(_bytes(row) for row, _ in entries)
     preview = {'jobs': len(entries), 'manifest_sha256': hashlib.sha256(payload).hexdigest(),

@@ -293,7 +293,7 @@ def run_smoke(dataset, mode, code_root, output):
     return record
 
 
-def _build_smoke_comparison(root):
+def _build_smoke_comparison(root, producer_commit=None):
     import numpy as np
     import torch
 
@@ -306,7 +306,14 @@ def _build_smoke_comparison(root):
             ['git', '-C', str(orchestration_root), 'status', '--porcelain'],
             text=True).strip():
         raise ValueError('smoke orchestration checkout is not clean')
-    smoke_script_sha256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    if producer_commit is not None:
+        orchestration_commit = producer_commit
+        script_bytes = subprocess.check_output([
+            'git', '-C', str(orchestration_root), 'show',
+            f'{producer_commit}:frozen_ablation_smoke.py'])
+    else:
+        script_bytes = Path(__file__).read_bytes()
+    smoke_script_sha256 = hashlib.sha256(script_bytes).hexdigest()
     current_runtime = runtime_identity()
     reports = {}
     for dataset in ('cifar100', 'isolet', 'upmc_food101'):
@@ -428,8 +435,8 @@ def _build_smoke_comparison(root):
     return reports
 
 
-def validate_smoke_records(root, comparison):
-    reports = _build_smoke_comparison(root)
+def validate_smoke_records(root, comparison, producer_commit=None):
+    reports = _build_smoke_comparison(root, producer_commit=producer_commit)
     if reports != comparison:
         raise ValueError('preflight comparison does not match raw smoke artifacts')
     return reports

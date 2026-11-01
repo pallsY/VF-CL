@@ -16,12 +16,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
 
+from frozen_ablation_seal import verify_formal_seal
+
 from frozen_ablation_manifest import (
     AUX_DATA_SHA, BASE_COMMIT, DATA_SHA, PATCH_COMMIT, RESULT_ROOT, SOURCE_ROOT,
-    SOURCE_ANCHOR_SHA,
+    SOURCE_ANCHOR_SHA, SMOKE_PRODUCER_COMMIT,
     _sha, auxiliary_data_paths, derive_config, expected_keys,
     patch_diff_sha256, runtime_identity, semantic_diff,
-    validate_smoke_comparison, _bytes,
+    validate_smoke_comparison, validate_publication_preflight, _bytes,
 )
 
 GPU_UUID = {
@@ -80,33 +82,6 @@ def wait_headroom(index, stop):
     return None
 
 
-def verify_formal_seal(run):
-    run = Path(run)
-    paths = {
-        'results_sha256': run / 'results.json',
-        'checkpoint_sha256': run / 'checkpoints/formal_final.pt',
-        'formal_complete_sha256': run / 'FORMAL_EVALUATION_COMPLETE.json',
-        'formal_sealed_sha256': run / 'FORMAL_EVALUATION_SEALED.json',
-        'formal_published_sha256': run / 'FORMAL_EVALUATION_PUBLISHED.json',
-        'test_access_sha256': run / 'formal_access/test.consumed.json',
-    }
-    if any(not path.is_file() for path in paths.values()):
-        raise ValueError('formal result or single test-access seal is absent')
-    complete = json.loads(paths['formal_complete_sha256'].read_text())
-    sealed = json.loads(paths['formal_sealed_sha256'].read_text())
-    published = json.loads(paths['formal_published_sha256'].read_text())
-    access = json.loads(paths['test_access_sha256'].read_text())
-    if (complete.get('status') != 'complete' or
-            sealed.get('status') != 'sealed' or
-            published.get('status') != 'published' or
-            published.get('results_sha256') != _sha(paths['results_sha256']) or
-            access.get('status') != 'consumed' or
-            access.get('access', {}).get('split') != 'test' or
-            access.get('access', {}).get('event') != 'first_iteration'):
-        raise ValueError('formal test did not seal one authorized access')
-    return {key: _sha(path) for key, path in paths.items()}
-
-
 def code_identity(path, expected):
     path = Path(path).resolve()
     head = subprocess.check_output(['git', '-C', str(path), 'rev-parse', 'HEAD'],
@@ -128,7 +103,7 @@ def verify_preflight(manifest, rows):
         raise ValueError('preflight evidence is missing')
     values = {name: {row.get(name) for row in rows} for name in (
         'preflight_sha256', 'smoke_comparison_sha256',
-        'patch_review_sha256', 'patch_diff_sha256')}
+        'patch_review_sha256', 'patch_diff_sha256', 'publication_preflight_sha256')}
     if any(len(value) != 1 for value in values.values()):
         raise ValueError('preflight identity differs across manifest rows')
     record = json.loads(record_path.read_text())
@@ -136,7 +111,12 @@ def verify_preflight(manifest, rows):
     comparison = json.loads(smoke_path.read_text())
     validate_smoke_comparison(comparison)
     from frozen_ablation_smoke import validate_smoke_records
-    validate_smoke_records(evidence / 'smokes', comparison)
+    validate_smoke_records(evidence / 'smokes', comparison,
+                           producer_commit=SMOKE_PRODUCER_COMMIT)
+    publication_sha = validate_publication_preflight(evidence / 'publication')
+    if (values['publication_preflight_sha256'] != {publication_sha} or
+            record.get('publication_preflight_sha256') != publication_sha):
+        raise ValueError('publication preflight identity differs')
     preflight_sha = next(iter(values['preflight_sha256']))
     smoke_sha = next(iter(values['smoke_comparison_sha256']))
     review_sha = next(iter(values['patch_review_sha256']))
