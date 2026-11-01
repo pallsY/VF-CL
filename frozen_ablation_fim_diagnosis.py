@@ -22,6 +22,13 @@ check_no_test = admission.check_no_test
 HASH = smoke.value_hash
 
 
+def require_environment():
+    for name, value in dict(CUBLAS_WORKSPACE_CONFIG=':4096:8', OMP_NUM_THREADS='1',
+                            MKL_NUM_THREADS='1', PYTHONHASHSEED='42').items():
+        if os.environ.get(name) != value:
+            raise ValueError(f'diagnosis requires startup environment {name}={value}')
+
+
 def fresh_output(output):
     output = admission.independent_path(output)
     output.mkdir(parents=True, exist_ok=False)
@@ -41,7 +48,8 @@ def inventory(root, excluded=()):
 
 def code_hashes():
     return {Path(path).name: admission.sha(path)
-            for path in (__file__, admission.__file__, smoke.__file__, admission.manifest.__file__)}
+            for path in (__file__, admission.__file__, smoke.__file__, admission.manifest.__file__,
+                         Path(__file__).with_name('run_frozen_fim_diagnosis.sh'))}
 
 
 def require_clean_checkout():
@@ -247,6 +255,7 @@ def capture(code_root, output, historical_candidate):
     output = fresh_output(output)
     payload = dict(tensors=[], quantiles=[])
     try:
+        require_environment()
         require_clean_checkout()
         old_files = inventory(Path(historical_candidate) / 'base')
         old_meta, old, _ = historical(historical_candidate, 'candidate')
@@ -288,6 +297,7 @@ def replay(capture_root, historical_reference, historical_candidate, output):
     try:
         capture_root = admission.independent_path(capture_root)
         sealed = load_seal(capture_root)
+        require_environment()
         require_clean_checkout()
         provenance = json.loads((capture_root / 'CAPTURE.json').read_text())
         if (sealed.get('status') != 'capture_bound' or
@@ -374,6 +384,7 @@ def replay(capture_root, historical_reference, historical_candidate, output):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest='command', required=True)
+    commands.add_parser('check-environment')
     capturing = commands.add_parser('capture')
     capturing.add_argument('--code-root', type=Path, required=True)
     replaying = commands.add_parser('replay')
@@ -383,6 +394,9 @@ def main():
         sub.add_argument('--historical-candidate', type=Path, required=True)
         sub.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
+    if args.command == 'check-environment':
+        require_environment()
+        return
     if args.command == 'capture':
         result = capture(args.code_root, args.output, args.historical_candidate)
     else:

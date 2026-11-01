@@ -1,5 +1,8 @@
 import copy
 import json
+import os
+import subprocess
+import sys
 import tempfile
 import unittest
 import numpy as np
@@ -21,6 +24,45 @@ class DiagnosisTests(unittest.TestCase):
     def row(self, value=1.0):
         return dict(task=0, name='party0/weight', kind='mean', shape=[], dtype='torch.float32',
                     values=[value], selected=True, accumulated=True)
+
+    def test_required_startup_environment_rejects_each_missing_or_wrong_value(self):
+        required = dict(CUBLAS_WORKSPACE_CONFIG=':4096:8', OMP_NUM_THREADS='1',
+                        MKL_NUM_THREADS='1', PYTHONHASHSEED='42')
+        with patch.dict(os.environ, required, clear=True):
+            diagnosis.require_environment()
+        for name in required:
+            for value in (None, 'wrong'):
+                changed = dict(required)
+                if value is None:
+                    changed.pop(name)
+                else:
+                    changed[name] = value
+                with self.subTest(name=name, value=value), patch.dict(
+                        os.environ, changed, clear=True), self.assertRaisesRegex(ValueError, name):
+                    diagnosis.require_environment()
+
+    def test_missing_startup_environment_blocks_capture_and_replay_before_gpu_gate(self):
+        with tempfile.TemporaryDirectory() as temporary, patch.object(
+                admission, 'ALLOWED_ROOTS', (Path(temporary),)), patch.dict(os.environ, {}, clear=True), \
+                patch.object(admission, 'wait_gate') as gate, patch.object(admission, 'run') as training, \
+                patch.object(diagnosis, 'load_seal', return_value={}):
+            root = Path(temporary)
+            with self.assertRaisesRegex(ValueError, 'CUBLAS_WORKSPACE_CONFIG'):
+                diagnosis.capture(root / 'code', root / 'capture-output', root / 'old')
+            with self.assertRaisesRegex(ValueError, 'CUBLAS_WORKSPACE_CONFIG'):
+                diagnosis.replay(root / 'capture', root / 'reference', root / 'old', root / 'replay-output')
+            gate.assert_not_called()
+            training.assert_not_called()
+
+    @unittest.skipIf(os.name == 'nt', 'shell launcher is verified on Linux')
+    def test_shell_launcher_sets_environment_before_cpu_only_check(self):
+        launcher = Path(__file__).with_name('run_frozen_fim_diagnosis.sh')
+        result = subprocess.run(['bash', str(launcher), sys.executable, 'check-environment'],
+            env=dict(os.environ, CUBLAS_WORKSPACE_CONFIG='wrong', OMP_NUM_THREADS='wrong',
+                     MKL_NUM_THREADS='wrong', PYTHONHASHSEED='0'), capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout, '')
+        self.assertEqual(result.stderr, '')
 
     def test_tolerance_cannot_hide_changed_selection_or_accumulated_mask(self):
         original = self.row()
