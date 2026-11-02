@@ -75,7 +75,167 @@ def party_kd_contribution_label(deltas):
             else 'inconsistent')
 
 
-def audit_metadata(manifest, digest):
+def verify_execution_extension(root, rows, manifest_sha, path, external_sha):
+    """Validate an explicitly anchored execution epoch, never select it implicitly."""
+    root, path = Path(root).resolve(), Path(path).resolve()
+    origin = 'f4735cacf51c41d63a9f87e8933c968cb268637b'
+    candidates = {'cifar100/no_partykd/43'} | {
+        f'isolet/{arm}/{seed}' for arm in ('no_partykd', 'fim_off') for seed in (42, 43, 44)}
+    if (path != root / 'gpu1-rebalance-v1/EXECUTION_EPOCH.json' or
+            path.is_symlink() or sha(path) != external_sha):
+        raise ValueError('execution extension path or external SHA differs')
+    epoch = json.loads(path.read_text())
+    armed_path = path.parent / 'ARMED.json'
+    armed = json.loads(armed_path.read_text())
+    raw = (root / 'ATTEMPTS.jsonl').read_bytes()
+    length, initial_length = epoch.get('ledger_prefix_bytes_length'), armed.get('ledger_bytes_length')
+    if (type(length) is not int or type(initial_length) is not int or
+            initial_length < 0 or length < initial_length or length > len(raw) or
+            (raw and not raw.endswith(b'\n')) or (length and raw[length-1:length] != b'\n') or
+            hashlib.sha256(raw[:length]).hexdigest() != epoch.get('ledger_prefix_sha256') or
+            hashlib.sha256(raw[:initial_length]).hexdigest() != armed.get('ledger_sha256')):
+        raise ValueError('original success prefix or armed ledger bytes changed')
+    prefix = [json.loads(line) for line in raw[:length].splitlines()]
+    by_key = defaultdict(list)
+    for event in prefix:
+        if event.get('execution_epoch_sha256') is not None or event.get('attempt') != 1:
+            raise ValueError('execution extension polluted the original ledger prefix')
+        by_key[event.get('job_key')].append(event)
+    for key, events in by_key.items():
+        if (len(events) != 2 or events[0].get('kind') != 'start' or events[1].get('kind') != 'finish' or
+                events[1].get('classification') != 'success' or events[1].get('returncode') != 0):
+            raise ValueError('execution prefix is not wholly successful and settled')
+    keys = {row['job_key'] for row in rows}
+    assignments = epoch.get('assignments', {})
+    pending = keys - set(by_key)
+    if (not isinstance(assignments, dict) or not pending <= candidates or
+            set(assignments) != pending or set(epoch.get('pending_keys', [])) != pending or
+            len(epoch.get('pending_keys', [])) != len(pending) or
+            set(epoch.get('success_keys', [])) != set(by_key) or
+            len(epoch.get('success_keys', [])) != len(by_key) or not set(by_key) <= keys or
+            set(armed.get('candidate_cap', [])) != candidates or
+            not pending <= set(armed.get('initial_pending', [])) <= candidates):
+        raise ValueError('execution extension expanded or duplicated the allowed pending matrix')
+    cifar = 'cifar100/no_partykd/43'
+    expected_map = {key: (int(key == cifar) if cifar in pending else i % 2)
+                    for i, key in enumerate(sorted(pending))}
+    if assignments != expected_map or set(assignments.values()) != {0, 1} or any(type(v) is not int for v in assignments.values()):
+        raise ValueError('execution extension physical assignment differs')
+    old, retired = epoch.get('old_identity', {}), epoch.get('retired_identity', {})
+    parent = epoch.get('controller_identity', {})
+    identity_fields = ('pid', 'ppid', 'pgrp', 'session', 'start_ticks', 'boot_id', 'cmdline')
+    if (epoch.get('schema_version') != 1 or armed.get('schema_version') != 1 or
+            epoch.get('manifest_sha256') != manifest_sha or armed.get('manifest_sha256') != manifest_sha or
+            epoch.get('armed_sha256') != sha(armed_path) or
+            epoch.get('original_orchestration_commit') != origin or
+            armed.get('original_orchestration_commit') != origin or
+            not re.fullmatch('[0-9a-f]{40}', epoch.get('orchestration_commit', '')) or
+            epoch.get('orchestration_commit') == origin or
+            epoch.get('orchestration_commit') != armed.get('orchestration_commit') or
+            parent != armed.get('controller_identity') or old != armed.get('old_identity') or
+            parent.get('pid') == old.get('pid') or
+            any(field not in old or field not in parent for field in identity_fields) or
+            any(retired.get(field) != old.get(field) for field in ('pid', 'start_ticks', 'boot_id')) or
+            retired.get('state') not in ('Z', 'X', 'gone') or
+            not epoch.get('stopped_utc') or not epoch.get('retired_utc') or
+            armed.get('gpu_uuid') != {str(i): GPU_UUID[i] for i in (0, 1)}):
+        raise ValueError('execution retirement, writer or source identity differs')
+    snapshots = epoch.get('stopped_snapshots', [])
+    if len(snapshots) != 2:
+        raise ValueError('execution retirement lacks two stopped snapshots')
+    for snapshot in snapshots:
+        observed = snapshot.get('identity', {})
+        threads = snapshot.get('threads', [])
+        if (any(observed.get(field) != old.get(field) for field in identity_fields) or
+                observed.get('state') != 'T' or not threads or
+                any(len(thread) != 4 or thread[2] != 'T' or thread[3] or
+                    type(thread[0]) is not int or type(thread[1]) is not int or
+                    thread[0] <= 0 or thread[1] <= 0 for thread in threads) or
+                snapshot.get('ledger_sha256') != epoch['ledger_prefix_sha256'] or
+                snapshot.get('ledger_bytes_length') != length or not snapshot.get('observed_utc')):
+            raise ValueError('execution stopped snapshot has children, changed identity or ledger')
+    if snapshots[0]['threads'] != snapshots[1]['threads']:
+        raise ValueError('execution stopped thread inventories differ')
+    files = epoch.get('metadata_files_sha256', {})
+    expected_paths = {'QUEUE_LOCK.json', 'QUEUE_COMPLETE.json', 'QUEUE_FAILURE.json',
+                      'manifests/manifest.jsonl', 'manifests/manifest.sha256',
+                      'gpu1-rebalance-v1/ARMED.json'}
+    plan_paths = {f'{k.split("/")[1]}/{k.split("/")[0]}/{k.split("/")[2]}/attempt-01.plan.json': k
+                  for k in keys}
+    expected_paths.update(plan_paths)
+    if (set(files) != expected_paths or
+            hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest() != epoch.get('metadata_sha256') or
+            files.get('manifests/manifest.jsonl') != manifest_sha or
+            files.get('gpu1-rebalance-v1/ARMED.json') != epoch['armed_sha256']):
+        raise ValueError('execution immutable metadata inventory differs')
+    for relative, expected_sha in files.items():
+        target = root / relative
+        if expected_sha is not None:
+            if target.is_symlink() or not target.is_file() or sha(target) != expected_sha:
+                raise ValueError('execution immutable metadata bytes changed')
+        elif relative == 'QUEUE_COMPLETE.json' or (relative in plan_paths and plan_paths[relative] in pending):
+            continue
+        elif target.exists() or target.is_symlink():
+            raise ValueError('execution created an unapproved metadata path')
+    lock = json.loads((root / 'QUEUE_LOCK.json').read_text())
+    if (lock.get('pid') != old['pid'] or lock.get('manifest_sha256') != manifest_sha or
+            lock.get('orchestration_commit') != origin):
+        raise ValueError('original queue lock identity differs')
+    return epoch
+
+
+def verify_execution_source(epoch, armed):
+    root = Path(__file__).resolve().parent
+    names = ('frozen_ablation_gpu1_continue.py', 'frozen_ablation_quiescent.py', 'frozen_ablation_audit.py')
+    head = subprocess.check_output(['git', '-C', str(root), 'rev-parse', 'HEAD'], text=True).strip()
+    dirty = subprocess.check_output(['git', '-C', str(root), 'status', '--porcelain'], text=True).strip()
+    if (head != epoch['orchestration_commit'] or dirty or
+            armed.get('orchestration_files_sha256') != {name: sha(root / name) for name in names} or
+            armed.get('training_commits') != {'no_partykd': BASE_COMMIT, 'fim_off': PATCH_COMMIT}):
+        raise ValueError('execution audit source is not the clean pinned orchestration and training code')
+
+
+def verify_execution_job(root, row, config, start, finish, gate, runtime, epoch, epoch_sha):
+    key = row['job_key']
+    index = epoch['assignments'][key]
+    binding = dict(execution_epoch_sha256=epoch_sha, controller_identity=epoch['controller_identity'],
+                   gpu_index=index, gpu_uuid=GPU_UUID[index], logical_device='cuda:0',
+                   cuda_visible_devices=[GPU_UUID[index], GPU_UUID[1-index]])
+    if config['device'] != 'cuda:0':
+        raise ValueError('execution extension changed original logical CUDA device')
+    for name, record in (('start', start), ('finish', finish), ('gate', gate), ('runtime', runtime)):
+        if any(record.get(k) != v for k, v in binding.items()):
+            raise ValueError(f'execution {name} physical/logical identity differs: {key}')
+    for record in (runtime, gate):
+        if (record.get('observed_cuda_uuid_order') != binding['cuda_visible_devices'] or
+                record.get('job_key') != key or record.get('attempt') != 1 or
+                record.get('manifest_sha256') != epoch['manifest_sha256'] or
+                record.get('config_sha256') != row['config_sha256'] or
+                record.get('training_code_commit') != row['code_commit']):
+            raise ValueError(f'execution observed CUDA identities differ: {key}')
+    job_root = Path(config['output_dir']).parent
+    if (json.loads((job_root / 'attempt-01.plan.json').read_text()) != {'job_key': key, 'attempt': 1} or
+            (job_root / 'attempt-01/APPROVED_CONFIG.json').read_bytes() !=
+            (Path(root) / 'manifests' / row['config_relpath']).read_bytes() or
+            (job_root / 'attempt-01/config.json').read_bytes() !=
+            (Path(root) / 'manifests' / row['config_relpath']).read_bytes()):
+        raise ValueError(f'execution original config copy or plan differs: {key}')
+    protocol = Path(root) / 'gpu1-rebalance-v1/workers' / key.replace('/', '__')
+    ready, go = (json.loads((protocol / name).read_text()) for name in ('READY.json', 'GO.json'))
+    worker = ready.get('worker_identity', {})
+    expected = dict(job_key=key, attempt=1, config_sha256=row['config_sha256'],
+                    training_code_commit=row['code_commit'], **binding, worker_identity=worker)
+    if (ready != expected or go != expected or runtime.get('worker_identity') != worker or
+            gate.get('worker_identity') != worker or worker.get('ppid') != epoch['controller_identity']['pid'] or
+            not isinstance(worker.get('pid'), int) or worker.get('pid') <= 0 or
+            worker.get('session') != worker['pid'] or worker.get('pgrp') != worker['pid'] or
+            not worker.get('start_ticks') or not worker.get('boot_id') or not worker.get('cmdline')):
+        raise ValueError(f'execution READY/GO or worker identity differs: {key}')
+
+
+def audit_metadata(manifest, digest, *, execution_epoch=None, execution_epoch_sha256=None):
+    if bool(execution_epoch) != bool(execution_epoch_sha256):
+        raise ValueError('execution extension requires both explicit path and external SHA')
     manifest = Path(manifest).resolve()
     root = Path(RESULT_ROOT)
     if (manifest != root / 'manifests/manifest.jsonl' or
@@ -85,6 +245,10 @@ def audit_metadata(manifest, digest):
     rows = [json.loads(line) for line in manifest.read_text().splitlines()]
     if len(rows) != 18 or {row['job_key'] for row in rows} != expected_keys():
         raise ValueError('formal ablation matrix is incomplete')
+    epoch = (verify_execution_extension(root, rows, digest, execution_epoch, execution_epoch_sha256)
+             if execution_epoch else None)
+    if epoch:
+        verify_execution_source(epoch, json.loads((Path(execution_epoch).parent / 'ARMED.json').read_text()))
     evidence = manifest.parent / 'preflight'
     preflight_path = evidence / 'PRELAUNCH_PREFLIGHT.json'
     smoke_path = evidence / 'SMOKE_COMPARISON.json'
@@ -137,11 +301,14 @@ def audit_metadata(manifest, digest):
     ledger_path = root / 'ATTEMPTS.jsonl'
     if (queue.get('status') != 'complete' or
             queue.get('manifest_sha256') != digest or
-            queue.get('orchestration_commit') != rows[0]['orchestration_commit'] or
+            queue.get('orchestration_commit') != (epoch['orchestration_commit'] if epoch else rows[0]['orchestration_commit']) or
             queue.get('accounted_for') != 18 or
             queue.get('successes') != 18 or
             queue.get('attempts_sha256') != sha(ledger_path)):
         raise ValueError('formal ablation queue is not completely sealed')
+    if epoch and (queue.get('original_orchestration_commit') != rows[0]['orchestration_commit'] or
+                  queue.get('execution_epoch_sha256') != execution_epoch_sha256):
+        raise ValueError('queue completion is not bound to the actual execution extension')
     events = [json.loads(line) for line in ledger_path.read_text().splitlines()]
     if len(events) != 36:
         raise ValueError('formal ablation ledger has missing or extra events')
@@ -231,13 +398,14 @@ def audit_metadata(manifest, digest):
                 gpu != int(config['device'][-1])):
             raise ValueError(f'formal ablation identity differs: {key}')
         start, finish = by_key[key]
+        execution_gpu = epoch['assignments'].get(key, gpu) if epoch else gpu
         if (start.get('kind') != 'start' or finish.get('kind') != 'finish' or
                 start.get('attempt') != 1 or
                 finish.get('attempt') != 1 or
                 start.get('config_sha256') != row['config_sha256'] or
                 start.get('code_commit') != code or
-                start.get('gpu_index') != gpu or
-                start.get('gpu_uuid') != GPU_UUID[gpu] or
+                start.get('gpu_index') != execution_gpu or
+                start.get('gpu_uuid') != GPU_UUID[execution_gpu] or
                 finish.get('classification') != 'success' or
                 finish.get('returncode') != 0 or
                 finish.get('test_accessed') is not True):
@@ -261,6 +429,12 @@ def audit_metadata(manifest, digest):
                 json.loads(runtime_path.read_text()).get('runtime') !=
                 formal_runtime or gate.get('runtime') != formal_runtime):
             raise ValueError(f'ablation runtime identity differs: {key}')
+        if epoch and key in epoch['assignments']:
+            verify_execution_job(root, row, config, start, finish, gate,
+                                 json.loads(runtime_path.read_text()), epoch, execution_epoch_sha256)
+        elif any(record.get('execution_epoch_sha256') is not None for record in
+                 (start, finish, gate, json.loads(runtime_path.read_text()))):
+            raise ValueError(f'unapproved execution extension metadata: {key}')
         verify_run_gate(run, gate)
         if arm == 'fim_off':
             count = len(re.findall(r'FIM applied freeze: 0/\d+ bottom elements '
@@ -318,9 +492,12 @@ def main():
     parser.add_argument('--manifest', type=Path, required=True)
     parser.add_argument('--manifest-sha256', required=True)
     parser.add_argument('--summarize', action='store_true')
+    parser.add_argument('--execution-epoch', type=Path)
+    parser.add_argument('--execution-epoch-sha256')
     args = parser.parse_args()
     root = Path(RESULT_ROOT)
-    audited, ledger_sha = audit_metadata(args.manifest, args.manifest_sha256)
+    audited, ledger_sha = audit_metadata(args.manifest, args.manifest_sha256,
+        execution_epoch=args.execution_epoch, execution_epoch_sha256=args.execution_epoch_sha256)
     pass_path = root / 'INDEPENDENT_AUDIT_PASS.json'
     if not args.summarize:
         if pass_path.exists():
@@ -329,6 +506,7 @@ def main():
             json.dump({'status': 'passed', 'jobs': 18,
                        'manifest_sha256': args.manifest_sha256,
                        'ledger_sha256': ledger_sha,
+                       'execution_epoch_sha256': args.execution_epoch_sha256,
                        'job_gate_sha256': {key: item['gate_sha256']
                                            for key, item in audited.items()},
                        'accuracy_opened': False}, stream,
@@ -341,6 +519,7 @@ def main():
     if (passed.get('status') != 'passed' or passed.get('jobs') != 18 or
             passed.get('manifest_sha256') != args.manifest_sha256 or
             passed.get('ledger_sha256') != ledger_sha or
+            passed.get('execution_epoch_sha256') != args.execution_epoch_sha256 or
             passed.get('job_gate_sha256') != {key: item['gate_sha256']
                                               for key, item in audited.items()}):
         raise ValueError('independent audit seal changed before summary')
