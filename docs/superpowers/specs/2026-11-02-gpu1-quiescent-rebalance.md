@@ -10,6 +10,8 @@
 
 若CIFAR43仍未开始，GPU1优先跑它，GPU0接续全部ISOLET；若只有ISOLET，则按固定排序交替分配给0/1。GPU0/1各串行一项，GPU0>=3072MiB、GPU1>=5120MiB连续120秒且启动前复查，固定原UUID；外部共享继续允许。
 
+若空闲点剩余不足2项，或固定分配不能产生双卡并行，则不切换，让旧队列继续；不为没有并行收益的情况退役调度器。
+
 ## 原证据与新的执行映射
 
 原manifest SHA `bb10fa6c62719b68124e7b625a204defc6b3e396ac285c068849fff8866e8fca`，原调度代码f4735cacf51c41d63a9f87e8933c968cb268637b。原训练根e2a559d和b13ac24不改。新控制器调用干净f473模块的load_jobs复用全部原数据、配置、runtime、preflight验证，绝不伪装成旧parent或改QUEUE_LOCK.pid。
