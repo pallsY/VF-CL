@@ -20,6 +20,14 @@ class QuiescentTests(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
+        self.restart_bytes = b'opaque synthetic restart evidence\n'
+        self.restart = self.root / 'manifests/RESTART_ANCHOR.json'
+        self.restart.parent.mkdir()
+        self.restart.write_bytes(self.restart_bytes)
+        anchor_patch = mock.patch.object(q, 'RESTART_ANCHOR_SHA256',
+                                         hashlib.sha256(self.restart_bytes).hexdigest(), create=True)
+        anchor_patch.start()
+        self.addCleanup(anchor_patch.stop)
         self.rows = [dict(job_key=f'{dataset}/{arm}/{seed}', dataset=dataset,
                           arm=arm, seed=seed, physical_gpu=0,
                           config_sha256='a' * 64)
@@ -71,6 +79,27 @@ class QuiescentTests(unittest.TestCase):
                      ['isolet/fim_off/42'] * 2, ['../../escape']):
             with self.subTest(keys=keys), self.assertRaises(ValueError):
                 q.assign_pending(keys)
+
+    def test_pinned_restart_anchor_is_accepted_and_bound(self):
+        self.assertEqual(len(q.ledger_state(self.root, self.rows)['pending']), 18)
+        metadata = q._metadata_snapshot(self.root, self.rows)
+        self.assertEqual(metadata['manifests/RESTART_ANCHOR.json'],
+                         hashlib.sha256(self.restart_bytes).hexdigest())
+
+    def test_restart_anchor_missing_renamed_or_tampered_rejects_before_signals(self):
+        for mutation in ('missing', 'renamed', 'tampered'):
+            self.restart.write_bytes(self.restart_bytes)
+            if mutation == 'missing':
+                self.restart.unlink()
+            elif mutation == 'renamed':
+                self.restart.rename(self.restart.with_name('RENAMED_RESTART_ANCHOR.json'))
+            else:
+                self.restart.write_bytes(self.restart_bytes + b' ')
+            with self.subTest(mutation=mutation), mock.patch.object(
+                    q, 'identity', side_effect=AssertionError('must not inspect process')):
+                with self.assertRaisesRegex(ValueError, 'restart anchor'):
+                    q.try_quiescent_fence(self.root, self.rows, {})
+            self.restart.with_name('RENAMED_RESTART_ANCHOR.json').unlink(missing_ok=True)
 
     def test_complete_raw_prefix_and_unfinished_are_distinct(self):
         row = self.rows[0]

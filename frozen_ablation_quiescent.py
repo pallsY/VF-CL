@@ -17,6 +17,8 @@ from pathlib import Path
 
 from frozen_ablation_manifest import expected_keys
 
+RESTART_ANCHOR_SHA256 = '61d6e229783f12a3d0d02af81b158efea459830d6fe83667df5aab1037d2f00b'
+
 
 def _json(raw):
     def unique(pairs):
@@ -53,6 +55,15 @@ def _directory(path):
         raise ValueError(f'unknown or symlinked job directory: {path}')
 
 
+def _verify_restart_anchor(root):
+    try:
+        digest = _sha(root / 'manifests/RESTART_ANCHOR.json')
+    except ValueError as exc:
+        raise ValueError('required restart anchor is missing or unsafe') from exc
+    if digest != RESTART_ANCHOR_SHA256:
+        raise ValueError('restart anchor SHA differs')
+
+
 def assign_pending(keys):
     """Assign only the seven authorized candidates, with no duplicate claim."""
     keys = list(keys)
@@ -69,6 +80,7 @@ def ledger_state(root, rows):
     """Classify the original eighteen jobs; only hash completed gate/log bytes."""
     root, rows = Path(root), list(rows)
     _directory(root)
+    _verify_restart_anchor(root)
     by_key = {}
     for row in rows:
         key = row.get('job_key')
@@ -117,7 +129,8 @@ def ledger_state(root, rows):
             _directory(entry)
             if entry.name == 'manifests':
                 for item in entry.iterdir():
-                    if item.is_symlink() or item.name not in ('manifest.jsonl', 'manifest.sha256', 'preflight', 'configs'):
+                    if item.is_symlink() or item.name not in ('manifest.jsonl', 'manifest.sha256', 'RESTART_ANCHOR.json',
+                                                             'preflight', 'configs'):
                         raise ValueError('unknown manifest artifact')
                     if item.name in ('preflight', 'configs'):
                         _directory(item)
@@ -193,6 +206,7 @@ def ledger_state(root, rows):
             raise ValueError('unknown finish classification')
     if _read(root / 'ATTEMPTS.jsonl') != raw:
         raise ValueError('ledger changed during observation')
+    _verify_restart_anchor(root)
     return state
 
 
@@ -276,11 +290,11 @@ def _no_new_writer(root):
 
 def _metadata_snapshot(root, rows):
     paths = [root / name for name in ('QUEUE_LOCK.json', 'QUEUE_COMPLETE.json', 'QUEUE_FAILURE.json')]
-    paths += [root / 'manifests' / name for name in ('manifest.jsonl', 'manifest.sha256')]
+    paths += [root / 'manifests' / name for name in ('manifest.jsonl', 'manifest.sha256', 'RESTART_ANCHOR.json')]
     paths += [root / 'gpu1-rebalance-v1/ARMED.json']
     paths += [root / row['arm'] / row['dataset'] / str(row['seed']) / 'attempt-01.plan.json'
               for row in rows]
-    return {str(path.relative_to(root)): _sha(path) if path.exists() or path.is_symlink() else None
+    return {path.relative_to(root).as_posix(): _sha(path) if path.exists() or path.is_symlink() else None
             for path in paths}
 
 
