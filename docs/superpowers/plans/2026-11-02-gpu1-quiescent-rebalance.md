@@ -37,3 +37,5 @@ Create `frozen_ablation_gpu1_continue.py` and tests. Reuse Task A exact interfac
 - [x] Save handoff evidence and monitor PID/children/ledger/JOB_SUCCESS hashes/GPU identities/FAILURE/COMPLETE only. Report progress, effective assignments, checks, limits. Do not consume accuracies until complete/audited.
 
 Execution status: fixed57af7ce passed79 Linux tests without skips, actual18-job readonly validation, GPU alias probe, NAS atomic-link probe and independent review. Watcher3268813 is armed, not yet an active mapping as of the latest snapshot; legacy3216187 still runs. Deployment and pending transition are recorded in reports/2026-11-02-gpu1-rebalance-armed.md. No job retry or accuracy reading.
+
+Transition observed: epoch9d17fe3b327aba8806611e4eca23515d509685b0b1bd10dd2faf05b3ec09da7b created after11 legacy successes. Both GPU0 isolet/fim_off/42 andGPU1 cifar100/no_partykd/43 started undercontroller3268813. Independent remote CPU transition metadata audit passed. See active report; earlier armed-only note is historical.
