@@ -3,9 +3,11 @@
 import argparse
 import json
 import os
+import signal
 import subprocess
 import sys
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,6 +21,24 @@ from party_drift_queue import classify_failure, queue_run_lock, reserve_attempt
 from replay_fim_queue import GPU_UUID, _write_once, gpu_eligible, gpu_snapshot, wait_headroom
 
 STAGE_A_DECISION = Path('/brf/users/yangxx/VFCL-results/allparty-fim-final-attempt-v1-20261029/adjudication/STAGE_A_DECISION.json')
+
+
+def terminate_process_group(process):
+    try:
+        os.killpg(process.pid, signal.SIGTERM)
+    except ProcessLookupError:
+        return
+    deadline = time.monotonic() + 5
+    while time.monotonic() < deadline:
+        try:
+            os.killpg(process.pid, 0)
+        except ProcessLookupError:
+            return
+        time.sleep(0.1)
+    try:
+        os.killpg(process.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
 
 
 def validate_rows(rows):
@@ -89,7 +109,15 @@ def run_queue(manifest, manifest_sha, *, preflight=False):
         events = result_root / 'ATTEMPTS.jsonl'
         events.open('x', encoding='utf-8').close()
         mutex, stop = threading.Lock(), threading.Event()
+        process_mutex, processes = threading.Lock(), {}
         outcomes = {}
+
+        def stop_all():
+            with process_mutex:
+                stop.set()
+                active = list(processes.values())
+            for process in active:
+                terminate_process_group(process)
 
         def append(value):
             with mutex, events.open('a', encoding='utf-8') as stream:
@@ -128,33 +156,43 @@ def run_queue(manifest, manifest_sha, *, preflight=False):
                     'OMP_NUM_THREADS': '1', 'MKL_NUM_THREADS': '1',
                 })
                 with log.open('x', encoding='utf-8') as stream:
-                    process = subprocess.run([
-                        sys.executable, '-u', str(checkout / 'f_off_formal_worker.py'),
-                        '--job-key', key, '--manifest', str(manifest),
-                        '--manifest-sha256', manifest_sha,
-                    ], cwd=checkout, env=environment, stdout=stream,
-                       stderr=subprocess.STDOUT)
+                    with process_mutex:
+                        if stop.is_set():
+                            return
+                        process = subprocess.Popen([
+                            sys.executable, '-u', str(checkout / 'f_off_formal_worker.py'),
+                            '--job-key', key, '--manifest', str(manifest),
+                            '--manifest-sha256', manifest_sha,
+                        ], cwd=checkout, env=environment, stdout=stream,
+                           stderr=subprocess.STDOUT, start_new_session=True)
+                        processes[index] = process
+                    try:
+                        returncode = process.wait()
+                    finally:
+                        with process_mutex:
+                            processes.pop(index, None)
                 gate_path = job_root / 'attempt-01/JOB_SUCCESS.json'
-                if process.returncode == 0 and gate_path.is_file():
+                if returncode == 0 and gate_path.is_file():
                     try:
                         verify_success(gate_path.parent, row, manifest_sha)
                         classification = 'success'
                     except (ValueError, KeyError, FileNotFoundError):
                         classification = 'unknown'
                 else:
-                    classification = classify_failure(process.returncode or 1,
+                    classification = classify_failure(returncode or 1,
                         log.read_text(encoding='utf-8', errors='replace')[-100000:])
                 with mutex:
                     outcomes[key] = classification
                 append({'kind': 'finish', 'job_key': key, 'attempt': 1,
                         'classification': classification,
-                        'returncode': process.returncode,
+                        'returncode': returncode,
                         'log_sha256': digest(log),
                         'job_success_sha256': (digest(gate_path)
                                                if classification == 'success' else None),
                         'time_utc': datetime.now(timezone.utc).isoformat()})
                 if classification != 'success':
-                    stop.set()
+                    stop_all()
+                    terminate_process_group(process)
                     return
 
         error = None
@@ -164,7 +202,7 @@ def run_queue(manifest, manifest_sha, *, preflight=False):
                 try:
                     future.result()
                 except Exception as exc:
-                    stop.set()
+                    stop_all()
                     error = exc
         complete = not stop.is_set() and len(outcomes) == 9 and all(
             value == 'success' for value in outcomes.values())
