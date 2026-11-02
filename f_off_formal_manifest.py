@@ -9,7 +9,7 @@ from pathlib import Path, PurePosixPath
 from party_drift_manifest import DATASETS, DATA_SHA256, _canonical_bytes, write_manifest_files
 from replay_fim_manifest import EPOCHS
 
-ROOT = PurePosixPath('/brf/users/yangxx/VFCL-results/f-off-formal-followup-v3-20261102')
+ROOT = PurePosixPath('/brf/users/yangxx/VFCL-results/f-off-formal-followup-v4-20261102')
 SOURCE_ROOT = PurePosixPath('/brf/users/yangxx/VFCL-results/adaptive-sample-only-fourparty-v1-20261017')
 SOURCE_CONFIG_SHA256 = {
     'cifar100': {

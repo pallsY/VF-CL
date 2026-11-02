@@ -1,6 +1,7 @@
 """One-attempt, two-GPU fail-stop queue for the disclosed F-off formal runs."""
 
 import argparse
+from contextlib import contextmanager
 import json
 import os
 import signal
@@ -21,6 +22,27 @@ from party_drift_queue import classify_failure, queue_run_lock, reserve_attempt
 from replay_fim_queue import GPU_UUID, _write_once, gpu_eligible, gpu_snapshot, wait_headroom
 
 STAGE_A_DECISION = Path('/brf/users/yangxx/VFCL-results/allparty-fim-final-attempt-v1-20261029/adjudication/STAGE_A_DECISION.json')
+
+
+@contextmanager
+def stop_on_signals(stop_all):
+    previous = {number: signal.getsignal(number)
+                for number in (signal.SIGTERM, signal.SIGINT)}
+    stopped = False
+
+    def handler(_signum, _frame):
+        nonlocal stopped
+        if not stopped:
+            stopped = True
+            stop_all()
+
+    for number in previous:
+        signal.signal(number, handler)
+    try:
+        yield
+    finally:
+        for number, original in previous.items():
+            signal.signal(number, original)
 
 
 def terminate_process_group(process):
@@ -196,12 +218,13 @@ def run_queue(manifest, manifest_sha, *, preflight=False):
                     return
 
         error = None
-        with ThreadPoolExecutor(max_workers=2) as pool:
-            futures = [pool.submit(lane, index) for index in (0, 1)]
-            for future in as_completed(futures):
+        with stop_on_signals(stop_all):
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                futures = [pool.submit(lane, index) for index in (0, 1)]
                 try:
-                    future.result()
-                except Exception as exc:
+                    for future in as_completed(futures):
+                        future.result()
+                except BaseException as exc:
                     stop_all()
                     error = exc
         complete = not stop.is_set() and len(outcomes) == 9 and all(

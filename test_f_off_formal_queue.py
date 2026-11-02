@@ -3,11 +3,18 @@ import os
 import subprocess
 import sys
 
-from f_off_formal_queue import validate_rows, terminate_process_group
+from f_off_formal_queue import validate_rows, terminate_process_group, stop_on_signals
 from f_off_formal_manifest import expected_keys
 
 
 class FormalQueueTests(unittest.TestCase):
+    @unittest.skipUnless(os.name == 'posix', 'signals are a Linux execution gate')
+    def test_parent_sigterm_calls_fail_stop(self):
+        calls = []
+        with stop_on_signals(lambda: calls.append('stop')):
+            os.kill(os.getpid(), __import__('signal').SIGTERM)
+        self.assertEqual(calls, ['stop'])
+
     @unittest.skipUnless(os.name == 'posix', 'process groups are a Linux execution gate')
     def test_failure_terminates_inflight_sibling_group(self):
         process = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(30)'],
