@@ -26,6 +26,7 @@ GPU_UUID = {
     0: 'GPU-6c7fee92-a6fe-5525-c554-bddb8e14943f',
     1: 'GPU-6569e526-43ea-74e1-264e-4b66417181e1',
 }
+RESTART_ANCHOR_SHA256 = '61d6e229783f12a3d0d02af81b158efea459830d6fe83667df5aab1037d2f00b'
 
 
 def sha(path):
@@ -162,6 +163,7 @@ def verify_execution_extension(root, rows, manifest_sha, path, external_sha):
     files = epoch.get('metadata_files_sha256', {})
     expected_paths = {'QUEUE_LOCK.json', 'QUEUE_COMPLETE.json', 'QUEUE_FAILURE.json',
                       'manifests/manifest.jsonl', 'manifests/manifest.sha256',
+                      'manifests/RESTART_ANCHOR.json',
                       'gpu1-rebalance-v1/ARMED.json'}
     plan_paths = {f'{k.split("/")[1]}/{k.split("/")[0]}/{k.split("/")[2]}/attempt-01.plan.json': k
                   for k in keys}
@@ -169,6 +171,7 @@ def verify_execution_extension(root, rows, manifest_sha, path, external_sha):
     if (set(files) != expected_paths or
             hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest() != epoch.get('metadata_sha256') or
             files.get('manifests/manifest.jsonl') != manifest_sha or
+            files.get('manifests/RESTART_ANCHOR.json') != RESTART_ANCHOR_SHA256 or
             files.get('gpu1-rebalance-v1/ARMED.json') != epoch['armed_sha256']):
         raise ValueError('execution immutable metadata inventory differs')
     for relative, expected_sha in files.items():

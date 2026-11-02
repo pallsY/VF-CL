@@ -14,6 +14,11 @@ class ExtensionAuditTests(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
+        self.restart_raw = b'synthetic restart anchor\n'
+        patch = mock.patch.object(audit, 'RESTART_ANCHOR_SHA256',
+                                  hashlib.sha256(self.restart_raw).hexdigest(), create=True)
+        patch.start()
+        self.addCleanup(patch.stop)
 
     def fixture(self):
         pending = ['isolet/fim_off/43', 'isolet/no_partykd/44']
@@ -39,6 +44,7 @@ class ExtensionAuditTests(unittest.TestCase):
         (self.root / 'manifests').mkdir()
         (self.root / 'manifests/manifest.jsonl').write_text('synthetic manifest')
         (self.root / 'manifests/manifest.sha256').write_text('synthetic external anchor')
+        (self.root / 'manifests/RESTART_ANCHOR.json').write_bytes(self.restart_raw)
         manifest_sha = continuation.sha(self.root / 'manifests/manifest.jsonl')
         armed['manifest_sha256'] = manifest_sha
         (extension / 'ARMED.json').write_text(json.dumps(armed))
@@ -47,6 +53,7 @@ class ExtensionAuditTests(unittest.TestCase):
         metadata = {name: continuation.sha(self.root / name) if (self.root / name).is_file() else None
                     for name in ['QUEUE_LOCK.json', 'QUEUE_COMPLETE.json', 'QUEUE_FAILURE.json',
                                  'manifests/manifest.jsonl', 'manifests/manifest.sha256',
+                                 'manifests/RESTART_ANCHOR.json',
                                  'gpu1-rebalance-v1/ARMED.json']}
         metadata.update({f'{k.split("/")[1]}/{k.split("/")[0]}/{k.split("/")[2]}/attempt-01.plan.json': None
                          for k in audit.expected_keys()})
@@ -100,6 +107,28 @@ class ExtensionAuditTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'preflight'):
                 audit.audit_metadata(manifest, continuation.sha(manifest))
             extension.assert_not_called()
+
+    def test_restart_anchor_missing_tampered_or_forged_record_is_rejected(self):
+        rows, path, epoch, _ = self.fixture()
+        anchor = self.root / 'manifests/RESTART_ANCHOR.json'
+        for change in ('missing', 'tampered', 'forged_record'):
+            changed = json.loads(json.dumps(epoch))
+            with self.subTest(change=change):
+                try:
+                    if change == 'missing':
+                        anchor.unlink()
+                    else:
+                        anchor.write_bytes(b'changed restart anchor\n')
+                    if change == 'forged_record':
+                        changed['metadata_files_sha256']['manifests/RESTART_ANCHOR.json'] = continuation.sha(anchor)
+                        changed['metadata_sha256'] = hashlib.sha256(json.dumps(
+                            changed['metadata_files_sha256'], sort_keys=True).encode()).hexdigest()
+                    path.write_text(json.dumps(changed))
+                    with self.assertRaises(ValueError):
+                        audit.verify_execution_extension(self.root, rows, epoch['manifest_sha256'],
+                                                         path, continuation.sha(path))
+                finally:
+                    anchor.write_bytes(self.restart_raw)
 
     def test_extension_arguments_are_an_explicit_pair(self):
         with self.assertRaises(ValueError):
