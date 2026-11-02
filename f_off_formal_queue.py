@@ -12,7 +12,7 @@ from pathlib import Path
 
 from f_off_formal_manifest import (
     ROOT, STAGE_A_SHA, digest, expected_keys, load_approved_job,
-    validate_stage_a,
+    pinned_checkout, validate_stage_a,
 )
 from f_off_formal_worker import validate_sources
 from party_drift_queue import classify_failure, queue_run_lock, reserve_attempt
@@ -52,6 +52,7 @@ def run_queue(manifest, manifest_sha, *, preflight=False):
     checkout = Path(__file__).resolve().parent
     commit = subprocess.check_output(['git', '-C', str(checkout), 'rev-parse', 'HEAD'],
                                      text=True).strip()
+    pinned_checkout(commit)
     manifest = Path(manifest).resolve()
     result_root = Path(ROOT / 'formal')
     if (manifest != Path(ROOT / 'manifests/formal/manifest.jsonl')

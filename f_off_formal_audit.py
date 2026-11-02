@@ -6,8 +6,25 @@ import math
 import statistics
 from pathlib import Path
 
-from f_off_formal_manifest import ROOT, STAGE_A_SHA, digest, expected_keys
+from f_off_formal_manifest import ROOT, STAGE_A_SHA, SOURCE_CONFIG_SHA256, SOURCE_ROOT, digest, expected_keys, pinned_checkout
 from f_off_formal_queue import GPU_UUID, validate_rows
+
+
+def formal_score(dataset, result):
+    if dataset == 'cifar100':
+        bic = result['bic_final']
+        audit = bic['calibration_audit']
+        if (bic['fit']['mode'] != 'joint_alpha_beta'
+                or audit.get('passed') is not True
+                or audit.get('overlap_count') != 0
+                or audit.get('test_used_for_fit') is not False):
+            raise ValueError('formal CIFAR BiC calibration is invalid')
+        score = bic['paired']['calibrated']['overall_accuracy']
+    else:
+        score = result['cl_metrics']['AA_final']
+    if type(score) not in (int, float) or not math.isfinite(score) or not 0 <= score <= 1:
+        raise ValueError('formal Class-IL score is invalid')
+    return score
 
 
 def summarize(values):
@@ -39,6 +56,7 @@ def audit_and_summarize(manifest, manifest_sha, output):
     queue_path = root / 'QUEUE_COMPLETE.json'
     ledger_path = root / 'ATTEMPTS.jsonl'
     queue = json.loads(queue_path.read_text(encoding='utf-8'))
+    pinned_checkout(queue.get('code_commit'))
     if ((root / 'QUEUE_FAILURE.json').exists()
             or queue.get('status') != 'complete'
             or queue.get('stage') != 'formal_followup'
@@ -59,6 +77,12 @@ def audit_and_summarize(manifest, manifest_sha, output):
     # Validate every artifact and input before opening any results.json content.
     for row in rows:
         key = row['job_key']
+        dataset, _, _, seed_text = key.split('/')
+        if (row.get('code_commit') != queue['code_commit']
+                or row.get('source_config_path') != str(
+                    SOURCE_ROOT / 'full' / dataset / 'adaptive' / seed_text / 'run/config.json')
+                or row.get('source_config_sha256') != SOURCE_CONFIG_SHA256[dataset][int(seed_text)]):
+            raise ValueError(f'formal source/code identity differs: {key}')
         pair = by_key[key]
         if (len(pair) != 2 or pair[0].get('kind') != 'start'
                 or pair[1].get('kind') != 'finish'
@@ -87,6 +111,7 @@ def audit_and_summarize(manifest, manifest_sha, output):
         if (digest(gate_path) != pair[1].get('job_success_sha256')
                 or digest(root / key / 'attempt-01.log') != pair[1].get('log_sha256')
                 or gate.get('status') != 'success' or gate.get('job_key') != key
+                or gate.get('code_commit') != queue['code_commit']
                 or gate.get('manifest_sha256') != manifest_sha):
             raise ValueError(f'formal success gate changed: {key}')
         for field, path in (
@@ -119,7 +144,7 @@ def audit_and_summarize(manifest, manifest_sha, output):
     values = {'cifar100': {}, 'isolet': {}, 'upmc_food101': {}}
     for row in rows:
         result = json.loads((root / row['job_key'] / 'attempt-01/results.json').read_text())
-        metric = result['cl_metrics']['AA_final']
+        metric = formal_score(row['dataset'], result)
         values[row['dataset']][row['seed']] = metric
     summary = {
         'status': 'audited_formal_followup',

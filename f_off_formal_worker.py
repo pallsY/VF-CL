@@ -7,7 +7,7 @@ from pathlib import Path
 
 import torch
 
-from f_off_formal_manifest import digest, load_approved_job
+from f_off_formal_manifest import digest, load_approved_job, pinned_checkout
 from run_party_drift_development import (
     attempt_args, authorize_queue_attempt, write_attempt_configs,
 )
@@ -35,6 +35,7 @@ def run_job(job_key, manifest, manifest_sha):
     checkout = Path(__file__).resolve().parent
     commit = subprocess.check_output(['git', '-C', str(checkout), 'rev-parse', 'HEAD'],
                                      text=True).strip()
+    pinned_checkout(commit)
     row = load_approved_job(job_key, manifest, manifest_sha, commit)
     config_path = (Path(manifest).resolve().parent / row['config_relpath']).resolve()
     config = json.loads(config_path.read_text(encoding='utf-8'))
@@ -85,6 +86,7 @@ def run_job(job_key, manifest, manifest_sha):
         json.dump({
             'status': 'success', 'stage': 'formal_followup',
             'job_key': job_key, 'attempt': 1, 'manifest_sha256': manifest_sha,
+            'code_commit': commit,
             'checkpoint_sha256': digest(checkpoint),
             'results_sha256': digest(results),
             'published_sha256': digest(published),

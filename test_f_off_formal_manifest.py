@@ -21,6 +21,14 @@ class FormalManifestTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 validate_stage_a(path, digest(path))
 
+    def test_dirty_checkout_cannot_pass_code_identity_gate(self):
+        from unittest.mock import patch
+        import f_off_formal_manifest as m
+        commit = 'a' * 40
+        with patch.object(m.subprocess, 'check_output', side_effect=[commit, ' M runner.py']):
+            with self.assertRaises(ValueError):
+                m.pinned_checkout(commit)
+
     def test_exact_nine_jobs(self):
         keys = expected_keys()
         self.assertEqual(len(keys), 9)
@@ -65,6 +73,9 @@ class FormalManifestTests(unittest.TestCase):
                     'code_commit': 'a' * 40,
                     'stage_a_decision_sha256': m.STAGE_A_SHA,
                     'dataset': dataset, 'seed': seed, 'physical_gpu': index % 2,
+                    'source_config_path': str(m.SOURCE_ROOT / 'full' / dataset /
+                                              'adaptive' / seed_text / 'run/config.json'),
+                    'source_config_sha256': m.SOURCE_CONFIG_SHA256[dataset][seed],
                     'config_relpath': 'configs/' + key.replace('/', '_').replace('.', 'p') + '.json',
                     'config_sha256': hashlib.sha256(_canonical_bytes(config)).hexdigest(),
                 }
