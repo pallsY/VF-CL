@@ -238,6 +238,60 @@ class ContinuationTests(unittest.TestCase):
                 continuation.validate_old_parent({**parent, 'start_ticks': 61}, self.root,
                                                   '/result/manifests/manifest.jsonl', roots)
 
+    def test_legacy_import_binds_original_manifest_even_when_new_manifest_is_cached(self):
+        import frozen_ablation_manifest as current_manifest
+        source = Path(continuation.__file__).parent
+        old_root = self.root / 'old-origin'
+        old_root.mkdir()
+        for name in ('frozen_ablation_manifest.py', 'frozen_ablation_run.py'):
+            (old_root / name).write_bytes((source / name).read_bytes())
+        before_path = sys.path[:]
+        with mock.patch.object(continuation, 'pinned_checkout', return_value=old_root), \
+             mock.patch.object(sys, 'path', list(sys.path)):
+            legacy = continuation.load_legacy(old_root)
+        validator = legacy.validate_publication_preflight
+        self.assertEqual(Path(validator.__globals__['__file__']), old_root / 'frozen_ablation_manifest.py')
+        self.assertEqual(Path(validator.__code__.co_filename), old_root / 'frozen_ablation_manifest.py')
+        self.assertEqual(sys.path, before_path)
+        self.assertIs(sys.modules['frozen_ablation_manifest'], current_manifest)
+        self.assertIsNot(validator, current_manifest.validate_publication_preflight)
+        modules = ('test_frozen_ablation_run', 'test_frozen_ablation_audit',
+                   'test_frozen_ablation_manifest', 'test_frozen_ablation_smoke',
+                   'test_frozen_fim_application')
+        for name in modules:
+            (old_root / (name + '.py')).write_bytes((source / (name + '.py')).read_bytes())
+        publication = self.root / 'publication'
+        publication.mkdir()
+        log = publication / 'publication-tests.log'
+        log.write_text('test_full_linux_producer_fixture_passes_formal_seal '
+                       '(test_frozen_ablation_run.AblationRunTests) ... ok\n')
+        report = dict(status='passed', returncode=0, platform='linux',
+                      linux_producer_fixture_passed=True, skipped_tests=0,
+                      orchestration_commit=continuation.ORIGIN_COMMIT, real_test_access=False,
+                      log_sha256=continuation.sha(log), test_source_sha256={
+                          name: continuation.sha(old_root / (name + '.py')) for name in modules})
+        report_path = publication / 'PUBLICATION_PREFLIGHT.json'
+        continuation.write_once(report_path, report)
+        with mock.patch.object(continuation.subprocess, 'check_output', return_value=continuation.ORIGIN_COMMIT + '\n'):
+            self.assertEqual(validator(publication), continuation.sha(report_path))
+            report_path.write_text(json.dumps({**report, 'orchestration_commit': '0' * 40}))
+            with self.assertRaisesRegex(ValueError, 'did not pass this code'):
+                validator(publication)
+            report_path.write_text(json.dumps(report))
+            (old_root / 'test_frozen_ablation_run.py').write_text('changed source')
+            with self.assertRaisesRegex(ValueError, 'test sources changed'):
+                validator(publication)
+
+    def test_failed_legacy_import_restores_the_current_manifest_module(self):
+        import frozen_ablation_manifest as current_manifest
+        (self.root / 'frozen_ablation_manifest.py').write_bytes(Path(current_manifest.__file__).read_bytes())
+        (self.root / 'frozen_ablation_run.py').write_text("raise RuntimeError('synthetic import failure')\n")
+        with mock.patch.object(continuation, 'pinned_checkout', return_value=self.root), \
+             mock.patch.object(sys, 'path', list(sys.path)):
+            with self.assertRaisesRegex(RuntimeError, 'synthetic import failure'):
+                continuation.load_legacy(self.root)
+        self.assertIs(sys.modules['frozen_ablation_manifest'], current_manifest)
+
     def test_actual_cuda_order_requires_exactly_two_expected_uuids(self):
         fake = SimpleNamespace(cuda=SimpleNamespace(device_count=lambda: 2,
             get_device_properties=lambda i: SimpleNamespace(uuid=continuation.GPU_UUID[1-i])))

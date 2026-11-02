@@ -63,6 +63,13 @@ class ExtensionAuditTests(unittest.TestCase):
                      stopped_snapshots=[dict(observed_utc='time', identity=dict(old, state='T'),
                          threads=[[1, 10, 'T', []]], ledger_sha256=hashlib.sha256(prefix).hexdigest(),
                          ledger_bytes_length=len(prefix))] * 2)
+        roots = {'no_partykd': '/pinned/base', 'fim_off': '/pinned/patch'}
+        armed.update(legacy_root='/pinned/origin', code_roots=roots)
+        (extension / 'ARMED.json').write_text(json.dumps(armed))
+        metadata['gpu1-rebalance-v1/ARMED.json'] = continuation.sha(extension / 'ARMED.json')
+        epoch.update(legacy_root='/pinned/origin', code_roots=roots,
+                     armed_sha256=metadata['gpu1-rebalance-v1/ARMED.json'],
+                     metadata_sha256=hashlib.sha256(json.dumps(metadata, sort_keys=True).encode()).hexdigest())
         path = extension / 'EXECUTION_EPOCH.json'
         continuation.write_once(path, epoch)
         (self.root / 'ATTEMPTS.jsonl').write_bytes(prefix)
@@ -97,6 +104,25 @@ class ExtensionAuditTests(unittest.TestCase):
     def test_extension_arguments_are_an_explicit_pair(self):
         with self.assertRaises(ValueError):
             audit.audit_metadata(self.root / 'missing', 'x', execution_epoch=self.root / 'epoch')
+
+    def test_publication_validation_delegates_to_pinned_origin_only_in_extension_mode(self):
+        self.assertTrue(hasattr(audit, 'audit_publication_preflight'), 'origin publication delegation missing')
+        import frozen_ablation_gpu1_continue as continuation
+        legacy = mock.Mock()
+        legacy.validate_publication_preflight.return_value = 'origin-publication-sha'
+        path = self.root / 'publication'
+        epoch = {'legacy_root': '/pinned/origin'}
+        with mock.patch.object(continuation, 'load_legacy', return_value=legacy) as load, \
+             mock.patch.object(audit, 'validate_publication_preflight', return_value='current-sha') as current:
+            self.assertEqual(audit.audit_publication_preflight(path, None), 'current-sha')
+            load.assert_not_called()
+            self.assertEqual(audit.audit_publication_preflight(path, epoch), 'origin-publication-sha')
+            load.assert_called_once_with('/pinned/origin')
+            legacy.validate_publication_preflight.assert_called_once_with(path)
+            self.assertEqual(current.call_count, 1)
+            legacy.validate_publication_preflight.side_effect = ValueError('original source rejection')
+            with self.assertRaisesRegex(ValueError, 'original source rejection'):
+                audit.audit_publication_preflight(path, epoch)
 
     def test_execution_job_rejects_runtime_config_copy_and_handshake_tampering(self):
         key = 'isolet/fim_off/43'

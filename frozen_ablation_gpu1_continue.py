@@ -128,10 +128,28 @@ def pinned_checkout(root, commit):
 
 def load_legacy(root):
     root = pinned_checkout(root, ORIGIN_COMMIT)
+    manifest_spec = importlib.util.spec_from_file_location(
+        '_gpu1_legacy_manifest_f473', root / 'frozen_ablation_manifest.py')
+    manifest_module = importlib.util.module_from_spec(manifest_spec)
+    manifest_spec.loader.exec_module(manifest_module)
+    # A may already have imported the new manifest. Bind the real old module
+    # while executing old imports so its validators retain their own __file__
+    # and globals; never substitute a commit value in a current validator.
+    absent = object()
+    previous_manifest = sys.modules.get('frozen_ablation_manifest', absent)
+    previous_path = sys.path[:]
+    sys.modules['frozen_ablation_manifest'] = manifest_module
     sys.path.insert(0, str(root))
-    spec = importlib.util.spec_from_file_location('_gpu1_legacy_f473', root / 'frozen_ablation_run.py')
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    try:
+        spec = importlib.util.spec_from_file_location('_gpu1_legacy_f473', root / 'frozen_ablation_run.py')
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+    finally:
+        sys.path[:] = previous_path
+        if previous_manifest is absent:
+            sys.modules.pop('frozen_ablation_manifest', None)
+        else:
+            sys.modules['frozen_ablation_manifest'] = previous_manifest
     return module
 
 

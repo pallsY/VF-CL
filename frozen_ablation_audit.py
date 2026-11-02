@@ -132,6 +132,9 @@ def verify_execution_extension(root, rows, manifest_sha, path, external_sha):
             not re.fullmatch('[0-9a-f]{40}', epoch.get('orchestration_commit', '')) or
             epoch.get('orchestration_commit') == origin or
             epoch.get('orchestration_commit') != armed.get('orchestration_commit') or
+            not epoch.get('legacy_root') or epoch.get('legacy_root') != armed.get('legacy_root') or
+            set(epoch.get('code_roots', {})) != {'no_partykd', 'fim_off'} or
+            epoch.get('code_roots') != armed.get('code_roots') or
             parent != armed.get('controller_identity') or old != armed.get('old_identity') or
             parent.get('pid') == old.get('pid') or
             any(field not in old or field not in parent for field in identity_fields) or
@@ -193,6 +196,13 @@ def verify_execution_source(epoch, armed):
             armed.get('orchestration_files_sha256') != {name: sha(root / name) for name in names} or
             armed.get('training_commits') != {'no_partykd': BASE_COMMIT, 'fim_off': PATCH_COMMIT}):
         raise ValueError('execution audit source is not the clean pinned orchestration and training code')
+
+
+def audit_publication_preflight(path, epoch):
+    if epoch is None:
+        return validate_publication_preflight(path)
+    from frozen_ablation_gpu1_continue import load_legacy
+    return load_legacy(epoch['legacy_root']).validate_publication_preflight(path)
 
 
 def verify_execution_job(root, row, config, start, finish, gate, runtime, epoch, epoch_sha):
@@ -263,7 +273,7 @@ def audit_metadata(manifest, digest, *, execution_epoch=None, execution_epoch_sh
     from frozen_ablation_smoke import validate_smoke_records
     validate_smoke_records(evidence / 'smokes', comparison,
                            producer_commit=SMOKE_PRODUCER_COMMIT)
-    publication_sha = validate_publication_preflight(evidence / 'publication')
+    publication_sha = audit_publication_preflight(evidence / 'publication', epoch)
     if (any(row.get('publication_preflight_sha256') != publication_sha for row in rows) or
             preflight.get('publication_preflight_sha256') != publication_sha):
         raise ValueError('publication preflight identity differs')
