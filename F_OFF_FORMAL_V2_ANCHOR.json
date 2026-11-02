@@ -1,0 +1,13 @@
+{
+  "code_commit": "8cb5358622ef3bb0480a1e215a1f8690886756bf",
+  "gpu_uuid": {
+    "0": "GPU-6c7fee92-a6fe-5525-c554-bddb8e14943f",
+    "1": "GPU-6569e526-43ea-74e1-264e-4b66417181e1"
+  },
+  "manifest_sha256": "747c41c9a6435ee1c446b0caae62cec81ec22c7d66a54c7e67aa78e5a60c0a5a",
+  "protocol_sha256": "b7cf8f4a7fc6d79f2b5e81f71cfe6204c19089a9d9f0c993e791ae3fc25aaa00",
+  "protocol_v2_amendment_sha256": "6846ac7ebfce00ee51ce896e1e6a1c2774dc135e896a234e5b453240dce1dc57",
+  "result_root": "/brf/users/yangxx/VFCL-results/f-off-formal-followup-v2-20261102/formal",
+  "stage": "formal_followup",
+  "stage_a_closed_decision_sha256": "46a1081417d262f9de737f32a229705f1b46469f451813bcabaee2f7f2aa36e2"
+}
